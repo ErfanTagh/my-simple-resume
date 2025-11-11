@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: resume_mongodb
+    restart: always
+    ports:
+      - "127.0.0.1:27017:27017"  # Only accessible from localhost
+    volumes:
+      - mongodb_data:/data/db
+      - ./backup:/backup  # For backups
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGODB_NAME}
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - resume-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: resume_backend
+    restart: always
+    expose:
+      - "8000"  # Only expose to internal network, not host
+    volumes:
+      - ./backend:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    env_file:
+      - .env
+    environment:
+      - MONGODB_CONNECTION_STRING=mongodb://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@mongodb:27017/${MONGODB_NAME}?authSource=admin
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    command: sh -c "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 4 --timeout 60"
+    networks:
+      - resume-network
+
+  frontend:
+    build:
+      context: ./frontend/skill-step-form
+      dockerfile: Dockerfile.prod
+    container_name: resume_frontend
+    restart: always
+    expose:
+      - "80"
+    volumes:
+      - frontend_build:/app/dist
+    environment:
+      - VITE_API_URL=https://${DOMAIN}/api
+    networks:
+      - resume-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: resume_nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+      - static_volume:/app/staticfiles:ro
+      - media_volume:/app/media:ro
+      - frontend_build:/usr/share/nginx/html:ro
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - resume-network
+
+  certbot:
+    image: certbot/certbot
+    container_name: resume_certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    networks:
+      - resume-network
+
+volumes:
+  mongodb_data:
+  static_volume:
+  media_volume:
+  frontend_build:
+
+networks:
+  resume-network:
+    driver: bridge
+

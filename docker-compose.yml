@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: resume_mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: resume_db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - resume-network
+
+  backend:
+    build: ./backend
+    container_name: resume_backend
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - SECRET_KEY=django-insecure-dev-key-change-this-in-production-12345678
+      - DEBUG=True
+      - MONGODB_HOST=mongodb
+      - MONGODB_PORT=27017
+      - MONGODB_NAME=resume_db
+      - ALLOWED_HOSTS=localhost,127.0.0.1,backend
+      - CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000,http://frontend:5173
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    networks:
+      - resume-network
+
+  frontend:
+    image: node:18-alpine
+    container_name: resume_frontend
+    restart: always
+    working_dir: /app
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend/skill-step-form:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8000/api
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    depends_on:
+      - backend
+    networks:
+      - resume-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  resume-network:
+    driver: bridge
+

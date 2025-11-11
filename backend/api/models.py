@@ -1,0 +1,152 @@
+"""
+Models for CV/Resume data
+"""
+from djongo import models
+from django.contrib.auth.models import User
+
+
+class Interest(models.Model):
+    interest = models.CharField(max_length=100)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return self.interest
+
+
+class Technology(models.Model):
+    technology = models.CharField(max_length=100)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return self.technology
+
+
+class Competency(models.Model):
+    competency = models.CharField(max_length=100)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return self.competency
+
+
+class Course(models.Model):
+    course = models.CharField(max_length=200)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return self.course
+
+
+class PersonalInfo(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    professional_title = models.CharField(max_length=200, blank=True, null=True)
+    profile_image = models.URLField(blank=True, null=True)
+    email = models.EmailField()
+    phone = models.CharField(max_length=50, blank=True, null=True)
+    location = models.CharField(max_length=200, blank=True, null=True)
+    linkedin = models.URLField(blank=True, null=True)
+    github = models.URLField(blank=True, null=True)
+    website = models.URLField(blank=True, null=True)
+    summary = models.TextField(blank=True, null=True)
+    interests = models.ArrayField(model_container=Interest, blank=True, null=True)
+
+    class Meta:
+        abstract = True
+
+
+class WorkExperience(models.Model):
+    position = models.CharField(max_length=200)
+    company = models.CharField(max_length=200)
+    location = models.CharField(max_length=200, blank=True, null=True)
+    start_date = models.CharField(max_length=20, blank=True, null=True)
+    end_date = models.CharField(max_length=20, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    technologies = models.ArrayField(model_container=Technology, blank=True, null=True)
+    competencies = models.ArrayField(model_container=Competency, blank=True, null=True)
+
+    class Meta:
+        abstract = True
+
+
+class Education(models.Model):
+    degree = models.CharField(max_length=200)
+    institution = models.CharField(max_length=200)
+    location = models.CharField(max_length=200, blank=True, null=True)
+    start_date = models.CharField(max_length=20, blank=True, null=True)
+    end_date = models.CharField(max_length=20, blank=True, null=True)
+    field = models.CharField(max_length=200, blank=True, null=True)
+    key_courses = models.ArrayField(model_container=Course, blank=True, null=True)
+
+    class Meta:
+        abstract = True
+
+
+class Project(models.Model):
+    name = models.CharField(max_length=200, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    technologies = models.ArrayField(model_container=Technology, blank=True, null=True)
+    start_date = models.CharField(max_length=20, blank=True, null=True)
+    end_date = models.CharField(max_length=20, blank=True, null=True)
+    link = models.URLField(blank=True, null=True)
+
+    class Meta:
+        abstract = True
+
+
+class Certificate(models.Model):
+    name = models.CharField(max_length=200, blank=True, null=True)
+    organization = models.CharField(max_length=200, blank=True, null=True)
+    issue_date = models.CharField(max_length=20, blank=True, null=True)
+    expiration_date = models.CharField(max_length=20, blank=True, null=True)
+    credential_id = models.CharField(max_length=200, blank=True, null=True)
+    url = models.URLField(blank=True, null=True)
+
+    class Meta:
+        abstract = True
+
+
+class Language(models.Model):
+    language = models.CharField(max_length=100)
+    proficiency = models.CharField(max_length=50)
+
+    class Meta:
+        abstract = True
+
+
+class Skill(models.Model):
+    skill = models.CharField(max_length=100)
+
+    class Meta:
+        abstract = True
+
+
+class Resume(models.Model):
+    """Main Resume/CV model that contains all user information"""
+    _id = models.ObjectIdField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='resumes')
+    personal_info = models.EmbeddedField(model_container=PersonalInfo)
+    work_experience = models.ArrayField(model_container=WorkExperience, blank=True, null=True)
+    education = models.ArrayField(model_container=Education, blank=True, null=True)
+    projects = models.ArrayField(model_container=Project, blank=True, null=True)
+    certificates = models.ArrayField(model_container=Certificate, blank=True, null=True)
+    languages = models.ArrayField(model_container=Language, blank=True, null=True)
+    skills = models.ArrayField(model_container=Skill, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'resumes'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Resume - {self.personal_info.first_name} {self.personal_info.last_name} (User: {self.user.username})"
+

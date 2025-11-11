@@ -1,41 +1,71 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Environment variables
+.env
+.env.local
+.env.production
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
+# Docker volumes
+mongodb_data/
+static_volume/
+media_volume/
+frontend_build/
 
-# testing
-/coverage
+# SSL certificates
+certbot/
 
-# next.js
-/.next/
-/out/
+# Backups
+backup/
 
-# production
-/build
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# misc
-.DS_Store
-*.pem
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+staticfiles/
+media/
 
-# debug
+# Node
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+dist/
+dist-ssr/
 
-# env files (can opt-in for committing if needed)
-.env*
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
-# vercel
-.vercel
+# OS
+.DS_Store
+Thumbs.db
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# Test
+.coverage
+htmlcov/
+.pytest_cache/

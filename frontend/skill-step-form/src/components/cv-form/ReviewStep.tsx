@@ -1,0 +1,283 @@
+import { UseFormReturn } from "react-hook-form";
+import { CVFormData } from "./types";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Mail, Phone, MapPin, Linkedin, Github, Globe, Calendar, Edit } from "lucide-react";
+
+interface ReviewStepProps {
+  form: UseFormReturn<CVFormData>;
+  onEditStep: (step: number) => void;
+}
+
+export const ReviewStep = ({ form, onEditStep }: ReviewStepProps) => {
+  const data = form.getValues();
+
+  const SectionHeader = ({ title, onEdit }: { title: string; onEdit: () => void }) => (
+    <div className="flex items-center justify-between mb-4">
+      <h3 className="text-xl font-semibold text-foreground">{title}</h3>
+      <Button variant="outline" size="sm" onClick={onEdit}>
+        <Edit className="h-4 w-4 mr-2" />
+        Edit
+      </Button>
+    </div>
+  );
+
+  return (
+    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+      <div>
+        <h2 className="text-2xl font-semibold mb-2">Review Your CV</h2>
+        <p className="text-muted-foreground">
+          Review all your information before submitting. You can edit any section if needed.
+        </p>
+      </div>
+
+      <Card className="p-6 space-y-6">
+        {/* Personal Information */}
+        <div>
+          <SectionHeader title="Personal Information" onEdit={() => onEditStep(0)} />
+          <div className="space-y-3">
+            <div>
+              <p className="text-lg font-semibold text-foreground">
+                {data.personalInfo.firstName} {data.personalInfo.lastName}
+              </p>
+              {data.personalInfo.professionalTitle && (
+                <p className="text-sm text-muted-foreground">{data.personalInfo.professionalTitle}</p>
+              )}
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+              {data.personalInfo.email && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Mail className="h-4 w-4" />
+                  <span>{data.personalInfo.email}</span>
+                </div>
+              )}
+              {data.personalInfo.phone && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Phone className="h-4 w-4" />
+                  <span>{data.personalInfo.phone}</span>
+                </div>
+              )}
+              {data.personalInfo.location && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <MapPin className="h-4 w-4" />
+                  <span>{data.personalInfo.location}</span>
+                </div>
+              )}
+              {data.personalInfo.linkedin && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Linkedin className="h-4 w-4" />
+                  <span className="truncate">{data.personalInfo.linkedin}</span>
+                </div>
+              )}
+              {data.personalInfo.github && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Github className="h-4 w-4" />
+                  <span className="truncate">{data.personalInfo.github}</span>
+                </div>
+              )}
+              {data.personalInfo.website && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Globe className="h-4 w-4" />
+                  <span className="truncate">{data.personalInfo.website}</span>
+                </div>
+              )}
+            </div>
+
+            {data.personalInfo.summary && (
+              <div className="mt-3">
+                <p className="text-sm font-medium text-foreground">Professional Summary</p>
+                <p className="text-sm text-muted-foreground mt-1">{data.personalInfo.summary}</p>
+              </div>
+            )}
+
+            {data.personalInfo.interests && data.personalInfo.interests.length > 0 && data.personalInfo.interests.some(i => i.interest) && (
+              <div className="mt-3">
+                <p className="text-sm font-medium text-foreground">Interests & Hobbies</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {data.personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Work Experience */}
+        {data.workExperience.some(exp => exp.position || exp.company) && (
+          <>
+            <div>
+              <SectionHeader title="Work Experience" onEdit={() => onEditStep(1)} />
+              <div className="space-y-4">
+                {data.workExperience.map((exp, index) => (
+                  (exp.position || exp.company) && (
+                    <div key={index} className="space-y-1">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-semibold text-foreground">{exp.position || "Position"}</p>
+                          <p className="text-sm text-muted-foreground">{exp.company || "Company"}</p>
+                          {exp.location && <p className="text-xs text-muted-foreground">{exp.location}</p>}
+                        </div>
+                        {(exp.startDate || exp.endDate) && (
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <Calendar className="h-3 w-3" />
+                            <span>{exp.startDate} - {exp.endDate || "Present"}</span>
+                          </div>
+                        )}
+                      </div>
+                      {exp.description && (
+                        <p className="text-sm text-muted-foreground">{exp.description}</p>
+                      )}
+                    </div>
+                  )
+                ))}
+              </div>
+            </div>
+            <Separator />
+          </>
+        )}
+
+        {/* Education */}
+        {data.education.some(edu => edu.degree || edu.institution) && (
+          <>
+            <div>
+              <SectionHeader title="Education" onEdit={() => onEditStep(2)} />
+              <div className="space-y-4">
+                {data.education.map((edu, index) => (
+                  (edu.degree || edu.institution) && (
+                    <div key={index} className="space-y-1">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-semibold text-foreground">{edu.degree || "Degree"}</p>
+                          <p className="text-sm text-muted-foreground">{edu.institution || "Institution"}</p>
+                          {edu.field && <p className="text-sm text-muted-foreground italic">{edu.field}</p>}
+                          {edu.location && <p className="text-xs text-muted-foreground">{edu.location}</p>}
+                        </div>
+                        {(edu.startDate || edu.endDate) && (
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <Calendar className="h-3 w-3" />
+                            <span>{edu.startDate} - {edu.endDate || "Present"}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )
+                ))}
+              </div>
+            </div>
+            <Separator />
+          </>
+        )}
+
+        {/* Projects */}
+        {data.projects.some(proj => proj.name) && (
+          <>
+            <div>
+              <SectionHeader title="Projects" onEdit={() => onEditStep(3)} />
+              <div className="space-y-4">
+                {data.projects.map((proj, index) => (
+                  proj.name && (
+                    <div key={index} className="space-y-1">
+                      <div className="flex justify-between items-start">
+                        <p className="font-semibold text-foreground">{proj.name}</p>
+                        {(proj.startDate || proj.endDate) && (
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <Calendar className="h-3 w-3" />
+                            <span>{proj.startDate} - {proj.endDate || "Present"}</span>
+                          </div>
+                        )}
+                      </div>
+                      {proj.description && (
+                        <p className="text-sm text-muted-foreground">{proj.description}</p>
+                      )}
+                      {proj.technologies && proj.technologies.length > 0 && proj.technologies.some(t => t.technology) && (
+                        <p className="text-xs text-muted-foreground">
+                          <span className="font-medium">Technologies:</span> {proj.technologies.map(t => t.technology).filter(Boolean).join(", ")}
+                        </p>
+                      )}
+                      {proj.link && (
+                        <a href={proj.link} className="text-xs text-primary hover:underline flex items-center gap-1">
+                          <Globe className="h-3 w-3" />
+                          View Project
+                        </a>
+                      )}
+                    </div>
+                  )
+                ))}
+              </div>
+            </div>
+            <Separator />
+          </>
+        )}
+
+        {/* Certificates */}
+        {data.certificates.some(cert => cert.name) && (
+          <>
+            <div>
+              <SectionHeader title="Certificates" onEdit={() => onEditStep(4)} />
+              <div className="space-y-3">
+                {data.certificates.map((cert, index) => (
+                  cert.name && (
+                    <div key={index} className="space-y-1">
+                      <p className="font-semibold text-foreground">{cert.name}</p>
+                      {cert.organization && (
+                        <p className="text-sm text-muted-foreground">{cert.organization}</p>
+                      )}
+                      <div className="flex gap-3 text-xs text-muted-foreground">
+                        {cert.issueDate && <span>Issued: {cert.issueDate}</span>}
+                        {cert.expirationDate && <span>Expires: {cert.expirationDate}</span>}
+                      </div>
+                      {cert.credentialId && (
+                        <p className="text-xs text-muted-foreground">ID: {cert.credentialId}</p>
+                      )}
+                    </div>
+                  )
+                ))}
+              </div>
+            </div>
+            <Separator />
+          </>
+        )}
+
+        {/* Languages */}
+        {data.languages.some(lang => lang.language) && (
+          <>
+            <div>
+              <SectionHeader title="Languages" onEdit={() => onEditStep(5)} />
+              <div className="flex flex-wrap gap-3 text-sm">
+                {data.languages.map((lang, index) => (
+                  lang.language && (
+                    <div key={index}>
+                      <span className="font-medium text-foreground">{lang.language}</span>
+                      {lang.proficiency && <span className="text-muted-foreground"> - {lang.proficiency}</span>}
+                    </div>
+                  )
+                ))}
+              </div>
+            </div>
+            <Separator />
+          </>
+        )}
+
+        {/* Skills */}
+        {data.skills.some(s => s.skill) && (
+          <div>
+            <SectionHeader title="Skills" onEdit={() => onEditStep(6)} />
+            <div className="flex flex-wrap gap-2">
+              {data.skills.map((s, index) => (
+                s.skill && (
+                  <span key={index} className="px-3 py-1 bg-secondary text-secondary-foreground rounded-full text-sm">
+                    {s.skill}
+                  </span>
+                )
+              ))}
+            </div>
+          </div>
+        )}
+      </Card>
+    </div>
+  );
+};
+

@@ -1,0 +1,235 @@
+"""
+API Views for Resume/CV operations
+"""
+from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from .models import Resume
+from .serializers import ResumeSerializer
+from bson import ObjectId
+
+
+@api_view(['GET', 'POST'])
+def resume_list(request):
+    """
+    List all resumes for the authenticated user or create a new resume
+    """
+    if request.method == 'GET':
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        try:
+            # Get raw data from MongoDB without instantiating abstract models
+            from pymongo import MongoClient
+            from bson import ObjectId as BsonObjectId
+            import os
+            
+            # Connect to MongoDB directly
+            mongo_host = os.getenv('MONGODB_HOST', 'localhost')
+            mongo_port = int(os.getenv('MONGODB_PORT', 27017))
+            mongo_db = os.getenv('MONGODB_NAME', 'resume_db')
+            
+            client = MongoClient(mongo_host, mongo_port)
+            db = client[mongo_db]
+            
+            # Get resumes for this user
+            user_id = request.user.id
+            resumes_cursor = db.resumes.find({'user_id': user_id})
+            
+            resumes_data = []
+            for resume_doc in resumes_cursor:
+                resume_dict = {
+                    'id': str(resume_doc['_id']),
+                    'personal_info': resume_doc.get('personal_info', {}),
+                    'work_experience': resume_doc.get('work_experience', []),
+                    'education': resume_doc.get('education', []),
+                    'projects': resume_doc.get('projects', []),
+                    'certificates': resume_doc.get('certificates', []),
+                    'languages': resume_doc.get('languages', []),
+                    'skills': resume_doc.get('skills', []),
+                    'created_at': resume_doc.get('created_at'),
+                    'updated_at': resume_doc.get('updated_at'),
+                }
+                resumes_data.append(resume_dict)
+            
+            logger.error(f"Found {len(resumes_data)} resumes")
+            return Response(resumes_data)
+        except Exception as e:
+            logger.error(f"Error listing resumes: {str(e)}")
+            import traceback
+            logger.error(traceback.format_exc())
+            return Response(
+                {'error': str(e)}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    elif request.method == 'POST':
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        logger.error(f"Received POST data: {request.data}")
+        
+        serializer = ResumeSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                # Save data from validated_data to model
+                data = serializer.validated_data
+                resume = Resume(
+                    user=request.user,  # Link resume to authenticated user
+                    personal_info=data.get('personal_info'),
+                    work_experience=data.get('work_experience', []),
+                    education=data.get('education', []),
+                    projects=data.get('projects', []),
+                    certificates=data.get('certificates', []),
+                    languages=data.get('languages', []),
+                    skills=data.get('skills', [])
+                )
+                resume.save()
+                
+                # Return the created resume
+                response_serializer = ResumeSerializer(resume)
+                return Response(
+                    response_serializer.data, 
+                    status=status.HTTP_201_CREATED
+                )
+            except Exception as e:
+                logger.error(f"Error saving resume: {str(e)}")
+                import traceback
+                logger.error(traceback.format_exc())
+                return Response(
+                    {'error': str(e)}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+        logger.error(f"Serializer validation failed: {serializer.errors}")
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def resume_detail(request, pk):
+    """
+    Retrieve, update or delete a resume (only if it belongs to the authenticated user)
+    """
+    # Setup MongoDB connection for all methods
+    from pymongo import MongoClient
+    from bson import ObjectId as BsonObjectId
+    import os
+    
+    mongo_host = os.getenv('MONGODB_HOST', 'localhost')
+    mongo_port = int(os.getenv('MONGODB_PORT', 27017))
+    mongo_db = os.getenv('MONGODB_NAME', 'resume_db')
+    
+    client = MongoClient(mongo_host, mongo_port)
+    db = client[mongo_db]
+    
+    # Validate ObjectId format
+    try:
+        resume_id = BsonObjectId(pk)
+    except Exception:
+        return Response(
+            {'error': 'Invalid resume ID format'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    if request.method == 'GET':
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        try:
+            # Get the specific resume
+            resume_doc = db.resumes.find_one({'_id': resume_id, 'user_id': request.user.id})
+            
+            if not resume_doc:
+                return Response(
+                    {'error': 'Resume not found'}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            resume_dict = {
+                'id': str(resume_doc['_id']),
+                'personal_info': resume_doc.get('personal_info', {}),
+                'work_experience': resume_doc.get('work_experience', []),
+                'education': resume_doc.get('education', []),
+                'projects': resume_doc.get('projects', []),
+                'certificates': resume_doc.get('certificates', []),
+                'languages': resume_doc.get('languages', []),
+                'skills': resume_doc.get('skills', []),
+                'created_at': resume_doc.get('created_at'),
+                'updated_at': resume_doc.get('updated_at'),
+            }
+            return Response(resume_dict)
+        except Exception as e:
+            logger.error(f"Error serializing resume: {str(e)}")
+            import traceback
+            logger.error(traceback.format_exc())
+            return Response(
+                {'error': str(e)}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    
+    elif request.method == 'PUT':
+        serializer = ResumeSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                # Update the resume in MongoDB
+                update_data = serializer.validated_data
+                result = db.resumes.update_one(
+                    {'_id': resume_id, 'user_id': request.user.id},
+                    {'$set': update_data}
+                )
+                
+                if result.matched_count == 0:
+                    return Response(
+                        {'error': 'Resume not found'}, 
+                        status=status.HTTP_404_NOT_FOUND
+                    )
+                
+                # Return updated resume
+                updated_doc = db.resumes.find_one({'_id': resume_id})
+                resume_dict = {
+                    'id': str(updated_doc['_id']),
+                    'personal_info': updated_doc.get('personal_info', {}),
+                    'work_experience': updated_doc.get('work_experience', []),
+                    'education': updated_doc.get('education', []),
+                    'projects': updated_doc.get('projects', []),
+                    'certificates': updated_doc.get('certificates', []),
+                    'languages': updated_doc.get('languages', []),
+                    'skills': updated_doc.get('skills', []),
+                    'created_at': updated_doc.get('created_at'),
+                    'updated_at': updated_doc.get('updated_at'),
+                }
+                return Response(resume_dict)
+            except Exception as e:
+                return Response(
+                    {'error': str(e)}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    elif request.method == 'DELETE':
+        result = db.resumes.delete_one({'_id': resume_id, 'user_id': request.user.id})
+        
+        if result.deleted_count == 0:
+            return Response(
+                {'error': 'Resume not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        return Response(
+            {'message': 'Resume deleted successfully'}, 
+            status=status.HTTP_204_NO_CONTENT
+        )
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def health_check(request):
+    """
+    Simple health check endpoint (public)
+    """
+    return Response({
+        'status': 'healthy',
+        'message': 'Resume API is running'
+    })
+
