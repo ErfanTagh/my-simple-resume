@@ -1,0 +1,81 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  deploy:
+    name: Deploy to Server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🚀 Deploy to Production Server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: 37.27.31.223
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            echo "🔄 Starting deployment..."
+
+            # Navigate to project directory
+            cd ~/my-simple-resume
+
+            # Pull latest code
+            echo "📥 Pulling latest code from GitHub..."
+            git pull origin main
+
+            # Stop services
+            echo "🛑 Stopping services..."
+            docker compose -f docker-compose.prod.yml down
+
+            # Remove old frontend volume to force rebuild
+            echo "🗑️  Cleaning old frontend build..."
+            docker volume rm my-simple-resume_frontend_build || true
+
+            # Rebuild containers
+            echo "🔨 Rebuilding containers..."
+            docker compose -f docker-compose.prod.yml build --no-cache frontend
+            docker compose -f docker-compose.prod.yml build backend
+
+            # Start services
+            echo "▶️  Starting services..."
+            docker compose -f docker-compose.prod.yml up -d
+
+            # Wait for services to start
+            echo "⏳ Waiting for services to initialize..."
+            sleep 15
+
+            # Copy frontend files to nginx
+            echo "📋 Copying frontend files..."
+            docker cp resume_frontend:/usr/share/nginx/html/. /tmp/react-app/ || true
+            docker cp /tmp/react-app/. resume_nginx:/usr/share/nginx/html/ || true
+            rm -rf /tmp/react-app
+
+            # Restart nginx to load new files
+            echo "🔄 Restarting nginx..."
+            docker compose -f docker-compose.prod.yml restart nginx
+
+            # Show status
+            echo "✅ Deployment complete!"
+            echo ""
+            echo "📊 Service Status:"
+            docker compose -f docker-compose.prod.yml ps
+
+            echo ""
+            echo "🌐 Site: https://123resume.de"
+
+      - name: ✅ Deployment Status
+        if: success()
+        run: |
+          echo "✅ Successfully deployed to production!"
+          echo "🌐 Your site is live at: https://123resume.de"
+
+      - name: ❌ Deployment Failed
+        if: failure()
+        run: |
+          echo "❌ Deployment failed! Check the logs above."

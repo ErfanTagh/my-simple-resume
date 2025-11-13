@@ -3,6 +3,8 @@ Models for CV/Resume data
 """
 from djongo import models
 from django.contrib.auth.models import User
+from django.utils import timezone
+from datetime import timedelta
 
 
 class Interest(models.Model):
@@ -149,4 +151,28 @@ class Resume(models.Model):
 
     def __str__(self):
         return f"Resume - {self.personal_info.first_name} {self.personal_info.last_name} (User: {self.user.username})"
+
+
+class EmailVerification(models.Model):
+    """Email verification tokens for user registration"""
+    _id = models.ObjectIdField(primary_key=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='email_verification')
+    token = models.CharField(max_length=100, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_verified = models.BooleanField(default=False)
+    
+    class Meta:
+        db_table = 'email_verifications'
+    
+    def save(self, *args, **kwargs):
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timedelta(hours=24)
+        super().save(*args, **kwargs)
+    
+    def is_expired(self):
+        return timezone.now() > self.expires_at
+    
+    def __str__(self):
+        return f"Verification for {self.user.username} - Verified: {self.is_verified}"
 

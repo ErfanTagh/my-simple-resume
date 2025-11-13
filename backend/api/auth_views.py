@@ -10,6 +10,14 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.conf import settings
+from .models import EmailVerification
+from .email_verification import (
+    generate_verification_token,
+    create_verification_link,
+    send_verification_email,
+    send_welcome_email
+)
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -86,31 +94,48 @@ def register(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    # Create user
+    # Create user (inactive until email is verified)
     try:
         user = User.objects.create_user(
             username=username,
             email=email,
             password=password,
             first_name=first_name,
-            last_name=last_name
+            last_name=last_name,
+            is_active=False  # User must verify email first
         )
         
-        # Generate tokens
-        refresh = RefreshToken.for_user(user)
+        # Generate verification token
+        token = generate_verification_token()
+        
+        # Create verification record
+        verification = EmailVerification.objects.create(
+            user=user,
+            token=token
+        )
+        
+        # Send verification email
+        domain = settings.DOMAIN
+        verification_link = create_verification_link(token, domain)
+        email_sent = send_verification_email(email, username, verification_link)
+        
+        if not email_sent:
+            # If email fails, still return success but warn the user
+            return Response({
+                'message': 'User registered but email could not be sent. Please contact support.',
+                'email_verified': False,
+                'user': {
+                    'username': username,
+                    'email': email,
+                }
+            }, status=status.HTTP_201_CREATED)
         
         return Response({
-            'message': 'User registered successfully',
+            'message': 'Registration successful! Please check your email to verify your account.',
+            'email_verified': False,
             'user': {
-                'id': user.id,
-                'username': user.username,
-                'email': user.email,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-            },
-            'tokens': {
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
+                'username': username,
+                'email': email,
             }
         }, status=status.HTTP_201_CREATED)
         
@@ -141,6 +166,24 @@ def login(request):
             {'error': 'Username and password are required'},
             status=status.HTTP_400_BAD_REQUEST
         )
+    
+    # Check if user exists
+    try:
+        user_obj = User.objects.get(username=username)
+        
+        # Check if email is verified
+        if not user_obj.is_active:
+            try:
+                verification = EmailVerification.objects.get(user=user_obj)
+                if not verification.is_verified:
+                    return Response({
+                        'error': 'Please verify your email before logging in. Check your inbox for the verification link.',
+                        'email_verified': False
+                    }, status=status.HTTP_403_FORBIDDEN)
+            except EmailVerification.DoesNotExist:
+                pass
+    except User.DoesNotExist:
+        pass
     
     user = authenticate(username=username, password=password)
     
@@ -214,4 +257,152 @@ def user_profile(request):
         'first_name': user.first_name,
         'last_name': user.last_name,
     })
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def verify_email(request):
+    """
+    Verify user email with token
+    
+    Expected payload:
+    {
+        "token": "verification_token_string"
+    }
+    """
+    token = request.data.get('token')
+    
+    if not token:
+        return Response(
+            {'error': 'Verification token is required'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        verification = EmailVerification.objects.get(token=token)
+        
+        # Check if already verified
+        if verification.is_verified:
+            return Response({
+                'message': 'Email already verified. You can log in now.',
+                'email_verified': True
+            })
+        
+        # Check if token is expired
+        if verification.is_expired():
+            return Response({
+                'error': 'Verification link has expired. Please request a new one.',
+                'expired': True
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Mark as verified and activate user
+        verification.is_verified = True
+        verification.save()
+        
+        user = verification.user
+        user.is_active = True
+        user.save()
+        
+        # Send welcome email
+        send_welcome_email(user.email, user.username)
+        
+        return Response({
+            'message': 'Email verified successfully! You can now log in.',
+            'email_verified': True,
+            'user': {
+                'username': user.username,
+                'email': user.email
+            }
+        })
+        
+    except EmailVerification.DoesNotExist:
+        return Response({
+            'error': 'Invalid verification token',
+            'invalid': True
+        }, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def resend_verification(request):
+    """
+    Resend verification email
+    
+    Expected payload:
+    {
+        "email": "user@example.com"
+    }
+    """
+    email = request.data.get('email')
+    
+    if not email:
+        return Response(
+            {'error': 'Email is required'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        user = User.objects.get(email=email)
+        
+        # Check if already verified
+        if user.is_active:
+            return Response({
+                'message': 'Email is already verified. You can log in now.'
+            })
+        
+        # Get or create verification record
+        try:
+            verification = EmailVerification.objects.get(user=user)
+            
+            # Check if already verified
+            if verification.is_verified:
+                user.is_active = True
+                user.save()
+                return Response({
+                    'message': 'Email is already verified. You can log in now.'
+                })
+            
+            # Generate new token
+            verification.token = generate_verification_token()
+            from django.utils import timezone
+            from datetime import timedelta
+            verification.expires_at = timezone.now() + timedelta(hours=24)
+            verification.save()
+            
+        except EmailVerification.DoesNotExist:
+            # Create new verification record
+            verification = EmailVerification.objects.create(
+                user=user,
+                token=generate_verification_token()
+            )
+        
+        # Send new verification email
+        domain = settings.DOMAIN
+        verification_link = create_verification_link(verification.token, domain)
+        email_sent = send_verification_email(email, user.username, verification_link)
+        
+        if not email_sent:
+            return Response({
+                'error': 'Failed to send verification email. Please try again later.'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        return Response({
+            'message': 'Verification email sent! Please check your inbox.'
+        })
+        
+    except User.DoesNotExist:
+        # Don't reveal if email exists or not (security)
+        return Response({
+            'message': 'If this email is registered, a verification link has been sent.'
+        })
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 

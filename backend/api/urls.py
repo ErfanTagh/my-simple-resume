@@ -17,6 +17,8 @@ urlpatterns = [
     path('auth/logout/', auth_views.logout, name='logout'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
     path('auth/profile/', auth_views.user_profile, name='user-profile'),
+    path('auth/verify-email/', auth_views.verify_email, name='verify-email'),
+    path('auth/resend-verification/', auth_views.resend_verification, name='resend-verification'),
     
     # Resume endpoints (protected)
     path('resumes/', views.resume_list, name='resume-list'),
