@@ -69,3 +69,6 @@ Thumbs.db
 .coverage
 htmlcov/
 .pytest_cache/
+
+# Temporary source folders
+frontend/skill-step-form-main/

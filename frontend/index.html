@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="styles.css?v=2.2">
+  <link rel="stylesheet" href="styles.css?v=3.7">
 </head>
 <body>
   <div class="resume-container">
@@ -22,299 +22,279 @@
       </div>
     </header>
 
-    <!-- Main Content -->
+    <!-- Main Content - Single Column -->
     <main class="resume-main">
-      <div class="content-grid">
-        <!-- Left Column -->
-        <div class="left-column">
-          <!-- Contact Section -->
-          <section class="resume-section">
-            <h3 class="section-title">
-              <i class="fas fa-address-book"></i>
-              Kontakt
-            </h3>
-            <div class="contact-info">
-              <div class="contact-item">
-                <i class="fas fa-phone"></i>
-                <span>+49 157 35338285</span>
-              </div>
-              <div class="contact-item">
-                <i class="fas fa-envelope"></i>
-                <span>etaghvaei0098@gmail.com</span>
-              </div>
-              <div class="contact-item">
-                <i class="fas fa-map-marker-alt"></i>
-                <span>Kaiserslautern, Germany</span>
-              </div>
-              <div class="contact-item">
-                <i class="fas fa-graduation-cap"></i>
-                <span>RPTU Kaiserslautern</span>
-              </div>
-              <div class="contact-item">
-                <i class="fab fa-github"></i>
-                <a href="https://erfantagh.github.io" target="_blank" class="contact-link">erfantagh.github.io</a>
-              </div>
-              <div class="contact-item">
-                <i class="fab fa-linkedin"></i>
-                <a href="https://linkedin.com/in/erfan-taghvaei-2b9313255" target="_blank" class="contact-link">linkedin.com/in/erfan-taghvaei-2b9313255</a>
-              </div>
-            </div>
-          </section>
-
-          <!-- Projects Section -->
-          <section class="resume-section">
-            <h3 class="section-title">
-              <i class="fas fa-project-diagram"></i>
-              Projekte
-            </h3>
-
-            <div class="project-item">
-              <div class="project-header">
-                <h4>AAS Sanity Project for DFKI Smart Factory</h4>
-              </div>
-              <p class="project-description">
-                Webanwendung für Universitätsprojekt mit Bootstrap-Frontend und Flask-Backend. JSON-Datei-Upload mit automatischer Analyse durch 18 Regeln, interaktive Validierung durch Benutzer und Multi-Threading-Optimierung für bessere Performance. Vollständig containerisiert mit Docker Compose.
-              </p>
-              <div class="project-tech">
-                <span class="tech-tag">Python</span>
-                <span class="tech-tag">Flask</span>
-                <span class="tech-tag">REST API</span>
-                <span class="tech-tag">Multi-Threading</span>
-                <span class="tech-tag">Bootstrap</span>
-                <span class="tech-tag">Docker</span>
-                <span class="tech-tag">NGINX</span>
-              </div>
-            </div>
-            <div class="project-item">
-              <div class="project-header">
-                <h4>RecallCards</h4>
-                <a href="https://recallcards.net/" target="_blank" class="project-link">
-                  <i class="fas fa-external-link-alt"></i>
-                  Projekt ansehen
-                </a>
-              </div>
-              <p class="project-description">
-                Vollständig entwickelte produktionsreife Karteikarten-Anwendung mit React-Frontend und Flask-Backend. MongoDB-Datenbank für Kartenspeicherung, Benutzerauthentifizierung über Auth0, responsive Design für alle Geräte. Vollständige CI/CD-Pipeline mit GitHub Actions für automatisiertes Testing und Deployment. Docker-containerisiert mit NGINX, über HTTPS erreichbar.
-              </p>
-              <div class="project-tech">
-                <span class="tech-tag">React</span>
-                <span class="tech-tag">Flask</span>
-                <span class="tech-tag">MongoDB</span>
-                <span class="tech-tag">Auth0</span>
-                <span class="tech-tag">Docker</span>
-                <span class="tech-tag">NGINX</span>
-                <span class="tech-tag">GitHub Actions</span>
-                <span class="tech-tag">Responsive Design</span>
-              </div>
-            </div>
-          </section>
-
-          <!-- Certifications Section -->
-          <section class="resume-section">
-            <h3 class="section-title">
-              <i class="fas fa-certificate"></i>
-              Zertifizierungen
-            </h3>
-            <div class="certification-item">
-              <div class="certification-header">
-                <h4>MongoDB Associate Developer</h4>
-                <span class="certification-issuer">MongoDB</span>
-              </div>
-              <p class="certification-date">2024</p>
-              <a href="https://www.credly.com/badges/87f5217b-8ef7-4b69-9e7c-6b218ddeba12/linked_in_profile" 
-                 target="_blank" 
-                 class="certification-link">
-                <i class="fas fa-external-link-alt"></i>
-                Credly Badge ansehen
-              </a>
-            </div>
-          </section>
-
-          <!-- Languages Section -->
-          <section class="resume-section">
-            <h3 class="section-title">
-              <i class="fas fa-language"></i>
-              Sprachen
-            </h3>
-            <div class="languages-list">
-              <div class="language-item">
-                <span class="language-name">Englisch</span>
-                <span class="language-level">C2</span>
-              </div>
-              <div class="language-item">
-                <span class="language-name">Deutsch</span>
-                <span class="language-level">C1</span>
-              </div>
-              <div class="language-item">
-                <span class="language-name">Persisch</span>
-                <span class="language-level">C2</span>
-              </div>
-            </div>
-          </section>
-
-          <!-- Interests Section -->
-          <section class="resume-section">
-            <h3 class="section-title">
-              <i class="fas fa-heart"></i>
-              Interessen
-            </h3>
-            <div class="interests-list">
-              <span class="interest-tag">Laufen</span>
-              <span class="interest-tag">Radfahren</span>
-              <span class="interest-tag">Sprachenlernen</span>
-            </div>
-          </section>
+      
+      <!-- Contact Section -->
+      <section class="resume-section">
+        <h3 class="section-title">
+          <i class="fas fa-address-book"></i>
+          Kontakt
+        </h3>
+        <div class="contact-info-horizontal">
+          <div class="contact-item">
+            <i class="fas fa-phone"></i>
+            <span>+49 157 35338285</span>
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-envelope"></i>
+            <span>etaghvaei0098@gmail.com</span>
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>Kaiserslautern, Germany</span>
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-graduation-cap"></i>
+            <span>RPTU Kaiserslautern</span>
+          </div>
+          <div class="contact-item">
+            <i class="fab fa-github"></i>
+            <a href="https://erfantagh.github.io" target="_blank" class="contact-link">erfantagh.github.io</a>
+          </div>
+          <div class="contact-item">
+            <i class="fab fa-linkedin"></i>
+            <a href="https://linkedin.com/in/erfan-taghvaei-2b9313255" target="_blank" class="contact-link">LinkedIn</a>
+          </div>
         </div>
+      </section>
 
-        <!-- Right Column -->
-        <div class="right-column">
-          <!-- Experience Section -->
-          <section class="resume-section">
-            <h3 class="section-title">
-              <i class="fas fa-briefcase"></i>
-              Berufserfahrung
-            </h3>
-            <!-- Corning job - commented out for tech roles, uncomment for non-tech positions
-            <div class="experience-item">
-              <div class="experience-header">
-                <h4>Student Worker <span class="werkstudent-text">(Working Student)</span></h4>
-              </div>
-              <div class="experience-place">
-                <span class="company"><i class="fas fa-building"></i> Corning Incorporated</span>
-                <span class="period">Aug 2025 - Present</span>
-              </div>
-              <div class="experience-location">
-                <i class="fas fa-map-marker-alt"></i>
-                <span>Kaiserslautern, Germany</span>
-              </div>
-              <ul class="experience-details">
-                <li>Work experience at a major ceramics company, Corning, as a working student.</li>
-                <li>Developed important soft skills: teamwork, punctuality, and time management.</li>
-              </ul>
-              <div class="job-competencies">
-                <span class="competency-bubble">Teamwork</span>
-                <span class="competency-bubble">Time Management</span>
-                <span class="competency-bubble">German Language</span>
-                <span class="competency-bubble">Punctuality</span>
-              </div>
-            </div>
-            -->
-            <div class="experience-item">
-              <div class="experience-header">
-                <h4><strong>React Native Developer</strong> <span class="werkstudent-text">(Working Student)</span></h4>
-              </div>
-              <div class="experience-place">
-                <span class="company"><i class="fas fa-building"></i> <strong>Neocosmo</strong></span>
-                <span class="period">Feb 2022 - Feb 2024</span>
-              </div>
-              <div class="experience-location">
-                <i class="fas fa-map-marker-alt"></i>
-                <span>Saarbrücken, Germany</span>
-              </div>
-              <ul class="experience-details">
-                <li><strong>Full-Stack-Softwareentwicklung:</strong> Zwei Jahre Entwicklung moderner Softwarelösungen mit JavaScript/TypeScript für mehrere große Kundenprojekte (PIIPE, KVNO, Riniger, Festo, Hochschule Kempten).</li>
-                <li><strong>Codequalität & Best Practices:</strong> Durchführung der JavaScript-zu-TypeScript-Migration mit umfassenden Typdefinitionen für typsichere Entwicklung, Code-Reviews und Einhaltung von Programmierstandards.</li>
-                <li><strong>Testing & Debugging:</strong> Implementierung von E2E-Tests, Unit-Tests, Code-Analyse und systematisches Debugging für stabile, hochwertige Softwarelösungen.</li>
-                <li><strong>Agile Softwareentwicklung:</strong> Kompletter Entwicklungsprozess vom Design über die Implementierung bis zum Deployment – CI/CD-Pipelines, Build-Automatisierung und agile Teamzusammenarbeit.</li>
-                <li>Eigenständige Bearbeitung komplexer Features über zwei Monate mit direkter Kundenkommunikation, Analyse, Design und erfolgreicher Fertigstellung.</li>
-              </ul>
-              <div class="job-tech">
-                <span class="tech-tag">JavaScript</span>
-                <span class="tech-tag">TypeScript</span>
-                <span class="tech-tag">Git</span>
-                <span class="tech-tag">CI/CD</span>
-                <span class="tech-tag">Testing</span>
-                <span class="tech-tag">Debugging</span>
-                <span class="tech-tag">Agile</span>
-                <span class="tech-tag">Code Reviews</span>
-              </div>
-              <div class="job-competencies">
-                <span class="competency-bubble">Softwareentwicklung</span>
-                <span class="competency-bubble">Codequalität</span>
-                <span class="competency-bubble">Testing & Debugging</span>
-                <span class="competency-bubble">Agile Methoden</span>
-              </div>
-            </div>
-            <div class="experience-item">
-              <div class="experience-header">
-                <h4><strong>Java Developer</strong> <span class="werkstudent-text">(Working Student)</span></h4>
-              </div>
-              <div class="experience-place">
-                <span class="company"><i class="fas fa-building"></i> <strong>Magiavas</strong></span>
-                <span class="period">Sep 2017 - Sep 2019</span>
-              </div>
-              <div class="experience-location">
-                <i class="fas fa-map-marker-alt"></i>
-                <span>Tehran Province, Iran</span>
-              </div>
-              <ul class="experience-details">
-                <li><strong>Java-Softwareentwicklung:</strong> Zwei Jahre praktische Erfahrung mit Java – fundierte Kenntnisse in OOP-Prinzipien, Design Patterns und Softwareentwicklungskonzepten.</li>
-                <li><strong>Datenbankintegration:</strong> Arbeit mit Datenbanken, SQL-Abfragen, Datenpersistenz und CRUD-Operationen für dynamische Anwendungen.</li>
-                <li><strong>REST-API-Entwicklung & Testing:</strong> Implementierung von API-Clients, HTTP-Request-Handling, JSON-Parsing sowie Unit-Testing und Debugging von Java-Anwendungen.</li>
-                <li><strong>Softwarearchitektur:</strong> Entwicklung strukturierter, wartbarer Softwarelösungen mit MVC-Pattern und Best Practices für sauberen, dokumentierten Code.</li>
-              </ul>
-              <div class="job-tech">
-                <span class="tech-tag">Java</span>
-                <span class="tech-tag">OOP</span>
-                <span class="tech-tag">SQL</span>
-                <span class="tech-tag">REST API</span>
-                <span class="tech-tag">JSON</span>
-                <span class="tech-tag">MVC</span>
-                <span class="tech-tag">Git</span>
-                <span class="tech-tag">Debugging</span>
-              </div>
-              <div class="job-competencies">
-                <span class="competency-bubble">Java-Entwicklung</span>
-                <span class="competency-bubble">Datenbankintegration</span>
-                <span class="competency-bubble">API-Entwicklung</span>
-                <span class="competency-bubble">Softwarearchitektur</span>
-              </div>
-            </div>
-          </section>
-
-          <!-- Education Section -->
-          <section class="resume-section">
-            <h3 class="section-title">
-              <i class="fas fa-graduation-cap"></i>
-              Ausbildung
-            </h3>
-            <div class="education-item">
-              <h4><strong>Master of Computer Science</strong></h4>
-              <div class="education-header">
-                <p class="institution"><strong>RPTU Kaiserslautern</strong></p>
-                <p class="period">Oktober 2021 - Heute</p>
-              </div>
-              <p class="location">Kaiserslautern, Deutschland</p>
-              <div class="key-courses">
-                <span class="course-tag">Foundations of Software Engineering</span>
-                <span class="course-tag">Network Security</span>
-                <span class="course-tag">Product Line Engineering</span>
-                <span class="course-tag">Social Web Mining</span>
-                <span class="course-tag">Data Visualization</span>
-                <span class="course-tag">Foundations of Digital Farming</span>
-              </div>
-            </div>
-            <div class="education-item">
-              <h4><strong>Bachelor of Software Engineering</strong></h4>
-              <div class="education-header">
-                <p class="institution"><strong>Tehran Azad University</strong></p>
-                <p class="period">März 2017 - August 2021</p>
-              </div>
-              <p class="location">Teheran, Iran</p>
-              <div class="key-courses">
-                <span class="course-tag">Operating Systems</span>
-                <span class="course-tag">Computer Networks</span>
-                <span class="course-tag">Data Structures and Algorithms</span>
-                <span class="course-tag">Object-Oriented Programming</span>
-                <span class="course-tag">Java Programming</span>
-                <span class="course-tag">Compiler Design</span>
-              </div>
-            </div>
-          </section>
-
-
+      <!-- Education Section -->
+      <section class="resume-section">
+        <h3 class="section-title">
+          <i class="fas fa-graduation-cap"></i>
+          Ausbildung
+        </h3>
+        <div class="education-item">
+          <h4><strong>Master of Computer Science</strong></h4>
+          <div class="education-header">
+            <p class="institution"><strong>RPTU Kaiserslautern</strong></p>
+            <p class="period">Oktober 2021 - Heute</p>
+          </div>
+          <p class="location">Kaiserslautern, Deutschland</p>
+          <div class="key-courses">
+            <span class="course-tag">Foundations of Software Engineering</span>
+            <span class="course-tag">Network Security</span>
+            <span class="course-tag">Product Line Engineering</span>
+            <span class="course-tag">Social Web Mining</span>
+            <span class="course-tag">Data Visualization</span>
+            <span class="course-tag">Foundations of Digital Farming</span>
+          </div>
         </div>
-      </div>
+        <div class="education-item">
+          <h4><strong>Bachelor of Software Engineering</strong></h4>
+          <div class="education-header">
+            <p class="institution"><strong>Tehran Azad University</strong></p>
+            <p class="period">März 2017 - August 2021</p>
+          </div>
+          <p class="location">Teheran, Iran</p>
+          <div class="key-courses">
+            <span class="course-tag">Operating Systems</span>
+            <span class="course-tag">Computer Networks</span>
+            <span class="course-tag">Data Structures and Algorithms</span>
+            <span class="course-tag">Object-Oriented Programming</span>
+            <span class="course-tag">Java Programming</span>
+            <span class="course-tag">Compiler Design</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Work Experience Section -->
+      <section class="resume-section">
+        <h3 class="section-title">
+          <i class="fas fa-briefcase"></i>
+          Berufserfahrung
+        </h3>
+        <div class="experience-item">
+          <div class="experience-header">
+            <h4><strong>React Native Developer</strong> <span class="werkstudent-text">(Working Student)</span></h4>
+          </div>
+          <div class="experience-place">
+            <span class="company"><i class="fas fa-building"></i> <strong>Neocosmo</strong></span>
+            <span class="period">Feb 2022 - Feb 2024</span>
+          </div>
+          <div class="experience-location">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>Saarbrücken, Germany</span>
+          </div>
+          <ul class="experience-details">
+            <li><strong>Full-Stack-Softwareentwicklung:</strong> Zwei Jahre Entwicklung moderner Softwarelösungen mit JavaScript/TypeScript für mehrere große Kundenprojekte (PIIPE, KVNO, Riniger, Festo, Hochschule Kempten).</li>
+            <li><strong>Test-Automatisierung:</strong> Implementierung von Detox E2E-Tests mit 95% App-Abdeckung und isolierte Storybook-Komponententests für 80% aller Komponenten – erhöhte Codequalität und reduzierte Bugs erheblich.</li>
+            <li><strong>Code-Refactoring:</strong> Durchführung umfassender Refactoring-Initiative nach Clean-Code-Prinzipien, die den Code von React-Komponenten um 50% reduzierte und Wartbarkeit deutlich verbesserte.</li>
+            <li><strong>Shared Component Library:</strong> Entwicklung einer wiederverwendbaren UI-Komponenten-Bibliothek, die in 70% aller Apps eingesetzt wurde – drastische Reduktion von Code-Duplikation und konsistente User Experience.</li>
+            <li><strong>JavaScript-zu-TypeScript-Migration:</strong> Vollständige Migration mit umfassenden Typdefinitionen – 60% aller JavaScript-Variablen mit starker Typisierung versehen, was Type-Safety deutlich erhöhte und Laufzeitfehler minimierte.</li>
+            <li>Eigenständige Bearbeitung komplexer Features über zwei Monate mit direkter Kundenkommunikation, Analyse, Design und erfolgreicher Fertigstellung.</li>
+          </ul>
+          <div class="job-tech">
+            <span class="tech-tag">JavaScript</span>
+            <span class="tech-tag">TypeScript</span>
+            <span class="tech-tag">React Native</span>
+            <span class="tech-tag">Detox</span>
+            <span class="tech-tag">Storybook</span>
+            <span class="tech-tag">Git</span>
+            <span class="tech-tag">CI/CD</span>
+            <span class="tech-tag">Clean Code</span>
+          </div>
+        </div>
+        <div class="experience-item">
+          <div class="experience-header">
+            <h4><strong>React Native Developer</strong> <span class="werkstudent-text">Voll-Zeit Entwickler</span></h4>
+          </div>
+          <div class="experience-place">
+            <span class="company"><i class="fas fa-building"></i> <strong>Magiavas</strong></span>
+            <span class="period">2018 - 2020</span>
+          </div>
+          <div class="experience-location">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>Tehran Province, Iran</span>
+          </div>
+          <ul class="experience-details">
+            <li><strong>React Native Mobile Entwicklung:</strong> Zwei Jahre Entwicklung Cross-Platform Mobile Apps mit React Native und JavaScript – fundierte Kenntnisse in komponentenbasierter Architektur und modernen Frontend-Patterns.</li>
+            <li><strong>JavaScript & ES6+:</strong> Intensive Arbeit mit JavaScript, ES6+ Features, asynchroner Programmierung und State Management für responsive Mobile Anwendungen.</li>
+            <li><strong>API Integration & Datenhandling:</strong> Implementierung von REST-API-Clients, HTTP-Request-Handling, JSON-Parsing und Datenmanagement in Mobile Apps.</li>
+            <li><strong>Mobile App Development:</strong> Entwicklung nativer Features, Performance-Optimierung, Debugging und Testing von React Native Apps für iOS und Android Plattformen.</li>
+          </ul>
+          <div class="job-tech">
+            <span class="tech-tag">React Native</span>
+            <span class="tech-tag">JavaScript</span>
+            <span class="tech-tag">ES6+</span>
+            <span class="tech-tag">REST API</span>
+            <span class="tech-tag">JSON</span>
+            <span class="tech-tag">Mobile Development</span>
+            <span class="tech-tag">Git</span>
+            <span class="tech-tag">Debugging</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Projects Section -->
+      <section class="resume-section">
+        <h3 class="section-title">
+          <i class="fas fa-project-diagram"></i>
+          Projekte
+        </h3>
+        <div class="project-item">
+          <div class="project-header">
+            <h4><strong>123Resume - CV Builder Platform</strong></h4>
+            <a href="https://github.com/ErfanTagh/my-simple-resume" target="_blank" class="project-link">
+              <i class="fab fa-github"></i>
+              GitHub Repository
+            </a>
+          </div>
+          <p class="project-description">
+            Vollständige Full-Stack Lebenslauf-Erstellungsplattform mit React/TypeScript-Frontend und Django-Backend. Multi-Step-Formular mit Live-Vorschau, Zod-Validierung und React Hook Form. JWT-Authentifizierung, MongoDB-Datenbank, automatische camelCase/snake_case-Konvertierung zwischen Frontend und Backend. Docker-containerisiert mit produktionsbereiter NGINX-Konfiguration, SSL-Zertifikaten und CI/CD-Pipeline. Vollständig responsive mit modernem UI-Design und PDF-Export-Funktionalität.
+          </p>
+          <div class="project-tech">
+            <span class="tech-tag">React</span>
+            <span class="tech-tag">TypeScript</span>
+            <span class="tech-tag">Django</span>
+            <span class="tech-tag">MongoDB</span>
+            <span class="tech-tag">JWT</span>
+            <span class="tech-tag">Docker</span>
+            <span class="tech-tag">NGINX</span>
+            <span class="tech-tag">Tailwind CSS</span>
+            <span class="tech-tag">React Hook Form</span>
+            <span class="tech-tag">Zod</span>
+          </div>
+        </div>
+        <div class="project-item">
+          <div class="project-header">
+            <h4><strong>AAS Sanity Project for DFKI Smart Factory</strong></h4>
+          </div>
+          <p class="project-description">
+            Webanwendung für Universitätsprojekt mit Bootstrap-Frontend und Flask-Backend. JSON-Datei-Upload mit automatischer Analyse durch 18 Regeln, interaktive Validierung durch Benutzer und Multi-Threading-Optimierung für bessere Performance. Vollständig containerisiert mit Docker Compose. Erstellung von Sequenzdiagrammen zur Visualisierung der Beziehungen zwischen verschiedenen Funktionen und Feature-Komponenten für besseres Systemverständnis und Dokumentation.
+          </p>
+          <div class="project-tech">
+            <span class="tech-tag">Python</span>
+            <span class="tech-tag">Flask</span>
+            <span class="tech-tag">REST API</span>
+            <span class="tech-tag">Multi-Threading</span>
+            <span class="tech-tag">Bootstrap</span>
+            <span class="tech-tag">Docker</span>
+            <span class="tech-tag">NGINX</span>
+            <span class="tech-tag">UML</span>
+          </div>
+        </div>
+        <div class="project-item">
+          <div class="project-header">
+            <h4><strong>RecallCards</strong></h4>
+            <a href="https://recallcards.net/" target="_blank" class="project-link">
+              <i class="fas fa-external-link-alt"></i>
+              Projekt ansehen
+            </a>
+          </div>
+          <p class="project-description">
+            Vollständig entwickelte produktionsreife Karteikarten-Anwendung mit React-Frontend und Flask-Backend. MongoDB-Datenbank für Kartenspeicherung, Benutzerauthentifizierung über Auth0, responsive Design für alle Geräte. Vollständige CI/CD-Pipeline mit GitHub Actions für automatisiertes Testing und Deployment. Docker-containerisiert mit NGINX, über HTTPS erreichbar.
+          </p>
+          <div class="project-tech">
+            <span class="tech-tag">React</span>
+            <span class="tech-tag">Flask</span>
+            <span class="tech-tag">MongoDB</span>
+            <span class="tech-tag">Auth0</span>
+            <span class="tech-tag">Docker</span>
+            <span class="tech-tag">NGINX</span>
+            <span class="tech-tag">GitHub Actions</span>
+            <span class="tech-tag">Responsive Design</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Certifications Section -->
+      <section class="resume-section">
+        <h3 class="section-title">
+          <i class="fas fa-certificate"></i>
+          Zertifizierungen
+        </h3>
+        <div class="certification-item">
+          <div class="certification-header">
+            <h4><strong>MongoDB Associate Developer</strong></h4>
+            <span class="certification-issuer">MongoDB</span>
+          </div>
+          <p class="certification-date">2024</p>
+          <a href="https://www.credly.com/badges/87f5217b-8ef7-4b69-9e7c-6b218ddeba12/linked_in_profile" 
+             target="_blank" 
+             class="certification-link">
+            <i class="fas fa-external-link-alt"></i>
+            Credly Badge ansehen
+          </a>
+        </div>
+      </section>
+
+      <!-- Languages Section -->
+      <section class="resume-section">
+        <h3 class="section-title">
+          <i class="fas fa-language"></i>
+          Sprachen
+        </h3>
+        <div class="languages-list-horizontal">
+          <div class="language-item">
+            <span class="language-name">Englisch</span>
+            <span class="language-level">C2</span>
+          </div>
+          <div class="language-item">
+            <span class="language-name">Deutsch</span>
+            <span class="language-level">C1</span>
+          </div>
+          <div class="language-item">
+            <span class="language-name">Persisch</span>
+            <span class="language-level">C2</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Interests Section -->
+      <section class="resume-section">
+        <h3 class="section-title">
+          <i class="fas fa-heart"></i>
+          Interessen
+        </h3>
+        <div class="interests-list">
+          <span class="interest-tag">Laufen</span>
+          <span class="interest-tag">Radfahren</span>
+          <span class="interest-tag">Sprachenlernen</span>
+        </div>
+      </section>
+
     </main>
   </div>
 </body>

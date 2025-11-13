@@ -125,7 +125,7 @@ export default function ResumeView() {
         <header className="resume-header">
           <div className="header-content">
             <div className="profile-info">
-              <h1 className="name">{personalInfo.firstName} {personalInfo.lastName}</h1>
+              <h1 className="name"><strong>{personalInfo.firstName} {personalInfo.lastName}</strong></h1>
               {personalInfo.professionalTitle && (
                 <h2 className="title">{personalInfo.professionalTitle}</h2>
               )}
@@ -136,285 +136,263 @@ export default function ResumeView() {
           </div>
         </header>
 
-        {/* Main Content */}
+        {/* Main Content - Single Column */}
         <main className="resume-main">
-          <div className="content-grid">
-            {/* Left Column */}
-            <div className="left-column">
-              {/* Contact Section */}
-              <section className="resume-section">
-                <h3 className="section-title">
-                  <i className="fas fa-address-book"></i>
-                  Contact
-                </h3>
-                <div className="contact-info">
-                  {personalInfo.phone && (
-                    <div className="contact-item">
-                      <i className="fas fa-phone"></i>
-                      <span>{personalInfo.phone}</span>
-                    </div>
-                  )}
-                  <div className="contact-item">
-                    <i className="fas fa-envelope"></i>
-                    <span>{personalInfo.email}</span>
+          
+          {/* Contact Section */}
+          <section className="resume-section">
+            <h3 className="section-title">
+              <i className="fas fa-address-book"></i>
+              Contact
+            </h3>
+            <div className="contact-info-horizontal">
+              {personalInfo.phone && (
+                <div className="contact-item">
+                  <i className="fas fa-phone"></i>
+                  <span>{personalInfo.phone}</span>
+                </div>
+              )}
+              <div className="contact-item">
+                <i className="fas fa-envelope"></i>
+                <span>{personalInfo.email}</span>
+              </div>
+              {personalInfo.location && (
+                <div className="contact-item">
+                  <i className="fas fa-map-marker-alt"></i>
+                  <span>{personalInfo.location}</span>
+                </div>
+              )}
+              {personalInfo.github && (
+                <div className="contact-item">
+                  <i className="fab fa-github"></i>
+                  <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="contact-link">
+                    {personalInfo.github}
+                  </a>
+                </div>
+              )}
+              {personalInfo.linkedin && (
+                <div className="contact-item">
+                  <i className="fab fa-linkedin"></i>
+                  <a href={personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="contact-link">
+                    {personalInfo.linkedin}
+                  </a>
+                </div>
+              )}
+              {personalInfo.website && (
+                <div className="contact-item">
+                  <i className="fas fa-globe"></i>
+                  <a href={personalInfo.website} target="_blank" rel="noopener noreferrer" className="contact-link">
+                    {personalInfo.website}
+                  </a>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Education Section */}
+          {resume.education && resume.education.length > 0 && 
+           resume.education.some((edu) => edu.degree || edu.institution) && (
+            <section className="resume-section">
+              <h3 className="section-title">
+                <i className="fas fa-graduation-cap"></i>
+                Education
+              </h3>
+              {resume.education.filter((edu) => edu.degree || edu.institution).map((edu, index) => (
+                <div key={index} className="education-item">
+                  <h4><strong>{edu.degree}</strong></h4>
+                  <div className="education-header">
+                    <p className="institution"><strong>{edu.institution}</strong></p>
+                    {(edu.startDate || edu.endDate) && (
+                      <p className="period">
+                        {edu.startDate} - {edu.endDate || 'Present'}
+                      </p>
+                    )}
                   </div>
-                  {personalInfo.location && (
-                    <div className="contact-item">
-                      <i className="fas fa-map-marker-alt"></i>
-                      <span>{personalInfo.location}</span>
-                    </div>
+                  {edu.location && (
+                    <p className="location">{edu.location}</p>
                   )}
-                  {personalInfo.github && (
-                    <div className="contact-item">
-                      <i className="fab fa-github"></i>
-                      <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="contact-link">
-                        {personalInfo.github}
-                      </a>
-                    </div>
-                  )}
-                  {personalInfo.linkedin && (
-                    <div className="contact-item">
-                      <i className="fab fa-linkedin"></i>
-                      <a href={personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="contact-link">
-                        {personalInfo.linkedin}
-                      </a>
-                    </div>
-                  )}
-                  {personalInfo.website && (
-                    <div className="contact-item">
-                      <i className="fas fa-globe"></i>
-                      <a href={personalInfo.website} target="_blank" rel="noopener noreferrer" className="contact-link">
-                        {personalInfo.website}
-                      </a>
+                  {edu.keyCourses && edu.keyCourses.length > 0 && 
+                   edu.keyCourses.some((course) => course.course && course.course.trim()) && (
+                    <div className="key-courses">
+                      {edu.keyCourses
+                        .filter((course) => course.course && course.course.trim())
+                        .map((course, courseIndex) => (
+                          <span key={courseIndex} className="course-tag">{course.course}</span>
+                        ))}
                     </div>
                   )}
                 </div>
-              </section>
+              ))}
+            </section>
+          )}
 
-              {/* Projects Section */}
-              {resume.projects && resume.projects.length > 0 && (
-                <section className="resume-section">
-                  <h3 className="section-title">
-                    <i className="fas fa-project-diagram"></i>
-                    Projects
-                  </h3>
-                  {resume.projects.map((project, index) => (
-                    project.name && (
-                      <div key={index} className="project-item">
-                        <div className="project-header">
-                          <h4>{project.name}</h4>
-                          {project.link && (
-                            <a href={project.link} target="_blank" rel="noopener noreferrer" className="project-link">
-                              <i className="fas fa-external-link-alt"></i>
-                              View Project
-                            </a>
-                          )}
-                        </div>
-                        {project.description && (
-                          <p className="project-description">{project.description}</p>
-                        )}
-                        {project.technologies && project.technologies.length > 0 && 
-                         project.technologies.some((tech) => tech.technology && tech.technology.trim()) && (
-                          <div className="project-tech">
-                            {project.technologies
-                              .filter((tech) => tech.technology && tech.technology.trim())
-                              .map((tech, techIndex) => (
-                                <span key={techIndex} className="tech-tag">{tech.technology}</span>
-                              ))}
-                          </div>
-                        )}
-                      </div>
-                    )
-                  ))}
-                </section>
-              )}
-
-              {/* Certifications Section */}
-              {resume.certificates && resume.certificates.length > 0 && (
-                <section className="resume-section">
-                  <h3 className="section-title">
-                    <i className="fas fa-certificate"></i>
-                    Certifications
-                  </h3>
-                  {resume.certificates.map((cert, index) => (
-                    cert.name && (
-                      <div key={index} className="certification-item">
-                        <div className="certification-header">
-                          <h4>{cert.name}</h4>
-                          {cert.organization && (
-                            <span className="certification-issuer">{cert.organization}</span>
-                          )}
-                        </div>
-                        {cert.issueDate && (
-                          <p className="certification-date">{cert.issueDate}</p>
-                        )}
-                        {cert.url && (
-                          <a href={cert.url} target="_blank" rel="noopener noreferrer" className="certification-link">
-                            <i className="fas fa-external-link-alt"></i>
-                            View Certificate
-                          </a>
-                        )}
-                      </div>
-                    )
-                  ))}
-                </section>
-              )}
-
-              {/* Languages Section */}
-              {resume.languages && resume.languages.length > 0 && 
-               resume.languages.some((lang) => lang.language && lang.language.trim()) && (
-                <section className="resume-section">
-                  <h3 className="section-title">
-                    <i className="fas fa-language"></i>
-                    Languages
-                  </h3>
-                  <div className="languages-list">
-                    {resume.languages
-                      .filter((lang) => lang.language && lang.language.trim())
-                      .map((lang, index) => (
-                        <div key={index} className="language-item">
-                          <span className="language-name">{lang.language}</span>
-                          <span className="language-level">{lang.proficiency}</span>
-                        </div>
-                      ))}
+          {/* Work Experience Section */}
+          {resume.workExperience && resume.workExperience.length > 0 && 
+           resume.workExperience.some((exp) => exp.position || exp.company) && (
+            <section className="resume-section">
+              <h3 className="section-title">
+                <i className="fas fa-briefcase"></i>
+                Work Experience
+              </h3>
+              {resume.workExperience.filter((exp) => exp.position || exp.company).map((exp, index) => (
+                <div key={index} className="experience-item">
+                  <div className="experience-header">
+                    <h4><strong>{exp.position}</strong></h4>
                   </div>
-                </section>
-              )}
-
-              {/* Interests Section */}
-              {personalInfo.interests && personalInfo.interests.length > 0 && 
-               personalInfo.interests.some((interest) => interest.interest && interest.interest.trim()) && (
-                <section className="resume-section">
-                  <h3 className="section-title">
-                    <i className="fas fa-heart"></i>
-                    Interests
-                  </h3>
-                  <div className="interests-list">
-                    {personalInfo.interests
-                      .filter((interest) => interest.interest && interest.interest.trim())
-                      .map((interest, index) => (
-                        <span key={index} className="interest-tag">{interest.interest}</span>
-                      ))}
+                  <div className="experience-place">
+                    <span className="company">
+                      <i className="fas fa-building"></i> <strong>{exp.company}</strong>
+                    </span>
+                    {(exp.startDate || exp.endDate) && (
+                      <span className="period">
+                        {exp.startDate} - {exp.endDate || 'Present'}
+                      </span>
+                    )}
                   </div>
-                </section>
-              )}
-            </div>
+                  {exp.location && (
+                    <div className="experience-location">
+                      <i className="fas fa-map-marker-alt"></i>
+                      <span>{exp.location}</span>
+                    </div>
+                  )}
+                  {exp.description && (
+                    <ul className="experience-details">
+                      {exp.description.split('\n').filter(line => line.trim()).map((line, lineIndex) => (
+                        <li key={lineIndex}>{line.trim()}</li>
+                      ))}
+                    </ul>
+                  )}
+                  {exp.technologies && exp.technologies.length > 0 && 
+                   exp.technologies.some((tech) => tech.technology && tech.technology.trim()) && (
+                    <div className="job-tech">
+                      {exp.technologies
+                        .filter((tech) => tech.technology && tech.technology.trim())
+                        .map((tech, techIndex) => (
+                          <span key={techIndex} className="tech-tag">{tech.technology}</span>
+                        ))}
+                    </div>
+                  )}
+                  {exp.competencies && exp.competencies.length > 0 && 
+                   exp.competencies.some((comp) => comp.competency && comp.competency.trim()) && (
+                    <div className="job-competencies">
+                      {exp.competencies
+                        .filter((comp) => comp.competency && comp.competency.trim())
+                        .map((comp, compIndex) => (
+                          <span key={compIndex} className="competency-bubble">{comp.competency}</span>
+                        ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </section>
+          )}
 
-            {/* Right Column */}
-            <div className="right-column">
-              {/* Experience Section */}
-              {resume.workExperience && resume.workExperience.length > 0 && 
-               resume.workExperience.some((exp) => exp.position || exp.company) && (
-                <section className="resume-section">
-                  <h3 className="section-title">
-                    <i className="fas fa-briefcase"></i>
-                    Work Experience
-                  </h3>
-                  {resume.workExperience.filter((exp) => exp.position || exp.company).map((exp, index) => (
-                    <div key={index} className="experience-item">
-                      <div className="experience-header">
-                        <h4>{exp.position}</h4>
-                      </div>
-                      <div className="experience-place">
-                        <span className="company">
-                          <i className="fas fa-building"></i> {exp.company}
-                        </span>
-                        {(exp.startDate || exp.endDate) && (
-                          <span className="period">
-                            {exp.startDate} - {exp.endDate || 'Present'}
-                          </span>
-                        )}
-                      </div>
-                      {exp.location && (
-                        <div className="experience-location">
-                          <i className="fas fa-map-marker-alt"></i>
-                          <span>{exp.location}</span>
-                        </div>
-                      )}
-                      {exp.description && (
-                        <p className="experience-description">{exp.description}</p>
-                      )}
-                      {exp.technologies && exp.technologies.length > 0 && 
-                       exp.technologies.some((tech) => tech.technology && tech.technology.trim()) && (
-                        <div className="job-tech">
-                          {exp.technologies
-                            .filter((tech) => tech.technology && tech.technology.trim())
-                            .map((tech, techIndex) => (
-                              <span key={techIndex} className="tech-tag">{tech.technology}</span>
-                            ))}
-                        </div>
-                      )}
-                      {exp.competencies && exp.competencies.length > 0 && 
-                       exp.competencies.some((comp) => comp.competency && comp.competency.trim()) && (
-                        <div className="job-competencies">
-                          {exp.competencies
-                            .filter((comp) => comp.competency && comp.competency.trim())
-                            .map((comp, compIndex) => (
-                              <span key={compIndex} className="competency-bubble">{comp.competency}</span>
-                            ))}
-                        </div>
-                      )}
+          {/* Projects Section */}
+          {resume.projects && resume.projects.length > 0 && 
+           resume.projects.some((project) => project.name && project.name.trim()) && (
+            <section className="resume-section">
+              <h3 className="section-title">
+                <i className="fas fa-project-diagram"></i>
+                Projects
+              </h3>
+              {resume.projects.filter((project) => project.name && project.name.trim()).map((project, index) => (
+                <div key={index} className="project-item">
+                  <div className="project-header">
+                    <h4><strong>{project.name}</strong></h4>
+                    {project.link && (
+                      <a href={project.link} target="_blank" rel="noopener noreferrer" className="project-link">
+                        <i className="fas fa-external-link-alt"></i>
+                        View Project
+                      </a>
+                    )}
+                  </div>
+                  {project.description && (
+                    <p className="project-description">{project.description}</p>
+                  )}
+                  {project.technologies && project.technologies.length > 0 && 
+                   project.technologies.some((tech) => tech.technology && tech.technology.trim()) && (
+                    <div className="project-tech">
+                      {project.technologies
+                        .filter((tech) => tech.technology && tech.technology.trim())
+                        .map((tech, techIndex) => (
+                          <span key={techIndex} className="tech-tag">{tech.technology}</span>
+                        ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </section>
+          )}
+
+          {/* Certifications Section */}
+          {resume.certificates && resume.certificates.length > 0 && 
+           resume.certificates.some((cert) => cert.name && cert.name.trim()) && (
+            <section className="resume-section">
+              <h3 className="section-title">
+                <i className="fas fa-certificate"></i>
+                Certifications
+              </h3>
+              {resume.certificates.filter((cert) => cert.name && cert.name.trim()).map((cert, index) => (
+                <div key={index} className="certification-item">
+                  <div className="certification-header">
+                    <h4><strong>{cert.name}</strong></h4>
+                    {cert.organization && (
+                      <span className="certification-issuer">{cert.organization}</span>
+                    )}
+                  </div>
+                  {cert.issueDate && (
+                    <p className="certification-date">{cert.issueDate}</p>
+                  )}
+                  {cert.url && (
+                    <a href={cert.url} target="_blank" rel="noopener noreferrer" className="certification-link">
+                      <i className="fas fa-external-link-alt"></i>
+                      View Certificate
+                    </a>
+                  )}
+                </div>
+              ))}
+            </section>
+          )}
+
+          {/* Languages Section */}
+          {resume.languages && resume.languages.length > 0 && 
+           resume.languages.some((lang) => lang.language && lang.language.trim()) && (
+            <section className="resume-section">
+              <h3 className="section-title">
+                <i className="fas fa-language"></i>
+                Languages
+              </h3>
+              <div className="languages-list-horizontal">
+                {resume.languages
+                  .filter((lang) => lang.language && lang.language.trim())
+                  .map((lang, index) => (
+                    <div key={index} className="language-item">
+                      <span className="language-name">{lang.language}</span>
+                      <span className="language-level">{lang.proficiency}</span>
                     </div>
                   ))}
-                </section>
-              )}
+              </div>
+            </section>
+          )}
 
-              {/* Education Section */}
-              {resume.education && resume.education.length > 0 && 
-               resume.education.some((edu) => edu.degree || edu.institution) && (
-                <section className="resume-section">
-                  <h3 className="section-title">
-                    <i className="fas fa-graduation-cap"></i>
-                    Education
-                  </h3>
-                  {resume.education.filter((edu) => edu.degree || edu.institution).map((edu, index) => (
-                    <div key={index} className="education-item">
-                      <h4>{edu.degree}</h4>
-                      <div className="education-header">
-                        <p className="institution">{edu.institution}</p>
-                        {(edu.startDate || edu.endDate) && (
-                          <p className="period">
-                            {edu.startDate} - {edu.endDate || 'Present'}
-                          </p>
-                        )}
-                      </div>
-                      {edu.location && (
-                        <p className="location">{edu.location}</p>
-                      )}
-                      {edu.keyCourses && edu.keyCourses.length > 0 && 
-                       edu.keyCourses.some((course) => course.course && course.course.trim()) && (
-                        <div className="key-courses">
-                          {edu.keyCourses
-                            .filter((course) => course.course && course.course.trim())
-                            .map((course, courseIndex) => (
-                              <span key={courseIndex} className="course-tag">{course.course}</span>
-                            ))}
-                        </div>
-                      )}
-                    </div>
+          {/* Interests Section */}
+          {personalInfo.interests && personalInfo.interests.length > 0 && 
+           personalInfo.interests.some((interest) => interest.interest && interest.interest.trim()) && (
+            <section className="resume-section">
+              <h3 className="section-title">
+                <i className="fas fa-heart"></i>
+                Interests
+              </h3>
+              <div className="interests-list">
+                {personalInfo.interests
+                  .filter((interest) => interest.interest && interest.interest.trim())
+                  .map((interest, index) => (
+                    <span key={index} className="interest-tag">{interest.interest}</span>
                   ))}
-                </section>
-              )}
+              </div>
+            </section>
+          )}
 
-              {/* Skills Section */}
-              {resume.skills && resume.skills.length > 0 && 
-               resume.skills.some((skill) => skill.skill && skill.skill.trim()) && (
-                <section className="resume-section">
-                  <h3 className="section-title">
-                    <i className="fas fa-code"></i>
-                    Skills
-                  </h3>
-                  <div className="skill-tags">
-                    {resume.skills
-                      .filter((skill) => skill.skill && skill.skill.trim())
-                      .map((skill, index) => (
-                        <span key={index} className="skill-tag">{skill.skill}</span>
-                      ))}
-                  </div>
-                </section>
-              )}
-            </div>
-          </div>
         </main>
       </div>
 

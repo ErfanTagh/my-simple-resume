@@ -89,6 +89,10 @@ export const cvFormSchema = z.object({
       skill: z.string().min(1, "Skill is required"),
     })
   ),
+  sectionOrder: z.array(z.string()).optional(),
+  template: z.enum(["modern", "classic", "minimal", "creative"]).default("modern"),
 });
 
 export type CVFormData = z.infer<typeof cvFormSchema>;
+
+export type CVTemplate = "modern" | "classic" | "minimal" | "creative";

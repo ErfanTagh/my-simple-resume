@@ -100,6 +100,13 @@ body {
   gap: 4px;
 }
 
+.contact-info-horizontal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px 30px;
+  justify-content: flex-start;
+}
+
 .contact-item {
   display: flex;
   align-items: center;
@@ -146,9 +153,8 @@ body {
 }
 
 .content-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  gap: 25px;
+  display: block;
+  width: 100%;
 }
 
 /* Section Styles */
@@ -336,26 +342,30 @@ body {
   gap: 8px;
 }
 
+.languages-list-horizontal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px 40px;
+  justify-content: flex-start;
+}
+
 .language-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
+  gap: 10px;
 }
 
 .language-name {
   font-weight: 500;
   color: #495057;
-  min-width: 80px;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
 }
 
 .language-level {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #6c757d;
-  font-weight: 500;
-  width: 24px;
-  text-align: right;
+  font-weight: 600;
   font-family: monospace;
 }
 
@@ -404,10 +414,14 @@ body {
 }
 
 .certification-header h4 {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: #2c3e50;
-  line-height: 1.3;
+  color: #000000;
+  line-height: 1.2;
+}
+
+.certification-header h4 strong {
+  font-weight: 700;
 }
 
 .certification-issuer {
@@ -607,6 +621,10 @@ body {
   font-weight: 600;
   color: #000000;
   line-height: 1.2;
+}
+
+.project-header h4 strong {
+  font-weight: 700;
 }
 
 .project-link {
@@ -859,13 +877,18 @@ body {
     padding: 0;
   }
   
+  @page {
+    margin: 18mm 18mm;
+    size: A4;
+  }
+  
   .resume-container {
     box-shadow: none;
-    margin: 0;
+    margin: 0 !important;
+    padding: 0 !important;
     border-radius: 0;
     max-width: none;
     width: 100%;
-    page-break-inside: avoid;
   }
   
   .resume-header {
@@ -873,7 +896,8 @@ body {
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
     print-color-adjust: exact;
-    padding: 15px 25px !important;
+    padding: 25px 30px 20px 30px !important;
+    page-break-after: avoid;
   }
   
   .level-fill,
@@ -895,36 +919,80 @@ body {
   }
   
   .resume-main {
-    padding: 15px 25px !important;
+    padding: 0 30px 25px 30px !important;
+    margin: 0 !important;
   }
   
   .content-grid {
-    gap: 20px !important;
+    display: block !important;
+    width: 100% !important;
   }
   
+  /* Ensure all sections have consistent spacing */
   .resume-section {
-    margin-bottom: 14px !important;
+    margin-bottom: 12px !important;
+    margin-top: 0 !important;
+    padding-top: 18px !important;
     page-break-inside: avoid;
+    orphans: 3;
+    widows: 3;
   }
   
+  /* First section on page 1 needs less top spacing */
+  .resume-section:first-of-type {
+    padding-top: 0 !important;
+    page-break-before: avoid;
+  }
+  
+  /* Section titles should stay with their content */
+  .section-title {
+    margin-bottom: 8px !important;
+    padding-bottom: 4px !important;
+    page-break-after: avoid;
+    orphans: 3;
+  }
+  
+  /* Items should stay together */
   .project-item,
   .certification-item {
     margin-bottom: 10px !important;
     padding-bottom: 10px !important;
     page-break-inside: avoid;
+    orphans: 2;
+    widows: 2;
   }
   
   .experience-item {
     margin-bottom: 12px !important;
     page-break-inside: avoid;
+    orphans: 3;
+    widows: 3;
   }
   
   .education-item {
     margin-bottom: 10px !important;
     padding-bottom: 10px !important;
     page-break-inside: avoid;
+    orphans: 2;
+    widows: 2;
   }
   
+  /* Keep list items together with their headers */
+  .experience-header {
+    page-break-after: avoid;
+  }
+  
+  .experience-details {
+    page-break-before: avoid;
+  }
+  
+  .experience-details li {
+    margin-bottom: 2px !important;
+    line-height: 1.2 !important;
+    page-break-inside: avoid;
+  }
+  
+  /* Compact spacing for tags */
   .skills-grid {
     gap: 12px !important;
   }
@@ -933,7 +1001,8 @@ body {
     gap: 10px !important;
   }
   
-  .languages-list {
+  .languages-list,
+  .languages-list-horizontal {
     gap: 6px !important;
   }
   
@@ -941,6 +1010,7 @@ body {
   .job-tech {
     gap: 3px !important;
     margin-top: 4px !important;
+    page-break-before: avoid;
   }
   
   .job-competencies {
@@ -956,19 +1026,21 @@ body {
     gap: 3px !important;
   }
   
-  .section-title {
-    margin-bottom: 8px !important;
-    padding-bottom: 4px !important;
-  }
-  
-  .experience-details li {
-    margin-bottom: 2px !important;
-    line-height: 1.2 !important;
-  }
-  
   .profile-image {
     width: 60px !important;
     height: 60px !important;
+  }
+  
+  /* Avoid page breaks after headers */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    orphans: 3;
+    widows: 3;
+  }
+  
+  /* Contact info should not break */
+  .contact-info-horizontal {
+    page-break-inside: avoid;
   }
 }
 

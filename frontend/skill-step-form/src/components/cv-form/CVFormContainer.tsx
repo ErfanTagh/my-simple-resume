@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProgressIndicator } from "./ProgressIndicator";
 import { PersonalInfoStep } from "./PersonalInfoStep";
 import { WorkExperienceStep } from "./WorkExperienceStep";
@@ -14,8 +15,11 @@ import { LanguagesStep } from "./LanguagesStep";
 import { SkillsStep } from "./SkillsStep";
 import { ReviewStep } from "./ReviewStep";
 import { CVPreview } from "./CVPreview";
-import { cvFormSchema, CVFormData } from "./types";
-import { ChevronLeft, ChevronRight, FileCheck, Beaker } from "lucide-react";
+import { CVRating } from "./CVRating";
+import { TemplateSelector } from "./TemplateSelector";
+import { SectionOrderManager } from "./SectionOrderManager";
+import { cvFormSchema, CVFormData, CVTemplate } from "./types";
+import { ChevronLeft, ChevronRight, FileCheck, Beaker, Sparkles, Palette, ListOrdered } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { getTestProfile, getTestProfileNames } from "@/lib/testData";
 
@@ -63,6 +67,8 @@ export const CVFormContainer = () => {
       certificates: [],
       languages: [{ language: "", proficiency: "" }],
       skills: [{ skill: "" }],
+      sectionOrder: ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"],
+      template: "modern",
     },
   });
 
@@ -178,90 +184,135 @@ export const CVFormContainer = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Form Section */}
-        <Card className="p-8 shadow-elevated">
-          <ProgressIndicator
-            currentStep={currentStep}
-            totalSteps={steps.length}
-            stepLabels={steps.map((s) => s.label)}
-          />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Form Section - Takes 2 columns */}
+          <div className="lg:col-span-2">
+            <Card className="p-8 shadow-elevated">
+              <ProgressIndicator
+                currentStep={currentStep}
+                totalSteps={steps.length}
+                stepLabels={steps.map((s) => s.label)}
+              />
 
-          {/* Dev-only Test Data Loader */}
-          {import.meta.env.DEV && (
-            <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <Beaker className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                <label className="text-sm font-semibold text-amber-900 dark:text-amber-100">
-                  Development Mode: Test Data Loader
-                </label>
-              </div>
-              <select
-                onChange={handleLoadTestProfile}
-                className="w-full p-2 border border-amber-300 dark:border-amber-700 rounded-md text-sm bg-white dark:bg-amber-900 text-amber-900 dark:text-amber-100"
-                defaultValue=""
-              >
-                <option value="">Select a test profile...</option>
-                <option value="minimal">Minimal Data (Edge Case)</option>
-                <option value="maximal">Maximal Data (Stress Test)</option>
-                <option value="specialChars">Special Characters (José, 中文)</option>
-                <option value="longText">Long Text Overflow</option>
-                <option value="freshGraduate">Fresh Graduate</option>
-                <option value="seniorProfessional">Senior Professional (10+ years)</option>
-                <option value="withProfileImage">With Profile Image</option>
-                <option value="allOptionalEmpty">All Optional Fields Empty</option>
-              </select>
-              <p className="text-xs text-amber-700 dark:text-amber-300 mt-2">
-                💡 Instantly fill the form with test data to preview different resume layouts
-              </p>
-            </div>
-          )}
-
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-              {currentStep === steps.length - 1 ? (
-                <ReviewStep form={form} onEditStep={handleEditStep} />
-              ) : (
-                <CurrentStepComponent form={form} />
+              {/* Dev-only Test Data Loader */}
+              {import.meta.env.DEV && (
+                <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Beaker className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                    <label className="text-sm font-semibold text-amber-900 dark:text-amber-100">
+                      Development Mode: Test Data Loader
+                    </label>
+                  </div>
+                  <select
+                    onChange={handleLoadTestProfile}
+                    className="w-full p-2 border border-amber-300 dark:border-amber-700 rounded-md text-sm bg-white dark:bg-amber-900 text-amber-900 dark:text-amber-100"
+                    defaultValue=""
+                  >
+                    <option value="">Select a test profile...</option>
+                    <option value="minimal">Minimal Data (Edge Case)</option>
+                    <option value="maximal">Maximal Data (Stress Test)</option>
+                    <option value="specialChars">Special Characters (José, 中文)</option>
+                    <option value="longText">Long Text Overflow</option>
+                    <option value="freshGraduate">Fresh Graduate</option>
+                    <option value="seniorProfessional">Senior Professional (10+ years)</option>
+                    <option value="withProfileImage">With Profile Image</option>
+                    <option value="allOptionalEmpty">All Optional Fields Empty</option>
+                  </select>
+                  <p className="text-xs text-amber-700 dark:text-amber-300 mt-2">
+                    💡 Instantly fill the form with test data to preview different resume layouts
+                  </p>
+                </div>
               )}
 
-              <div className="flex justify-between mt-8 pt-6 border-t">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handlePrevious}
-                  disabled={currentStep === 0}
-                >
-                  <ChevronLeft className="mr-2 h-4 w-4" />
-                  Previous
-                </Button>
+              <form onSubmit={form.handleSubmit(onSubmit)}>
+                  {currentStep === steps.length - 1 ? (
+                    <ReviewStep form={form} onEditStep={handleEditStep} />
+                  ) : (
+                    <CurrentStepComponent form={form} />
+                  )}
 
-                {currentStep === steps.length - 1 ? (
-                  <Button type="submit" className="gap-2" disabled={isSaving}>
-                    {isSaving ? (
-                      <>
-                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
-                        Saving...
-                      </>
+                  <div className="flex justify-between mt-8 pt-6 border-t">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handlePrevious}
+                      disabled={currentStep === 0}
+                    >
+                      <ChevronLeft className="mr-2 h-4 w-4" />
+                      Previous
+                    </Button>
+
+                    {currentStep === steps.length - 1 ? (
+                      <Button type="submit" className="gap-2" disabled={isSaving}>
+                        {isSaving ? (
+                          <>
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <FileCheck className="h-4 w-4" />
+                            Complete CV
+                          </>
+                        )}
+                      </Button>
                     ) : (
-                      <>
-                        <FileCheck className="h-4 w-4" />
-                        Complete CV
-                      </>
+                      <Button type="button" onClick={handleNext}>
+                        Next
+                        <ChevronRight className="ml-2 h-4 w-4" />
+                      </Button>
                     )}
-                  </Button>
-                ) : (
-                  <Button type="button" onClick={handleNext}>
-                    Next
-                    <ChevronRight className="ml-2 h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            </form>
-          </Card>
+                  </div>
+                </form>
+            </Card>
+          </div>
 
-          {/* Live Preview Section - Hidden on mobile, visible on large screens */}
-          <div className="hidden lg:block">
-            <CVPreview data={formData} />
+          {/* Right Sidebar - Tabbed Preview, Rating & Customization */}
+          <div className="hidden lg:block space-y-6">
+            <Tabs defaultValue="preview" className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="preview" className="text-xs">
+                  <FileCheck className="h-4 w-4 mr-1" />
+                  Preview
+                </TabsTrigger>
+                <TabsTrigger value="rating" className="text-xs">
+                  <Sparkles className="h-4 w-4 mr-1" />
+                  Score
+                </TabsTrigger>
+                <TabsTrigger value="template" className="text-xs">
+                  <Palette className="h-4 w-4 mr-1" />
+                  Style
+                </TabsTrigger>
+                <TabsTrigger value="order" className="text-xs">
+                  <ListOrdered className="h-4 w-4 mr-1" />
+                  Order
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="preview" className="mt-4">
+                <CVPreview data={formData} />
+              </TabsContent>
+              
+              <TabsContent value="rating" className="mt-4">
+                <CVRating data={formData} />
+              </TabsContent>
+              
+              <TabsContent value="template" className="mt-4">
+                <Card className="p-6">
+                  <TemplateSelector
+                    selected={formData.template || "modern"}
+                    onSelect={(template) => form.setValue("template", template)}
+                  />
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="order" className="mt-4">
+                <SectionOrderManager
+                  sectionOrder={formData.sectionOrder || ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"]}
+                  onReorder={(newOrder) => form.setValue("sectionOrder", newOrder)}
+                />
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </div>

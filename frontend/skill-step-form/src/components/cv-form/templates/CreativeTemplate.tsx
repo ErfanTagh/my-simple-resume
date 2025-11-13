@@ -1,0 +1,231 @@
+import { CVFormData } from "../types";
+import { Mail, Phone, MapPin, Linkedin, Github, Globe } from "lucide-react";
+
+interface CreativeTemplateProps {
+  data: CVFormData;
+}
+
+export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
+  const { personalInfo, workExperience, education, projects, certificates, languages, skills, sectionOrder } = data;
+  
+  const defaultOrder = ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"];
+  const orderedSections = sectionOrder || defaultOrder;
+
+  const renderSection = (sectionKey: string) => {
+    switch (sectionKey) {
+      case "summary":
+        return personalInfo.summary ? (
+          <div key="summary" className="mb-6">
+            <div className="relative pl-6 border-l-4 border-primary">
+              <h2 className="text-2xl font-black mb-3 text-primary italic">About Me</h2>
+              <p className="text-sm text-foreground leading-relaxed">{personalInfo.summary}</p>
+            </div>
+          </div>
+        ) : null;
+
+      case "workExperience":
+        return workExperience.some(exp => exp.position || exp.company) ? (
+          <div key="workExperience" className="mb-6">
+            <div className="relative pl-6 border-l-4 border-primary">
+              <h2 className="text-2xl font-black mb-4 text-primary italic">Experience</h2>
+              <div className="space-y-5">
+                {workExperience.map((exp, index) => (
+                  (exp.position || exp.company) && (
+                    <div key={index} className="relative">
+                      <div className="absolute -left-[26px] w-3 h-3 rounded-full bg-primary"></div>
+                      <h3 className="text-lg font-bold text-foreground">{exp.position}</h3>
+                      <p className="text-base font-semibold text-primary">{exp.company}</p>
+                      {(exp.startDate || exp.endDate) && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {exp.startDate} - {exp.endDate || "Present"}
+                        </p>
+                      )}
+                      {exp.description && <p className="text-sm text-muted-foreground mt-2">{exp.description}</p>}
+                    </div>
+                  )
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : null;
+
+      case "education":
+        return education.some(edu => edu.degree || edu.institution) ? (
+          <div key="education" className="mb-6">
+            <div className="relative pl-6 border-l-4 border-primary">
+              <h2 className="text-2xl font-black mb-4 text-primary italic">Education</h2>
+              <div className="space-y-4">
+                {education.map((edu, index) => (
+                  (edu.degree || edu.institution) && (
+                    <div key={index} className="relative">
+                      <div className="absolute -left-[26px] w-3 h-3 rounded-full bg-primary"></div>
+                      <h3 className="text-lg font-bold text-foreground">{edu.degree}</h3>
+                      <p className="text-sm text-muted-foreground">{edu.institution}</p>
+                      {edu.field && <p className="text-sm text-muted-foreground italic">{edu.field}</p>}
+                    </div>
+                  )
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : null;
+
+      case "projects":
+        return projects.some(proj => proj.name) ? (
+          <div key="projects" className="mb-6">
+            <div className="relative pl-6 border-l-4 border-primary">
+              <h2 className="text-2xl font-black mb-4 text-primary italic">Projects</h2>
+              <div className="space-y-4">
+                {projects.map((proj, index) => (
+                  proj.name && (
+                    <div key={index} className="relative">
+                      <div className="absolute -left-[26px] w-3 h-3 rounded-full bg-primary"></div>
+                      <h3 className="text-lg font-bold text-foreground">{proj.name}</h3>
+                      {proj.description && <p className="text-sm text-muted-foreground">{proj.description}</p>}
+                      {proj.technologies && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {proj.technologies.split(',').map((tech, i) => (
+                            <span key={i} className="px-2 py-0.5 bg-primary/20 text-primary text-xs rounded">
+                              {tech.trim()}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : null;
+
+      case "certificates":
+        return certificates.some(cert => cert.name) ? (
+          <div key="certificates" className="mb-6">
+            <div className="relative pl-6 border-l-4 border-primary">
+              <h2 className="text-2xl font-black mb-4 text-primary italic">Certifications</h2>
+              <div className="space-y-3">
+                {certificates.map((cert, index) => (
+                  cert.name && (
+                    <div key={index} className="relative">
+                      <div className="absolute -left-[26px] w-3 h-3 rounded-full bg-primary"></div>
+                      <h3 className="font-bold text-foreground">{cert.name}</h3>
+                      <p className="text-sm text-muted-foreground">{cert.organization}</p>
+                    </div>
+                  )
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : null;
+
+      case "skills":
+        return skills.some(s => s.skill) ? (
+          <div key="skills" className="mb-6">
+            <div className="relative pl-6 border-l-4 border-primary">
+              <h2 className="text-2xl font-black mb-4 text-primary italic">Skills</h2>
+              <div className="flex flex-wrap gap-2">
+                {skills.map((s, index) => (
+                  s.skill && (
+                    <span key={index} className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-bold shadow-md">
+                      {s.skill}
+                    </span>
+                  )
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : null;
+
+      case "languages":
+        return languages.some(lang => lang.language) ? (
+          <div key="languages" className="mb-6">
+            <div className="relative pl-6 border-l-4 border-primary">
+              <h2 className="text-2xl font-black mb-4 text-primary italic">Languages</h2>
+              <div className="grid grid-cols-2 gap-3">
+                {languages.map((lang, index) => (
+                  lang.language && (
+                    <div key={index} className="bg-primary/5 p-3 rounded-lg">
+                      <p className="font-bold text-foreground">{lang.language}</p>
+                      <p className="text-sm text-muted-foreground">{lang.proficiency}</p>
+                    </div>
+                  )
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : null;
+
+      case "interests":
+        return personalInfo.interests ? (
+          <div key="interests" className="mb-6">
+            <div className="relative pl-6 border-l-4 border-primary">
+              <h2 className="text-2xl font-black mb-3 text-primary italic">Interests</h2>
+              <p className="text-sm text-foreground">{personalInfo.interests}</p>
+            </div>
+          </div>
+        ) : null;
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="bg-gradient-to-br from-background to-primary/5 text-foreground p-8 max-w-4xl mx-auto">
+      {/* Bold creative header */}
+      <div className="mb-8">
+        <h1 className="text-5xl font-black text-foreground mb-2 italic tracking-tight">
+          {personalInfo.firstName}
+        </h1>
+        <h1 className="text-5xl font-black text-primary mb-4 italic tracking-tight">
+          {personalInfo.lastName}
+        </h1>
+        
+        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mt-4">
+          {personalInfo.email && (
+            <div className="flex items-center gap-2 bg-background/50 px-3 py-1 rounded-full">
+              <Mail className="h-4 w-4 text-primary" />
+              <span>{personalInfo.email}</span>
+            </div>
+          )}
+          {personalInfo.phone && (
+            <div className="flex items-center gap-2 bg-background/50 px-3 py-1 rounded-full">
+              <Phone className="h-4 w-4 text-primary" />
+              <span>{personalInfo.phone}</span>
+            </div>
+          )}
+          {personalInfo.location && (
+            <div className="flex items-center gap-2 bg-background/50 px-3 py-1 rounded-full">
+              <MapPin className="h-4 w-4 text-primary" />
+              <span>{personalInfo.location}</span>
+            </div>
+          )}
+          {personalInfo.linkedin && (
+            <div className="flex items-center gap-2 bg-background/50 px-3 py-1 rounded-full">
+              <Linkedin className="h-4 w-4 text-primary" />
+              <span>{personalInfo.linkedin}</span>
+            </div>
+          )}
+          {personalInfo.github && (
+            <div className="flex items-center gap-2 bg-background/50 px-3 py-1 rounded-full">
+              <Github className="h-4 w-4 text-primary" />
+              <span>{personalInfo.github}</span>
+            </div>
+          )}
+          {personalInfo.website && (
+            <div className="flex items-center gap-2 bg-background/50 px-3 py-1 rounded-full">
+              <Globe className="h-4 w-4 text-primary" />
+              <span>{personalInfo.website}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Sections with creative timeline */}
+      <div>
+        {orderedSections.map(section => renderSection(section))}
+      </div>
+    </div>
+  );
+};
