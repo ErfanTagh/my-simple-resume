@@ -33,10 +33,6 @@ jobs:
             echo "🛑 Stopping services..."
             docker compose -f docker-compose.prod.yml down
 
-            # Remove old frontend volume to force rebuild
-            echo "🗑️  Cleaning old frontend build..."
-            docker volume rm my-simple-resume_frontend_build || true
-
             # Rebuild containers
             echo "🔨 Rebuilding containers..."
             docker compose -f docker-compose.prod.yml build --no-cache frontend
@@ -48,17 +44,25 @@ jobs:
 
             # Wait for services to start
             echo "⏳ Waiting for services to initialize..."
-            sleep 15
+            sleep 20
 
-            # Copy frontend files to nginx
-            echo "📋 Copying frontend files..."
-            docker cp resume_frontend:/usr/share/nginx/html/. /tmp/react-app/ || true
-            docker cp /tmp/react-app/. resume_nginx:/usr/share/nginx/html/ || true
-            rm -rf /tmp/react-app
+            # Copy frontend files from container to nginx
+            echo "📋 Copying frontend files to nginx..."
+            docker cp resume_frontend:/usr/share/nginx/html/. /tmp/frontend-build/ 2>/dev/null || echo "Frontend files already in place"
+            if [ -d "/tmp/frontend-build" ]; then
+              docker cp /tmp/frontend-build/. resume_nginx:/usr/share/nginx/html/
+              rm -rf /tmp/frontend-build
+              echo "✅ Frontend files copied successfully"
+            fi
 
-            # Restart nginx to load new files
-            echo "🔄 Restarting nginx..."
-            docker compose -f docker-compose.prod.yml restart nginx
+            # Run database migrations
+            echo "🗄️  Running database migrations..."
+            docker compose -f docker-compose.prod.yml exec -T backend python manage.py makemigrations || true
+            docker compose -f docker-compose.prod.yml exec -T backend python manage.py migrate || true
+
+            # Restart services to ensure everything is fresh
+            echo "🔄 Restarting services..."
+            docker compose -f docker-compose.prod.yml restart
 
             # Show status
             echo "✅ Deployment complete!"
