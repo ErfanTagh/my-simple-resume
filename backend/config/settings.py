@@ -80,6 +80,10 @@ DATABASES = {
         'CLIENT': {
             'host': os.getenv('MONGODB_HOST', 'localhost'),
             'port': int(os.getenv('MONGODB_PORT', 27017)),
+            'username': os.getenv('MONGODB_USERNAME', ''),
+            'password': os.getenv('MONGODB_PASSWORD', ''),
+            'authSource': 'admin',
+            'authMechanism': 'SCRAM-SHA-1',
         }
     }
 }
