@@ -3,12 +3,8 @@
  * Handles all HTTP requests to the Django backend
  */
 
-// Force the correct API base URL since env vars aren't working in Docker
-const API_BASE_URL = 'http://localhost:8000/api';
-
-// Log the API base URL for debugging
-console.log('API Base URL:', API_BASE_URL);
-console.log('Environment VITE_API_URL:', import.meta.env.VITE_API_URL);
+// Use relative API base URL so it works in both dev (Vite proxy) and production (Nginx)
+const API_BASE_URL = '/api';
 
 // Helper function to convert camelCase to snake_case
 const camelToSnake = (str: string): string => {
