@@ -1,268 +1,116 @@
-# 📄 Resume Builder App
+# Resume Builder
 
-A full-stack web application for creating beautiful, professional resumes with PDF export functionality.
+Build professional resumes with a clean multi-step form. Live at [123resume.de](https://123resume.de)
 
-## 🚀 Quick Start with Docker (Recommended)
+## Quick Start
 
-### One Command to Start Everything
+Just run this:
 
 ```bash
-/home/erfan/resume-app/START_ALL_DOCKER.sh
+./START_ALL_DOCKER.sh
 ```
 
-This starts:
+Opens at http://localhost:5173
 
-- ✅ MongoDB database
-- ✅ Django REST API backend
-- ✅ React frontend
-
-Then open: **http://localhost:5173**
-
-### Prerequisites
-
-You only need Docker:
+You'll need Docker installed first:
 
 ```bash
-# Ubuntu/Debian
 sudo apt install docker.io docker-compose-plugin
-
-# Start Docker
 sudo systemctl start docker
 sudo usermod -aG docker $USER
-# (logout and login again)
 ```
 
-See [INSTALL_DOCKER.md](INSTALL_DOCKER.md) for detailed installation instructions.
+Then logout and back in.
 
-## 🎯 Features
+## What's in it
 
-- ✨ **Multi-step Form** - Easy-to-use form for entering resume data
-- 📝 **Comprehensive Sections** - Personal info, work experience, education, projects, certifications, skills, languages
-- 👁️ **Live Preview** - View your resume in professional layout
-- 📄 **PDF Export** - Print or download as PDF
-- 🔒 **User Authentication** - JWT-based secure authentication
-- 💾 **Save Multiple Resumes** - Create and manage multiple versions
-- 🎨 **Beautiful Design** - Modern, professional resume template
-- 📱 **Responsive** - Works on desktop, tablet, and mobile
+- Multi-step form for resume building
+- 4 templates: Modern, Classic, Minimal, Creative (each with its own font)
+- Live preview as you type
+- Quality scoring (checks completeness, clarity, formatting, impact)
+- Add responsibilities and skills one line at a time
+- Drag-and-drop to reorder sections
+- Export to PDF
+- User accounts with email verification
+- Password reset via email
+- Save multiple resume versions
+- Works on mobile too
 
-## 📚 Tech Stack
+## Tech Stack
 
-### Frontend
+**Frontend:** React + TypeScript, Vite, Tailwind CSS, shadcn/ui, React Hook Form, Zod
 
-- React + TypeScript
-- Vite
-- Tailwind CSS
-- shadcn/ui components
-- React Hook Form + Zod validation
-- React Router
-- Axios
+**Backend:** Django REST Framework, JWT auth, MongoDB
 
-### Backend
+**Deployment:** Docker Compose, Nginx, Let's Encrypt SSL, GitHub Actions for CI/CD
 
-- Django 4.2
-- Django REST Framework
-- JWT Authentication (simplejwt)
-- MongoDB (via Djongo)
-- CORS enabled
+## Development
 
-### Infrastructure
-
-- Docker & Docker Compose
-- MongoDB 6.0
-
-## 🛠️ Setup Options
-
-### Option 1: Docker (Easiest & Recommended) ⭐
-
-**Start everything:**
+**With Docker:**
 
 ```bash
-/home/erfan/resume-app/START_ALL_DOCKER.sh
+./START_ALL_DOCKER.sh    # Start everything
+docker compose down       # Stop
 ```
 
-**Start backend only:**
+**Without Docker:**
 
 ```bash
-/home/erfan/resume-app/START_DOCKER.sh
-```
-
-**Stop everything:**
-
-```bash
-cd /home/erfan/resume-app
-docker compose down
-```
-
-### Option 2: Local Development
-
-**Backend:**
-
-```bash
-cd /home/erfan/resume-app/backend
+# Backend
+cd backend
 source venv/bin/activate
 python manage.py runserver
-```
 
-**Frontend:**
-
-```bash
-cd /home/erfan/resume-app/frontend/skill-step-form
+# Frontend (separate terminal)
+cd frontend/skill-step-form
 npm install
 npm run dev
 ```
 
-See [QUICK_START.md](QUICK_START.md) for detailed local setup instructions.
+## How to use it
 
-## 📖 Documentation
+1. Sign up and verify your email
+2. Click "Create Resume"
+3. Fill in the form (personal info, work experience, education, etc.)
+4. Pick a template and customize section order if you want
+5. See live preview on the right
+6. Export to PDF when done
+7. All your resumes are saved - edit or create new ones anytime
 
-- **[DOCKER_GUIDE.md](DOCKER_GUIDE.md)** - Complete Docker documentation
-- **[INSTALL_DOCKER.md](INSTALL_DOCKER.md)** - Docker installation guide
-- **[QUICK_START.md](QUICK_START.md)** - Local development setup
-- **[IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md)** - Full feature overview
-- **[backend/README.md](backend/README.md)** - Backend API documentation
-- **[backend/AUTHENTICATION.md](backend/AUTHENTICATION.md)** - Authentication guide
-- **[frontend/skill-step-form/RESUME_VIEWER.md](frontend/skill-step-form/RESUME_VIEWER.md)** - Resume viewer docs
+## API Endpoints
 
-## 🎮 Usage
+**Frontend:** http://localhost:5173
 
-### 1. Start the Application
+**Backend:** http://localhost:8000
 
-```bash
-/home/erfan/resume-app/START_ALL_DOCKER.sh
-```
+Main routes:
 
-Wait for:
-
-```
-✅ SUCCESS! All services are running!
-📱 Frontend Application: http://localhost:5173
-```
-
-### 2. Create an Account
-
-- Open http://localhost:5173
-- Click "Sign Up"
-- Enter your details
-- Login
-
-### 3. Create Your Resume
-
-- Click "Create New Resume"
-- Fill out the multi-step form:
-  - **Personal Information** - Name, contact, professional title
-  - **Work Experience** - Jobs, companies, responsibilities
-  - **Education** - Degrees, institutions, courses
-  - **Projects** - Personal/professional projects (optional)
-  - **Certifications** - Certificates and credentials (optional)
-  - **Languages** - Language proficiency
-  - **Skills** - Technical and soft skills
-
-### 4. View & Download
-
-- After completing the form, you'll see your resume in professional layout
-- Click "Print" or "Download PDF" to save it
-- Your resume is automatically saved to your account
-
-### 5. Manage Resumes
-
-- Go to "My Resumes" to see all your saved resumes
-- View, edit, or delete any resume
-- Create multiple versions for different job applications
-
-## 🌐 Endpoints
-
-### Frontend
-
-- **Application**: http://localhost:5173
-- **Login/Signup**: http://localhost:5173/login
-
-### Backend API
-
-- **API Base**: http://localhost:8000
-- **Health Check**: http://localhost:8000/api/health/
-- **Admin Panel**: http://localhost:8000/admin/
-
-### API Routes
-
-- `POST /api/auth/register/` - Register new user
+- `POST /api/auth/register/` - Sign up
 - `POST /api/auth/login/` - Login
-- `POST /api/auth/logout/` - Logout
-- `GET /api/auth/profile/` - Get user profile
-- `POST /api/auth/token/refresh/` - Refresh access token
-- `GET /api/resumes/` - List user's resumes
-- `POST /api/resumes/` - Create new resume
-- `GET /api/resumes/{id}/` - Get specific resume
+- `GET /api/resumes/` - Get your resumes
+- `POST /api/resumes/` - Create resume
 - `PUT /api/resumes/{id}/` - Update resume
 - `DELETE /api/resumes/{id}/` - Delete resume
 
-## 🔧 Development
-
-### View Logs
+## Useful Commands
 
 ```bash
-# All services
-docker compose logs -f
-
-# Backend only
+# Logs
 docker compose logs -f backend
-
-# Frontend only
 docker compose logs -f frontend
 
-# MongoDB only
-docker compose logs -f mongodb
-```
-
-### Restart Services
-
-```bash
+# Restart
 docker compose restart
 
-# Or restart specific service
-docker compose restart backend
-```
-
-### Rebuild After Changes
-
-```bash
+# Rebuild after changes
 docker compose down
 docker compose build
 docker compose up -d
-```
 
-### Access Container Shell
-
-```bash
-# Backend
+# Access containers
 docker exec -it resume_backend bash
-
-# MongoDB
 docker exec -it resume_mongodb mongosh
 ```
-
-## 🎨 Resume Template
-
-The resume viewer uses a professional template with:
-
-- Two-column layout
-- Modern typography (Inter font)
-- Professional color scheme
-- Icon integration (Font Awesome)
-- Responsive design
-- Print-optimized CSS
-
-Customize the template by editing:
-
-- `frontend/skill-step-form/public/resume-styles.css`
-
-## 🔒 Security
-
-- JWT token-based authentication
-- HttpOnly cookies for refresh tokens
-- CORS protection
-- Password hashing with Django
-- Protected API endpoints
-- User-scoped data access
 
 ## 📦 Project Structure
 
@@ -289,93 +137,62 @@ resume-app/
 └── README.md            # This file
 ```
 
-## 🐛 Troubleshooting
+## Common Issues
 
-### Docker Compose Not Found
-
-```bash
-sudo apt install docker-compose-plugin
-# or
-sudo apt install docker-compose
-```
-
-### Port Already in Use
+**Port already in use:**
 
 ```bash
-# Kill process on port 8000
 sudo lsof -i :8000
 kill -9 <PID>
-
-# Or change port in docker-compose.yml
 ```
 
-### Cannot Connect to Docker
+**Docker not starting:**
 
 ```bash
 sudo systemctl start docker
 sudo usermod -aG docker $USER
-# logout and login
+# logout and back in
 ```
 
-### Frontend Can't Connect to Backend
+**Frontend can't reach backend:**
 
-1. Check backend is running: http://localhost:8000/api/health/
-2. Check CORS settings in backend
-3. Restart both services
+- Check backend is up: http://localhost:8000/api/health/
+- Restart: `docker compose restart`
 
-### MongoDB Connection Issues
+**MongoDB issues:**
 
 ```bash
-# Check MongoDB container
-docker ps | grep mongodb
-
-# View MongoDB logs
 docker compose logs mongodb
-
-# Restart MongoDB
 docker compose restart mongodb
 ```
 
-## 🚢 Production Deployment
+## Deployment
 
-Before deploying:
+Live site: [123resume.de](https://123resume.de)
 
-1. Update environment variables in `docker-compose.yml`:
+Uses GitHub Actions - just push to main and it auto-deploys:
 
-   - Set strong `SECRET_KEY`
-   - Set `DEBUG=False`
-   - Update `ALLOWED_HOSTS`
-   - Update `CORS_ALLOWED_ORIGINS`
+1. Pulls latest code
+2. Rebuilds Docker containers (no cache)
+3. Runs migrations
+4. Copies frontend to Nginx
+5. Reloads everything
 
-2. Use production database settings
+Setup includes:
 
-3. Set up HTTPS/SSL
+- HTTPS with Let's Encrypt
+- Nginx reverse proxy
+- MongoDB with auth
+- Email verification
+- Short cache times (5min for JS/CSS, none for HTML)
 
-4. Use production WSGI server (gunicorn)
+If deploying manually, set up `.env` with your secrets, run `./setup-ssl.sh` for SSL, then:
 
-5. Set up proper logging
-
-6. Configure backup strategy
-
-## 📄 License
-
-This project is for personal use.
-
-## 🙏 Acknowledgments
-
-- Built with Django REST Framework
-- UI components from shadcn/ui
-- Icons from Font Awesome
-- Fonts from Google Fonts
-
-## 📞 Support
-
-For issues or questions, check the documentation files:
-
-- [DOCKER_GUIDE.md](DOCKER_GUIDE.md)
-- [QUICK_START.md](QUICK_START.md)
-- [IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md)
+```bash
+docker compose -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.prod.yml exec backend python manage.py migrate
+```
 
 ---
 
-Made with ❤️ using Django, React, and Docker
+Made with Django REST Framework, React, shadcn/ui
