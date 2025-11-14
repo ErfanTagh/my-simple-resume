@@ -77,7 +77,7 @@ def calculate_completeness(data):
     
     has_detailed_edu = any(
         e.get('degree') and e.get('institution') and 
-        (e.get('field_of_study') or e.get('fieldOfStudy'))
+        (e.get('field_of_study') or e.get('fieldOfStudy') or e.get('field'))
         for e in education
     )
     if has_detailed_edu:
@@ -150,7 +150,7 @@ def calculate_clarity(data):
     clear_edu_entries = sum(
         1 for e in education
         if e.get('degree') and e.get('institution') and 
-        (e.get('field_of_study') or e.get('fieldOfStudy'))
+        (e.get('field_of_study') or e.get('fieldOfStudy') or e.get('field'))
     )
     
     if clear_edu_entries >= 1:

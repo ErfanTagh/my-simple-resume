@@ -202,21 +202,21 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
             </div>
           )}
           {personalInfo.linkedin && (
-            <div className="flex items-center gap-2 bg-background/50 px-3 py-1 rounded-full">
-              <Linkedin className="h-4 w-4 text-primary" />
-              <span>{personalInfo.linkedin}</span>
+            <div className="flex items-center gap-2 bg-background/50 px-3 py-1 rounded-full min-w-0 max-w-fit">
+              <Linkedin className="h-4 w-4 text-primary flex-shrink-0" />
+              <span className="truncate text-xs">{personalInfo.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span>
             </div>
           )}
           {personalInfo.github && (
-            <div className="flex items-center gap-2 bg-background/50 px-3 py-1 rounded-full">
-              <Github className="h-4 w-4 text-primary" />
-              <span>{personalInfo.github}</span>
+            <div className="flex items-center gap-2 bg-background/50 px-3 py-1 rounded-full min-w-0 max-w-fit">
+              <Github className="h-4 w-4 text-primary flex-shrink-0" />
+              <span className="truncate text-xs">{personalInfo.github.replace(/^https?:\/\/(www\.)?/, '')}</span>
             </div>
           )}
           {personalInfo.website && (
-            <div className="flex items-center gap-2 bg-background/50 px-3 py-1 rounded-full">
-              <Globe className="h-4 w-4 text-primary" />
-              <span>{personalInfo.website}</span>
+            <div className="flex items-center gap-2 bg-background/50 px-3 py-1 rounded-full min-w-0 max-w-fit">
+              <Globe className="h-4 w-4 text-primary flex-shrink-0" />
+              <span className="truncate text-xs">{personalInfo.website.replace(/^https?:\/\/(www\.)?/, '')}</span>
             </div>
           )}
         </div>

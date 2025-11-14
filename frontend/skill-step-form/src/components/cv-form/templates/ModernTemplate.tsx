@@ -183,21 +183,21 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
             </div>
           )}
           {personalInfo.linkedin && (
-            <div className="flex items-center gap-2">
-              <Linkedin className="h-4 w-4 text-primary" />
-              <span className="truncate">{personalInfo.linkedin}</span>
+            <div className="flex items-center gap-2 min-w-0">
+              <Linkedin className="h-4 w-4 text-primary flex-shrink-0" />
+              <span className="truncate text-xs">{personalInfo.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span>
             </div>
           )}
           {personalInfo.github && (
-            <div className="flex items-center gap-2">
-              <Github className="h-4 w-4 text-primary" />
-              <span className="truncate">{personalInfo.github}</span>
+            <div className="flex items-center gap-2 min-w-0">
+              <Github className="h-4 w-4 text-primary flex-shrink-0" />
+              <span className="truncate text-xs">{personalInfo.github.replace(/^https?:\/\/(www\.)?/, '')}</span>
             </div>
           )}
           {personalInfo.website && (
-            <div className="flex items-center gap-2">
-              <Globe className="h-4 w-4 text-primary" />
-              <span className="truncate">{personalInfo.website}</span>
+            <div className="flex items-center gap-2 min-w-0">
+              <Globe className="h-4 w-4 text-primary flex-shrink-0" />
+              <span className="truncate text-xs">{personalInfo.website.replace(/^https?:\/\/(www\.)?/, '')}</span>
             </div>
           )}
         </div>

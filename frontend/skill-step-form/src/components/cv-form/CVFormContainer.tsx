@@ -172,11 +172,12 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
 
         toast({
           title: "CV Updated Successfully!",
-          description: "Redirecting to your updated resume...",
+          description: "Opening your resume in a new tab...",
         });
 
         setTimeout(() => {
-          navigate(`/resume/${updatedResume.id}`);
+          window.open(`/resume/${updatedResume.id}`, '_blank');
+          navigate('/resumes');
         }, 800);
       } else {
         console.log("API imported, creating resume...");
@@ -188,12 +189,13 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
         
         toast({
           title: "CV Saved Successfully!",
-          description: "Redirecting to your resume...",
+          description: "Opening your resume in a new tab...",
         });
 
-        // Redirect to the newly created resume view after a brief delay
+        // Open resume in new tab and redirect to resumes list
         setTimeout(() => {
-          navigate(`/resume/${savedResume.id}`);
+          window.open(`/resume/${savedResume.id}`, '_blank');
+          navigate('/resumes');
         }, 1000);
       }
     } catch (error: any) {

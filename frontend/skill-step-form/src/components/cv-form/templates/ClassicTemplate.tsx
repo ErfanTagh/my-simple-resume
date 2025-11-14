@@ -173,21 +173,21 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
             </div>
           )}
           {personalInfo.linkedin && (
-            <div className="flex items-center gap-1">
-              <Linkedin className="h-3 w-3" />
-              <span>{personalInfo.linkedin}</span>
+            <div className="flex items-center gap-1 min-w-0">
+              <Linkedin className="h-3 w-3 flex-shrink-0" />
+              <span className="truncate text-xs">{personalInfo.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span>
             </div>
           )}
           {personalInfo.github && (
-            <div className="flex items-center gap-1">
-              <Github className="h-3 w-3" />
-              <span>{personalInfo.github}</span>
+            <div className="flex items-center gap-1 min-w-0">
+              <Github className="h-3 w-3 flex-shrink-0" />
+              <span className="truncate text-xs">{personalInfo.github.replace(/^https?:\/\/(www\.)?/, '')}</span>
             </div>
           )}
           {personalInfo.website && (
-            <div className="flex items-center gap-1">
-              <Globe className="h-3 w-3" />
-              <span>{personalInfo.website}</span>
+            <div className="flex items-center gap-1 min-w-0">
+              <Globe className="h-3 w-3 flex-shrink-0" />
+              <span className="truncate text-xs">{personalInfo.website.replace(/^https?:\/\/(www\.)?/, '')}</span>
             </div>
           )}
         </div>

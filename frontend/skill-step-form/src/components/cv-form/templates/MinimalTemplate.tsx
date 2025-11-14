@@ -155,9 +155,9 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
           {personalInfo.email && <span>{personalInfo.email}</span>}
           {personalInfo.phone && <span>{personalInfo.phone}</span>}
           {personalInfo.location && <span>{personalInfo.location}</span>}
-          {personalInfo.linkedin && <span>{personalInfo.linkedin}</span>}
-          {personalInfo.github && <span>{personalInfo.github}</span>}
-          {personalInfo.website && <span>{personalInfo.website}</span>}
+          {personalInfo.linkedin && <span className="truncate max-w-[200px]">{personalInfo.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span>}
+          {personalInfo.github && <span className="truncate max-w-[200px]">{personalInfo.github.replace(/^https?:\/\/(www\.)?/, '')}</span>}
+          {personalInfo.website && <span className="truncate max-w-[200px]">{personalInfo.website.replace(/^https?:\/\/(www\.)?/, '')}</span>}
         </div>
       </div>
 
