@@ -6,26 +6,62 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { LogIn, AlertCircle } from 'lucide-react';
+import { LogIn, AlertCircle, Mail } from 'lucide-react';
 
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showResend, setShowResend] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  const handleResendVerification = async () => {
+    if (!userEmail) return;
+
+    try {
+      const response = await fetch('/api/auth/resend-verification/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: userEmail }),
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        alert('Verification email sent! Please check your inbox.');
+        setShowResend(false);
+      } else {
+        alert(data.error || 'Failed to resend email.');
+      }
+    } catch (error) {
+      alert('Network error. Please try again later.');
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setShowResend(false);
     setIsLoading(true);
 
     try {
       await login(username, password);
       navigate('/');
     } catch (err: any) {
-      setError(err.message || 'Failed to login. Please check your credentials.');
+      const errorMessage = err.message || 'Failed to login. Please check your credentials.';
+      setError(errorMessage);
+      
+      // Check if it's an email verification error
+      if (errorMessage.toLowerCase().includes('verify') || errorMessage.toLowerCase().includes('email')) {
+        setShowResend(true);
+        // Try to get user email - you might need to call an API to get this
+        // For now, we'll ask them to check their email
+      }
     } finally {
       setIsLoading(false);
     }
@@ -45,7 +81,34 @@ export default function Login() {
         {error && (
           <Alert variant="destructive" className="mb-6">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription>
+              {error}
+              {showResend && (
+                <div className="mt-3 pt-3 border-t border-destructive/20">
+                  <p className="text-sm mb-2">Need to verify your email?</p>
+                  <div className="space-y-2">
+                    <Input
+                      type="email"
+                      placeholder="Enter your email to resend verification"
+                      value={userEmail}
+                      onChange={(e) => setUserEmail(e.target.value)}
+                      className="text-sm"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={handleResendVerification}
+                      disabled={!userEmail}
+                    >
+                      <Mail className="mr-2 h-3 w-3" />
+                      Resend Verification Email
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </AlertDescription>
           </Alert>
         )}
 

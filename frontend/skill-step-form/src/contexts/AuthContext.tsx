@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const login = async (username: string, password: string) => {
     try {
-      const response = await fetch('http://localhost:8000/api/auth/login/', {
+      const response = await fetch('/api/auth/login/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -68,6 +68,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const data = await response.json();
 
       if (!response.ok) {
+        // Handle unverified email error (403)
+        if (response.status === 403 && data.email_verified === false) {
+          throw new Error(data.error || 'Please verify your email before logging in.');
+        }
         throw new Error(data.error || 'Login failed');
       }
 
@@ -90,7 +94,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     lastName?: string
   ) => {
     try {
-      const response = await fetch('http://localhost:8000/api/auth/register/', {
+      const response = await fetch('/api/auth/register/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -110,11 +114,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         throw new Error(data.error || 'Registration failed');
       }
 
-      setUser(data.user);
-      setTokens(data.tokens);
+      // New flow: Registration doesn't log in immediately
+      // User must verify email first, so tokens won't be in response
+      // Don't set user/tokens here - they'll need to login after verification
       
-      localStorage.setItem('user', JSON.stringify(data.user));
-      localStorage.setItem('tokens', JSON.stringify(data.tokens));
+      return data; // Return the response so Signup page can show the message
     } catch (error) {
       console.error('Registration error:', error);
       throw error;
@@ -124,7 +128,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const logout = async () => {
     try {
       if (tokens?.refresh) {
-        await fetch('http://localhost:8000/api/auth/logout/', {
+        await fetch('/api/auth/logout/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
