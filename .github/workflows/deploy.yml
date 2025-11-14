@@ -25,9 +25,14 @@ jobs:
             # Navigate to project directory
             cd ~/my-simple-resume
 
-            # Pull latest code
-            echo "📥 Pulling latest code from GitHub..."
-            git pull origin main
+            # Discard any local changes and pull latest code
+            echo "📥 Fetching latest code from GitHub..."
+            git fetch origin
+
+            echo "🧹 Discarding local changes..."
+            git reset --hard origin/main
+
+            echo "✅ Code updated to latest version"
 
             # Stop services
             echo "🛑 Stopping services..."
