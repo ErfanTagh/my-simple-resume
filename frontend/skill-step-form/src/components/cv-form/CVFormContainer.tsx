@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
@@ -22,6 +22,7 @@ import { cvFormSchema, CVFormData, CVTemplate } from "./types";
 import { ChevronLeft, ChevronRight, FileCheck, Beaker, Sparkles, Palette, ListOrdered } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { getTestProfile, getTestProfileNames } from "@/lib/testData";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface CVFormContainerProps {
   initialData?: CVFormData;
@@ -31,6 +32,7 @@ interface CVFormContainerProps {
 export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const form = useForm<CVFormData>({
     resolver: zodResolver(cvFormSchema),
@@ -76,6 +78,21 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
       template: "modern",
     },
   });
+
+  // When creating a new resume, prefill personal info from logged-in user
+  useEffect(() => {
+    if (editId || !user) return;
+
+    form.reset((current) => ({
+      ...current,
+      personalInfo: {
+        ...current.personalInfo,
+        firstName: user.first_name || current.personalInfo.firstName,
+        lastName: user.last_name || current.personalInfo.lastName,
+        email: user.email || current.personalInfo.email,
+      },
+    }));
+  }, [editId, user, form]);
 
   // Watch form data for live preview
   const formData = form.watch();
