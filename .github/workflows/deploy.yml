@@ -58,6 +58,10 @@ jobs:
               docker cp /tmp/frontend-build/. resume_nginx:/usr/share/nginx/html/
               rm -rf /tmp/frontend-build
               echo "✅ Frontend files copied successfully"
+              
+              # Reload nginx to serve new files
+              echo "🔄 Reloading nginx..."
+              docker compose -f docker-compose.prod.yml exec -T nginx nginx -s reload
             fi
 
             # Run database migrations
