@@ -173,7 +173,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-background to-primary/5 text-foreground p-8 max-w-4xl mx-auto">
+    <div className="bg-gradient-to-br from-background to-primary/5 text-foreground p-8 max-w-4xl mx-auto font-creative">
       {/* Bold creative header */}
       <div className="mb-8">
         <h1 className="text-5xl font-black text-foreground mb-2 italic tracking-tight">

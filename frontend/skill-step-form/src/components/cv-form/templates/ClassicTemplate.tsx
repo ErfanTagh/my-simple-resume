@@ -147,7 +147,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
   };
 
   return (
-    <div className="bg-background text-foreground p-8 max-w-3xl mx-auto">
+    <div className="bg-background text-foreground p-8 max-w-3xl mx-auto font-classic">
       {/* Header - centered and traditional */}
       <div className="text-center mb-6 pb-4 border-b-2 border-foreground">
         <h1 className="text-2xl font-bold text-foreground mb-3 uppercase tracking-wide">

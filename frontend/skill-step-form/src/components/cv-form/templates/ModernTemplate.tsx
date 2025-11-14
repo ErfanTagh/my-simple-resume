@@ -157,7 +157,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
   };
 
   return (
-    <div className="bg-background text-foreground p-8 max-w-4xl mx-auto">
+    <div className="bg-background text-foreground p-8 max-w-4xl mx-auto font-modern">
       {/* Header with colored background */}
       <div className="bg-primary/5 -mx-8 -mt-8 px-8 py-6 mb-6 border-l-4 border-primary">
         <h1 className="text-3xl font-bold text-foreground mb-2">

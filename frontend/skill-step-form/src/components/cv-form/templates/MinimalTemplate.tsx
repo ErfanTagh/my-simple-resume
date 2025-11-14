@@ -145,7 +145,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
   };
 
   return (
-    <div className="bg-background text-foreground p-12 max-w-3xl mx-auto">
+    <div className="bg-background text-foreground p-12 max-w-3xl mx-auto font-minimal">
       {/* Ultra-minimal header */}
       <div className="mb-10">
         <h1 className="text-xl font-bold text-foreground mb-1 tracking-tight">

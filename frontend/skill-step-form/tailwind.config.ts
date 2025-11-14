@@ -13,6 +13,13 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        modern: ['Roboto', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        classic: ['Merriweather', 'Georgia', 'serif'],
+        minimal: ['IBM Plex Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        creative: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
