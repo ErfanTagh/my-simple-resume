@@ -30,8 +30,22 @@ def resume_list(request):
             mongo_host = os.getenv('MONGODB_HOST', 'localhost')
             mongo_port = int(os.getenv('MONGODB_PORT', 27017))
             mongo_db = os.getenv('MONGODB_NAME', 'resume_db')
+            mongo_username = os.getenv('MONGODB_USERNAME', '')
+            mongo_password = os.getenv('MONGODB_PASSWORD', '')
             
-            client = MongoClient(mongo_host, mongo_port)
+            # Create authenticated connection
+            if mongo_username and mongo_password:
+                client = MongoClient(
+                    mongo_host, 
+                    mongo_port,
+                    username=mongo_username,
+                    password=mongo_password,
+                    authSource='admin',
+                    authMechanism='SCRAM-SHA-1'
+                )
+            else:
+                client = MongoClient(mongo_host, mongo_port)
+            
             db = client[mongo_db]
             
             # Get resumes for this user
@@ -159,8 +173,22 @@ def resume_detail(request, pk):
     mongo_host = os.getenv('MONGODB_HOST', 'localhost')
     mongo_port = int(os.getenv('MONGODB_PORT', 27017))
     mongo_db = os.getenv('MONGODB_NAME', 'resume_db')
+    mongo_username = os.getenv('MONGODB_USERNAME', '')
+    mongo_password = os.getenv('MONGODB_PASSWORD', '')
     
-    client = MongoClient(mongo_host, mongo_port)
+    # Create authenticated connection
+    if mongo_username and mongo_password:
+        client = MongoClient(
+            mongo_host, 
+            mongo_port,
+            username=mongo_username,
+            password=mongo_password,
+            authSource='admin',
+            authMechanism='SCRAM-SHA-1'
+        )
+    else:
+        client = MongoClient(mongo_host, mongo_port)
+    
     db = client[mongo_db]
     
     # Validate ObjectId format
