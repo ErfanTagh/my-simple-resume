@@ -1,5 +1,6 @@
 import { CVFormData } from "../types";
 import { Mail, Phone, MapPin, Linkedin, Github, Globe, Calendar } from "lucide-react";
+import { formatDateRange } from "@/lib/dateFormatter";
 
 interface ModernTemplateProps {
   data: CVFormData;
@@ -37,7 +38,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                       {(exp.startDate || exp.endDate) && (
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Calendar className="h-3 w-3" />
-                          <span>{exp.startDate} - {exp.endDate || "Present"}</span>
+                          <span>{formatDateRange(exp.startDate, exp.endDate)}</span>
                         </div>
                       )}
                     </div>
@@ -64,7 +65,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                         {edu.field && <p className="text-sm text-muted-foreground italic">{edu.field}</p>}
                       </div>
                       {(edu.startDate || edu.endDate) && (
-                        <span className="text-xs text-muted-foreground">{edu.startDate} - {edu.endDate || "Present"}</span>
+                        <span className="text-xs text-muted-foreground">{formatDateRange(edu.startDate, edu.endDate)}</span>
                       )}
                     </div>
                   </div>

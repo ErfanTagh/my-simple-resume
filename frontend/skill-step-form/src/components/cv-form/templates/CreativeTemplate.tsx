@@ -1,5 +1,6 @@
 import { CVFormData } from "../types";
 import { Mail, Phone, MapPin, Linkedin, Github, Globe } from "lucide-react";
+import { formatDateRange } from "@/lib/dateFormatter";
 
 interface CreativeTemplateProps {
   data: CVFormData;
@@ -37,7 +38,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                       <p className="text-base font-semibold text-primary">{exp.company}</p>
                       {(exp.startDate || exp.endDate) && (
                         <p className="text-xs text-muted-foreground mt-1">
-                          {exp.startDate} - {exp.endDate || "Present"}
+                          {formatDateRange(exp.startDate, exp.endDate)}
                         </p>
                       )}
                       {exp.description && <p className="text-sm text-muted-foreground mt-2">{exp.description}</p>}

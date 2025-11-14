@@ -1,5 +1,6 @@
 import { CVFormData } from "../types";
 import { Mail, Phone, MapPin, Linkedin, Github, Globe, Calendar } from "lucide-react";
+import { formatDateRange } from "@/lib/dateFormatter";
 
 interface ClassicTemplateProps {
   data: CVFormData;
@@ -34,7 +35,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
                       <span className="italic text-muted-foreground">{exp.company}</span>
                       {(exp.startDate || exp.endDate) && (
                         <span className="text-xs text-muted-foreground">
-                          {exp.startDate} - {exp.endDate || "Present"}
+                          {formatDateRange(exp.startDate, exp.endDate)}
                         </span>
                       )}
                     </div>
@@ -59,7 +60,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
                       <span className="italic text-muted-foreground">{edu.institution}</span>
                       {(edu.startDate || edu.endDate) && (
                         <span className="text-xs text-muted-foreground">
-                          {edu.startDate} - {edu.endDate || "Present"}
+                          {formatDateRange(edu.startDate, edu.endDate)}
                         </span>
                       )}
                     </div>

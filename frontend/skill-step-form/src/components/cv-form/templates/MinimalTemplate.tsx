@@ -1,4 +1,5 @@
 import { CVFormData } from "../types";
+import { formatDateRange } from "@/lib/dateFormatter";
 
 interface MinimalTemplateProps {
   data: CVFormData;
@@ -31,7 +32,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                       <h3 className="text-sm font-semibold text-foreground">{exp.position}</h3>
                       {(exp.startDate || exp.endDate) && (
                         <span className="text-xs text-muted-foreground">
-                          {exp.startDate} — {exp.endDate || "Present"}
+                          {formatDateRange(exp.startDate, exp.endDate)}
                         </span>
                       )}
                     </div>
@@ -56,7 +57,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                       <h3 className="text-sm font-semibold text-foreground">{edu.degree}</h3>
                       {(edu.startDate || edu.endDate) && (
                         <span className="text-xs text-muted-foreground">
-                          {edu.startDate} — {edu.endDate || "Present"}
+                          {formatDateRange(edu.startDate, edu.endDate)}
                         </span>
                       )}
                     </div>
