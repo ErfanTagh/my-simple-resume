@@ -42,7 +42,26 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                         </div>
                       )}
                     </div>
-                    {exp.description && <p className="text-sm text-muted-foreground">{exp.description}</p>}
+                    {((exp.responsibilities && exp.responsibilities.length > 0) || exp.description) && (
+                      <ul className="text-sm text-muted-foreground space-y-1 mt-2">
+                        {exp.responsibilities && exp.responsibilities.length > 0 
+                          ? exp.responsibilities.map((resp, i) => (
+                              resp.responsibility && (
+                                <li key={i} className="flex gap-2">
+                                  <span className="text-primary mt-1">•</span>
+                                  <span className="flex-1">{resp.responsibility}</span>
+                                </li>
+                              )
+                            ))
+                          : exp.description?.split('\n').filter(line => line.trim()).map((line, i) => (
+                              <li key={i} className="flex gap-2">
+                                <span className="text-primary mt-1">•</span>
+                                <span className="flex-1">{line.trim()}</span>
+                              </li>
+                            ))
+                        }
+                      </ul>
+                    )}
                   </div>
                 )
               ))}
@@ -84,8 +103,21 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                 proj.name && (
                   <div key={index}>
                     <h3 className="font-bold text-foreground">{proj.name}</h3>
-                    {proj.description && <p className="text-sm text-muted-foreground">{proj.description}</p>}
-                    {proj.technologies && <p className="text-xs text-primary mt-1">Tech: {proj.technologies}</p>}
+                    {proj.description && (
+                      <ul className="text-sm text-muted-foreground space-y-1 mt-1">
+                        {proj.description.split('\n').filter(line => line.trim()).map((line, i) => (
+                          <li key={i} className="flex gap-2">
+                            <span className="text-primary mt-1">•</span>
+                            <span className="flex-1">{line.trim()}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {proj.technologies && proj.technologies.length > 0 && (
+                      <p className="text-xs text-primary mt-1">
+                        Tech: {proj.technologies.map(t => t.technology).filter(Boolean).join(", ")}
+                      </p>
+                    )}
                   </div>
                 )
               ))}

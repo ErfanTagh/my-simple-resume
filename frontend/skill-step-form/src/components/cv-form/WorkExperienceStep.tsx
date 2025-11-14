@@ -11,6 +11,11 @@ interface WorkExperienceStepProps {
 }
 
 const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: number }) => {
+  const { fields: respFields, append: appendResp, remove: removeResp } = useFieldArray({
+    control: form.control,
+    name: `workExperience.${index}.responsibilities`,
+  });
+
   const { fields: techFields, append: appendTech, remove: removeTech } = useFieldArray({
     control: form.control,
     name: `workExperience.${index}.technologies`,
@@ -66,14 +71,40 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor={`workExperience.${index}.description`}>Description</Label>
-        <Textarea
-          {...form.register(`workExperience.${index}.description`)}
-          placeholder="Describe your responsibilities and achievements..."
-          rows={3}
-          className="resize-none"
-        />
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <Label>Key Responsibilities & Achievements</Label>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => appendResp({ responsibility: "" })}
+            className="h-8"
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            Add
+          </Button>
+        </div>
+        <div className="space-y-2">
+          {respFields.map((field, respIndex) => (
+            <div key={field.id} className="flex gap-2">
+              <Input
+                {...form.register(`workExperience.${index}.responsibilities.${respIndex}.responsibility`)}
+                placeholder="e.g., Led development of microservices architecture"
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => removeResp(respIndex)}
+                className="shrink-0"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="space-y-3">
@@ -196,6 +227,7 @@ export const WorkExperienceStep = ({ form }: WorkExperienceStepProps) => {
           startDate: "", 
           endDate: "", 
           description: "",
+          responsibilities: [],
           technologies: [],
           competencies: []
         })}

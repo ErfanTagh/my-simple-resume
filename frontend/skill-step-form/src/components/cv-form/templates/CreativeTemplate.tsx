@@ -41,7 +41,26 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                           {formatDateRange(exp.startDate, exp.endDate)}
                         </p>
                       )}
-                      {exp.description && <p className="text-sm text-muted-foreground mt-2">{exp.description}</p>}
+                      {((exp.responsibilities && exp.responsibilities.length > 0) || exp.description) && (
+                        <ul className="text-sm text-muted-foreground space-y-1 mt-2">
+                          {exp.responsibilities && exp.responsibilities.length > 0 
+                            ? exp.responsibilities.map((resp, i) => (
+                                resp.responsibility && (
+                                  <li key={i} className="flex gap-2">
+                                    <span className="text-primary font-bold">•</span>
+                                    <span className="flex-1">{resp.responsibility}</span>
+                                  </li>
+                                )
+                              ))
+                            : exp.description?.split('\n').filter(line => line.trim()).map((line, i) => (
+                                <li key={i} className="flex gap-2">
+                                  <span className="text-primary font-bold">•</span>
+                                  <span className="flex-1">{line.trim()}</span>
+                                </li>
+                              ))
+                          }
+                        </ul>
+                      )}
                     </div>
                   )
                 ))}
@@ -82,13 +101,24 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                     <div key={index} className="relative">
                       <div className="absolute -left-[26px] w-3 h-3 rounded-full bg-primary"></div>
                       <h3 className="text-lg font-bold text-foreground">{proj.name}</h3>
-                      {proj.description && <p className="text-sm text-muted-foreground">{proj.description}</p>}
-                      {proj.technologies && (
+                      {proj.description && (
+                        <ul className="text-sm text-muted-foreground space-y-1 mt-1">
+                          {proj.description.split('\n').filter(line => line.trim()).map((line, i) => (
+                            <li key={i} className="flex gap-2">
+                              <span className="text-primary font-bold">•</span>
+                              <span className="flex-1">{line.trim()}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                      {proj.technologies && proj.technologies.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
-                          {proj.technologies.split(',').map((tech, i) => (
-                            <span key={i} className="px-2 py-0.5 bg-primary/20 text-primary text-xs rounded">
-                              {tech.trim()}
-                            </span>
+                          {proj.technologies.map((tech, i) => (
+                            tech.technology && (
+                              <span key={i} className="px-2 py-0.5 bg-primary/20 text-primary text-xs rounded">
+                                {tech.technology}
+                              </span>
+                            )
                           ))}
                         </div>
                       )}

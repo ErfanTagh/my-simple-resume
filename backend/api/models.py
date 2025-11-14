@@ -37,6 +37,26 @@ class Competency(models.Model):
         return self.competency
 
 
+class Responsibility(models.Model):
+    responsibility = models.CharField(max_length=500)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return self.responsibility
+
+
+class Highlight(models.Model):
+    highlight = models.CharField(max_length=500)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return self.highlight
+
+
 class Course(models.Model):
     course = models.CharField(max_length=200)
 
@@ -71,7 +91,8 @@ class WorkExperience(models.Model):
     location = models.CharField(max_length=200, blank=True, null=True)
     start_date = models.CharField(max_length=20, blank=True, null=True)
     end_date = models.CharField(max_length=20, blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)  # Keep for backward compatibility
+    responsibilities = models.ArrayField(model_container=Responsibility, blank=True, null=True)
     technologies = models.ArrayField(model_container=Technology, blank=True, null=True)
     competencies = models.ArrayField(model_container=Competency, blank=True, null=True)
 
@@ -94,7 +115,8 @@ class Education(models.Model):
 
 class Project(models.Model):
     name = models.CharField(max_length=200, blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)  # Keep for backward compatibility
+    highlights = models.ArrayField(model_container=Highlight, blank=True, null=True)
     technologies = models.ArrayField(model_container=Technology, blank=True, null=True)
     start_date = models.CharField(max_length=20, blank=True, null=True)
     end_date = models.CharField(max_length=20, blank=True, null=True)

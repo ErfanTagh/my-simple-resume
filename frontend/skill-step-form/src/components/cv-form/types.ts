@@ -26,7 +26,12 @@ export const cvFormSchema = z.object({
       location: z.string().optional(),
       startDate: z.string().optional(),
       endDate: z.string().optional(),
-      description: z.string().optional(),
+      description: z.string().optional(), // Keep for backward compatibility
+      responsibilities: z.array(
+        z.object({
+          responsibility: z.string().optional(),
+        })
+      ).optional(),
       technologies: z.array(
         z.object({
           technology: z.string().optional(),
@@ -57,7 +62,12 @@ export const cvFormSchema = z.object({
   projects: z.array(
     z.object({
       name: z.string().optional(),
-      description: z.string().optional(),
+      description: z.string().optional(), // Keep for backward compatibility
+      highlights: z.array(
+        z.object({
+          highlight: z.string().optional(),
+        })
+      ).optional(),
       technologies: z.array(
         z.object({
           technology: z.string().min(1, "Technology is required"),
