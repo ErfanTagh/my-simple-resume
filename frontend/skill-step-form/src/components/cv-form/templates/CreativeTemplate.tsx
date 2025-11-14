@@ -157,11 +157,11 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
         ) : null;
 
       case "interests":
-        return personalInfo.interests ? (
+        return personalInfo.interests && personalInfo.interests.length > 0 && personalInfo.interests.some(i => i.interest) ? (
           <div key="interests" className="mb-6">
             <div className="relative pl-6 border-l-4 border-primary">
               <h2 className="text-2xl font-black mb-3 text-primary italic">Interests</h2>
-              <p className="text-sm text-foreground">{personalInfo.interests}</p>
+              <p className="text-sm text-foreground">{personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}</p>
             </div>
           </div>
         ) : null;

@@ -133,10 +133,10 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
         ) : null;
 
       case "interests":
-        return personalInfo.interests ? (
+        return personalInfo.interests && personalInfo.interests.length > 0 && personalInfo.interests.some(i => i.interest) ? (
           <div key="interests" className="mb-5">
             <h2 className="text-base font-bold mb-2 text-foreground uppercase tracking-wide">Interests</h2>
-            <p className="text-sm text-foreground">{personalInfo.interests}</p>
+            <p className="text-sm text-foreground">{personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}</p>
           </div>
         ) : null;
 

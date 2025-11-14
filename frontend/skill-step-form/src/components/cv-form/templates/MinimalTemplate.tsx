@@ -131,10 +131,10 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
         ) : null;
 
       case "interests":
-        return personalInfo.interests ? (
+        return personalInfo.interests && personalInfo.interests.length > 0 && personalInfo.interests.some(i => i.interest) ? (
           <div key="interests" className="mb-8">
             <h2 className="text-xs font-bold mb-4 text-foreground uppercase tracking-widest">Interests</h2>
-            <p className="text-xs text-foreground leading-relaxed">{personalInfo.interests}</p>
+            <p className="text-xs text-foreground leading-relaxed">{personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}</p>
           </div>
         ) : null;
 

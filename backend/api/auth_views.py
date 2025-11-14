@@ -83,6 +83,13 @@ def register(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
+    # Validate password strength
+    if len(password) < 8:
+        return Response(
+            {'error': 'Password must be at least 8 characters long'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
     # Check if user already exists
     if User.objects.filter(username=username).exists():
         return Response(
@@ -491,9 +498,9 @@ def reset_password(request):
         )
     
     # Validate password length
-    if len(new_password) < 6:
+    if len(new_password) < 8:
         return Response(
-            {'error': 'Password must be at least 6 characters long'},
+            {'error': 'Password must be at least 8 characters long'},
             status=status.HTTP_400_BAD_REQUEST
         )
     

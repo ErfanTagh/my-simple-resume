@@ -143,10 +143,10 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
         ) : null;
 
       case "interests":
-        return personalInfo.interests ? (
+        return personalInfo.interests && personalInfo.interests.length > 0 && personalInfo.interests.some(i => i.interest) ? (
           <div key="interests" className="mb-6">
             <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">INTERESTS</h2>
-            <p className="text-sm text-muted-foreground">{personalInfo.interests}</p>
+            <p className="text-sm text-muted-foreground">{personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}</p>
           </div>
         ) : null;
 
