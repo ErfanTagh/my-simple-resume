@@ -38,10 +38,10 @@ jobs:
             echo "🛑 Stopping services..."
             docker compose -f docker-compose.prod.yml down
 
-            # Rebuild containers
+            # Rebuild containers with clean cache
             echo "🔨 Rebuilding containers..."
             docker compose -f docker-compose.prod.yml build --no-cache frontend
-            docker compose -f docker-compose.prod.yml build backend
+            docker compose -f docker-compose.prod.yml build --no-cache backend
 
             # Start services
             echo "▶️  Starting services..."
