@@ -7,6 +7,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from .models import Resume
 from .serializers import ResumeSerializer
+from .resume_scorer import calculate_resume_quality
 from bson import ObjectId
 
 
@@ -48,6 +49,22 @@ def resume_list(request):
                     'certificates': resume_doc.get('certificates', []),
                     'languages': resume_doc.get('languages', []),
                     'skills': resume_doc.get('skills', []),
+                    'template': resume_doc.get('template', 'modern'),
+                    'section_order': resume_doc.get('section_order', [
+                        'summary',
+                        'workExperience',
+                        'education',
+                        'projects',
+                        'certificates',
+                        'skills',
+                        'languages',
+                        'interests',
+                    ]),
+                    'completeness_score': resume_doc.get('completeness_score', 0.0),
+                    'clarity_score': resume_doc.get('clarity_score', 0.0),
+                    'formatting_score': resume_doc.get('formatting_score', 0.0),
+                    'impact_score': resume_doc.get('impact_score', 0.0),
+                    'overall_score': resume_doc.get('overall_score', 0.0),
                     'created_at': resume_doc.get('created_at'),
                     'updated_at': resume_doc.get('updated_at'),
                 }
@@ -75,6 +92,13 @@ def resume_list(request):
             try:
                 # Save data from validated_data to model
                 data = serializer.validated_data
+                
+                # Calculate quality scores
+                quality_scores = calculate_resume_quality(request.data)
+                
+                # Calculate quality scores
+                quality_scores = calculate_resume_quality(request.data)
+                
                 resume = Resume(
                     user=request.user,  # Link resume to authenticated user
                     personal_info=data.get('personal_info'),
@@ -83,7 +107,23 @@ def resume_list(request):
                     projects=data.get('projects', []),
                     certificates=data.get('certificates', []),
                     languages=data.get('languages', []),
-                    skills=data.get('skills', [])
+                    skills=data.get('skills', []),
+                    template=data.get('template', 'modern'),
+                    section_order=data.get('section_order', [
+                        'summary',
+                        'workExperience',
+                        'education',
+                        'projects',
+                        'certificates',
+                        'skills',
+                        'languages',
+                        'interests',
+                    ]),
+                    completeness_score=quality_scores['completeness_score'],
+                    clarity_score=quality_scores['clarity_score'],
+                    formatting_score=quality_scores['formatting_score'],
+                    impact_score=quality_scores['impact_score'],
+                    overall_score=quality_scores['overall_score'],
                 )
                 resume.save()
                 
@@ -155,6 +195,22 @@ def resume_detail(request, pk):
                 'certificates': resume_doc.get('certificates', []),
                 'languages': resume_doc.get('languages', []),
                 'skills': resume_doc.get('skills', []),
+                'template': resume_doc.get('template', 'modern'),
+                'section_order': resume_doc.get('section_order', [
+                    'summary',
+                    'workExperience',
+                    'education',
+                    'projects',
+                    'certificates',
+                    'skills',
+                    'languages',
+                    'interests',
+                ]),
+                'completeness_score': resume_doc.get('completeness_score', 0.0),
+                'clarity_score': resume_doc.get('clarity_score', 0.0),
+                'formatting_score': resume_doc.get('formatting_score', 0.0),
+                'impact_score': resume_doc.get('impact_score', 0.0),
+                'overall_score': resume_doc.get('overall_score', 0.0),
                 'created_at': resume_doc.get('created_at'),
                 'updated_at': resume_doc.get('updated_at'),
             }
@@ -172,8 +228,13 @@ def resume_detail(request, pk):
         serializer = ResumeSerializer(data=request.data)
         if serializer.is_valid():
             try:
+                # Calculate quality scores
+                quality_scores = calculate_resume_quality(request.data)
+                
                 # Update the resume in MongoDB
                 update_data = serializer.validated_data
+                update_data.update(quality_scores)  # Add scores to update
+                
                 result = db.resumes.update_one(
                     {'_id': resume_id, 'user_id': request.user.id},
                     {'$set': update_data}
@@ -196,6 +257,11 @@ def resume_detail(request, pk):
                     'certificates': updated_doc.get('certificates', []),
                     'languages': updated_doc.get('languages', []),
                     'skills': updated_doc.get('skills', []),
+                    'completeness_score': updated_doc.get('completeness_score', 0.0),
+                    'clarity_score': updated_doc.get('clarity_score', 0.0),
+                    'formatting_score': updated_doc.get('formatting_score', 0.0),
+                    'impact_score': updated_doc.get('impact_score', 0.0),
+                    'overall_score': updated_doc.get('overall_score', 0.0),
                     'created_at': updated_doc.get('created_at'),
                     'updated_at': updated_doc.get('updated_at'),
                 }

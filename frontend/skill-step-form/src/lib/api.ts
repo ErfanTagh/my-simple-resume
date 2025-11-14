@@ -225,6 +225,8 @@ export interface ResumeData {
   skills?: Array<{
     skill: string;
   }>;
+  sectionOrder?: string[];
+  template?: "modern" | "classic" | "minimal" | "creative";
 }
 
 export interface Resume extends ResumeData {

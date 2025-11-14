@@ -11,12 +11,14 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.conf import settings
-from .models import EmailVerification
+from .models import EmailVerification, PasswordReset
 from .email_verification import (
     generate_verification_token,
     create_verification_link,
     send_verification_email,
-    send_welcome_email
+    send_welcome_email,
+    send_password_reset_email,
+    send_password_changed_email
 )
 
 
@@ -400,6 +402,140 @@ def resend_verification(request):
         return Response({
             'message': 'If this email is registered, a verification link has been sent.'
         })
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def forgot_password(request):
+    """
+    Send password reset email
+    
+    Expected payload:
+    {
+        "email": "user@example.com"
+    }
+    """
+    email = request.data.get('email')
+    
+    if not email:
+        return Response(
+            {'error': 'Email is required'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        user = User.objects.get(email=email)
+        
+        # Generate reset token
+        token = generate_verification_token()
+        
+        # Invalidate any previous unused reset tokens for this user
+        PasswordReset.objects.filter(user=user, is_used=False).update(is_used=True)
+        
+        # Create new password reset record
+        password_reset = PasswordReset.objects.create(
+            user=user,
+            token=token
+        )
+        
+        # Send password reset email
+        domain = settings.DOMAIN
+        reset_link = f"https://{domain}/reset-password?token={token}"
+        email_sent = send_password_reset_email(email, user.username, reset_link)
+        
+        if not email_sent:
+            return Response({
+                'error': 'Failed to send password reset email. Please try again later.'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        return Response({
+            'message': 'Password reset email sent! Please check your inbox.'
+        })
+        
+    except User.DoesNotExist:
+        # Don't reveal if email exists or not (security)
+        return Response({
+            'message': 'If this email is registered, a password reset link has been sent.'
+        })
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def reset_password(request):
+    """
+    Reset password with token
+    
+    Expected payload:
+    {
+        "token": "reset_token_string",
+        "password": "new_password"
+    }
+    """
+    token = request.data.get('token')
+    new_password = request.data.get('password')
+    
+    if not token or not new_password:
+        return Response(
+            {'error': 'Token and new password are required'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # Validate password length
+    if len(new_password) < 6:
+        return Response(
+            {'error': 'Password must be at least 6 characters long'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        password_reset = PasswordReset.objects.get(token=token)
+        
+        # Check if already used
+        if password_reset.is_used:
+            return Response({
+                'error': 'This password reset link has already been used.',
+                'used': True
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if token is expired
+        if password_reset.is_expired():
+            return Response({
+                'error': 'Password reset link has expired. Please request a new one.',
+                'expired': True
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Reset the password
+        user = password_reset.user
+        user.set_password(new_password)
+        user.save()
+        
+        # Mark token as used
+        password_reset.is_used = True
+        password_reset.save()
+        
+        # Send confirmation email
+        send_password_changed_email(user.email, user.username)
+        
+        return Response({
+            'message': 'Password has been reset successfully! You can now log in with your new password.',
+            'success': True
+        })
+        
+    except PasswordReset.DoesNotExist:
+        return Response({
+            'error': 'Invalid password reset token',
+            'invalid': True
+        }, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response(
             {'error': str(e)},

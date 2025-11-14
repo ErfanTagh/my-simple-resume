@@ -185,3 +185,172 @@ def send_welcome_email(user_email, username):
         print(f"Error sending welcome email: {e}")
         return False
 
+
+def send_password_reset_email(user_email, username, reset_link):
+    """Send password reset email to user"""
+    subject = 'Reset Your Password - 123Resume'
+    
+    # HTML email content
+    html_message = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+            .header {{ background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }}
+            .content {{ background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }}
+            .button {{ display: inline-block; padding: 15px 30px; background: #f97316; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; font-weight: bold; }}
+            .footer {{ text-align: center; margin-top: 20px; color: #666; font-size: 12px; }}
+            .warning {{ background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 5px; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>🔐 Password Reset Request</h1>
+            </div>
+            <div class="content">
+                <h2>Hi {username},</h2>
+                <p>We received a request to reset your password for your 123Resume account.</p>
+                <p>Click the button below to reset your password:</p>
+                <center>
+                    <a href="{reset_link}" class="button">Reset My Password</a>
+                </center>
+                <p>Or copy and paste this link into your browser:</p>
+                <p style="background: white; padding: 15px; border-radius: 5px; word-break: break-all; font-size: 12px;">
+                    {reset_link}
+                </p>
+                
+                <div class="warning">
+                    <strong>⚠️ Security Notice:</strong>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li>This link expires in <strong>1 hour</strong></li>
+                        <li>If you didn't request this, please ignore this email</li>
+                        <li>Your password won't change unless you click the link above</li>
+                    </ul>
+                </div>
+                
+                <p style="margin-top: 20px; color: #666; font-size: 14px;">
+                    If you didn't request a password reset, someone may be trying to access your account. 
+                    Consider changing your password if you suspect unauthorized access.
+                </p>
+            </div>
+            <div class="footer">
+                <p>© 2025 123Resume. All rights reserved.</p>
+                <p>This is an automated message, please do not reply.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    # Plain text fallback
+    plain_message = f"""
+    Password Reset Request - 123Resume
+    
+    Hi {username},
+    
+    We received a request to reset your password for your 123Resume account.
+    
+    Click the link below to reset your password:
+    {reset_link}
+    
+    ⚠️ SECURITY NOTICE:
+    - This link expires in 1 hour
+    - If you didn't request this, please ignore this email
+    - Your password won't change unless you click the link above
+    
+    If you didn't request a password reset, someone may be trying to access your account.
+    
+    © 2025 123Resume. All rights reserved.
+    """
+    
+    try:
+        send_mail(
+            subject=subject,
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user_email],
+            html_message=html_message,
+            fail_silently=False,
+        )
+        return True
+    except Exception as e:
+        print(f"Error sending password reset email: {e}")
+        return False
+
+
+def send_password_changed_email(user_email, username):
+    """Send confirmation email after password was changed"""
+    subject = '✅ Password Changed - 123Resume'
+    
+    html_message = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+            .header {{ background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }}
+            .content {{ background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }}
+            .footer {{ text-align: center; margin-top: 20px; color: #666; font-size: 12px; }}
+            .alert {{ background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 5px; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>✅ Password Successfully Changed</h1>
+            </div>
+            <div class="content">
+                <h2>Hi {username},</h2>
+                <p>Your password for your 123Resume account has been successfully changed.</p>
+                
+                <div class="alert">
+                    <strong>⚠️ Didn't change your password?</strong><br>
+                    If you didn't make this change, please contact us immediately and secure your account.
+                </div>
+                
+                <p>You can now log in with your new password.</p>
+                <p style="margin-top: 20px;">
+                    <a href="https://123resume.de/login" style="color: #10b981;">Go to Login →</a>
+                </p>
+            </div>
+            <div class="footer">
+                <p>© 2025 123Resume. All rights reserved.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    plain_message = f"""
+    Password Successfully Changed - 123Resume
+    
+    Hi {username},
+    
+    Your password for your 123Resume account has been successfully changed.
+    
+    ⚠️ DIDN'T CHANGE YOUR PASSWORD?
+    If you didn't make this change, please contact us immediately and secure your account.
+    
+    You can now log in with your new password.
+    
+    © 2025 123Resume. All rights reserved.
+    """
+    
+    try:
+        send_mail(
+            subject=subject,
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user_email],
+            html_message=html_message,
+            fail_silently=False,
+        )
+        return True
+    except Exception as e:
+        print(f"Error sending password changed email: {e}")
+        return False
+

@@ -19,6 +19,8 @@ urlpatterns = [
     path('auth/profile/', auth_views.user_profile, name='user-profile'),
     path('auth/verify-email/', auth_views.verify_email, name='verify-email'),
     path('auth/resend-verification/', auth_views.resend_verification, name='resend-verification'),
+    path('auth/forgot-password/', auth_views.forgot_password, name='forgot-password'),
+    path('auth/reset-password/', auth_views.reset_password, name='reset-password'),
     
     # Resume endpoints (protected)
     path('resumes/', views.resume_list, name='resume-list'),

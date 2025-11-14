@@ -170,6 +170,12 @@ class ResumeSerializer(serializers.Serializer):
     certificates = CertificateSerializer(many=True, required=False)
     languages = LanguageSerializer(many=True, required=False)
     skills = SkillSerializer(many=True, required=False)
+    template = serializers.CharField(max_length=50, required=False, allow_blank=True)
+    section_order = serializers.ListField(
+        child=serializers.CharField(max_length=100),
+        required=False,
+        allow_empty=True
+    )
     created_at = serializers.DateTimeField(read_only=True)
     updated_at = serializers.DateTimeField(read_only=True)
 

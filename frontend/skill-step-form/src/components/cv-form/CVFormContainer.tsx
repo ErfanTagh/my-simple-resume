@@ -23,13 +23,18 @@ import { ChevronLeft, ChevronRight, FileCheck, Beaker, Sparkles, Palette, ListOr
 import { toast } from "@/hooks/use-toast";
 import { getTestProfile, getTestProfileNames } from "@/lib/testData";
 
-export const CVFormContainer = () => {
+interface CVFormContainerProps {
+  initialData?: CVFormData;
+  editId?: string;
+}
+
+export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const navigate = useNavigate();
 
   const form = useForm<CVFormData>({
     resolver: zodResolver(cvFormSchema),
-    defaultValues: {
+    defaultValues: initialData ?? {
       personalInfo: {
         firstName: "",
         lastName: "",
@@ -141,22 +146,39 @@ export const CVFormContainer = () => {
       // Import the API service
       const { resumeAPI } = await import('@/lib/api');
       
-      console.log("API imported, creating resume...");
-      
-      // Save to backend - data matches ResumeData interface
-      const savedResume = await resumeAPI.create(data as any);
-      
-      console.log("Resume created successfully:", savedResume);
-      
-      toast({
-        title: "CV Saved Successfully!",
-        description: "Redirecting to your resume...",
-      });
+      if (editId) {
+        console.log("API imported, updating resume...", editId);
 
-      // Redirect to the newly created resume view after a brief delay
-      setTimeout(() => {
-        navigate(`/resume/${savedResume.id}`);
-      }, 1000);
+        const updatedResume = await resumeAPI.update(editId, data as any);
+
+        console.log("Resume updated successfully:", updatedResume);
+
+        toast({
+          title: "CV Updated Successfully!",
+          description: "Redirecting to your updated resume...",
+        });
+
+        setTimeout(() => {
+          navigate(`/resume/${updatedResume.id}`);
+        }, 800);
+      } else {
+        console.log("API imported, creating resume...");
+        
+        // Save to backend - data matches ResumeData interface
+        const savedResume = await resumeAPI.create(data as any);
+        
+        console.log("Resume created successfully:", savedResume);
+        
+        toast({
+          title: "CV Saved Successfully!",
+          description: "Redirecting to your resume...",
+        });
+
+        // Redirect to the newly created resume view after a brief delay
+        setTimeout(() => {
+          navigate(`/resume/${savedResume.id}`);
+        }, 1000);
+      }
     } catch (error: any) {
       console.error("=== Error saving CV ===");
       console.error("Error details:", error);
@@ -168,6 +190,7 @@ export const CVFormContainer = () => {
         description: error.message || "Failed to save your CV. Please try again.",
         variant: "destructive",
       });
+    } finally {
       setIsSaving(false);
     }
   };

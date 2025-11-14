@@ -142,6 +142,17 @@ class Resume(models.Model):
     certificates = models.ArrayField(model_container=Certificate, blank=True, null=True)
     languages = models.ArrayField(model_container=Language, blank=True, null=True)
     skills = models.ArrayField(model_container=Skill, blank=True, null=True)
+    # Presentation settings
+    template = models.CharField(max_length=50, default='modern')
+    section_order = models.JSONField(blank=True, null=True)
+    
+    # Quality scores (0-10 scale)
+    completeness_score = models.FloatField(default=0.0)
+    clarity_score = models.FloatField(default=0.0)
+    formatting_score = models.FloatField(default=0.0)
+    impact_score = models.FloatField(default=0.0)
+    overall_score = models.FloatField(default=0.0)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -175,4 +186,29 @@ class EmailVerification(models.Model):
     
     def __str__(self):
         return f"Verification for {self.user.username} - Verified: {self.is_verified}"
+
+
+class PasswordReset(models.Model):
+    """Password reset tokens"""
+    _id = models.ObjectIdField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='password_resets')
+    token = models.CharField(max_length=100, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+    
+    class Meta:
+        db_table = 'password_resets'
+        ordering = ['-created_at']
+    
+    def save(self, *args, **kwargs):
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timedelta(hours=1)  # 1 hour expiry for security
+        super().save(*args, **kwargs)
+    
+    def is_expired(self):
+        return timezone.now() > self.expires_at
+    
+    def __str__(self):
+        return f"Password reset for {self.user.username} - Used: {self.is_used}"
 

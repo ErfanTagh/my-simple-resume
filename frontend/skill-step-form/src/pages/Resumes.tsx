@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { resumeAPI, Resume } from '@/lib/api';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   FileText,
@@ -10,8 +11,11 @@ import {
   Trash2,
   Eye,
   AlertCircle,
-  Calendar,
-  User,
+  Clock,
+  Star,
+  Edit,
+  Download,
+  X,
 } from 'lucide-react';
 import {
   AlertDialog,
@@ -77,19 +81,40 @@ export default function Resumes() {
     });
   };
 
+  const getRatingColor = (rating: number) => {
+    if (rating >= 9) return "text-green-600";
+    if (rating >= 7) return "text-yellow-600";
+    return "text-red-600";
+  };
+
+  const getRatingBadge = (rating: number) => {
+    if (rating >= 9) return "Excellent";
+    if (rating >= 7) return "Good";
+    return "Needs Work";
+  };
+
+  const handleDownload = (resume: Resume) => {
+    // Open resume in new tab for printing/downloading as PDF
+    const url = `/resume/${resume.id}`;
+    window.open(url, '_blank');
+    
+    toast({
+      title: 'Opening Resume',
+      description: 'You can download it as PDF using Print (Ctrl+P) → Save as PDF',
+    });
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background py-12 px-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold mb-2">My Resumes</h1>
-            <p className="text-muted-foreground">
-              Manage your saved resumes
-            </p>
+            <h1 className="text-4xl font-bold text-foreground mb-2">My Resumes</h1>
+            <p className="text-muted-foreground">View and manage your created CVs</p>
           </div>
-          <Button onClick={() => navigate('/create')} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Create New Resume
+          <Button onClick={() => navigate('/create')} size="lg">
+            <Plus className="mr-2 h-4 w-4" />
+            Create New CV
           </Button>
         </div>
 
@@ -108,67 +133,131 @@ export default function Resumes() {
             </div>
           </div>
         ) : resumes.length === 0 ? (
-          <Card className="p-12 text-center">
-            <FileText className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-            <h2 className="text-2xl font-semibold mb-2">No Resumes Yet</h2>
-            <p className="text-muted-foreground mb-6">
-              Start building your professional resume today
-            </p>
-            <Button onClick={() => navigate('/create')} className="gap-2">
-              <Plus className="h-4 w-4" />
-              Create Your First Resume
-            </Button>
+          <Card className="text-center py-12">
+            <CardContent>
+              <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-xl font-semibold mb-2">No resumes yet</h3>
+              <p className="text-muted-foreground mb-4">
+                Create your first CV to get started
+              </p>
+              <Button onClick={() => navigate('/create')}>
+                <Plus className="mr-2 h-4 w-4" />
+                Create Your First CV
+              </Button>
+            </CardContent>
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {resumes.map((resume) => (
-              <Card
-                key={resume.id}
-                className="p-6 hover:shadow-lg transition-shadow"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-5 w-5 text-primary" />
-                    <h3 className="font-semibold text-lg truncate">
-                      {resume.personalInfo.firstName}{' '}
-                      {resume.personalInfo.lastName}
-                    </h3>
-                  </div>
-                </div>
-
-                <div className="space-y-2 mb-4">
-                  {resume.personalInfo.professionalTitle && (
-                    <p className="text-sm text-muted-foreground flex items-center gap-2">
-                      <User className="h-4 w-4" />
-                      {resume.personalInfo.professionalTitle}
-                    </p>
-                  )}
-                  <p className="text-sm text-muted-foreground flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    Updated {formatDate(resume.updated_at)}
-                  </p>
-                </div>
-
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => navigate(`/resume/${resume.id}`)}
+            {resumes.map((resume) => {
+              // Get quality scores from API
+              const resumeData = resume as any;
+              const completenessScore = resumeData.completeness_score || 0;
+              const clarityScore = resumeData.clarity_score || 0;
+              const formattingScore = resumeData.formatting_score || 0;
+              const impactScore = resumeData.impact_score || 0;
+              
+              // Calculate overall score on frontend (average of 4 scores)
+              const overallScore = Math.round(
+                ((completenessScore + clarityScore + formattingScore + impactScore) / 4) * 10
+              ) / 10;
+              
+              const template = resumeData.template || 'modern';
+              
+              return (
+                <Card key={resume.id} className="hover:shadow-lg transition-shadow relative group">
+                  {/* Delete button - top right corner */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteId(resume.id);
+                    }}
+                    className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-red-50 text-red-600 opacity-0 group-hover:opacity-100 hover:bg-red-100 hover:text-red-700 transition-all"
+                    title="Delete resume"
+                    aria-label="Delete resume"
                   >
-                    <Eye className="h-4 w-4 mr-2" />
-                    View
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setDeleteId(resume.id)}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </Card>
-            ))}
+                    <X className="h-4 w-4" />
+                  </button>
+                  
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <FileText className="h-8 w-8 text-primary mb-2" />
+                      <Badge variant="secondary" className="capitalize">
+                        {template}
+                      </Badge>
+                    </div>
+                    <CardTitle className="text-xl">
+                      {resume.personalInfo.firstName} {resume.personalInfo.lastName}
+                    </CardTitle>
+                    <CardDescription className="flex items-center gap-2">
+                      <Clock className="h-3 w-3" />
+                      {formatDate(resume.updated_at)}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Star className={`h-5 w-5 fill-current ${getRatingColor(overallScore)}`} />
+                        <span className={`text-2xl font-bold ${getRatingColor(overallScore)}`}>
+                          {overallScore}
+                        </span>
+                        <span className="text-muted-foreground">/10</span>
+                      </div>
+                      <Badge variant="outline">{getRatingBadge(overallScore)}</Badge>
+                    </div>
+
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Completeness</span>
+                        <span className="font-medium">{completenessScore}/10</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Clarity</span>
+                        <span className="font-medium">{clarityScore}/10</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Formatting</span>
+                        <span className="font-medium">{formattingScore}/10</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Impact</span>
+                        <span className="font-medium">{impactScore}/10</span>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2 pt-2">
+                      <Button 
+                        variant="outline" 
+                        className="flex-1" 
+                        size="sm"
+                        onClick={() => navigate(`/resume/${resume.id}`)}
+                      >
+                        <Eye className="h-3 w-3 mr-1" />
+                        View
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        className="flex-1" 
+                        size="sm"
+                        onClick={() => handleDownload(resume)}
+                      >
+                        <Download className="h-3 w-3 mr-1" />
+                        PDF
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        className="flex-1" 
+                        size="sm"
+                        onClick={() => navigate(`/create?edit=${resume.id}`)}
+                        title="Edit resume"
+                      >
+                        <Edit className="h-3 w-3 mr-1" />
+                        Edit
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
 
