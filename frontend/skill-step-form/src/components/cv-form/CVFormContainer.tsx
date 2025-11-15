@@ -37,46 +37,29 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
   const form = useForm<CVFormData>({
     resolver: zodResolver(cvFormSchema),
     defaultValues: initialData ?? {
-      personalInfo: {
-        firstName: "",
-        lastName: "",
-        professionalTitle: "",
-        profileImage: "",
-        email: "",
-        phone: "",
-        location: "",
-        linkedin: "",
-        github: "",
-        website: "",
-        summary: "",
-        interests: [{ interest: "" }],
-      },
-      workExperience: [{ 
-        position: "", 
-        company: "", 
-        location: "",
-        startDate: "", 
-        endDate: "", 
-        description: "",
-        technologies: [],
-        competencies: []
-      }],
-      education: [{ 
-        degree: "", 
-        institution: "", 
-        location: "",
-        startDate: "", 
-        endDate: "", 
-        field: "",
-        keyCourses: []
-      }],
-      projects: [],
-      certificates: [],
-      languages: [{ language: "", proficiency: "" }],
-      skills: [{ skill: "" }],
-      sectionOrder: ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"],
-      template: "modern",
-    },
+  personalInfo: {
+    firstName: "",
+    lastName: "",
+    professionalTitle: "",
+    profileImage: "",
+    email: "",
+    phone: "",
+    location: "",
+    linkedin: "",
+    github: "",
+    website: "",
+    summary: "",
+    interests: [],  // 🔧 Changed to empty array
+  },
+  workExperience: [],  // Already good
+  education: [],  // Already good
+  projects: [],
+  certificates: [],
+  languages: [],  // 🔧 Changed to empty array
+  skills: [],  // 🔧 Changed to empty array
+  sectionOrder: ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"],
+  template: "modern",
+},
   });
 
   // Log form state changes

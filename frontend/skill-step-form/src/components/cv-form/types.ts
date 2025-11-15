@@ -26,7 +26,7 @@ export const cvFormSchema = z.object({
       location: z.string().optional(),
       startDate: z.string().optional(),
       endDate: z.string().optional(),
-      description: z.string().optional(), // Keep for backward compatibility
+      description: z.string().optional(),
       responsibilities: z.array(
         z.object({
           responsibility: z.string().optional(),
@@ -62,7 +62,7 @@ export const cvFormSchema = z.object({
   projects: z.array(
     z.object({
       name: z.string().optional(),
-      description: z.string().optional(), // Keep for backward compatibility
+      description: z.string().optional(),
       highlights: z.array(
         z.object({
           highlight: z.string().optional(),
@@ -70,9 +70,9 @@ export const cvFormSchema = z.object({
       ).optional(),
       technologies: z.array(
         z.object({
-          technology: z.string().min(1, "Technology is required"),
+          technology: z.string().optional(),  // 🔧 Changed to optional
         })
-      ),
+      ).optional(),  // 🔧 Made array optional
       startDate: z.string().optional(),
       endDate: z.string().optional(),
       link: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
@@ -90,19 +90,18 @@ export const cvFormSchema = z.object({
   ).optional(),
   languages: z.array(
     z.object({
-      language: z.string().min(1, "Language is required"),
-      proficiency: z.string().min(1, "Proficiency is required"),
+      language: z.string().optional(),  // 🔧 Changed to optional
+      proficiency: z.string().optional(),  // 🔧 Changed to optional
     })
-  ),
+  ).optional(),  // 🔧 Made array optional
   skills: z.array(
     z.object({
-      skill: z.string().min(1, "Skill is required"),
+      skill: z.string().optional(),  // 🔧 Changed to optional
     })
-  ),
+  ).optional(),  // 🔧 Made array optional
   sectionOrder: z.array(z.string()).optional(),
   template: z.enum(["modern", "classic", "minimal", "creative"]).default("modern"),
 });
-
 export type CVFormData = z.infer<typeof cvFormSchema>;
 
 export type CVTemplate = "modern" | "classic" | "minimal" | "creative";
