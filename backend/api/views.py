@@ -3,7 +3,7 @@ API Views for Resume/CV operations
 """
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from .models import Resume
 from .serializers import ResumeSerializer
@@ -12,6 +12,7 @@ from bson import ObjectId
 
 
 @api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
 def resume_list(request):
     """
     List all resumes for the authenticated user or create a new resume
@@ -161,6 +162,7 @@ def resume_list(request):
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
 def resume_detail(request, pk):
     """
     Retrieve, update or delete a resume (only if it belongs to the authenticated user)

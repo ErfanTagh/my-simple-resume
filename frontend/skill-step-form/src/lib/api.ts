@@ -73,14 +73,61 @@ const createHeaders = (includeAuth = true) => {
   return headers;
 };
 
-// Handle API errors
-const handleResponse = async (response: Response) => {
+// Try to refresh token if expired
+const tryRefreshToken = async (): Promise<boolean> => {
+  try {
+    const tokens = getTokens();
+    if (!tokens?.refresh) {
+      return false;
+    }
+
+    const response = await fetch(`${API_BASE_URL}/auth/token/refresh/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh: tokens.refresh }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      // Update access token
+      const newTokens = { ...tokens, access: data.access };
+      localStorage.setItem('tokens', JSON.stringify(newTokens));
+      return true;
+    }
+    
+    // Refresh token also expired, clear everything
+    localStorage.removeItem('tokens');
+    localStorage.removeItem('user');
+    return false;
+  } catch (error) {
+    console.error('Token refresh failed:', error);
+    return false;
+  }
+};
+
+// Handle API errors with automatic token refresh
+const handleResponse = async (response: Response, retryFn?: () => Promise<Response>) => {
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
     
     // Special handling for authentication errors
+    if (response.status === 401 && retryFn) {
+      // Try to refresh the token
+      const refreshed = await tryRefreshToken();
+      if (refreshed) {
+        // Retry the original request with new token
+        const retryResponse = await retryFn();
+        if (retryResponse.ok) {
+          const data = await retryResponse.json();
+          return snakeToCamelObject(data);
+        }
+      }
+      // If refresh failed or retry failed, throw error
+      throw new Error('Your session has expired. Please log in again.');
+    }
+    
     if (response.status === 401) {
-      throw new Error('You must be logged in to perform this action. Please log in and try again.');
+      throw new Error('Your session has expired. Please log in again.');
     }
     
     throw new Error(error.error || error.detail || `HTTP ${response.status}: ${response.statusText}`);
@@ -236,20 +283,22 @@ export const resumeAPI = {
    * Get all resumes for the authenticated user
    */
   getAll: async (): Promise<Resume[]> => {
-    const response = await fetch(`${API_BASE_URL}/resumes/`, {
+    const makeRequest = () => fetch(`${API_BASE_URL}/resumes/`, {
       headers: createHeaders(true),
     });
-    return handleResponse(response);
+    const response = await makeRequest();
+    return handleResponse(response, makeRequest);
   },
 
   /**
    * Get a specific resume by ID
    */
   getById: async (id: string): Promise<Resume> => {
-    const response = await fetch(`${API_BASE_URL}/resumes/${id}/`, {
+    const makeRequest = () => fetch(`${API_BASE_URL}/resumes/${id}/`, {
       headers: createHeaders(true),
     });
-    return handleResponse(response);
+    const response = await makeRequest();
+    return handleResponse(response, makeRequest);
   },
 
   /**
@@ -259,12 +308,13 @@ export const resumeAPI = {
     // Convert camelCase to snake_case for backend
     const snakeCaseData = camelToSnakeObject(data);
     
-    const response = await fetch(`${API_BASE_URL}/resumes/`, {
+    const makeRequest = () => fetch(`${API_BASE_URL}/resumes/`, {
       method: 'POST',
       headers: createHeaders(true),
       body: JSON.stringify(snakeCaseData),
     });
-    return handleResponse(response);
+    const response = await makeRequest();
+    return handleResponse(response, makeRequest);
   },
 
   /**
@@ -274,12 +324,13 @@ export const resumeAPI = {
     // Convert camelCase to snake_case for backend
     const snakeCaseData = camelToSnakeObject(data);
     
-    const response = await fetch(`${API_BASE_URL}/resumes/${id}/`, {
+    const makeRequest = () => fetch(`${API_BASE_URL}/resumes/${id}/`, {
       method: 'PUT',
       headers: createHeaders(true),
       body: JSON.stringify(snakeCaseData),
     });
-    return handleResponse(response);
+    const response = await makeRequest();
+    return handleResponse(response, makeRequest);
   },
 
   /**
