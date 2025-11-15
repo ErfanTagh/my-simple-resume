@@ -8,33 +8,33 @@ from datetime import timedelta
 
 
 class Interest(models.Model):
-    interest = models.CharField(max_length=100)
+    interest = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
         abstract = True
 
     def __str__(self):
-        return self.interest
+        return self.interest or ''
 
 
 class Technology(models.Model):
-    technology = models.CharField(max_length=100)
+    technology = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
         abstract = True
 
     def __str__(self):
-        return self.technology
+        return self.technology or ''
 
 
 class Competency(models.Model):
-    competency = models.CharField(max_length=100)
+    competency = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
         abstract = True
 
     def __str__(self):
-        return self.competency
+        return self.competency or ''
 
 
 class Responsibility(models.Model):
@@ -58,13 +58,13 @@ class Highlight(models.Model):
 
 
 class Course(models.Model):
-    course = models.CharField(max_length=200)
+    course = models.CharField(max_length=200, blank=True, null=True)
 
     class Meta:
         abstract = True
 
     def __str__(self):
-        return self.course
+        return self.course or ''
 
 
 class PersonalInfo(models.Model):
@@ -86,8 +86,8 @@ class PersonalInfo(models.Model):
 
 
 class WorkExperience(models.Model):
-    position = models.CharField(max_length=200)
-    company = models.CharField(max_length=200)
+    position = models.CharField(max_length=200, blank=True, null=True)
+    company = models.CharField(max_length=200, blank=True, null=True)
     location = models.CharField(max_length=200, blank=True, null=True)
     start_date = models.CharField(max_length=20, blank=True, null=True)
     end_date = models.CharField(max_length=20, blank=True, null=True)
@@ -101,8 +101,8 @@ class WorkExperience(models.Model):
 
 
 class Education(models.Model):
-    degree = models.CharField(max_length=200)
-    institution = models.CharField(max_length=200)
+    degree = models.CharField(max_length=200, blank=True, null=True)
+    institution = models.CharField(max_length=200, blank=True, null=True)
     location = models.CharField(max_length=200, blank=True, null=True)
     start_date = models.CharField(max_length=20, blank=True, null=True)
     end_date = models.CharField(max_length=20, blank=True, null=True)
@@ -139,15 +139,15 @@ class Certificate(models.Model):
 
 
 class Language(models.Model):
-    language = models.CharField(max_length=100)
-    proficiency = models.CharField(max_length=50)
+    language = models.CharField(max_length=100, blank=True, null=True)
+    proficiency = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
         abstract = True
 
 
 class Skill(models.Model):
-    skill = models.CharField(max_length=100)
+    skill = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
         abstract = True
