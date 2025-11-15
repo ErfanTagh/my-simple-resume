@@ -38,23 +38,23 @@ class Competency(models.Model):
 
 
 class Responsibility(models.Model):
-    responsibility = models.CharField(max_length=500)
+    responsibility = models.CharField(max_length=500, blank=True, null=True)
 
     class Meta:
         abstract = True
 
     def __str__(self):
-        return self.responsibility
+        return self.responsibility or ''
 
 
 class Highlight(models.Model):
-    highlight = models.CharField(max_length=500)
+    highlight = models.CharField(max_length=500, blank=True, null=True)
 
     class Meta:
         abstract = True
 
     def __str__(self):
-        return self.highlight
+        return self.highlight or ''
 
 
 class Course(models.Model):
