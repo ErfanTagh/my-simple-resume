@@ -233,6 +233,7 @@ export interface ResumeData {
     startDate?: string;
     endDate?: string;
     description?: string;
+    responsibilities?: Array<{ responsibility: string }>;
     technologies?: Array<{ technology: string }>;
     competencies?: Array<{ competency: string }>;
   }>;
@@ -248,6 +249,7 @@ export interface ResumeData {
   projects?: Array<{
     name?: string;
     description?: string;
+    highlights?: Array<{ highlight: string }>;
     technologies?: Array<{ technology: string }>;
     startDate?: string;
     endDate?: string;
@@ -276,6 +278,11 @@ export interface Resume extends ResumeData {
   id: string;
   created_at: string;
   updated_at: string;
+  completenessScore?: number;
+  clarityScore?: number;
+  formattingScore?: number;
+  impactScore?: number;
+  overallScore?: number;
 }
 
 export const resumeAPI = {

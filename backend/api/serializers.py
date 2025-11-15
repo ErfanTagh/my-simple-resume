@@ -16,6 +16,14 @@ class CompetencySerializer(serializers.Serializer):
     competency = serializers.CharField(max_length=100, required=False, allow_blank=True)
 
 
+class ResponsibilitySerializer(serializers.Serializer):
+    responsibility = serializers.CharField(max_length=500, required=False, allow_blank=True)
+
+
+class HighlightSerializer(serializers.Serializer):
+    highlight = serializers.CharField(max_length=500, required=False, allow_blank=True)
+
+
 class CourseSerializer(serializers.Serializer):
     course = serializers.CharField(max_length=200, required=False, allow_blank=True)
 
@@ -69,6 +77,7 @@ class WorkExperienceSerializer(serializers.Serializer):
         allow_blank=True
     )
     description = serializers.CharField(required=False, allow_blank=True)
+    responsibilities = ResponsibilitySerializer(many=True, required=False)
     technologies = TechnologySerializer(many=True, required=False)
     competencies = CompetencySerializer(many=True, required=False)
 
@@ -109,6 +118,7 @@ class ProjectSerializer(serializers.Serializer):
         allow_blank=True
     )
     description = serializers.CharField(required=False, allow_blank=True)
+    highlights = HighlightSerializer(many=True, required=False)
     technologies = TechnologySerializer(many=True, required=False)
     start_date = serializers.CharField(
         max_length=20, 
@@ -176,6 +186,13 @@ class ResumeSerializer(serializers.Serializer):
         required=False,
         allow_empty=True
     )
+    # Quality scores
+    completeness_score = serializers.FloatField(read_only=True, required=False)
+    clarity_score = serializers.FloatField(read_only=True, required=False)
+    formatting_score = serializers.FloatField(read_only=True, required=False)
+    impact_score = serializers.FloatField(read_only=True, required=False)
+    overall_score = serializers.FloatField(read_only=True, required=False)
+    
     created_at = serializers.DateTimeField(read_only=True)
     updated_at = serializers.DateTimeField(read_only=True)
 
