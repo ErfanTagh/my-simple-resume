@@ -21,9 +21,9 @@ def format_mongo_date(date_value):
     try:
         from bson import datetime as bson_datetime
         if isinstance(date_value, bson_datetime.datetime):
-            # Convert BSON datetime to Python datetime
-            return date_value.as_datetime().isoformat()
-    except (ImportError, AttributeError):
+            # BSON datetime already has isoformat() method
+            return date_value.isoformat()
+    except (ImportError, AttributeError, TypeError):
         pass
     
     # Handle Python datetime objects
@@ -129,10 +129,6 @@ def resume_list(request):
                 # Get dates with fallback
                 created_at_raw = resume_doc.get('created_at')
                 updated_at_raw = resume_doc.get('updated_at')
-                
-                # Log for debugging
-                logger.debug(f"Resume {resume_doc['_id']} - created_at type: {type(created_at_raw)}, value: {created_at_raw}")
-                logger.debug(f"Resume {resume_doc['_id']} - updated_at type: {type(updated_at_raw)}, value: {updated_at_raw}")
                 
                 resume_dict = {
                     'id': str(resume_doc['_id']),

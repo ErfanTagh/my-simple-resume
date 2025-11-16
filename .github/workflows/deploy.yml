@@ -21,94 +21,35 @@ jobs:
           port: 22
           script: |
             echo "🔄 Starting deployment..."
-
-            # Navigate to project directory
             cd ~/my-simple-resume
 
-            # Discard any local changes and pull latest code
-            echo "📥 Fetching latest code from GitHub..."
+            # Update code
             git fetch origin
-
-            echo "🧹 Discarding local changes..."
             git reset --hard origin/main
 
-            echo "✅ Code updated to latest version"
-
-            # Stop services
-            echo "🛑 Stopping services..."
+            # Rebuild and restart services
             docker compose -f docker-compose.prod.yml down
-
-            # Clean up old images to free space
-            echo "🧹 Cleaning up old Docker images..."
-            docker image prune -f || true
-
-            # Rebuild ALL containers with clean cache
-            echo "🔨 Rebuilding all containers with --no-cache..."
             docker compose -f docker-compose.prod.yml build --no-cache
-
-            # Start services
-            echo "▶️  Starting services..."
             docker compose -f docker-compose.prod.yml up -d
 
-            # Wait for services to start and be healthy
-            echo "⏳ Waiting for services to initialize..."
-            sleep 15
+            # Wait for services to start
+            echo "⏳ Waiting for services to start..."
+            sleep 20
 
-            # Wait for backend to be ready
-            echo "⏳ Waiting for backend to be ready..."
-            timeout=60
-            while [ $timeout -gt 0 ]; do
-              if docker compose -f docker-compose.prod.yml exec -T backend python -c "import django; print('OK')" 2>/dev/null; then
-                echo "✅ Backend is ready"
-                break
-              fi
-              sleep 2
-              timeout=$((timeout - 2))
-            done
-
-            # Copy frontend files from container to nginx
-            echo "📋 Copying frontend files to nginx..."
+            # Copy frontend files to nginx
             mkdir -p /tmp/frontend-build
-            docker cp resume_frontend:/usr/share/nginx/html/. /tmp/frontend-build/ 2>/dev/null || {
-              echo "⚠️  Frontend container might not be ready, waiting..."
-              sleep 5
-              docker cp resume_frontend:/usr/share/nginx/html/. /tmp/frontend-build/ || echo "❌ Failed to copy frontend files"
-            }
+            docker cp resume_frontend:/usr/share/nginx/html/. /tmp/frontend-build/ 2>/dev/null || sleep 5 && docker cp resume_frontend:/usr/share/nginx/html/. /tmp/frontend-build/
+            docker cp /tmp/frontend-build/. resume_nginx:/usr/share/nginx/html/ 2>/dev/null || true
+            rm -rf /tmp/frontend-build
 
-            if [ -d "/tmp/frontend-build" ] && [ "$(ls -A /tmp/frontend-build)" ]; then
-              docker cp /tmp/frontend-build/. resume_nginx:/usr/share/nginx/html/
-              rm -rf /tmp/frontend-build
-              echo "✅ Frontend files copied successfully"
-              
-              # Wait for nginx to be ready before reloading
-              sleep 3
-              echo "🔄 Reloading nginx..."
-              docker compose -f docker-compose.prod.yml exec -T nginx nginx -s reload || echo "⚠️  Nginx reload failed, but continuing..."
-            else
-              echo "⚠️  No frontend files found to copy"
-            fi
+            # Run migrations
+            docker compose -f docker-compose.prod.yml exec -T backend python manage.py migrate || true
 
-            # Run database migrations
-            echo "🗄️  Running database migrations..."
-            docker compose -f docker-compose.prod.yml exec -T backend python manage.py makemigrations || echo "⚠️  Makemigrations failed or no changes"
-            docker compose -f docker-compose.prod.yml exec -T backend python manage.py migrate || echo "❌ Migrations failed!"
+            # Reload nginx
+            docker compose -f docker-compose.prod.yml exec -T nginx nginx -s reload || docker compose -f docker-compose.prod.yml restart nginx
 
-            # Collect static files
-            echo "📦 Collecting static files..."
-            docker compose -f docker-compose.prod.yml exec -T backend python manage.py collectstatic --noinput || echo "⚠️  Collectstatic failed"
-
-            # Restart services to ensure everything is fresh
-            echo "🔄 Restarting services..."
-            docker compose -f docker-compose.prod.yml restart
-
-            # Show status
             echo "✅ Deployment complete!"
-            echo ""
-            echo "📊 Service Status:"
             docker compose -f docker-compose.prod.yml ps
-
-            echo ""
-            echo "🌐 Site: https://123resume.de"
 
       - name: ✅ Deployment Status
         if: success()
