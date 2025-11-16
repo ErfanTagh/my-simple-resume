@@ -16,9 +16,9 @@ export const ProgressIndicator = ({
 
   return (
     <div className="w-full mb-8">
-      <div className="relative pl-2 sm:pl-0">
+      <div className="relative pl-1 sm:pl-0">
         {/* Progress Bar */}
-        <div className="absolute top-5 left-0 h-1 w-full bg-muted rounded-full overflow-hidden">
+        <div className="absolute top-4 sm:top-5 left-0 h-1 w-full bg-muted rounded-full overflow-hidden">
           <div
             className="h-full bg-gradient-to-r from-primary to-primary-glow transition-all duration-500 ease-out"
             style={{ width: `${progressPercentage}%` }}
@@ -26,12 +26,12 @@ export const ProgressIndicator = ({
         </div>
 
         {/* Step Indicators */}
-        <div className="relative flex gap-2 sm:justify-between sm:gap-0">
+        <div className="relative flex gap-1.5 sm:justify-between sm:gap-0">
           {stepLabels.map((label, index) => (
-            <div key={index} className="flex flex-col items-center">
+            <div key={index} className="flex flex-col items-center flex-shrink-0">
               <div
                 className={cn(
-                  "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 border-2",
+                  "w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-300 border-2",
                   index < currentStep
                     ? "bg-primary border-primary text-primary-foreground"
                     : index === currentStep
@@ -40,9 +40,9 @@ export const ProgressIndicator = ({
                 )}
               >
                 {index < currentStep ? (
-                  <Check className="w-5 h-5" />
+                  <Check className="w-4 h-4 sm:w-5 sm:h-5" />
                 ) : (
-                  <span className="text-sm font-medium">{index + 1}</span>
+                  <span className="text-xs sm:text-sm font-medium">{index + 1}</span>
                 )}
               </div>
               <span
