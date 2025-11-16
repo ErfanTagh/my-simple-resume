@@ -5,11 +5,12 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
-
 # Build paths inside the project
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent  # backend/
+ROOT_DIR = BASE_DIR.parent  # project root where .env is
+
+# Load environment variables from the root .env
+load_dotenv(ROOT_DIR / ".env")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-this-in-production')
@@ -78,7 +79,7 @@ DATABASES = {
         'ENGINE': 'djongo',
         'NAME': os.getenv('MONGODB_NAME', 'resume_db'),
         'CLIENT': {
-            'host': os.getenv('MONGODB_HOST', 'localhost'),
+            'host': os.getenv('MONGODB_HOST', 'mongodb'),  # Docker service name
             'port': int(os.getenv('MONGODB_PORT', 27017)),
             'username': os.getenv('MONGODB_USERNAME', ''),
             'password': os.getenv('MONGODB_PASSWORD', ''),
@@ -174,4 +175,3 @@ EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
-
