@@ -83,17 +83,38 @@ def send_verification_email(user_email, username, verification_link):
     """
     
     try:
+        # Ensure FROM email matches the authenticated email to avoid blocking
+        from_email = settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER
+        if not from_email:
+            print("Error: EMAIL_HOST_USER or DEFAULT_FROM_EMAIL not configured")
+            return False
+        
         send_mail(
             subject=subject,
             message=plain_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
+            from_email=from_email,
             recipient_list=[user_email],
             html_message=html_message,
             fail_silently=False,
         )
         return True
     except Exception as e:
-        print(f"Error sending email: {e}")
+        error_msg = str(e)
+        print(f"Error sending email: {error_msg}")
+        
+        # Provide helpful error messages
+        if "blocked" in error_msg.lower() or "550" in error_msg:
+            print("⚠️  Email blocked. Common causes:")
+            print("   1. FROM email doesn't match authenticated email")
+            print("   2. Gmail requires App Password (not regular password)")
+            print("   3. Missing SPF/DKIM records for custom domain")
+            print("   4. Email flagged as spam")
+        elif "authentication" in error_msg.lower() or "535" in error_msg:
+            print("⚠️  Authentication failed. Check:")
+            print("   1. EMAIL_HOST_USER is correct")
+            print("   2. EMAIL_HOST_PASSWORD is an App Password (for Gmail)")
+            print("   3. Less secure app access is enabled (if using regular password)")
+        
         return False
 
 
@@ -172,10 +193,15 @@ def send_welcome_email(user_email, username):
     """
     
     try:
+        from_email = settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER
+        if not from_email:
+            print("Error: EMAIL_HOST_USER or DEFAULT_FROM_EMAIL not configured")
+            return False
+        
         send_mail(
             subject=subject,
             message=plain_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
+            from_email=from_email,
             recipient_list=[user_email],
             html_message=html_message,
             fail_silently=False,
@@ -267,10 +293,15 @@ def send_password_reset_email(user_email, username, reset_link):
     """
     
     try:
+        from_email = settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER
+        if not from_email:
+            print("Error: EMAIL_HOST_USER or DEFAULT_FROM_EMAIL not configured")
+            return False
+        
         send_mail(
             subject=subject,
             message=plain_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
+            from_email=from_email,
             recipient_list=[user_email],
             html_message=html_message,
             fail_silently=False,
@@ -341,10 +372,15 @@ def send_password_changed_email(user_email, username):
     """
     
     try:
+        from_email = settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER
+        if not from_email:
+            print("Error: EMAIL_HOST_USER or DEFAULT_FROM_EMAIL not configured")
+            return False
+        
         send_mail(
             subject=subject,
             message=plain_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
+            from_email=from_email,
             recipient_list=[user_email],
             html_message=html_message,
             fail_silently=False,

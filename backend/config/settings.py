@@ -183,6 +183,25 @@ EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.Email
 EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
+EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'False') == 'True'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '').strip()
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '').strip()
+
+# Gmail requires FROM email to match authenticated email exactly
+# If DEFAULT_FROM_EMAIL is set, use it; otherwise use EMAIL_HOST_USER
+# Remove any display name and use just the email address
+default_from = os.getenv('DEFAULT_FROM_EMAIL', '').strip()
+if default_from:
+    # Extract email from "Display Name <email@domain.com>" format if present
+    import re
+    email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', default_from)
+    if email_match:
+        DEFAULT_FROM_EMAIL = email_match.group(0)
+    else:
+        DEFAULT_FROM_EMAIL = default_from
+else:
+    # Fallback to authenticated email
+    DEFAULT_FROM_EMAIL = EMAIL_HOST_USER or 'noreply@123resume.de'
+
+# Set SERVER_EMAIL to match for error reporting
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
