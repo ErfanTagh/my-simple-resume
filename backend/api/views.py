@@ -31,11 +31,18 @@ def resume_list(request):
             # First try to use connection string if available
             connection_string = os.getenv('MONGODB_CONNECTION_STRING')
             if connection_string:
-                client = MongoClient(connection_string)
-                # Extract database name from connection string or use default
-                mongo_db = os.getenv('MONGODB_NAME', 'resume_db')
-            else:
-                # Fallback to individual env vars
+                # Try using connection string, but if it fails, fall back to individual vars
+                try:
+                    client = MongoClient(connection_string)
+                    # Test the connection
+                    client.admin.command('ping')
+                except Exception:
+                    # Connection string might have encoding issues, use individual vars
+                    connection_string = None
+            
+            if not connection_string:
+                # Use individual env vars (more reliable for special characters)
+                from urllib.parse import quote_plus
                 mongo_host = os.getenv('MONGODB_HOST', 'localhost')
                 mongo_port = int(os.getenv('MONGODB_PORT', 27017))
                 mongo_db = os.getenv('MONGODB_NAME', 'resume_db')
@@ -54,6 +61,8 @@ def resume_list(request):
                     )
                 else:
                     client = MongoClient(mongo_host, mongo_port)
+            
+            mongo_db = os.getenv('MONGODB_NAME', 'resume_db')
             
             db = client[mongo_db]
             
@@ -183,11 +192,17 @@ def resume_detail(request, pk):
     # First try to use connection string if available
     connection_string = os.getenv('MONGODB_CONNECTION_STRING')
     if connection_string:
-        client = MongoClient(connection_string)
-        # Extract database name from connection string or use default
-        mongo_db = os.getenv('MONGODB_NAME', 'resume_db')
-    else:
-        # Fallback to individual env vars
+        # Try using connection string, but if it fails, fall back to individual vars
+        try:
+            client = MongoClient(connection_string)
+            # Test the connection
+            client.admin.command('ping')
+        except Exception:
+            # Connection string might have encoding issues, use individual vars
+            connection_string = None
+    
+    if not connection_string:
+        # Use individual env vars (more reliable for special characters)
         mongo_host = os.getenv('MONGODB_HOST', 'localhost')
         mongo_port = int(os.getenv('MONGODB_PORT', 27017))
         mongo_db = os.getenv('MONGODB_NAME', 'resume_db')
@@ -207,6 +222,7 @@ def resume_detail(request, pk):
         else:
             client = MongoClient(mongo_host, mongo_port)
     
+    mongo_db = os.getenv('MONGODB_NAME', 'resume_db')
     db = client[mongo_db]
     
     # Validate ObjectId format

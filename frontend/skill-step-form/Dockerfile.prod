@@ -17,11 +17,18 @@ RUN npm run build
 # Production stage
 FROM nginx:alpine
 
-# Copy built files from builder
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Copy built files from builder to a temp location
+COPY --from=builder /app/dist /app/build
 
-# Copy will be mounted from docker-compose
+# Create entrypoint script to copy files to volume on startup
+RUN echo '#!/bin/sh' > /docker-entrypoint.sh && \
+    echo 'echo "Copying frontend files to shared volume..."' >> /docker-entrypoint.sh && \
+    echo 'cp -r /app/build/* /usr/share/nginx/html/ 2>/dev/null || true' >> /docker-entrypoint.sh && \
+    echo 'echo "Frontend files copied. Keeping container alive..."' >> /docker-entrypoint.sh && \
+    echo 'exec tail -f /dev/null' >> /docker-entrypoint.sh && \
+    chmod +x /docker-entrypoint.sh
+
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/docker-entrypoint.sh"]
 
