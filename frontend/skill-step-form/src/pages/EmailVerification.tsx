@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CheckCircle2, XCircle, Mail, Loader2, Home } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 export default function EmailVerification() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { user, tokens } = useAuth();
   const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'expired'>('loading');
   const [message, setMessage] = useState('');
   const [email, setEmail] = useState('');
@@ -37,8 +40,54 @@ export default function EmailVerification() {
           setMessage(data.message);
           setEmail(data.user?.email || '');
           
-          // Note: Resume will be saved after user logs in (handled in Login component)
-          // We just keep the pendingResume in localStorage for now
+          // Auto-login if tokens are provided
+          if (data.tokens && data.user) {
+            // Store user and tokens
+            localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('tokens', JSON.stringify(data.tokens));
+            
+            // Reload the page to update auth context
+            // Check for pending resume and save it
+            const pendingResume = localStorage.getItem('pendingResume');
+            if (pendingResume) {
+              try {
+                const resumeData = JSON.parse(pendingResume);
+                // Import and save resume
+                const { resumeAPI } = await import('@/lib/api');
+                const savedResume = await resumeAPI.create(resumeData);
+                localStorage.removeItem('pendingResume');
+                
+                toast({
+                  title: "Resume Saved!",
+                  description: "Your resume has been created successfully.",
+                });
+                
+                // Redirect to resumes page after a short delay
+                setTimeout(() => {
+                  window.location.href = '/resumes';
+                }, 1500);
+                return;
+              } catch (error: any) {
+                console.error("Failed to save resume after verification:", error);
+                toast({
+                  title: "Error Saving Resume",
+                  description: error.message || "Failed to save your resume. You can create it again.",
+                  variant: "destructive",
+                });
+                // Still redirect to resumes page even if save fails
+                setTimeout(() => {
+                  window.location.href = '/resumes';
+                }, 1500);
+                return;
+              }
+            } else {
+              // No pending resume, just redirect to resumes page
+              setTimeout(() => {
+                window.location.href = '/resumes';
+              }, 1500);
+              return;
+            }
+          }
         } else {
           if (data.expired) {
             setStatus('expired');
@@ -108,54 +157,21 @@ export default function EmailVerification() {
               <Alert className="mb-6 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
                 <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
                 <AlertDescription className="text-green-700 dark:text-green-300">
-                  Your account is now active! You can log in to start creating your resume.
+                  {(() => {
+                    const pendingResume = localStorage.getItem('pendingResume');
+                    if (pendingResume) {
+                      return "Your account is now active! Saving your resume and redirecting you...";
+                    }
+                    return "Your account is now active! Redirecting you to your resumes...";
+                  })()}
                 </AlertDescription>
               </Alert>
 
               <div className="space-y-3">
-                {(() => {
-                  const pendingResumeId = localStorage.getItem('pendingResumeId');
-                  const pendingResume = localStorage.getItem('pendingResume');
-                  
-                  if (pendingResumeId) {
-                    // Resume already saved, redirect to login then resumes list
-                    return (
-                      <Link to="/login" className="block">
-                        <Button className="w-full" size="lg">
-                          <Home className="mr-2 h-4 w-4" />
-                          Go to Login & View Resumes
-                        </Button>
-                      </Link>
-                    );
-                  } else if (pendingResume) {
-                    // Resume needs to be saved after login
-                    return (
-                      <Link to="/login?saveResume=true" className="block">
-                        <Button className="w-full" size="lg">
-                          <Home className="mr-2 h-4 w-4" />
-                          Go to Login & Save Resume
-                        </Button>
-                      </Link>
-                    );
-                  } else {
-                    // No pending resume
-                    return (
-                      <>
-                        <Link to="/login" className="block">
-                          <Button className="w-full" size="lg">
-                            <Home className="mr-2 h-4 w-4" />
-                            Go to Login
-                          </Button>
-                        </Link>
-                        <Link to="/" className="block">
-                          <Button variant="outline" className="w-full">
-                            Back to Home
-                          </Button>
-                        </Link>
-                      </>
-                    );
-                  }
-                })()}
+                <div className="text-center">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">Please wait...</p>
+                </div>
               </div>
             </>
           )}

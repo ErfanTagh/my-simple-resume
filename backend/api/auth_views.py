@@ -315,12 +315,22 @@ def verify_email(request):
         # Send welcome email
         send_welcome_email(user.email, user.username)
         
+        # Generate tokens for auto-login
+        refresh = RefreshToken.for_user(user)
+        
         return Response({
-            'message': 'Email verified successfully! You can now log in.',
+            'message': 'Email verified successfully! You are now logged in.',
             'email_verified': True,
             'user': {
+                'id': user.id,
                 'username': user.username,
-                'email': user.email
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+            },
+            'tokens': {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
             }
         })
         

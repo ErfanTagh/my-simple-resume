@@ -16,11 +16,45 @@ def format_mongo_date(date_value):
     """Convert MongoDB date to ISO string format"""
     if not date_value:
         return None
+    
+    # Handle bson datetime objects first (they're common in MongoDB)
+    try:
+        from bson import datetime as bson_datetime
+        if isinstance(date_value, bson_datetime.datetime):
+            # Convert BSON datetime to Python datetime
+            return date_value.as_datetime().isoformat()
+    except (ImportError, AttributeError):
+        pass
+    
+    # Handle Python datetime objects
     if hasattr(date_value, 'isoformat'):
-        return date_value.isoformat()
+        try:
+            result = date_value.isoformat()
+            # Ensure it's a string
+            if result:
+                return result
+        except (AttributeError, TypeError):
+            pass
+    
+    # Handle string dates - if already ISO format, return as is
     if isinstance(date_value, str):
-        return date_value
-    return str(date_value)
+        # If it's already an ISO string, return it
+        if 'T' in date_value:
+            return date_value
+        # Try to parse common formats
+        try:
+            # Try parsing as ISO format
+            dt = datetime.fromisoformat(date_value.replace('Z', '+00:00'))
+            return dt.isoformat()
+        except (ValueError, AttributeError):
+            # If parsing fails, return the string as is
+            return date_value
+    
+    # Last resort: convert to string
+    try:
+        return str(date_value)
+    except:
+        return None
 
 def get_date_or_now(date_value):
     """Get date from MongoDB or return current date if missing"""
@@ -92,6 +126,14 @@ def resume_list(request):
             
             resumes_data = []
             for resume_doc in resumes_cursor:
+                # Get dates with fallback
+                created_at_raw = resume_doc.get('created_at')
+                updated_at_raw = resume_doc.get('updated_at')
+                
+                # Log for debugging
+                logger.debug(f"Resume {resume_doc['_id']} - created_at type: {type(created_at_raw)}, value: {created_at_raw}")
+                logger.debug(f"Resume {resume_doc['_id']} - updated_at type: {type(updated_at_raw)}, value: {updated_at_raw}")
+                
                 resume_dict = {
                     'id': str(resume_doc['_id']),
                     'personal_info': resume_doc.get('personal_info', {}),
@@ -117,8 +159,8 @@ def resume_list(request):
                     'formatting_score': resume_doc.get('formatting_score', 0.0),
                     'impact_score': resume_doc.get('impact_score', 0.0),
                     'overall_score': resume_doc.get('overall_score', 0.0),
-                    'created_at': get_date_or_now(resume_doc.get('created_at')),
-                    'updated_at': get_date_or_now(resume_doc.get('updated_at')),
+                    'created_at': get_date_or_now(created_at_raw),
+                    'updated_at': get_date_or_now(updated_at_raw),
                 }
                 resumes_data.append(resume_dict)
             
