@@ -74,18 +74,29 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database - MongoDB with djongo
+mongo_username = os.getenv('MONGODB_USERNAME', '')
+mongo_password = os.getenv('MONGODB_PASSWORD', '')
+
+# Build CLIENT config conditionally based on whether auth is needed
+mongo_client_config = {
+    'host': os.getenv('MONGODB_HOST', 'mongodb'),  # Docker service name
+    'port': int(os.getenv('MONGODB_PORT', 27017)),
+}
+
+# Only add authentication if username and password are provided
+if mongo_username and mongo_password:
+    mongo_client_config.update({
+        'username': mongo_username,
+        'password': mongo_password,
+        'authSource': 'admin',
+        'authMechanism': 'SCRAM-SHA-1',
+    })
+
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
         'NAME': os.getenv('MONGODB_NAME', 'resume_db'),
-        'CLIENT': {
-            'host': os.getenv('MONGODB_HOST', 'mongodb'),  # Docker service name
-            'port': int(os.getenv('MONGODB_PORT', 27017)),
-            'username': os.getenv('MONGODB_USERNAME', ''),
-            'password': os.getenv('MONGODB_PASSWORD', ''),
-            'authSource': 'admin',
-            'authMechanism': 'SCRAM-SHA-1',
-        }
+        'CLIENT': mongo_client_config
     }
 }
 
