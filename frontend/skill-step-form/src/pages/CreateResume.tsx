@@ -113,8 +113,20 @@ const CreateResume = () => {
 
   useEffect(() => {
     if (!editId) {
-      // Creating a new resume
-      setInitialData(undefined);
+      // Creating a new resume - check for pending resume data
+      const pendingResume = localStorage.getItem('pendingResume');
+      if (pendingResume) {
+        try {
+          const resumeData = JSON.parse(pendingResume);
+          setInitialData(resumeData);
+          console.log("📋 Restored pending resume data from localStorage");
+        } catch (error) {
+          console.error("Failed to parse pending resume data:", error);
+          setInitialData(undefined);
+        }
+      } else {
+        setInitialData(undefined);
+      }
       setIsLoading(false);
       return;
     }

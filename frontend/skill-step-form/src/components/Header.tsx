@@ -31,8 +31,8 @@ export const Header = () => {
         <nav className="flex items-center space-x-4">
           {isAuthenticated ? (
             <>
-              <span className="text-sm text-muted-foreground hidden sm:inline">
-                Welcome, {user?.first_name || user?.username}!
+              <span className="text-sm font-medium text-foreground hidden sm:inline">
+                {user?.first_name || user?.username} Resume!
               </span>
               
               <DropdownMenu>
@@ -49,9 +49,13 @@ export const Header = () => {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate('/')}>
+                  <DropdownMenuItem onClick={() => navigate('/resumes')}>
                     <FileText className="mr-2 h-4 w-4" />
                     <span>My Resumes</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+                    <FileText className="mr-2 h-4 w-4" />
+                    <span>Dashboard</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate('/profile')}>
                     <Settings className="mr-2 h-4 w-4" />
@@ -68,7 +72,7 @@ export const Header = () => {
           ) : (
             <div className="flex items-center space-x-2">
               <Button variant="ghost" asChild>
-                <Link to="/login">Sign In</Link>
+                <Link to="/login">Log In</Link>
               </Button>
               <Button asChild>
                 <Link to="/signup">Sign Up</Link>

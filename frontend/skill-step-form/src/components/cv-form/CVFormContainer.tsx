@@ -178,6 +178,22 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
     
     setIsSaving(true);
     try {
+      // Check if user is authenticated
+      if (!user) {
+        // User is not authenticated - save to localStorage and redirect to signup
+        console.log("👤 User not authenticated, saving resume data to localStorage");
+        localStorage.setItem('pendingResume', JSON.stringify(data));
+        toast({
+          title: "Resume Saved!",
+          description: "Please sign up to complete your resume creation.",
+        });
+        setTimeout(() => {
+          navigate('/signup');
+        }, 1000);
+        setIsSaving(false);
+        return;
+      }
+
       console.log("📦 Importing API service...");
       const { resumeAPI } = await import('@/lib/api');
       console.log("✅ API service imported successfully");

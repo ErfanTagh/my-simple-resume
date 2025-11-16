@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -7,6 +7,7 @@ import { CheckCircle2, XCircle, Mail, Loader2, Home } from 'lucide-react';
 
 export default function EmailVerification() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'expired'>('loading');
   const [message, setMessage] = useState('');
   const [email, setEmail] = useState('');
@@ -35,6 +36,9 @@ export default function EmailVerification() {
           setStatus('success');
           setMessage(data.message);
           setEmail(data.user?.email || '');
+          
+          // Note: Resume will be saved after user logs in (handled in Login component)
+          // We just keep the pendingResume in localStorage for now
         } else {
           if (data.expired) {
             setStatus('expired');
@@ -109,17 +113,49 @@ export default function EmailVerification() {
               </Alert>
 
               <div className="space-y-3">
-                <Link to="/login" className="block">
-                  <Button className="w-full" size="lg">
-                    <Home className="mr-2 h-4 w-4" />
-                    Go to Login
-                  </Button>
-                </Link>
-                <Link to="/" className="block">
-                  <Button variant="outline" className="w-full">
-                    Back to Home
-                  </Button>
-                </Link>
+                {(() => {
+                  const pendingResumeId = localStorage.getItem('pendingResumeId');
+                  const pendingResume = localStorage.getItem('pendingResume');
+                  
+                  if (pendingResumeId) {
+                    // Resume already saved, redirect to login then resumes list
+                    return (
+                      <Link to="/login" className="block">
+                        <Button className="w-full" size="lg">
+                          <Home className="mr-2 h-4 w-4" />
+                          Go to Login & View Resumes
+                        </Button>
+                      </Link>
+                    );
+                  } else if (pendingResume) {
+                    // Resume needs to be saved after login
+                    return (
+                      <Link to="/login?saveResume=true" className="block">
+                        <Button className="w-full" size="lg">
+                          <Home className="mr-2 h-4 w-4" />
+                          Go to Login & Save Resume
+                        </Button>
+                      </Link>
+                    );
+                  } else {
+                    // No pending resume
+                    return (
+                      <>
+                        <Link to="/login" className="block">
+                          <Button className="w-full" size="lg">
+                            <Home className="mr-2 h-4 w-4" />
+                            Go to Login
+                          </Button>
+                        </Link>
+                        <Link to="/" className="block">
+                          <Button variant="outline" className="w-full">
+                            Back to Home
+                          </Button>
+                        </Link>
+                      </>
+                    );
+                  }
+                })()}
               </div>
             </>
           )}

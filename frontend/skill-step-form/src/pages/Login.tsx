@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,6 +18,7 @@ export default function Login() {
   const [userEmail, setUserEmail] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const handleResendVerification = async () => {
     if (!userEmail) return;
@@ -51,7 +53,55 @@ export default function Login() {
 
     try {
       await login(username, password);
-      navigate('/');
+      
+      // Check for redirect or resume saving
+      const redirect = searchParams.get('redirect');
+      const saveResume = searchParams.get('saveResume');
+      
+      // Check for pending resume ID (resume already saved, just need to view it)
+      const pendingResumeId = localStorage.getItem('pendingResumeId');
+      
+      if (redirect) {
+        // Redirect to specified page (e.g., resume page)
+        navigate(redirect);
+        if (pendingResumeId) {
+          localStorage.removeItem('pendingResumeId');
+        }
+      } else if (pendingResumeId) {
+        // Resume already saved, redirect to resumes list
+        localStorage.removeItem('pendingResumeId');
+        navigate('/resumes');
+      } else if (saveResume === 'true') {
+        // Save pending resume and redirect to resumes list
+        const pendingResume = localStorage.getItem('pendingResume');
+        if (pendingResume) {
+          try {
+            const resumeData = JSON.parse(pendingResume);
+            const { resumeAPI } = await import('@/lib/api');
+            const savedResume = await resumeAPI.create(resumeData);
+            localStorage.removeItem('pendingResume');
+            toast({
+              title: "Resume Saved!",
+              description: "Your resume has been created successfully.",
+            });
+            setTimeout(() => {
+              navigate('/resumes');
+            }, 1000);
+          } catch (error: any) {
+            console.error("Failed to save resume:", error);
+            toast({
+              title: "Error Saving Resume",
+              description: error.message || "Failed to save your resume. You can create it again from the dashboard.",
+              variant: "destructive",
+            });
+            navigate('/resumes');
+          }
+        } else {
+          navigate('/resumes');
+        }
+      } else {
+        navigate('/resumes');
+      }
     } catch (err: any) {
       const errorMessage = err.message || 'Failed to login. Please check your credentials.';
       setError(errorMessage);

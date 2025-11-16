@@ -33,8 +33,9 @@ const App = () => (
             <Route path="/verify-email" element={<EmailVerification />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/" element={<CreateResume />} />
             <Route
-              path="/"
+              path="/dashboard"
               element={
                 <ProtectedRoute>
                   <Index />
@@ -43,11 +44,7 @@ const App = () => (
             />
             <Route
               path="/create"
-              element={
-                <ProtectedRoute>
-                  <CreateResume />
-                </ProtectedRoute>
-              }
+              element={<CreateResume />}
             />
             <Route
               path="/resumes"

@@ -57,6 +57,13 @@ export default function Signup() {
         formData.lastName
       );
       
+      // Check if there's pending resume data and keep it in localStorage
+      const pendingResume = localStorage.getItem('pendingResume');
+      if (pendingResume) {
+        console.log("💾 Keeping pending resume data for after email verification");
+        // Keep it in localStorage - will be used after email verification
+      }
+      
       // Show success message (user needs to verify email)
       setSuccess(true);
       setSuccessMessage(response.message || 'Registration successful! Please check your email.');
