@@ -9,6 +9,18 @@ from .models import Resume
 from .serializers import ResumeSerializer
 from .resume_scorer import calculate_resume_quality
 from bson import ObjectId
+from datetime import datetime
+
+
+def format_mongo_date(date_value):
+    """Convert MongoDB date to ISO string format"""
+    if not date_value:
+        return None
+    if hasattr(date_value, 'isoformat'):
+        return date_value.isoformat()
+    if isinstance(date_value, str):
+        return date_value
+    return str(date_value)
 
 
 @api_view(['GET', 'POST'])
@@ -97,8 +109,8 @@ def resume_list(request):
                     'formatting_score': resume_doc.get('formatting_score', 0.0),
                     'impact_score': resume_doc.get('impact_score', 0.0),
                     'overall_score': resume_doc.get('overall_score', 0.0),
-                    'created_at': resume_doc.get('created_at'),
-                    'updated_at': resume_doc.get('updated_at'),
+                    'created_at': format_mongo_date(resume_doc.get('created_at')),
+                    'updated_at': format_mongo_date(resume_doc.get('updated_at')),
                 }
                 resumes_data.append(resume_dict)
             
@@ -273,8 +285,8 @@ def resume_detail(request, pk):
                 'formatting_score': resume_doc.get('formatting_score', 0.0),
                 'impact_score': resume_doc.get('impact_score', 0.0),
                 'overall_score': resume_doc.get('overall_score', 0.0),
-                'created_at': resume_doc.get('created_at'),
-                'updated_at': resume_doc.get('updated_at'),
+                'created_at': format_mongo_date(resume_doc.get('created_at')),
+                'updated_at': format_mongo_date(resume_doc.get('updated_at')),
             }
             return Response(resume_dict)
         except Exception as e:
