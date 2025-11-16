@@ -1,13 +1,17 @@
+version: "3.8"
+
 services:
   mongodb:
     image: mongo:6.0
     container_name: resume_mongodb
     restart: always
     ports:
-      - "127.0.0.1:27017:27017"  # Only accessible from localhost
+      - "127.0.0.1:27017:27017" # Only accessible from localhost
     volumes:
       - mongodb_data:/data/db
-      - ./backup:/backup  # For backups
+      - ./backup:/backup # For backups
+    env_file:
+      - ./.env # Load Mongo credentials from root .env
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
@@ -28,13 +32,13 @@ services:
     container_name: resume_backend
     restart: always
     expose:
-      - "8000"  # Only expose to internal network, not host
+      - "8000" # Only expose internally
     volumes:
       - ./backend:/app
       - static_volume:/app/staticfiles
       - media_volume:/app/media
     env_file:
-      - .env
+      - ./.env # Load env from root
     environment:
       - MONGODB_CONNECTION_STRING=mongodb://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@mongodb:27017/${MONGODB_NAME}?authSource=admin
     depends_on:
@@ -57,7 +61,6 @@ services:
     networks:
       - resume-network
     # Note: Built files are in the container, not a volume
-    # Deployment script copies them to nginx
 
   nginx:
     image: nginx:alpine
@@ -73,7 +76,6 @@ services:
       - ./certbot/www:/var/www/certbot:ro
       - static_volume:/app/staticfiles:ro
       - media_volume:/app/media:ro
-      # Frontend files copied via deployment script
     depends_on:
       - backend
       - frontend
@@ -98,4 +100,3 @@ volumes:
 networks:
   resume-network:
     driver: bridge
-
