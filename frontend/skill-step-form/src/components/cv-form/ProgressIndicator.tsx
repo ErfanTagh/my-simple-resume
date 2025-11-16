@@ -16,7 +16,7 @@ export const ProgressIndicator = ({
 
   return (
     <div className="w-full mb-8">
-      <div className="relative">
+      <div className="relative pl-2 sm:pl-0">
         {/* Progress Bar */}
         <div className="absolute top-5 left-0 h-1 w-full bg-muted rounded-full overflow-hidden">
           <div
@@ -26,7 +26,7 @@ export const ProgressIndicator = ({
         </div>
 
         {/* Step Indicators */}
-        <div className="relative flex justify-between">
+        <div className="relative flex gap-2 sm:justify-between sm:gap-0">
           {stepLabels.map((label, index) => (
             <div key={index} className="flex flex-col items-center">
               <div
