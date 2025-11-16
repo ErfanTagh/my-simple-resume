@@ -47,7 +47,7 @@ export const ProgressIndicator = ({
               </div>
               <span
                 className={cn(
-                  "mt-2 text-xs font-medium text-center max-w-[80px] transition-colors duration-300",
+                  "hidden sm:block mt-2 text-xs font-medium text-center max-w-[80px] transition-colors duration-300",
                   index <= currentStep ? "text-foreground" : "text-muted-foreground"
                 )}
               >
