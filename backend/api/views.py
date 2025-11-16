@@ -28,24 +28,32 @@ def resume_list(request):
             import os
             
             # Connect to MongoDB directly
-            mongo_host = os.getenv('MONGODB_HOST', 'localhost')
-            mongo_port = int(os.getenv('MONGODB_PORT', 27017))
-            mongo_db = os.getenv('MONGODB_NAME', 'resume_db')
-            mongo_username = os.getenv('MONGODB_USERNAME', '')
-            mongo_password = os.getenv('MONGODB_PASSWORD', '')
-            
-            # Create authenticated connection
-            if mongo_username and mongo_password:
-                client = MongoClient(
-                    mongo_host, 
-                    mongo_port,
-                    username=mongo_username,
-                    password=mongo_password,
-                    authSource='admin',
-                    authMechanism='SCRAM-SHA-1'
-                )
+            # First try to use connection string if available
+            connection_string = os.getenv('MONGODB_CONNECTION_STRING')
+            if connection_string:
+                client = MongoClient(connection_string)
+                # Extract database name from connection string or use default
+                mongo_db = os.getenv('MONGODB_NAME', 'resume_db')
             else:
-                client = MongoClient(mongo_host, mongo_port)
+                # Fallback to individual env vars
+                mongo_host = os.getenv('MONGODB_HOST', 'localhost')
+                mongo_port = int(os.getenv('MONGODB_PORT', 27017))
+                mongo_db = os.getenv('MONGODB_NAME', 'resume_db')
+                mongo_username = os.getenv('MONGODB_USERNAME', '')
+                mongo_password = os.getenv('MONGODB_PASSWORD', '')
+                
+                # Create authenticated connection
+                if mongo_username and mongo_password:
+                    client = MongoClient(
+                        mongo_host, 
+                        mongo_port,
+                        username=mongo_username,
+                        password=mongo_password,
+                        authSource='admin',
+                        authMechanism='SCRAM-SHA-1'
+                    )
+                else:
+                    client = MongoClient(mongo_host, mongo_port)
             
             db = client[mongo_db]
             
@@ -172,24 +180,32 @@ def resume_detail(request, pk):
     from bson import ObjectId as BsonObjectId
     import os
     
-    mongo_host = os.getenv('MONGODB_HOST', 'localhost')
-    mongo_port = int(os.getenv('MONGODB_PORT', 27017))
-    mongo_db = os.getenv('MONGODB_NAME', 'resume_db')
-    mongo_username = os.getenv('MONGODB_USERNAME', '')
-    mongo_password = os.getenv('MONGODB_PASSWORD', '')
-    
-    # Create authenticated connection
-    if mongo_username and mongo_password:
-        client = MongoClient(
-            mongo_host, 
-            mongo_port,
-            username=mongo_username,
-            password=mongo_password,
-            authSource='admin',
-            authMechanism='SCRAM-SHA-1'
-        )
+    # First try to use connection string if available
+    connection_string = os.getenv('MONGODB_CONNECTION_STRING')
+    if connection_string:
+        client = MongoClient(connection_string)
+        # Extract database name from connection string or use default
+        mongo_db = os.getenv('MONGODB_NAME', 'resume_db')
     else:
-        client = MongoClient(mongo_host, mongo_port)
+        # Fallback to individual env vars
+        mongo_host = os.getenv('MONGODB_HOST', 'localhost')
+        mongo_port = int(os.getenv('MONGODB_PORT', 27017))
+        mongo_db = os.getenv('MONGODB_NAME', 'resume_db')
+        mongo_username = os.getenv('MONGODB_USERNAME', '')
+        mongo_password = os.getenv('MONGODB_PASSWORD', '')
+        
+        # Create authenticated connection
+        if mongo_username and mongo_password:
+            client = MongoClient(
+                mongo_host, 
+                mongo_port,
+                username=mongo_username,
+                password=mongo_password,
+                authSource='admin',
+                authMechanism='SCRAM-SHA-1'
+            )
+        else:
+            client = MongoClient(mongo_host, mongo_port)
     
     db = client[mongo_db]
     
