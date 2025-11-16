@@ -1,16 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { resumeAPI, Resume } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { ArrowLeft, Download, AlertCircle, Printer } from 'lucide-react';
+import { ArrowLeft, Download, AlertCircle, Printer, Loader2 } from 'lucide-react';
+import { generatePDF } from '@/lib/pdfGenerator';
+import { toast } from '@/hooks/use-toast';
 
 export default function ResumeView() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [resume, setResume] = useState<Resume | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [error, setError] = useState('');
+  const resumeContentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (id) {
@@ -61,10 +65,39 @@ export default function ResumeView() {
     window.print();
   };
 
-  const handleDownload = () => {
-    // For now, just trigger print dialog
-    // You can later implement PDF generation
-    window.print();
+  const handleDownload = async () => {
+    if (!resumeContentRef.current) {
+      toast({
+        title: 'Error',
+        description: 'Resume content not found',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsGeneratingPDF(true);
+    try {
+      const personalInfo = resume?.personalInfo;
+      const filename = personalInfo 
+        ? `${personalInfo.firstName}_${personalInfo.lastName}_Resume`.replace(/\s+/g, '_')
+        : 'resume';
+      
+      await generatePDF(resumeContentRef.current, filename);
+      
+      toast({
+        title: 'Success',
+        description: 'PDF downloaded successfully',
+      });
+    } catch (error: any) {
+      console.error('PDF generation error:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to generate PDF. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsGeneratingPDF(false);
+    }
   };
 
   if (isLoading) {
@@ -111,16 +144,25 @@ export default function ResumeView() {
               <Printer className="mr-2 h-4 w-4" />
               Print
             </Button>
-            <Button onClick={handleDownload}>
-              <Download className="mr-2 h-4 w-4" />
-              Download PDF
+            <Button onClick={handleDownload} disabled={isGeneratingPDF}>
+              {isGeneratingPDF ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Download className="mr-2 h-4 w-4" />
+                  Download PDF
+                </>
+              )}
             </Button>
           </div>
         </div>
       </div>
 
       {/* Resume Content */}
-      <div className="resume-container">
+      <div className="resume-container" ref={resumeContentRef}>
         {/* Header Section */}
         <header className="resume-header">
           <div className="header-content">
