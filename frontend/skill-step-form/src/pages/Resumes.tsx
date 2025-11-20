@@ -110,13 +110,13 @@ export default function Resumes() {
   };
 
   const handleDownload = (resume: Resume) => {
-    // Open resume in new tab for printing/downloading as PDF
+    // Open resume in new tab where user can download PDF directly
     const url = `/resume/${resume.id}`;
     window.open(url, '_blank');
     
     toast({
       title: 'Opening Resume',
-      description: 'You can download it as PDF using Print (Ctrl+P) → Save as PDF',
+      description: 'Click "Download PDF" button to download your resume',
     });
   };
 

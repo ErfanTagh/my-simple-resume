@@ -56,30 +56,32 @@ export const CVRating = ({ data, onAnalyze, isAnalyzing, rating: externalRating 
     return { label: "Needs Improvement", color: "bg-red-500" };
   };
 
-  if (!rating && !data) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            CV Rating & Analysis
-          </CardTitle>
-          <CardDescription>
-            Get AI-powered feedback on your CV and suggestions for improvement
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button 
-            onClick={onAnalyze} 
-            disabled={isAnalyzing}
-            className="w-full"
-          >
-            {isAnalyzing ? "Analyzing..." : "Analyze My CV"}
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
+if (!rating) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Sparkles className="h-5 w-5 text-primary" />
+          CV Rating & Analysis
+        </CardTitle>
+        <CardDescription>
+          {data
+            ? "Click analyze to generate your latest resume score"
+            : "Get AI-powered feedback on your CV and suggestions for improvement"}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Button
+          onClick={onAnalyze}
+          disabled={isAnalyzing}
+          className="w-full"
+        >
+          {isAnalyzing ? "Analyzing..." : "Analyze My CV"}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
 
   const status = getOverallStatus(rating.overallScore);
 
