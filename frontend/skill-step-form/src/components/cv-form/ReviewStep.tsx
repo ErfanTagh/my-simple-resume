@@ -212,7 +212,7 @@ export const ReviewStep = ({ form, onEditStep }: ReviewStepProps) => {
         {data.projects.some(proj => proj.name) && (
           <>
             <div>
-              <SectionHeader title="Projects" onEdit={() => onEditStep(3)} />
+              <SectionHeader title="Projects" onEdit={() => onEditStep(1)} />
               <div className="space-y-4">
                 {data.projects.map((proj, index) => (
                   proj.name && (
@@ -253,7 +253,7 @@ export const ReviewStep = ({ form, onEditStep }: ReviewStepProps) => {
         {data.certificates.some(cert => cert.name) && (
           <>
             <div>
-              <SectionHeader title="Certificates" onEdit={() => onEditStep(4)} />
+              <SectionHeader title="Certificates" onEdit={() => onEditStep(2)} />
               <div className="space-y-3">
                 {data.certificates.map((cert, index) => (
                   cert.name && (
@@ -282,7 +282,7 @@ export const ReviewStep = ({ form, onEditStep }: ReviewStepProps) => {
         {data.languages.some(lang => lang.language) && (
           <>
             <div>
-              <SectionHeader title="Languages" onEdit={() => onEditStep(5)} />
+              <SectionHeader title="Languages" onEdit={() => onEditStep(3)} />
               <div className="flex flex-wrap gap-3 text-sm">
                 {data.languages.map((lang, index) => (
                   lang.language && (
@@ -301,7 +301,7 @@ export const ReviewStep = ({ form, onEditStep }: ReviewStepProps) => {
         {/* Skills */}
         {data.skills.some(s => s.skill) && (
           <div>
-            <SectionHeader title="Skills" onEdit={() => onEditStep(6)} />
+            <SectionHeader title="Skills" onEdit={() => onEditStep(3)} />
             <div className="flex flex-wrap gap-2">
               {data.skills.map((s, index) => (
                 s.skill && (

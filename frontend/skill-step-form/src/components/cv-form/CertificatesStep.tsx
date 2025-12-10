@@ -1,7 +1,8 @@
-import { UseFormReturn, useFieldArray } from "react-hook-form";
+import { UseFormReturn, useFieldArray, Controller } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { MonthPicker } from "@/components/ui/month-picker";
 import { Plus, Trash2 } from "lucide-react";
 import { CVFormData } from "./types";
 
@@ -66,19 +67,32 @@ export const CertificatesStep = ({ form }: CertificatesStepProps) => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor={`certificates.${index}.issueDate`}>Issue Date</Label>
-              <Input
-                type="month"
-                {...form.register(`certificates.${index}.issueDate`)}
+              <Label>Issue Date</Label>
+              <Controller
+                control={form.control}
+                name={`certificates.${index}.issueDate`}
+                render={({ field }) => (
+                  <MonthPicker
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Select issue date"
+                  />
+                )}
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor={`certificates.${index}.expirationDate`}>Expiration Date</Label>
-              <Input
-                type="month"
-                {...form.register(`certificates.${index}.expirationDate`)}
-                placeholder="No expiration"
+              <Label>Expiration Date</Label>
+              <Controller
+                control={form.control}
+                name={`certificates.${index}.expirationDate`}
+                render={({ field }) => (
+                  <MonthPicker
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="No expiration"
+                  />
+                )}
               />
             </div>
           </div>

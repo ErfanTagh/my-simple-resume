@@ -1,6 +1,5 @@
 import { CVFormData } from "../types";
 import { Mail, Phone, MapPin, Linkedin, Github, Globe, Calendar } from "lucide-react";
-import { formatDateRange } from "@/lib/dateFormatter";
 
 interface ModernTemplateProps {
   data: CVFormData;
@@ -38,30 +37,11 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                       {(exp.startDate || exp.endDate) && (
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Calendar className="h-3 w-3" />
-                          <span>{formatDateRange(exp.startDate, exp.endDate)}</span>
+                          <span>{exp.startDate} - {exp.endDate || "Present"}</span>
                         </div>
                       )}
                     </div>
-                    {((exp.responsibilities && exp.responsibilities.length > 0) || exp.description) && (
-                      <ul className="text-sm text-muted-foreground space-y-1 mt-2">
-                        {exp.responsibilities && exp.responsibilities.length > 0 
-                          ? exp.responsibilities.map((resp, i) => (
-                              resp.responsibility && (
-                                <li key={i} className="flex gap-2">
-                                  <span className="text-primary mt-1">•</span>
-                                  <span className="flex-1">{resp.responsibility}</span>
-                                </li>
-                              )
-                            ))
-                          : exp.description?.split('\n').filter(line => line.trim()).map((line, i) => (
-                              <li key={i} className="flex gap-2">
-                                <span className="text-primary mt-1">•</span>
-                                <span className="flex-1">{line.trim()}</span>
-                              </li>
-                            ))
-                        }
-                      </ul>
-                    )}
+                    {exp.description && <p className="text-sm text-muted-foreground">{exp.description}</p>}
                   </div>
                 )
               ))}
@@ -84,7 +64,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                         {edu.field && <p className="text-sm text-muted-foreground italic">{edu.field}</p>}
                       </div>
                       {(edu.startDate || edu.endDate) && (
-                        <span className="text-xs text-muted-foreground">{formatDateRange(edu.startDate, edu.endDate)}</span>
+                        <span className="text-xs text-muted-foreground">{edu.startDate} - {edu.endDate || "Present"}</span>
                       )}
                     </div>
                   </div>
@@ -103,19 +83,10 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                 proj.name && (
                   <div key={index}>
                     <h3 className="font-bold text-foreground">{proj.name}</h3>
-                    {proj.description && (
-                      <ul className="text-sm text-muted-foreground space-y-1 mt-1">
-                        {proj.description.split('\n').filter(line => line.trim()).map((line, i) => (
-                          <li key={i} className="flex gap-2">
-                            <span className="text-primary mt-1">•</span>
-                            <span className="flex-1">{line.trim()}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+                    {proj.description && <p className="text-sm text-muted-foreground">{proj.description}</p>}
                     {proj.technologies && proj.technologies.length > 0 && (
                       <p className="text-xs text-primary mt-1">
-                        Tech: {proj.technologies.map(t => t.technology).filter(Boolean).join(", ")}
+                        Tech: {proj.technologies.map(t => typeof t === 'string' ? t : t.technology).filter(Boolean).join(", ")}
                       </p>
                     )}
                   </div>
@@ -189,7 +160,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
   };
 
   return (
-    <div className="bg-background text-foreground p-8 max-w-4xl mx-auto font-modern">
+    <div className="bg-background text-foreground p-8 max-w-4xl mx-auto">
       {/* Header with colored background */}
       <div className="bg-primary/5 -mx-8 -mt-8 px-8 py-6 mb-6 border-l-4 border-primary">
         <h1 className="text-3xl font-bold text-foreground mb-2">
@@ -216,21 +187,21 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
             </div>
           )}
           {personalInfo.linkedin && (
-            <div className="flex items-center gap-2 min-w-0">
-              <Linkedin className="h-4 w-4 text-primary flex-shrink-0" />
-              <span className="truncate text-xs">{personalInfo.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span>
+            <div className="flex items-center gap-2">
+              <Linkedin className="h-4 w-4 text-primary" />
+              <span className="truncate">{personalInfo.linkedin}</span>
             </div>
           )}
           {personalInfo.github && (
-            <div className="flex items-center gap-2 min-w-0">
-              <Github className="h-4 w-4 text-primary flex-shrink-0" />
-              <span className="truncate text-xs">{personalInfo.github.replace(/^https?:\/\/(www\.)?/, '')}</span>
+            <div className="flex items-center gap-2">
+              <Github className="h-4 w-4 text-primary" />
+              <span className="truncate">{personalInfo.github}</span>
             </div>
           )}
           {personalInfo.website && (
-            <div className="flex items-center gap-2 min-w-0">
-              <Globe className="h-4 w-4 text-primary flex-shrink-0" />
-              <span className="truncate text-xs">{personalInfo.website.replace(/^https?:\/\/(www\.)?/, '')}</span>
+            <div className="flex items-center gap-2">
+              <Globe className="h-4 w-4 text-primary" />
+              <span className="truncate">{personalInfo.website}</span>
             </div>
           )}
         </div>

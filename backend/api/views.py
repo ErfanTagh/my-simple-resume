@@ -53,8 +53,9 @@ def format_mongo_date(date_value):
     # Last resort: convert to string
     try:
         return str(date_value)
-    except:
+    except Exception:
         return None
+
 
 def get_date_or_now(date_value):
     """Get date from MongoDB or return current date if missing"""
@@ -71,10 +72,18 @@ def resume_list(request):
     """
     List all resumes for the authenticated user or create a new resume
     """
+    import logging
+    import sys
+    logger = logging.getLogger(__name__)
+    
+    # Log all requests for debugging
+    print("=" * 50, file=sys.stderr)
+    print(f"REQUEST RECEIVED: {request.method} /api/resumes/", file=sys.stderr)
+    print(f"User: {request.user} (authenticated: {request.user.is_authenticated})", file=sys.stderr)
+    print(f"Headers: {dict(request.headers)}", file=sys.stderr)
+    print("=" * 50, file=sys.stderr)
+    
     if request.method == 'GET':
-        import logging
-        logger = logging.getLogger(__name__)
-        
         try:
             # Get raw data from MongoDB without instantiating abstract models
             from pymongo import MongoClient
@@ -96,7 +105,6 @@ def resume_list(request):
             
             if not connection_string:
                 # Use individual env vars (more reliable for special characters)
-                from urllib.parse import quote_plus
                 mongo_host = os.getenv('MONGODB_HOST', 'localhost')
                 mongo_port = int(os.getenv('MONGODB_PORT', 27017))
                 mongo_db = os.getenv('MONGODB_NAME', 'resume_db')
@@ -106,7 +114,7 @@ def resume_list(request):
                 # Create authenticated connection
                 if mongo_username and mongo_password:
                     client = MongoClient(
-                        mongo_host, 
+                        mongo_host,
                         mongo_port,
                         username=mongo_username,
                         password=mongo_password,
@@ -167,39 +175,82 @@ def resume_list(request):
             import traceback
             logger.error(traceback.format_exc())
             return Response(
-                {'error': str(e)}, 
+                {'error': str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
     
     elif request.method == 'POST':
         import logging
+        import sys
         logger = logging.getLogger(__name__)
+        
+        # Log to both logger and stdout/stderr
+        print("=" * 50, file=sys.stderr)
+        print("POST REQUEST RECEIVED", file=sys.stderr)
+        print(f"User: {request.user}", file=sys.stderr)
+        print(f"Data: {request.data}", file=sys.stderr)
+        print("=" * 50, file=sys.stderr)
         
         logger.error(f"Received POST data: {request.data}")
         
         serializer = ResumeSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                # Save data from validated_data to model
+                # Setup MongoDB connection
+                from pymongo import MongoClient
+                from bson import ObjectId as BsonObjectId
+                import os
+                
+                # First try to use connection string if available
+                connection_string = os.getenv('MONGODB_CONNECTION_STRING')
+                if connection_string:
+                    try:
+                        client = MongoClient(connection_string)
+                        client.admin.command('ping')
+                    except Exception:
+                        connection_string = None
+                
+                if not connection_string:
+                    # In Docker, use service name 'mongodb', otherwise 'localhost'
+                    mongo_host = os.getenv('MONGODB_HOST', 'mongodb')
+                    mongo_port = int(os.getenv('MONGODB_PORT', 27017))
+                    mongo_db = os.getenv('MONGODB_NAME', 'resume_db')
+                    mongo_username = os.getenv('MONGODB_USERNAME', '')
+                    mongo_password = os.getenv('MONGODB_PASSWORD', '')
+                    
+                    if mongo_username and mongo_password:
+                        client = MongoClient(
+                            mongo_host,
+                            mongo_port,
+                            username=mongo_username,
+                            password=mongo_password,
+                            authSource='admin',
+                            authMechanism='SCRAM-SHA-1'
+                        )
+                    else:
+                        client = MongoClient(mongo_host, mongo_port)
+                
+                mongo_db = os.getenv('MONGODB_NAME', 'resume_db')
+                db = client[mongo_db]
+                
+                # Save data from validated_data
                 data = serializer.validated_data
                 
                 # Calculate quality scores
                 quality_scores = calculate_resume_quality(request.data)
                 
-                # Calculate quality scores
-                quality_scores = calculate_resume_quality(request.data)
-                
-                resume = Resume(
-                    user=request.user,  # Link resume to authenticated user
-                    personal_info=data.get('personal_info'),
-                    work_experience=data.get('work_experience', []),
-                    education=data.get('education', []),
-                    projects=data.get('projects', []),
-                    certificates=data.get('certificates', []),
-                    languages=data.get('languages', []),
-                    skills=data.get('skills', []),
-                    template=data.get('template', 'modern'),
-                    section_order=data.get('section_order', [
+                # Prepare document for MongoDB
+                resume_doc = {
+                    'user_id': request.user.id,
+                    'personal_info': data.get('personal_info', {}),
+                    'work_experience': data.get('work_experience', []),
+                    'education': data.get('education', []),
+                    'projects': data.get('projects', []),
+                    'certificates': data.get('certificates', []),
+                    'languages': data.get('languages', []),
+                    'skills': data.get('skills', []),
+                    'template': data.get('template', 'modern'),
+                    'section_order': data.get('section_order', [
                         'summary',
                         'workExperience',
                         'education',
@@ -209,27 +260,64 @@ def resume_list(request):
                         'languages',
                         'interests',
                     ]),
-                    completeness_score=quality_scores['completeness_score'],
-                    clarity_score=quality_scores['clarity_score'],
-                    formatting_score=quality_scores['formatting_score'],
-                    impact_score=quality_scores['impact_score'],
-                    overall_score=quality_scores['overall_score'],
-                )
-                resume.save()
+                    'completeness_score': quality_scores.get('completeness_score', 0.0),
+                    'clarity_score': quality_scores.get('clarity_score', 0.0),
+                    'formatting_score': quality_scores.get('formatting_score', 0.0),
+                    'impact_score': quality_scores.get('impact_score', 0.0),
+                    'overall_score': quality_scores.get('overall_score', 0.0),
+                    'created_at': datetime.utcnow(),
+                    'updated_at': datetime.utcnow(),
+                }
                 
-                # Return the created resume
-                response_serializer = ResumeSerializer(resume)
-                return Response(
-                    response_serializer.data, 
-                    status=status.HTTP_201_CREATED
-                )
+                # Insert into MongoDB
+                result = db.resumes.insert_one(resume_doc)
+                resume_id = result.inserted_id
+                
+                # Retrieve the created resume
+                created_doc = db.resumes.find_one({'_id': resume_id})
+                
+                # Format response
+                resume_dict = {
+                    'id': str(created_doc['_id']),
+                    'personal_info': created_doc.get('personal_info', {}),
+                    'work_experience': created_doc.get('work_experience', []),
+                    'education': created_doc.get('education', []),
+                    'projects': created_doc.get('projects', []),
+                    'certificates': created_doc.get('certificates', []),
+                    'languages': created_doc.get('languages', []),
+                    'skills': created_doc.get('skills', []),
+                    'template': created_doc.get('template', 'modern'),
+                    'section_order': created_doc.get('section_order', [
+                        'summary',
+                        'workExperience',
+                        'education',
+                        'projects',
+                        'certificates',
+                        'skills',
+                        'languages',
+                        'interests',
+                    ]),
+                    'completeness_score': created_doc.get('completeness_score', 0.0),
+                    'clarity_score': created_doc.get('clarity_score', 0.0),
+                    'formatting_score': created_doc.get('formatting_score', 0.0),
+                    'impact_score': created_doc.get('impact_score', 0.0),
+                    'overall_score': created_doc.get('overall_score', 0.0),
+                    'created_at': get_date_or_now(created_doc.get('created_at')),
+                    'updated_at': get_date_or_now(created_doc.get('updated_at')),
+                }
+                
+                return Response(resume_dict, status=status.HTTP_201_CREATED)
             except Exception as e:
-                logger.error(f"Error saving resume: {str(e)}")
                 import traceback
-                logger.error(traceback.format_exc())
+                error_traceback = traceback.format_exc()
+                error_message = str(e)
+                logger.error(f"Error saving resume: {error_message}")
+                logger.error(error_traceback)
+                print(f"ERROR SAVING RESUME: {error_message}")
+                print(error_traceback)
                 return Response(
-                    {'error': str(e)}, 
-                    status=status.HTTP_400_BAD_REQUEST
+                    {'error': error_message, 'detail': error_traceback.split('\n')[-5:] if error_traceback else []},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
         
         logger.error(f"Serializer validation failed: {serializer.errors}")
@@ -270,7 +358,7 @@ def resume_detail(request, pk):
         # Create authenticated connection
         if mongo_username and mongo_password:
             client = MongoClient(
-                mongo_host, 
+                mongo_host,
                 mongo_port,
                 username=mongo_username,
                 password=mongo_password,
@@ -288,7 +376,7 @@ def resume_detail(request, pk):
         resume_id = BsonObjectId(pk)
     except Exception:
         return Response(
-            {'error': 'Invalid resume ID format'}, 
+            {'error': 'Invalid resume ID format'},
             status=status.HTTP_400_BAD_REQUEST
         )
     
@@ -302,7 +390,7 @@ def resume_detail(request, pk):
             
             if not resume_doc:
                 return Response(
-                    {'error': 'Resume not found'}, 
+                    {'error': 'Resume not found'},
                     status=status.HTTP_404_NOT_FOUND
                 )
             
@@ -340,7 +428,7 @@ def resume_detail(request, pk):
             import traceback
             logger.error(traceback.format_exc())
             return Response(
-                {'error': str(e)}, 
+                {'error': str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
     
@@ -363,7 +451,7 @@ def resume_detail(request, pk):
                 
                 if result.matched_count == 0:
                     return Response(
-                        {'error': 'Resume not found'}, 
+                        {'error': 'Resume not found'},
                         status=status.HTTP_404_NOT_FOUND
                     )
                 
@@ -378,18 +466,29 @@ def resume_detail(request, pk):
                     'certificates': updated_doc.get('certificates', []),
                     'languages': updated_doc.get('languages', []),
                     'skills': updated_doc.get('skills', []),
+                    'template': updated_doc.get('template', 'modern'),
+                    'section_order': updated_doc.get('section_order', [
+                        'summary',
+                        'workExperience',
+                        'education',
+                        'projects',
+                        'certificates',
+                        'skills',
+                        'languages',
+                        'interests',
+                    ]),
                     'completeness_score': updated_doc.get('completeness_score', 0.0),
                     'clarity_score': updated_doc.get('clarity_score', 0.0),
                     'formatting_score': updated_doc.get('formatting_score', 0.0),
                     'impact_score': updated_doc.get('impact_score', 0.0),
                     'overall_score': updated_doc.get('overall_score', 0.0),
-                    'created_at': updated_doc.get('created_at'),
-                    'updated_at': updated_doc.get('updated_at'),
+                    'created_at': get_date_or_now(updated_doc.get('created_at')),
+                    'updated_at': get_date_or_now(updated_doc.get('updated_at')),
                 }
                 return Response(resume_dict)
             except Exception as e:
                 return Response(
-                    {'error': str(e)}, 
+                    {'error': str(e)},
                     status=status.HTTP_400_BAD_REQUEST
                 )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -399,12 +498,12 @@ def resume_detail(request, pk):
         
         if result.deleted_count == 0:
             return Response(
-                {'error': 'Resume not found'}, 
+                {'error': 'Resume not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
-        
+
         return Response(
-            {'message': 'Resume deleted successfully'}, 
+            {'message': 'Resume deleted successfully'},
             status=status.HTTP_204_NO_CONTENT
         )
 

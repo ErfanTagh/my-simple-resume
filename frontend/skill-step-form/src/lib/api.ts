@@ -3,8 +3,24 @@
  * Handles all HTTP requests to the Django backend
  */
 
-// Use relative API base URL so it works in both dev (Vite proxy) and production (Nginx)
-const API_BASE_URL = '/api';
+// Use environment variable if available, otherwise use relative path for Vite proxy
+// Remove trailing slash if present to avoid double slashes
+const getApiBaseUrl = () => {
+  // In development mode, always use relative path to leverage Vite proxy
+  // In production, use the environment variable if provided
+  if (import.meta.env.DEV) {
+    return '/api';
+  }
+  // Production: use env var or default to /api
+  const url = import.meta.env.VITE_API_URL || '/api';
+  return url.endsWith('/') ? url.slice(0, -1) : url;
+};
+const API_BASE_URL = getApiBaseUrl();
+
+// Log API base URL on module load
+console.log('🔗 API Base URL:', API_BASE_URL);
+console.log('🔗 VITE_API_URL env:', import.meta.env.VITE_API_URL);
+console.log('🔗 DEV mode:', import.meta.env.DEV);
 
 // Helper function to convert camelCase to snake_case
 const camelToSnake = (str: string): string => {
@@ -108,7 +124,16 @@ const tryRefreshToken = async (): Promise<boolean> => {
 // Handle API errors with automatic token refresh
 const handleResponse = async (response: Response, retryFn?: () => Promise<Response>) => {
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
+    // Try to parse error response, but handle non-JSON responses
+    let error: any = {};
+    try {
+      const text = await response.text();
+      console.error('Error response text:', text);
+      error = text ? JSON.parse(text) : {};
+    } catch (e) {
+      console.error('Failed to parse error response:', e);
+      error = { detail: `HTTP ${response.status}: ${response.statusText}` };
+    }
     
     // Special handling for authentication errors
     if (response.status === 401 && retryFn) {
@@ -130,7 +155,15 @@ const handleResponse = async (response: Response, retryFn?: () => Promise<Respon
       throw new Error('Your session has expired. Please log in again.');
     }
     
-    throw new Error(error.error || error.detail || `HTTP ${response.status}: ${response.statusText}`);
+    // Provide more detailed error message
+    const errorMessage = error.error || error.detail || error.message || `HTTP ${response.status}: ${response.statusText}`;
+    console.error('API Error:', {
+      status: response.status,
+      statusText: response.statusText,
+      error: error,
+      errorMessage: errorMessage
+    });
+    throw new Error(errorMessage);
   }
   const data = await response.json();
   // Convert snake_case response to camelCase
@@ -152,6 +185,7 @@ export const authAPI = {
     first_name?: string;
     last_name?: string;
   }) => {
+    console.log('Register API Base URL:', API_BASE_URL);
     const response = await fetch(`${API_BASE_URL}/auth/register/`, {
       method: 'POST',
       headers: createHeaders(false),
@@ -164,6 +198,7 @@ export const authAPI = {
    * Login user
    */
   login: async (data: { username: string; password: string }) => {
+    console.log('Login API Base URL:', API_BASE_URL);
     const response = await fetch(`${API_BASE_URL}/auth/login/`, {
       method: 'POST',
       headers: createHeaders(false),
@@ -314,8 +349,11 @@ export const resumeAPI = {
   create: async (data: ResumeData): Promise<Resume> => {
     // Convert camelCase to snake_case for backend
     const snakeCaseData = camelToSnakeObject(data);
-    
-    const makeRequest = () => fetch(`${API_BASE_URL}/resumes/`, {
+    const fullUrl = `${API_BASE_URL}/resumes/`;
+    console.log('API Base URL:', API_BASE_URL);
+    console.log('Full URL:', fullUrl);
+    console.log('VITE_API_URL env:', import.meta.env.VITE_API_URL);
+    const makeRequest = () => fetch(fullUrl, {
       method: 'POST',
       headers: createHeaders(true),
       body: JSON.stringify(snakeCaseData),

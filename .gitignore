@@ -73,3 +73,7 @@ htmlcov/
 
 # Temporary source folders
 frontend/skill-step-form-main/
+frontend/skill-step-form-ui/
+
+# Temporary scripts
+backend/runserver_quiet.sh

@@ -34,10 +34,12 @@ services:
       - ./.env
     environment:
       - MONGODB_CONNECTION_STRING=mongodb://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@mongodb:27017/${MONGODB_NAME}?authSource=admin
+      - PYTHONUNBUFFERED=1
+      - ALLOWED_HOSTS=localhost,127.0.0.1,backend,backend:8000
     depends_on:
       mongodb:
         condition: service_healthy
-    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    command: sh -c "python manage.py migrate 2>&1 | grep -v 'Operations to perform' | grep -v 'Running migrations' | grep -v 'No migrations to apply' | grep -v 'Apply all migrations' || true && PYTHONUNBUFFERED=1 python manage.py runserver 0.0.0.0:8000"
     networks:
       - resume-network
 

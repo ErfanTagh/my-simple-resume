@@ -7,17 +7,15 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProgressIndicator } from "./ProgressIndicator";
 import { PersonalInfoStep } from "./PersonalInfoStep";
-import { WorkExperienceStep } from "./WorkExperienceStep";
+import { ExperienceStep } from "./ExperienceStep";
 import { EducationStep } from "./EducationStep";
-import { ProjectsStep } from "./ProjectsStep";
-import { CertificatesStep } from "./CertificatesStep";
-import { LanguagesStep } from "./LanguagesStep";
 import { SkillsStep } from "./SkillsStep";
 import { ReviewStep } from "./ReviewStep";
 import { CVPreview } from "./CVPreview";
 import { CVRating } from "./CVRating";
 import { TemplateSelector } from "./TemplateSelector";
 import { SectionOrderManager } from "./SectionOrderManager";
+import { SignupOverlay } from "./SignupOverlay";
 import { cvFormSchema, CVFormData, CVTemplate } from "./types";
 import { ChevronLeft, ChevronRight, FileCheck, Beaker, Sparkles, Palette, ListOrdered } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -31,35 +29,74 @@ interface CVFormContainerProps {
 
 export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) => {
   const [currentStep, setCurrentStep] = useState(0);
+  const [showSignupOverlay, setShowSignupOverlay] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  // Ensure workExperience and education always have at least one entry
+  const getDefaultValues = (): CVFormData => {
+    const defaults = {
+      personalInfo: {
+        firstName: "",
+        lastName: "",
+        professionalTitle: "",
+        profileImage: "",
+        email: "",
+        phone: "",
+        location: "",
+        linkedin: "",
+        github: "",
+        website: "",
+        summary: "",
+        interests: [],
+      },
+      workExperience: [{
+        position: "",
+        company: "",
+        location: "",
+        startDate: "",
+        endDate: "",
+        description: "",
+        responsibilities: [],
+        technologies: [],
+        competencies: []
+      }],
+      education: [{
+        degree: "",
+        institution: "",
+        location: "",
+        startDate: "",
+        endDate: "",
+        field: "",
+        keyCourses: []
+      }],
+      projects: [],
+      certificates: [],
+      languages: [],
+      skills: [],
+      sectionOrder: ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"],
+      template: "modern" as const,
+    };
+
+    if (!initialData) {
+      return defaults;
+    }
+
+    // If initialData exists, use it but ensure workExperience and education have at least one entry
+    return {
+      ...initialData,
+      workExperience: initialData.workExperience && initialData.workExperience.length > 0
+        ? initialData.workExperience
+        : defaults.workExperience,
+      education: initialData.education && initialData.education.length > 0
+        ? initialData.education
+        : defaults.education,
+    };
+  };
+
   const form = useForm<CVFormData>({
     resolver: zodResolver(cvFormSchema),
-    defaultValues: initialData ?? {
-  personalInfo: {
-    firstName: "",
-    lastName: "",
-    professionalTitle: "",
-    profileImage: "",
-    email: "",
-    phone: "",
-    location: "",
-    linkedin: "",
-    github: "",
-    website: "",
-    summary: "",
-    interests: [],  // 🔧 Changed to empty array
-  },
-  workExperience: [],  // Already good
-  education: [],  // Already good
-  projects: [],
-  certificates: [],
-  languages: [],  // 🔧 Changed to empty array
-  skills: [],  // 🔧 Changed to empty array
-  sectionOrder: ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"],
-  template: "modern",
-},
+    defaultValues: getDefaultValues(),
   });
 
   // Log form state changes
@@ -95,11 +132,8 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
 
   const steps = [
     { component: PersonalInfoStep, label: "Personal" },
-    { component: WorkExperienceStep, label: "Experience" },
+    { component: ExperienceStep, label: "Experience" },
     { component: EducationStep, label: "Education" },
-    { component: ProjectsStep, label: "Projects" },
-    { component: CertificatesStep, label: "Certificates" },
-    { component: LanguagesStep, label: "Languages" },
     { component: SkillsStep, label: "Skills" },
     { component: ReviewStep, label: "Review" },
   ];
@@ -180,17 +214,12 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
     try {
       // Check if user is authenticated
       if (!user) {
-        // User is not authenticated - save to localStorage and redirect to signup
+        // User is not authenticated - save to localStorage and show signup overlay
         console.log("👤 User not authenticated, saving resume data to localStorage");
         localStorage.setItem('pendingResume', JSON.stringify(data));
-        toast({
-          title: "Resume Saved!",
-          description: "Please sign up to complete your resume creation.",
-        });
-        setTimeout(() => {
-          navigate('/signup');
-        }, 1000);
         setIsSaving(false);
+        // Show full-page signup overlay with blurred resume
+        setShowSignupOverlay(true);
         return;
       }
 
@@ -238,9 +267,13 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
       console.error("🔍 Error response:", error.response);
       console.error("📚 Error stack:", error.stack);
       
+      // Show detailed error message
+      const errorMessage = error.message || error.toString() || "Failed to save your CV. Please try again.";
+      console.error("📋 Full error details:", JSON.stringify(error, null, 2));
+      
       toast({
         title: "Error Saving CV",
-        description: error.message || "Failed to save your CV. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -267,7 +300,14 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background py-12 px-4">
+    <>
+      {showSignupOverlay && (
+        <SignupOverlay
+          resumeData={form.getValues()}
+          onClose={() => setShowSignupOverlay(false)}
+        />
+      )}
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background py-12 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
@@ -286,6 +326,7 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
                 currentStep={currentStep}
                 totalSteps={steps.length}
                 stepLabels={steps.map((s) => s.label)}
+                onStepClick={(stepIndex) => setCurrentStep(stepIndex)}
               />
 
               {/* Dev-only Test Data Loader */}
@@ -423,5 +464,6 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
         </div>
       </div>
     </div>
+    </>
   );
 };

@@ -65,14 +65,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         body: JSON.stringify({ username, password }),
       });
 
-      const data = await response.json();
+      // Get response text first to handle non-JSON responses
+      const responseText = await response.text();
+      console.log('Login response status:', response.status);
+      console.log('Login response text:', responseText);
+      
+      let data: any = {};
+      try {
+        data = responseText ? JSON.parse(responseText) : {};
+      } catch (parseError) {
+        console.error('Failed to parse JSON response:', parseError);
+        console.error('Response text was:', responseText);
+        throw new Error(`Server returned invalid response. Status: ${response.status}. Response: ${responseText.substring(0, 200)}`);
+      }
 
       if (!response.ok) {
         // Handle unverified email error (403)
         if (response.status === 403 && data.email_verified === false) {
           throw new Error(data.error || 'Please verify your email before logging in.');
         }
-        throw new Error(data.error || 'Login failed');
+        throw new Error(data.error || data.detail || `Login failed (${response.status})`);
       }
 
       setUser(data.user);
@@ -108,10 +120,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         }),
       });
 
-      const data = await response.json();
+      // Get response text first to handle non-JSON responses
+      const responseText = await response.text();
+      console.log('Register response status:', response.status);
+      console.log('Register response text:', responseText);
+      
+      let data: any = {};
+      try {
+        data = responseText ? JSON.parse(responseText) : {};
+      } catch (parseError) {
+        console.error('Failed to parse JSON response:', parseError);
+        console.error('Response text was:', responseText);
+        throw new Error(`Server returned invalid response. Status: ${response.status}. Response: ${responseText.substring(0, 200)}`);
+      }
 
       if (!response.ok) {
-        throw new Error(data.error || 'Registration failed');
+        throw new Error(data.error || data.detail || `Registration failed (${response.status})`);
       }
 
       // New flow: Registration doesn't log in immediately

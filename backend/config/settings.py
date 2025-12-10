@@ -18,7 +18,12 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-this-in-production'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+# Allow requests from localhost, Docker service name, and any configured hosts
+# Default to localhost only - production should set ALLOWED_HOSTS env var
+# Local development (docker-compose.yml) explicitly sets ALLOWED_HOSTS to include 'backend'
+default_hosts = 'localhost,127.0.0.1'
+allowed_hosts_env = os.getenv('ALLOWED_HOSTS', default_hosts)
+ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(',')]
 
 # Domain for email links
 DOMAIN = os.getenv('DOMAIN', 'localhost:5173')
@@ -205,3 +210,68 @@ else:
 
 # Set SERVER_EMAIL to match for error reporting
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+# Logging Configuration - Suppress verbose Django messages
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'filters': {
+        'suppress_system_checks': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'null': {
+            'class': 'logging.NullHandler',
+        },
+    },
+    'loggers': {
+        # Suppress Django system check messages
+        'django.utils.autoreload': {
+            'handlers': ['null'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.core.management': {
+            'handlers': ['null'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        # Suppress runserver startup messages
+        'django.server': {
+            'handlers': ['null'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        # Keep our application logs
+        'api': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        # Keep errors
+        'django': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+}

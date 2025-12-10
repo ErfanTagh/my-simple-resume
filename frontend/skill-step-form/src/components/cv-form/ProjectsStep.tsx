@@ -1,8 +1,9 @@
-import { UseFormReturn, useFieldArray } from "react-hook-form";
+import { UseFormReturn, useFieldArray, Controller } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { MonthPicker } from "@/components/ui/month-picker";
 import { Plus, Trash2 } from "lucide-react";
 import { CVFormData } from "./types";
 
@@ -76,19 +77,32 @@ const ProjectItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: 
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor={`projects.${index}.startDate`}>Start Date</Label>
-          <Input
-            type="month"
-            {...form.register(`projects.${index}.startDate`)}
+          <Label>Start Date</Label>
+          <Controller
+            control={form.control}
+            name={`projects.${index}.startDate`}
+            render={({ field }) => (
+              <MonthPicker
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="Select start date"
+              />
+            )}
           />
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor={`projects.${index}.endDate`}>End Date</Label>
-          <Input
-            type="month"
-            {...form.register(`projects.${index}.endDate`)}
-            placeholder="Present"
+          <Label>End Date</Label>
+          <Controller
+            control={form.control}
+            name={`projects.${index}.endDate`}
+            render={({ field }) => (
+              <MonthPicker
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="Present"
+              />
+            )}
           />
         </div>
       </div>

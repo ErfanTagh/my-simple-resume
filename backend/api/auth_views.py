@@ -70,41 +70,51 @@ def register(request):
         "last_name": "string" (optional)
     }
     """
-    username = request.data.get('username')
-    email = request.data.get('email')
-    password = request.data.get('password')
-    first_name = request.data.get('first_name', '')
-    last_name = request.data.get('last_name', '')
+    import logging
+    import sys
+    import traceback
+    logger = logging.getLogger(__name__)
     
-    # Validation
-    if not username or not email or not password:
-        return Response(
-            {'error': 'Username, email, and password are required'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    # Validate password strength
-    if len(password) < 8:
-        return Response(
-            {'error': 'Password must be at least 8 characters long'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    # Check if user already exists
-    if User.objects.filter(username=username).exists():
-        return Response(
-            {'error': 'Username already exists'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    if User.objects.filter(email=email).exists():
-        return Response(
-            {'error': 'Email already registered'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    # Create user (inactive until email is verified)
     try:
+        print("=" * 50, file=sys.stderr)
+        print("REGISTER REQUEST RECEIVED", file=sys.stderr)
+        print(f"Data: {request.data}", file=sys.stderr)
+        print("=" * 50, file=sys.stderr)
+        
+        username = request.data.get('username')
+        email = request.data.get('email')
+        password = request.data.get('password')
+        first_name = request.data.get('first_name', '')
+        last_name = request.data.get('last_name', '')
+        
+        # Validation
+        if not username or not email or not password:
+            return Response(
+                {'error': 'Username, email, and password are required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validate password strength
+        if len(password) < 8:
+            return Response(
+                {'error': 'Password must be at least 8 characters long'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Check if user already exists
+        if User.objects.filter(username=username).exists():
+            return Response(
+                {'error': 'Username already exists'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if User.objects.filter(email=email).exists():
+            return Response(
+                {'error': 'Email already registered'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Create user (inactive until email is verified)
         user = User.objects.create_user(
             username=username,
             email=email,
@@ -149,9 +159,15 @@ def register(request):
         }, status=status.HTTP_201_CREATED)
         
     except Exception as e:
+        error_traceback = traceback.format_exc()
+        error_message = str(e)
+        logger.error(f"Register error: {error_message}")
+        logger.error(error_traceback)
+        print(f"ERROR IN REGISTER: {error_message}", file=sys.stderr)
+        print(error_traceback, file=sys.stderr)
         return Response(
-            {'error': str(e)},
-            status=status.HTTP_400_BAD_REQUEST
+            {'error': error_message, 'detail': error_traceback.split('\n')[-10:] if error_traceback else []},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
 
@@ -167,56 +183,78 @@ def login(request):
         "password": "string"
     }
     """
-    username = request.data.get('username')
-    password = request.data.get('password')
+    import logging
+    import sys
+    import traceback
+    logger = logging.getLogger(__name__)
     
-    if not username or not password:
-        return Response(
-            {'error': 'Username and password are required'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    # Check if user exists
     try:
-        user_obj = User.objects.get(username=username)
+        print("=" * 50, file=sys.stderr)
+        print("LOGIN REQUEST RECEIVED", file=sys.stderr)
+        print(f"Data: {request.data}", file=sys.stderr)
+        print("=" * 50, file=sys.stderr)
         
-        # Check if email is verified
-        if not user_obj.is_active:
-            try:
-                verification = EmailVerification.objects.get(user=user_obj)
-                if not verification.is_verified:
-                    return Response({
-                        'error': 'Please verify your email before logging in. Check your inbox for the verification link.',
-                        'email_verified': False
-                    }, status=status.HTTP_403_FORBIDDEN)
-            except EmailVerification.DoesNotExist:
-                pass
-    except User.DoesNotExist:
-        pass
-    
-    user = authenticate(username=username, password=password)
-    
-    if user is not None:
-        refresh = RefreshToken.for_user(user)
+        username = request.data.get('username')
+        password = request.data.get('password')
         
-        return Response({
-            'message': 'Login successful',
-            'user': {
-                'id': user.id,
-                'username': user.username,
-                'email': user.email,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-            },
-            'tokens': {
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            }
-        })
-    else:
+        if not username or not password:
+            return Response(
+                {'error': 'Username and password are required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Check if user exists
+        try:
+            user_obj = User.objects.get(username=username)
+            
+            # Check if email is verified
+            if not user_obj.is_active:
+                try:
+                    verification = EmailVerification.objects.get(user=user_obj)
+                    if not verification.is_verified:
+                        return Response({
+                            'error': 'Please verify your email before logging in. Check your inbox for the verification link.',
+                            'email_verified': False
+                        }, status=status.HTTP_403_FORBIDDEN)
+                except EmailVerification.DoesNotExist:
+                    pass
+        except User.DoesNotExist:
+            pass
+        
+        user = authenticate(username=username, password=password)
+        
+        if user is not None:
+            refresh = RefreshToken.for_user(user)
+            
+            return Response({
+                'message': 'Login successful',
+                'user': {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                },
+                'tokens': {
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                }
+            })
+        else:
+            return Response(
+                {'error': 'Invalid credentials'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+    except Exception as e:
+        error_traceback = traceback.format_exc()
+        error_message = str(e)
+        logger.error(f"Login error: {error_message}")
+        logger.error(error_traceback)
+        print(f"ERROR IN LOGIN: {error_message}", file=sys.stderr)
+        print(error_traceback, file=sys.stderr)
         return Response(
-            {'error': 'Invalid credentials'},
-            status=status.HTTP_401_UNAUTHORIZED
+            {'error': error_message, 'detail': error_traceback.split('\n')[-10:] if error_traceback else []},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
 

@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2, Upload, X } from "lucide-react";
 import { CVFormData } from "./types";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 interface PersonalInfoStepProps {
   form: UseFormReturn<CVFormData>;
@@ -17,10 +17,16 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
     name: "personalInfo.interests",
   });
 
-  const [imagePreview, setImagePreview] = useState<string | null>(
-    form.getValues("personalInfo.profileImage") || null
-  );
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Initialize image preview from form value (avoiding setState during render)
+  useEffect(() => {
+    const profileImage = form.getValues("personalInfo.profileImage");
+    if (profileImage) {
+      setImagePreview(profileImage);
+    }
+  }, []); // Only run once on mount
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

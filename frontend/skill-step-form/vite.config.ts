@@ -9,8 +9,10 @@ export default defineConfig(({ mode }) => ({
     port: 5173,
     proxy: {
       // Proxy API requests to backend in development
+      // Use 'backend' service name from docker-compose network (works in Docker)
+      // For local dev outside Docker, use 'http://localhost:8000'
       '/api': {
-        target: 'http://localhost:8000',
+        target: process.env.VITE_BACKEND_URL || 'http://backend:8000',
         changeOrigin: true,
         secure: false,
       },

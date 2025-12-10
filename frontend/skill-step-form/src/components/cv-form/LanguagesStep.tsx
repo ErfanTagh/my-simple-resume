@@ -58,7 +58,7 @@ export const LanguagesStep = ({ form }: LanguagesStepProps) => {
               <Label htmlFor={`languages.${index}.proficiency`}>Proficiency *</Label>
               <Select
                 onValueChange={(value) => form.setValue(`languages.${index}.proficiency`, value)}
-                defaultValue={field.proficiency}
+                value={field.proficiency || ""}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select level" />
