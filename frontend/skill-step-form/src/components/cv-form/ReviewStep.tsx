@@ -3,10 +3,9 @@ import { CVFormData } from "./types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Mail, Phone, MapPin, Linkedin, Github, Globe, Calendar, Edit, Info } from "lucide-react";
+import { Mail, Phone, MapPin, Linkedin, Github, Globe, Calendar, Edit } from "lucide-react";
 import { SectionOrderManager } from "./SectionOrderManager";
-import { TemplateSelector } from "./TemplateSelector";
+import { CVRating } from "./CVRating";
 
 interface ReviewStepProps {
   form: UseFormReturn<CVFormData>;
@@ -14,14 +13,10 @@ interface ReviewStepProps {
 }
 
 export const ReviewStep = ({ form, onEditStep }: ReviewStepProps) => {
-  const data = form.getValues();
+  const data = form.watch();
 
   const handleSectionReorder = (newOrder: string[]) => {
     form.setValue("sectionOrder", newOrder);
-  };
-
-  const handleTemplateChange = (template: "modern" | "classic" | "minimal" | "creative") => {
-    form.setValue("template", template);
   };
 
   const SectionHeader = ({ title, onEdit }: { title: string; onEdit: () => void }) => (
@@ -39,35 +34,18 @@ export const ReviewStep = ({ form, onEditStep }: ReviewStepProps) => {
       <div>
         <h2 className="text-2xl font-semibold mb-2">Review Your CV</h2>
         <p className="text-muted-foreground">
-          Review all your information before submitting. You can edit any section if needed.
+          Review all your information before submitting. Customize section order and check your resume score below.
         </p>
       </div>
 
-      <Alert>
-        <Info className="h-4 w-4" />
-        <AlertDescription>
-          💡 Tip: Switch to the "Style" and "Order" tabs on the right to customize your CV template and section order!
-        </AlertDescription>
-      </Alert>
+      {/* CV Score/Rating */}
+      <CVRating data={data} />
 
-      {/* Template Selector - Mobile/Small Screens */}
-      <div className="lg:hidden">
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Choose Template</h3>
-          <TemplateSelector
-            selected={data.template || "modern"}
-            onSelect={handleTemplateChange}
-          />
-        </Card>
-      </div>
-
-      {/* Section Order Manager - Mobile/Small Screens */}
-      <div className="lg:hidden">
-        <SectionOrderManager
-          sectionOrder={data.sectionOrder || ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"]}
-          onReorder={handleSectionReorder}
-        />
-      </div>
+      {/* Section Order Manager */}
+      <SectionOrderManager
+        sectionOrder={data.sectionOrder || ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"]}
+        onReorder={handleSectionReorder}
+      />
 
       <Card className="p-6 space-y-6">
         {/* Personal Information */}

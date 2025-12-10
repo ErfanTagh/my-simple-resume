@@ -74,7 +74,18 @@ export const SignupOverlay = ({ resumeData, onClose }: SignupOverlayProps) => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-base px-8 py-6">
-              <Link to="/signup">Sign Up Free</Link>
+              <Link 
+                to={{
+                  pathname: "/signup",
+                  search: new URLSearchParams({
+                    firstName: resumeData.personalInfo?.firstName || "",
+                    lastName: resumeData.personalInfo?.lastName || "",
+                    email: resumeData.personalInfo?.email || "",
+                  }).toString()
+                }}
+              >
+                Sign Up Free
+              </Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="text-base px-8 py-6">
               <Link to="/login">Log In</Link>

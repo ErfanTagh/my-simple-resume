@@ -4,20 +4,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProgressIndicator } from "./ProgressIndicator";
+import { TemplateSelector } from "./TemplateSelector";
 import { PersonalInfoStep } from "./PersonalInfoStep";
 import { ExperienceStep } from "./ExperienceStep";
 import { EducationStep } from "./EducationStep";
 import { SkillsStep } from "./SkillsStep";
 import { ReviewStep } from "./ReviewStep";
 import { CVPreview } from "./CVPreview";
-import { CVRating } from "./CVRating";
-import { TemplateSelector } from "./TemplateSelector";
-import { SectionOrderManager } from "./SectionOrderManager";
 import { SignupOverlay } from "./SignupOverlay";
-import { cvFormSchema, CVFormData, CVTemplate } from "./types";
-import { ChevronLeft, ChevronRight, FileCheck, Beaker, Sparkles, Palette, ListOrdered } from "lucide-react";
+import { cvFormSchema, CVFormData } from "./types";
+import { ChevronLeft, ChevronRight, FileCheck, Beaker } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { getTestProfile, getTestProfileNames } from "@/lib/testData";
 import { useAuth } from "@/contexts/AuthContext";
@@ -30,8 +27,14 @@ interface CVFormContainerProps {
 export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [showSignupOverlay, setShowSignupOverlay] = useState(false);
+  const [templateSelected, setTemplateSelected] = useState(!!initialData?.template);
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  // Ensure overlay is ALWAYS hidden when navigating between steps - only show when explicitly clicking "Complete CV"
+  useEffect(() => {
+    setShowSignupOverlay(false);
+  }, [currentStep]);
 
   // Ensure workExperience and education always have at least one entry
   const getDefaultValues = (): CVFormData => {
@@ -130,6 +133,13 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
   // Watch form data for live preview
   const formData = form.watch();
 
+  // Set template as selected if initialData has a template
+  useEffect(() => {
+    if (initialData?.template) {
+      setTemplateSelected(true);
+    }
+  }, [initialData]);
+
   const steps = [
     { component: PersonalInfoStep, label: "Personal" },
     { component: ExperienceStep, label: "Experience" },
@@ -211,6 +221,10 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
     });
     
     setIsSaving(true);
+    
+    // Ensure overlay is hidden at start - only show after user clicks "Complete CV"
+    setShowSignupOverlay(false);
+    
     try {
       // Check if user is authenticated
       if (!user) {
@@ -218,7 +232,7 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
         console.log("👤 User not authenticated, saving resume data to localStorage");
         localStorage.setItem('pendingResume', JSON.stringify(data));
         setIsSaving(false);
-        // Show full-page signup overlay with blurred resume
+        // Show full-page signup overlay with blurred resume ONLY when Complete CV is clicked
         setShowSignupOverlay(true);
         return;
       }
@@ -309,16 +323,48 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
       )}
       <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background py-12 px-4">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-            Build Your CV
-          </h1>
-          <p className="text-muted-foreground">
-            Fill in your information step by step to create your professional CV
-          </p>
-        </div>
+        {!templateSelected ? (
+          // Template Selection Screen (before starting the form)
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <div className="text-center mb-8">
+                <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                  Choose Your CV Template
+                </h1>
+                <p className="text-muted-foreground">
+                  Select a template that best fits your style. You can see a live preview as you fill out your information.
+                </p>
+              </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <Card className="p-8 shadow-elevated">
+                <TemplateSelector
+                  selected={form.watch("template") || "modern"}
+                  onSelect={(template) => {
+                    form.setValue("template", template);
+                    setTemplateSelected(true);
+                  }}
+                />
+              </Card>
+            </div>
+
+            {/* Preview on template selection screen */}
+            <div className="hidden lg:block">
+              <CVPreview data={formData} />
+            </div>
+          </div>
+        ) : (
+          // Main Form Flow
+          <>
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                Build Your CV
+              </h1>
+              <p className="text-muted-foreground">
+                Fill in your information step by step to create your professional CV
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Form Section - Takes 2 columns */}
           <div className="lg:col-span-2">
             <Card className="p-8 shadow-elevated">
@@ -359,7 +405,18 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
                 </div>
               )}
 
-              <form onSubmit={form.handleSubmit(onSubmit, onError)}>
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  // Prevent any automatic form submission - only allow explicit button click
+                }}
+                onKeyDown={(e) => {
+                  // Prevent form submission on Enter key
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                  }
+                }}
+              >
                   {currentStep === steps.length - 1 ? (
                     <ReviewStep form={form} onEditStep={handleEditStep} />
                   ) : (
@@ -379,16 +436,19 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
 
                     {currentStep === steps.length - 1 ? (
                       <Button 
-                        type="submit" 
+                        type="button"
                         className="gap-2" 
                         disabled={isSaving}
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
                           console.log("🔘 Complete CV button clicked");
                           console.log("📊 Current form state:", {
                             isValid: form.formState.isValid,
                             errors: form.formState.errors,
                             values: form.getValues(),
                           });
+                          // Explicitly trigger form submission
+                          form.handleSubmit(onSubmit, onError)();
                         }}
                       >
                         {isSaving ? (
@@ -414,54 +474,13 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
             </Card>
           </div>
 
-          {/* Right Sidebar - Tabbed Preview, Rating & Customization */}
-          <div className="hidden lg:block space-y-6">
-            <Tabs defaultValue="preview" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="preview" className="text-xs">
-                  <FileCheck className="h-4 w-4 mr-1" />
-                  Preview
-                </TabsTrigger>
-                <TabsTrigger value="rating" className="text-xs">
-                  <Sparkles className="h-4 w-4 mr-1" />
-                  Score
-                </TabsTrigger>
-                <TabsTrigger value="template" className="text-xs">
-                  <Palette className="h-4 w-4 mr-1" />
-                  Style
-                </TabsTrigger>
-                <TabsTrigger value="order" className="text-xs">
-                  <ListOrdered className="h-4 w-4 mr-1" />
-                  Order
-                </TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="preview" className="mt-4">
+              {/* Right Sidebar - Always Visible Preview */}
+              <div className="hidden lg:block">
                 <CVPreview data={formData} />
-              </TabsContent>
-              
-              <TabsContent value="rating" className="mt-4">
-                <CVRating data={formData} />
-              </TabsContent>
-              
-              <TabsContent value="template" className="mt-4">
-                <Card className="p-6">
-                  <TemplateSelector
-                    selected={formData.template || "modern"}
-                    onSelect={(template) => form.setValue("template", template)}
-                  />
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="order" className="mt-4">
-                <SectionOrderManager
-                  sectionOrder={formData.sectionOrder || ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"]}
-                  onReorder={(newOrder) => form.setValue("sectionOrder", newOrder)}
-                />
-              </TabsContent>
-            </Tabs>
-          </div>
-        </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
     </>

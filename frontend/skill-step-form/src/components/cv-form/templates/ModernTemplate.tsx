@@ -169,38 +169,38 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-muted-foreground mt-3">
           {personalInfo.email && (
-            <div className="flex items-center gap-2">
-              <Mail className="h-4 w-4 text-primary" />
-              <span>{personalInfo.email}</span>
+            <div className="flex items-center gap-2 min-w-0">
+              <Mail className="h-4 w-4 text-primary flex-shrink-0" />
+              <span className="truncate">{personalInfo.email}</span>
             </div>
           )}
           {personalInfo.phone && (
-            <div className="flex items-center gap-2">
-              <Phone className="h-4 w-4 text-primary" />
-              <span>{personalInfo.phone}</span>
+            <div className="flex items-center gap-2 min-w-0">
+              <Phone className="h-4 w-4 text-primary flex-shrink-0" />
+              <span className="truncate">{personalInfo.phone}</span>
             </div>
           )}
           {personalInfo.location && (
-            <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-primary" />
-              <span>{personalInfo.location}</span>
+            <div className="flex items-center gap-2 min-w-0">
+              <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+              <span className="truncate">{personalInfo.location}</span>
             </div>
           )}
           {personalInfo.linkedin && (
-            <div className="flex items-center gap-2">
-              <Linkedin className="h-4 w-4 text-primary" />
+            <div className="flex items-center gap-2 min-w-0">
+              <Linkedin className="h-4 w-4 text-primary flex-shrink-0" />
               <span className="truncate">{personalInfo.linkedin}</span>
             </div>
           )}
           {personalInfo.github && (
-            <div className="flex items-center gap-2">
-              <Github className="h-4 w-4 text-primary" />
+            <div className="flex items-center gap-2 min-w-0">
+              <Github className="h-4 w-4 text-primary flex-shrink-0" />
               <span className="truncate">{personalInfo.github}</span>
             </div>
           )}
           {personalInfo.website && (
-            <div className="flex items-center gap-2">
-              <Globe className="h-4 w-4 text-primary" />
+            <div className="flex items-center gap-2 min-w-0">
+              <Globe className="h-4 w-4 text-primary flex-shrink-0" />
               <span className="truncate">{personalInfo.website}</span>
             </div>
           )}

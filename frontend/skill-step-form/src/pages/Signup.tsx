@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,14 +9,33 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { UserPlus, AlertCircle, Mail, CheckCircle2 } from 'lucide-react';
 
 export default function Signup() {
+  const [searchParams] = useSearchParams();
+  
+  // Prefill form with data from URL params (from SignupOverlay)
   const [formData, setFormData] = useState({
     username: '',
-    email: '',
+    email: searchParams.get('email') || '',
     password: '',
     confirmPassword: '',
-    firstName: '',
-    lastName: '',
+    firstName: searchParams.get('firstName') || '',
+    lastName: searchParams.get('lastName') || '',
   });
+  
+  // Update form data when search params change
+  useEffect(() => {
+    const email = searchParams.get('email');
+    const firstName = searchParams.get('firstName');
+    const lastName = searchParams.get('lastName');
+    
+    if (email || firstName || lastName) {
+      setFormData(prev => ({
+        ...prev,
+        email: email || prev.email,
+        firstName: firstName || prev.firstName,
+        lastName: lastName || prev.lastName,
+      }));
+    }
+  }, [searchParams]);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
