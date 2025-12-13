@@ -92,6 +92,33 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       
       localStorage.setItem('user', JSON.stringify(data.user));
       localStorage.setItem('tokens', JSON.stringify(data.tokens));
+
+      // After successful login, check for pending resume and save it immediately
+      // Tokens are already set synchronously above, so no delay needed
+      const pendingResume = localStorage.getItem('pendingResume');
+      if (pendingResume) {
+        // Save in background - don't block login
+        (async () => {
+          try {
+            const resumeData = JSON.parse(pendingResume);
+            console.log('💾 Found pending resume, saving to backend after login...');
+            
+            // Import API dynamically to avoid circular dependencies
+            const { resumeAPI } = await import('@/lib/api');
+            
+            const savedResume = await resumeAPI.create(resumeData);
+            console.log('✅ Resume saved successfully:', savedResume);
+            
+            localStorage.removeItem('pendingResume');
+            
+            // Dispatch custom event to notify Resumes page
+            window.dispatchEvent(new CustomEvent('resumeSaved'));
+          } catch (err: any) {
+            console.error('❌ Failed to save pending resume after login:', err);
+            // Keep the resume in localStorage so user can try again
+          }
+        })();
+      }
     } catch (error) {
       console.error('Login error:', error);
       throw error;

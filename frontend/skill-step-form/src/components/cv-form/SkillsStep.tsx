@@ -31,15 +31,15 @@ export const SkillsStep = ({ form }: SkillsStepProps) => {
   ];
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-4 sm:space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
       {/* Skills Section */}
       <div>
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold mb-2">Skills</h2>
-          <p className="text-muted-foreground">Add your professional skills and competencies</p>
+        <div className="mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">Skills</h2>
+          <p className="text-muted-foreground text-sm sm:text-base">Add your professional skills and competencies</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
           {skillFields.map((field, index) => (
             <div key={field.id} className="flex gap-2">
               <div className="flex-1 space-y-2">
@@ -77,13 +77,13 @@ export const SkillsStep = ({ form }: SkillsStepProps) => {
 
       {/* Languages Section */}
       <div>
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold mb-2">Languages</h2>
-          <p className="text-muted-foreground">What languages do you speak?</p>
+        <div className="mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">Languages</h2>
+          <p className="text-muted-foreground text-sm sm:text-base">What languages do you speak?</p>
         </div>
 
         {languageFields.map((field, index) => (
-          <div key={field.id} className="p-6 border rounded-lg bg-card space-y-4 relative mb-4">
+          <div key={field.id} className="p-4 sm:p-6 border rounded-lg bg-card space-y-3 sm:space-y-4 relative mb-4">
             {languageFields.length > 1 && (
               <Button
                 type="button"
@@ -96,7 +96,7 @@ export const SkillsStep = ({ form }: SkillsStepProps) => {
               </Button>
             )}
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-2">
                 <Label htmlFor={`languages.${index}.language`}>Language *</Label>
                 <Input

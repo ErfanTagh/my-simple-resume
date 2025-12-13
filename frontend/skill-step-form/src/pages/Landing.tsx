@@ -88,8 +88,7 @@ const Landing = () => {
           </div>
 
           {/* Preview Cards */}
-          <div className="mt-12 sm:mt-20 relative">
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10 pointer-events-none" />
+          <div className="mt-12 sm:mt-20">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
               {[
                 { name: 'Modern', key: 'modern' as const },
@@ -98,7 +97,7 @@ const Landing = () => {
               ].map((template, i) => (
                 <div
                   key={template.key}
-                  className="bg-card rounded-2xl border border-border p-4 sm:p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-2"
+                  className="bg-card rounded-2xl border border-border p-4 sm:p-6 shadow-lg hover:shadow-[0_8px_25px_-5px_hsl(var(--primary)/0.35)] transition-all duration-300 hover:-translate-y-1.5"
                   style={{ animationDelay: `${i * 0.1}s` }}
                 >
                   <div className="aspect-[3/4] bg-white rounded-lg mb-3 sm:mb-4 overflow-hidden border border-border shadow-inner relative">
@@ -106,24 +105,9 @@ const Landing = () => {
                       <LandingTemplatePreview templateName={template.key} />
                     </div>
                   </div>
-                  <div className="relative z-10" style={{ transform: 'translateZ(0)' }}>
-                    <p className="font-semibold text-foreground text-sm sm:text-base" style={{ 
-                      textRendering: 'optimizeLegibility', 
-                      WebkitFontSmoothing: 'antialiased',
-                      MozOsxFontSmoothing: 'grayscale',
-                      fontWeight: 600,
-                      color: 'hsl(var(--foreground))'
-                    }}>
-                      {template.name} Template
-                    </p>
-                    <p className="text-xs sm:text-sm text-muted-foreground mt-1" style={{ 
-                      textRendering: 'optimizeLegibility', 
-                      WebkitFontSmoothing: 'antialiased',
-                      MozOsxFontSmoothing: 'grayscale',
-                      color: 'hsl(var(--muted-foreground))'
-                    }}>
-                      Professional & ATS-friendly
-                    </p>
+                  <div className="space-y-1 pt-2">
+                    <h3 className="font-bold text-lg sm:text-xl" style={{ color: 'hsl(215 25% 15%)' }}>{template.name} Template</h3>
+                    <p className="text-sm font-medium" style={{ color: 'hsl(214 95% 45%)' }}>Professional & ATS-friendly</p>
                   </div>
                 </div>
               ))}

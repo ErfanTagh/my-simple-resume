@@ -311,8 +311,8 @@ export interface ResumeData {
 
 export interface Resume extends ResumeData {
   id: string;
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
   completenessScore?: number;
   clarityScore?: number;
   formattingScore?: number;
@@ -390,6 +390,54 @@ export const resumeAPI = {
       const error = await response.json().catch(() => ({}));
       throw new Error(error.error || 'Failed to delete resume');
     }
+  },
+
+  /**
+   * Parse uploaded resume (PDF or text) and return structured data
+   * @deprecated Use parseResumeText for better PDF extraction quality
+   */
+  parseResume: async (file: File | FormData): Promise<ResumeData> => {
+    const formData = file instanceof FormData ? file : (() => {
+      const fd = new FormData();
+      fd.append('file', file);
+      return fd;
+    })();
+
+    const makeRequest = () => fetch(`${API_BASE_URL}/resumes/parse/`, {
+      method: 'POST',
+      headers: {
+        // Don't set Content-Type - let browser set it with boundary for FormData
+        ...(getAccessToken() ? { Authorization: `Bearer ${getAccessToken()}` } : {}),
+      },
+      body: formData,
+    });
+    
+    const response = await makeRequest();
+    const parsedData = await handleResponse(response, makeRequest);
+    
+    // Convert snake_case back to camelCase
+    return snakeToCamelObject(parsedData);
+  },
+
+  /**
+   * Parse resume text (extracted from PDF on frontend) and return structured data
+   * This uses better PDF extraction (react-pdftotext) on the frontend
+   */
+  parseResumeText: async (text: string): Promise<ResumeData> => {
+    const makeRequest = () => fetch(`${API_BASE_URL}/resumes/parse/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(getAccessToken() ? { Authorization: `Bearer ${getAccessToken()}` } : {}),
+      },
+      body: JSON.stringify({ text }),
+    });
+    
+    const response = await makeRequest();
+    const parsedData = await handleResponse(response, makeRequest);
+    
+    // Convert snake_case back to camelCase
+    return snakeToCamelObject(parsedData);
   },
 };
 

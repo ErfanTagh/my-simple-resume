@@ -1,0 +1,132 @@
+Collecting transformers
+  Downloading transformers-4.57.3-py3-none-any.whl.metadata (43 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.0/44.0 kB 2.9 MB/s eta 0:00:00
+
+Collecting pdfplumber
+  Downloading pdfplumber-0.11.8-py3-none-any.whl.metadata (43 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 43.6/43.6 kB 11.3 MB/s eta 0:00:00
+
+Collecting PyPDF2
+  Downloading pypdf2-3.0.1-py3-none-any.whl.metadata (6.8 kB)
+Requirement already satisfied: filelock in ./venv/lib/python3.12/site-packages (from transformers) (3.20.0)
+Collecting huggingface-hub<1.0,>=0.34.0 (from transformers)
+  Downloading huggingface_hub-0.36.0-py3-none-any.whl.metadata (14 kB)
+Collecting numpy>=1.17 (from transformers)
+  Downloading numpy-2.3.5-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (62 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 62.1/62.1 kB 13.0 MB/s eta 0:00:00
+
+Collecting packaging>=20.0 (from transformers)
+  Downloading packaging-25.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting pyyaml>=5.1 (from transformers)
+  Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+Collecting regex!=2019.12.17 (from transformers)
+  Downloading regex-2025.11.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 40.5/40.5 kB 4.1 MB/s eta 0:00:00
+
+Collecting requests (from transformers)
+  Downloading requests-2.32.5-py3-none-any.whl.metadata (4.9 kB)
+Collecting tokenizers<=0.23.0,>=0.22.0 (from transformers)
+  Downloading tokenizers-0.22.1-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.8 kB)
+Collecting safetensors>=0.4.3 (from transformers)
+  Downloading safetensors-0.7.0-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.1 kB)
+Collecting tqdm>=4.27 (from transformers)
+  Downloading tqdm-4.67.1-py3-none-any.whl.metadata (57 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 57.7/57.7 kB 241.9 MB/s eta 0:00:00
+
+Collecting pdfminer.six==20251107 (from pdfplumber)
+  Downloading pdfminer_six-20251107-py3-none-any.whl.metadata (4.2 kB)
+Collecting Pillow>=9.1 (from pdfplumber)
+  Downloading pillow-12.0.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (8.8 kB)
+Collecting pypdfium2>=4.18.0 (from pdfplumber)
+  Downloading pypdfium2-5.1.0-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (67 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 67.7/67.7 kB 16.3 MB/s eta 0:00:00
+
+Collecting charset-normalizer>=2.0.0 (from pdfminer.six==20251107->pdfplumber)
+  Downloading charset_normalizer-3.4.4-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (37 kB)
+Collecting cryptography>=36.0.0 (from pdfminer.six==20251107->pdfplumber)
+  Downloading cryptography-46.0.3-cp311-abi3-manylinux_2_34_x86_64.whl.metadata (5.7 kB)
+Requirement already satisfied: fsspec>=2023.5.0 in ./venv/lib/python3.12/site-packages (from huggingface-hub<1.0,>=0.34.0->transformers) (2025.12.0)
+Requirement already satisfied: typing-extensions>=3.7.4.3 in ./venv/lib/python3.12/site-packages (from huggingface-hub<1.0,>=0.34.0->transformers) (4.15.0)
+Collecting hf-xet<2.0.0,>=1.1.3 (from huggingface-hub<1.0,>=0.34.0->transformers)
+  Downloading hf_xet-1.2.0-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
+Collecting idna<4,>=2.5 (from requests->transformers)
+  Downloading idna-3.11-py3-none-any.whl.metadata (8.4 kB)
+Collecting urllib3<3,>=1.21.1 (from requests->transformers)
+  Downloading urllib3-2.6.1-py3-none-any.whl.metadata (6.6 kB)
+Collecting certifi>=2017.4.17 (from requests->transformers)
+  Downloading certifi-2025.11.12-py3-none-any.whl.metadata (2.5 kB)
+Collecting cffi>=2.0.0 (from cryptography>=36.0.0->pdfminer.six==20251107->pdfplumber)
+  Downloading cffi-2.0.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.6 kB)
+Collecting pycparser (from cffi>=2.0.0->cryptography>=36.0.0->pdfminer.six==20251107->pdfplumber)
+  Downloading pycparser-2.23-py3-none-any.whl.metadata (993 bytes)
+Downloading transformers-4.57.3-py3-none-any.whl (12.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.0/12.0 MB 10.0 MB/s eta 0:00:00
+
+Downloading pdfplumber-0.11.8-py3-none-any.whl (60 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 60.0/60.0 kB 85.0 MB/s eta 0:00:00
+
+Downloading pdfminer_six-20251107-py3-none-any.whl (5.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.6/5.6 MB 11.1 MB/s eta 0:00:00
+
+Downloading pypdf2-3.0.1-py3-none-any.whl (232 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 232.6/232.6 kB 10.7 MB/s eta 0:00:00
+
+Downloading huggingface_hub-0.36.0-py3-none-any.whl (566 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 566.1/566.1 kB 11.4 MB/s eta 0:00:00
+
+Downloading numpy-2.3.5-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.6/16.6 MB 14.2 MB/s eta 0:00:00
+
+Downloading packaging-25.0-py3-none-any.whl (66 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 66.5/66.5 kB 20.2 MB/s eta 0:00:00
+
+Downloading pillow-12.0.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (7.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.0/7.0 MB 13.7 MB/s eta 0:00:00
+
+Downloading pypdfium2-5.1.0-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.0/3.0 MB 14.7 MB/s eta 0:00:00
+
+Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (807 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 807.9/807.9 kB 7.2 MB/s eta 0:00:00
+
+Downloading regex-2025.11.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (803 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 803.5/803.5 kB 16.0 MB/s eta 0:00:00
+
+Downloading safetensors-0.7.0-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (507 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 507.2/507.2 kB 15.2 MB/s eta 0:00:00
+
+Downloading tokenizers-0.22.1-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.3/3.3 MB 15.6 MB/s eta 0:00:00
+
+Downloading tqdm-4.67.1-py3-none-any.whl (78 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 78.5/78.5 kB 60.9 MB/s eta 0:00:00
+
+Downloading requests-2.32.5-py3-none-any.whl (64 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 64.7/64.7 kB 72.0 MB/s eta 0:00:00
+
+Downloading certifi-2025.11.12-py3-none-any.whl (159 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 159.4/159.4 kB 14.0 MB/s eta 0:00:00
+
+Downloading charset_normalizer-3.4.4-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (153 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 153.5/153.5 kB 12.1 MB/s eta 0:00:00
+
+Downloading cryptography-46.0.3-cp311-abi3-manylinux_2_34_x86_64.whl (4.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.5/4.5 MB 14.3 MB/s eta 0:00:00
+
+Downloading hf_xet-1.2.0-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.3/3.3 MB 14.5 MB/s eta 0:00:00
+
+Downloading idna-3.11-py3-none-any.whl (71 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 71.0/71.0 kB 12.3 MB/s eta 0:00:00
+
+Downloading urllib3-2.6.1-py3-none-any.whl (131 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 131.1/131.1 kB 17.1 MB/s eta 0:00:00
+
+Downloading cffi-2.0.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (219 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 219.6/219.6 kB 17.8 MB/s eta 0:00:00
+
+Downloading pycparser-2.23-py3-none-any.whl (118 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 118.1/118.1 kB 11.6 MB/s eta 0:00:00
+
+Installing collected packages: urllib3, tqdm, safetensors, regex, pyyaml, pypdfium2, PyPDF2, pycparser, Pillow, packaging, numpy, idna, hf-xet, charset-normalizer, certifi, requests, cffi, huggingface-hub, cryptography, tokenizers, pdfminer.six, transformers, pdfplumber
+Successfully installed Pillow-12.0.0 PyPDF2-3.0.1 certifi-2025.11.12 cffi-2.0.0 charset-normalizer-3.4.4 cryptography-46.0.3 hf-xet-1.2.0 huggingface-hub-0.36.0 idna-3.11 numpy-2.3.5 packaging-25.0 pdfminer.six-20251107 pdfplumber-0.11.8 pycparser-2.23 pypdfium2-5.1.0 pyyaml-6.0.3 regex-2025.11.3 requests-2.32.5 safetensors-0.7.0 tokenizers-0.22.1 tqdm-4.67.1 transformers-4.57.3 urllib3-2.6.1

@@ -44,7 +44,7 @@ const EducationItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div className="space-y-2">
           <Label>Start Date</Label>
           <Controller
@@ -89,7 +89,7 @@ const EducationItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index
           <Label>Key Courses</Label>
           <p className="text-xs text-muted-foreground mt-1">Add notable courses you completed</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {courseFields.map((field, courseIndex) => (
             <div key={field.id} className="flex gap-1">
               <Input
@@ -156,16 +156,16 @@ export const EducationStep = ({ form }: EducationStepProps) => {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-4 sm:space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
       {/* Education Section */}
       <div>
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold mb-2">Education</h2>
-          <p className="text-muted-foreground">Tell us about your educational background</p>
+        <div className="mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">Education</h2>
+          <p className="text-muted-foreground text-sm sm:text-base">Tell us about your educational background</p>
         </div>
 
         {educationFields.map((field, index) => (
-          <div key={field.id} className="p-6 border rounded-lg bg-card space-y-4 relative mb-4">
+          <div key={field.id} className="p-4 sm:p-6 border rounded-lg bg-card space-y-3 sm:space-y-4 relative mb-4">
             {educationFields.length > 1 && (
               <Button
                 type="button"
@@ -207,9 +207,9 @@ export const EducationStep = ({ form }: EducationStepProps) => {
 
       {/* Certificates Section */}
       <div>
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold mb-2">Certificates & Licenses (Optional)</h2>
-          <p className="text-muted-foreground">Add your professional certifications and licenses - skip if not applicable</p>
+        <div className="mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">Certificates & Licenses (Optional)</h2>
+          <p className="text-muted-foreground text-sm sm:text-base">Add your professional certifications and licenses - skip if not applicable</p>
         </div>
 
         {certificateFields.length === 0 && (
@@ -227,7 +227,7 @@ export const EducationStep = ({ form }: EducationStepProps) => {
         )}
 
         {certificateFields.map((field, index) => (
-          <div key={field.id} className="p-6 border rounded-lg bg-card space-y-4 relative mb-4">
+          <div key={field.id} className="p-4 sm:p-6 border rounded-lg bg-card space-y-3 sm:space-y-4 relative mb-4">
             <Button
               type="button"
               variant="ghost"
@@ -254,7 +254,7 @@ export const EducationStep = ({ form }: EducationStepProps) => {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-2">
                 <Label>Issue Date</Label>
                 <Controller

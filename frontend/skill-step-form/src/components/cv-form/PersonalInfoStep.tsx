@@ -5,7 +5,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2, Upload, X } from "lucide-react";
 import { CVFormData } from "./types";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { ResumeUpload } from "./ResumeUpload";
+import { Separator } from "@/components/ui/separator";
 
 interface PersonalInfoStepProps {
   form: UseFormReturn<CVFormData>;
@@ -19,6 +21,7 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [parsedData, setParsedData] = useState<Partial<CVFormData> | null>(null);
 
   // Initialize image preview from form value (avoiding setState during render)
   useEffect(() => {
@@ -27,6 +30,38 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
       setImagePreview(profileImage);
     }
   }, []); // Only run once on mount
+
+  // Update form when parsed data is available
+  useEffect(() => {
+    if (!parsedData) return;
+
+    console.log("📥 Received parsed data:", parsedData);
+    
+    // Merge parsed data with current form values
+    const currentValues = form.getValues();
+    console.log("📋 Current form values:", currentValues);
+    
+    const mergedData = {
+      ...currentValues,
+      ...parsedData,
+      // Ensure arrays are properly merged
+      personalInfo: {
+        ...currentValues.personalInfo,
+        ...parsedData.personalInfo,
+      },
+      workExperience: parsedData.workExperience || currentValues.workExperience,
+      education: parsedData.education || currentValues.education,
+      skills: parsedData.skills || currentValues.skills,
+    };
+    
+    console.log("🔄 Merged data to set:", mergedData);
+    
+    form.reset(mergedData);
+    console.log("✅ Form reset completed");
+
+    // Clear parsed data after updating form
+    setParsedData(null);
+  }, [parsedData, form]);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -61,14 +96,23 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
     }
   };
 
+  const handleDataParsed = useCallback((data: Partial<CVFormData>) => {
+    // Store parsed data in state, useEffect will handle the form update
+    setParsedData(data);
+  }, []);
+
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-4 sm:space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
       <div>
-        <h2 className="text-2xl font-semibold mb-2">Personal Information</h2>
-        <p className="text-muted-foreground">Let's start with your basic details</p>
+        <h2 className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">Personal Information</h2>
+        <p className="text-muted-foreground text-sm sm:text-base">Let's start with your basic details</p>
       </div>
+
+      {/* Resume Upload Option */}
+      <ResumeUpload onDataParsed={handleDataParsed} />
+      <Separator />
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div className="space-y-2">
           <Label htmlFor="firstName">First Name *</Label>
           <Input
@@ -168,7 +212,7 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div className="space-y-2">
           <Label htmlFor="phone">Phone</Label>
           <Input
@@ -203,7 +247,7 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div className="space-y-2">
           <Label htmlFor="github">GitHub Profile</Label>
           <Input
@@ -251,7 +295,7 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
           <Label>Interests & Hobbies</Label>
           <p className="text-xs text-muted-foreground mt-1">Add individual interests as keywords</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {interestFields.map((field, index) => (
             <div key={field.id} className="flex gap-2">
               <div className="flex-1 space-y-2">

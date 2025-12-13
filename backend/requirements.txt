@@ -16,3 +16,7 @@ python-dotenv==1.0.0
 # Production server
 gunicorn==21.2.0
 
+# PDF parsing for resume extraction (better formatting than frontend extraction)
+pdfplumber>=0.9.0
+PyPDF2>=3.0.0
+

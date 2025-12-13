@@ -2,10 +2,12 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies (including for ML libraries)
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
+    libffi-dev \
+    libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements
@@ -28,6 +30,16 @@ RUN pip install --no-cache-dir \
     django-cors-headers==4.3.1 \
     python-dotenv==1.0.0 \
     PyJWT==2.8.0
+
+# Install ML dependencies for resume parsing
+# Install PyTorch CPU version (smaller, no CUDA needed)
+RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+
+# Install other ML packages
+RUN pip install --no-cache-dir \
+    transformers>=4.20.0 \
+    pdfplumber>=0.9.0 \
+    PyPDF2>=3.0.0
 
 # Copy project files
 COPY . .

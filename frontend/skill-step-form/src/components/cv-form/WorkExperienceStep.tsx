@@ -54,7 +54,7 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div className="space-y-2">
           <Label>Start Date</Label>
           <Controller
@@ -127,7 +127,7 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
           <Label>Technologies</Label>
           <p className="text-xs text-muted-foreground mt-1">Add technologies used in this role</p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {techFields.map((field, techIndex) => (
             <div key={field.id} className="flex gap-1">
               <Input
@@ -165,7 +165,7 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
           <Label>Key Competencies</Label>
           <p className="text-xs text-muted-foreground mt-1">Add key skills demonstrated in this role</p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {compFields.map((field, compIndex) => (
             <div key={field.id} className="flex gap-1">
               <Input
@@ -250,14 +250,14 @@ export const WorkExperienceStep = ({ form }: WorkExperienceStepProps) => {
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-4 sm:space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
       <div>
-        <h2 className="text-2xl font-semibold mb-2">Work Experience</h2>
-        <p className="text-muted-foreground">Add your professional experience</p>
+        <h2 className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">Work Experience</h2>
+        <p className="text-muted-foreground text-sm sm:text-base">Add your professional experience</p>
       </div>
 
       {fields.map((field, index) => (
-        <div key={field.id} className="p-6 border rounded-lg bg-card space-y-4 relative">
+        <div key={field.id} className="p-4 sm:p-6 border rounded-lg bg-card space-y-3 sm:space-y-4 relative">
           {fields.length > 1 && (
             <Button
               type="button"

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { resumeAPI, Resume } from '@/lib/api';
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Resumes() {
   const [resumes, setResumes] = useState<Resume[]>([]);
@@ -36,12 +37,9 @@ export default function Resumes() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
 
-  useEffect(() => {
-    loadResumes();
-  }, []);
-
-  const loadResumes = async () => {
+  const loadResumes = useCallback(async () => {
     setIsLoading(true);
     setError('');
     try {
@@ -52,7 +50,31 @@ export default function Resumes() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []); // No dependencies - function is stable
+
+  useEffect(() => {
+    if (!user) {
+      // No user, don't load resumes
+      setIsLoading(false);
+      setResumes([]);
+      return;
+    }
+
+    // Load resumes immediately when user is available
+    loadResumes();
+    
+    // Listen for resume saved event (from AuthContext after login)
+    const handleResumeSaved = () => {
+      console.log('📢 Resume saved event received, reloading...');
+      loadResumes();
+    };
+    
+    window.addEventListener('resumeSaved', handleResumeSaved);
+    
+    return () => {
+      window.removeEventListener('resumeSaved', handleResumeSaved);
+    };
+  }, [user, loadResumes]); // Reload when user changes (e.g., after login)
 
   const handleDelete = async (id: string) => {
     try {
@@ -165,17 +187,18 @@ export default function Resumes() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {resumes.map((resume) => {
-              // Get quality scores from API
+              // Get quality scores from API (already converted to camelCase by API)
               const resumeData = resume as any;
-              const completenessScore = resumeData.completeness_score || 0;
-              const clarityScore = resumeData.clarity_score || 0;
-              const formattingScore = resumeData.formatting_score || 0;
-              const impactScore = resumeData.impact_score || 0;
+              const completenessScore = resumeData.completenessScore || 0;
+              const clarityScore = resumeData.clarityScore || 0;
+              const formattingScore = resumeData.formattingScore || 0;
+              const impactScore = resumeData.impactScore || 0;
+              const overallScore = resumeData.overallScore || 0;
               
-              // Calculate overall score on frontend (average of 4 scores)
-              const overallScore = Math.round(
-                ((completenessScore + clarityScore + formattingScore + impactScore) / 4) * 10
-              ) / 10;
+              // Use overall_score from backend if available, otherwise calculate
+              const displayScore = overallScore > 0 
+                ? Math.round(overallScore * 10) / 10
+                : Math.round(((completenessScore + clarityScore + formattingScore + impactScore) / 4) * 10) / 10;
               
               const template = resumeData.template || 'modern';
               
@@ -206,19 +229,19 @@ export default function Resumes() {
                     </CardTitle>
                     <CardDescription className="flex items-center gap-2">
                       <Clock className="h-3 w-3" />
-                      {formatDate(resume.updated_at)}
+                      {formatDate((resume as any).updatedAt || (resume as any).updated_at)}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Star className={`h-5 w-5 fill-current ${getRatingColor(overallScore)}`} />
-                        <span className={`text-2xl font-bold ${getRatingColor(overallScore)}`}>
-                          {overallScore}
+                        <Star className={`h-5 w-5 fill-current ${getRatingColor(displayScore)}`} />
+                        <span className={`text-2xl font-bold ${getRatingColor(displayScore)}`}>
+                          {displayScore}
                         </span>
                         <span className="text-muted-foreground">/10</span>
                       </div>
-                      <Badge variant="outline">{getRatingBadge(overallScore)}</Badge>
+                      <Badge variant="outline">{getRatingBadge(displayScore)}</Badge>
                     </div>
 
                     <div className="space-y-2 text-sm">

@@ -24,4 +24,15 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  optimizeDeps: {
+    include: ['react-pdftotext', 'react-pdf'],
+    esbuildOptions: {
+      target: 'esnext',
+    },
+  },
+  build: {
+    commonjsOptions: {
+      include: [/react-pdftotext/, /node_modules/],
+    },
+  },
 }));

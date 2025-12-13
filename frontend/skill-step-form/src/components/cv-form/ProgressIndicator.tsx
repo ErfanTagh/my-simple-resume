@@ -35,7 +35,7 @@ export const ProgressIndicator = ({
         </div>
 
         {/* Step Indicators */}
-        <div className="relative flex gap-1.5 sm:justify-between sm:gap-0">
+        <div className="relative flex justify-between">
           {stepLabels.map((label, index) => {
             const isCompleted = index < currentStep;
             const isCurrent = index === currentStep;
