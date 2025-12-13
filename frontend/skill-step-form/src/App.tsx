@@ -32,9 +32,9 @@ const LandingOrRedirect = () => {
 // Component to handle conditional rendering of Header (must be inside Router)
 const AppRoutes = () => {
   const location = useLocation();
-  // Don't show header on landing, login, or signup pages
+  // Don't show header on landing, login, signup, or resume view pages
   const hideHeaderPaths = ['/', '/login', '/signup'];
-  const showHeader = !hideHeaderPaths.includes(location.pathname);
+  const showHeader = !hideHeaderPaths.includes(location.pathname) && !location.pathname.startsWith('/resume/');
 
   return (
     <>
