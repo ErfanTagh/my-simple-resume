@@ -2,12 +2,33 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system dependencies (including for ML libraries)
+# Install system dependencies (including for ML libraries and Playwright)
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
     libffi-dev \
     libssl-dev \
+    wget \
+    gnupg \
+    ca-certificates \
+    fonts-liberation \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libatspi2.0-0 \
+    libcups2 \
+    libdbus-1-3 \
+    libdrm2 \
+    libgbm1 \
+    libgtk-3-0 \
+    libnspr4 \
+    libnss3 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxfixes3 \
+    libxkbcommon0 \
+    libxrandr2 \
+    xdg-utils \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements
@@ -40,6 +61,13 @@ RUN pip install --no-cache-dir \
     transformers>=4.20.0 \
     pdfplumber>=0.9.0 \
     PyPDF2>=3.0.0
+
+# Install Playwright for PDF generation
+RUN pip install --no-cache-dir playwright>=1.40.0
+
+# Install Playwright browsers (Chromium for PDF generation)
+RUN playwright install chromium
+RUN playwright install-deps chromium
 
 # Copy project files
 COPY . .

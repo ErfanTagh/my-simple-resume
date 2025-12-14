@@ -1,0 +1,143 @@
+/* Responsive Design */
+@media (max-width: 768px) {
+  .resume-container {
+    margin: 10px;
+    border-radius: 0;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    gap: 25px;
+  }
+  
+  .profile-section {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+    max-width: 100%;
+  }
+  
+  .profile-image {
+    width: 90px;
+    height: 90px;
+  }
+  
+  .name {
+    font-size: 1.7rem;
+  }
+  
+  .title {
+    font-size: 0.95rem;
+  }
+  
+  .summary {
+    font-size: 0.8rem;
+    text-align: left;
+  }
+  
+  .contact-info {
+    min-width: auto;
+    width: 100%;
+    padding-top: 0;
+    gap: 6px;
+  }
+  
+  .contact-item {
+    font-size: 0.75rem;
+    justify-content: center;
+    gap: 6px;
+  }
+  
+  .contact-item i {
+    width: 11px;
+  }
+  
+  .content-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  
+  .resume-header,
+  .resume-main {
+    padding: 20px;
+  }
+  
+  .experience-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .experience-place {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .period {
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .resume-header,
+  .resume-main {
+    padding: 15px;
+  }
+  
+  .header-content {
+    gap: 20px;
+  }
+  
+  .profile-section {
+    gap: 12px;
+  }
+  
+  .profile-image {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .name {
+    font-size: 1.5rem;
+  }
+  
+  .title {
+    font-size: 0.85rem;
+  }
+  
+  .summary {
+    font-size: 0.75rem;
+  }
+  
+  .contact-info {
+    gap: 5px;
+  }
+  
+  .contact-item {
+    font-size: 0.7rem;
+    gap: 5px;
+  }
+  
+  .contact-item i {
+    width: 10px;
+  }
+  
+  .section-title {
+    font-size: 1rem;
+  }
+  
+  .skills-grid {
+    gap: 20px;
+  }
+  
+  .skill-tags {
+    gap: 6px;
+  }
+  
+  .skill-tag {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+  }
+}
+

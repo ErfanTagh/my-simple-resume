@@ -51,17 +51,7 @@ export const ResumeUpload = ({ onDataParsed, onClose }: ResumeUploadProps) => {
     try {
       // Send the file directly to backend - backend will extract with proper line breaks
       // This is better than frontend extraction which destroys line breaks
-      console.log("📤 Sending PDF file to backend for extraction and parsing...");
-      console.log("📄 File:", selectedFile.name, selectedFile.type, selectedFile.size, "bytes");
-      
       const parsedData = await resumeAPI.parseResume(selectedFile);
-      console.log("📥 Received parsed data from API:", parsedData);
-      console.log("📥 Parsed data structure:", {
-        personalInfo: parsedData.personalInfo,
-        workExperience: parsedData.workExperience?.length || 0,
-        education: parsedData.education?.length || 0,
-        skills: parsedData.skills?.length || 0,
-      });
       
       // Merge parsed data with existing form structure
       onDataParsed(parsedData as Partial<CVFormData>);

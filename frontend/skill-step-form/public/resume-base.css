@@ -1,0 +1,36 @@
+/* Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f8f9fa;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+/* Resume Container */
+.resume-container {
+  max-width: 210mm;
+  margin: 20px auto;
+  background: white;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Main Content */
+.resume-main {
+  padding: 40px;
+}
+
+.content-grid {
+  display: block;
+  width: 100%;
+}
+

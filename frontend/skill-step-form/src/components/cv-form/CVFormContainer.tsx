@@ -102,23 +102,10 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
     defaultValues: getDefaultValues(),
   });
 
-  // Log form state changes
-  useEffect(() => {
-    console.log("📊 Form State Update:", {
-      isValid: form.formState.isValid,
-      isSubmitting: form.formState.isSubmitting,
-      isValidating: form.formState.isValidating,
-      errors: form.formState.errors,
-      dirtyFields: form.formState.dirtyFields,
-      touchedFields: form.formState.touchedFields,
-    });
-  }, [form.formState]);
-
   // When creating a new resume, prefill personal info from logged-in user
   useEffect(() => {
     if (editId || !user) return;
 
-    console.log("👤 Prefilling user data:", user);
     form.reset((current) => ({
       ...current,
       personalInfo: {
@@ -149,7 +136,6 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
   ];
 
   const handleEditStep = (step: number) => {
-    console.log(`📝 Editing step: ${step} (${steps[step].label})`);
     setCurrentStep(step);
   };
 
@@ -158,7 +144,6 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
     const profileName = e.target.value;
     if (!profileName) return;
 
-    console.log(`🧪 Loading test profile: ${profileName}`);
     const profile = getTestProfile(profileName);
     if (profile) {
       form.reset(profile);
@@ -173,39 +158,25 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
   const CurrentStepComponent = steps[currentStep].component;
 
   const handleNext = async () => {
-    console.log(`⏭️ Next button clicked from step ${currentStep} (${steps[currentStep].label})`);
-    
     let isValid = false;
     
     if (currentStep === 0) {
-      console.log("🔍 Validating personalInfo...");
       isValid = await form.trigger("personalInfo");
-      console.log("✅ personalInfo validation result:", isValid);
-      
-      if (!isValid) {
-        console.log("❌ Validation errors:", form.formState.errors.personalInfo);
-      }
     } else {
-      console.log("⏩ Skipping validation for step", currentStep);
       isValid = true;
     }
 
     if (isValid) {
       if (currentStep < steps.length - 1) {
         const nextStep = currentStep + 1;
-        console.log(`✨ Moving to step ${nextStep} (${steps[nextStep].label})`);
         setCurrentStep(nextStep);
       }
-    } else {
-      console.log("🛑 Cannot proceed - validation failed");
     }
   };
 
   const handlePrevious = () => {
-    console.log(`⏮️ Previous button clicked from step ${currentStep}`);
     if (currentStep > 0) {
       const prevStep = currentStep - 1;
-      console.log(`⬅️ Moving to step ${prevStep} (${steps[prevStep].label})`);
       setCurrentStep(prevStep);
     }
   };
@@ -213,13 +184,6 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
   const [isSaving, setIsSaving] = useState(false);
 
   const onSubmit = async (data: CVFormData) => {
-    console.log("=== 🚀 Starting CV submission ===");
-    console.log("📋 Form data:", JSON.stringify(data, null, 2));
-    console.log("📊 Form state:", {
-      isValid: form.formState.isValid,
-      errors: form.formState.errors,
-    });
-    
     setIsSaving(true);
     
     // Ensure overlay is hidden at start - only show after user clicks "Complete CV"
@@ -229,7 +193,6 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
       // Check if user is authenticated
       if (!user) {
         // User is not authenticated - save to localStorage and show signup overlay
-        console.log("👤 User not authenticated, saving resume data to localStorage");
         localStorage.setItem('pendingResume', JSON.stringify(data));
         setIsSaving(false);
         // Show full-page signup overlay with blurred resume ONLY when Complete CV is clicked
@@ -237,14 +200,10 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
         return;
       }
 
-      console.log("📦 Importing API service...");
       const { resumeAPI } = await import('@/lib/api');
-      console.log("✅ API service imported successfully");
       
       if (editId) {
-        console.log(`🔄 Updating existing resume: ${editId}`);
         const updatedResume = await resumeAPI.update(editId, data as any);
-        console.log("✅ Resume updated successfully:", updatedResume);
 
         toast({
           title: "CV Updated Successfully!",
@@ -252,15 +211,11 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
         });
 
         setTimeout(() => {
-          console.log(`🔗 Opening resume in new tab: /resume/${updatedResume.id}`);
           window.open(`/resume/${updatedResume.id}`, '_blank');
-          console.log("↪️ Redirecting to /resumes");
           navigate('/resumes');
         }, 800);
       } else {
-        console.log("🆕 Creating new resume...");
         const savedResume = await resumeAPI.create(data as any);
-        console.log("✅ Resume created successfully:", savedResume);
         
         toast({
           title: "CV Saved Successfully!",
@@ -268,22 +223,13 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
         });
 
         setTimeout(() => {
-          console.log(`🔗 Opening resume in new tab: /resume/${savedResume.id}`);
           window.open(`/resume/${savedResume.id}`, '_blank');
-          console.log("↪️ Redirecting to /resumes");
           navigate('/resumes');
         }, 1000);
       }
     } catch (error: any) {
-      console.error("=== ❌ Error saving CV ===");
-      console.error("💥 Error object:", error);
-      console.error("📝 Error message:", error.message);
-      console.error("🔍 Error response:", error.response);
-      console.error("📚 Error stack:", error.stack);
-      
       // Show detailed error message
       const errorMessage = error.message || error.toString() || "Failed to save your CV. Please try again.";
-      console.error("📋 Full error details:", JSON.stringify(error, null, 2));
       
       toast({
         title: "Error Saving CV",
@@ -291,21 +237,11 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
         variant: "destructive",
       });
     } finally {
-      console.log("🏁 Submission complete, resetting isSaving flag");
       setIsSaving(false);
     }
   };
 
   const onError = (errors: any) => {
-    console.error("=== ❌ Form Validation Failed ===");
-    console.error("🚫 All errors:", JSON.stringify(errors, null, 2));
-    console.error("📊 Error count:", Object.keys(errors).length);
-    
-    // Log specific error paths
-    Object.keys(errors).forEach(key => {
-      console.error(`  ❌ ${key}:`, errors[key]);
-    });
-    
     toast({
       title: "Validation Error",
       description: "Please check all required fields and fix any errors.",
@@ -441,12 +377,6 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
                         disabled={isSaving}
                         onClick={(e) => {
                           e.preventDefault();
-                          console.log("🔘 Complete CV button clicked");
-                          console.log("📊 Current form state:", {
-                            isValid: form.formState.isValid,
-                            errors: form.formState.errors,
-                            values: form.getValues(),
-                          });
                           // Explicitly trigger form submission
                           form.handleSubmit(onSubmit, onError)();
                         }}

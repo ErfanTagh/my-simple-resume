@@ -8,9 +8,12 @@ import {
   Star, 
   ArrowRight,
   CheckCircle2,
-  Zap
+  Zap,
+  Clock,
+  BookOpen
 } from "lucide-react";
 import { LandingTemplatePreview } from "./LandingTemplatePreview";
+import { blogPosts } from "./Blog";
 
 const Landing = () => {
   return (
@@ -211,6 +214,95 @@ const Landing = () => {
               <Button size="lg" className="bg-primary hover:bg-primary/90 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 rounded-xl">
                 Start Building Now
                 <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Blog Section */}
+      <section className="py-16 sm:py-24 px-4 sm:px-6 bg-muted/30">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-10 sm:mb-16">
+            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-accent border border-border text-xs sm:text-sm font-medium text-accent-foreground mb-4">
+              <BookOpen className="w-3 h-3 sm:w-4 sm:h-4" />
+              Career Insights
+            </div>
+            <h2 className="text-2xl sm:text-4xl font-bold text-foreground mb-3 sm:mb-4">
+              Resume Tips & Career Advice
+            </h2>
+            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
+              Expert guidance to help you land your dream job faster
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {blogPosts.slice(0, 3).map((post, i) => {
+              const hasImage = post.image && typeof post.image === 'string';
+              return (
+              <Link to={`/blog/${post.id}`} key={post.id}>
+                <article className="group relative bg-card rounded-2xl border border-border overflow-hidden hover:shadow-[0_20px_40px_-15px_hsl(var(--primary)/0.25)] hover:border-primary/40 transition-all duration-500 cursor-pointer hover:-translate-y-2 h-full">
+                  {/* Hero Image or Decorative background pattern */}
+                  {hasImage ? (
+                    <div className="aspect-[16/9] relative overflow-hidden">
+                      <img 
+                        src={post.image} 
+                        alt={post.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => {
+                          console.error('Failed to load image:', post.image);
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div className={`aspect-[16/9] bg-gradient-to-br ${post.gradient} relative overflow-hidden`}>
+                      <div className="absolute inset-0 opacity-30">
+                        <div className="absolute top-4 right-4 w-20 h-20 border border-current rounded-full opacity-20" />
+                        <div className="absolute bottom-4 left-4 w-12 h-12 border border-current rounded-lg rotate-12 opacity-20" />
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border border-current rounded-full opacity-10" />
+                      </div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-background/80 backdrop-blur-sm flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500">
+                          <BookOpen className={`w-8 h-8 sm:w-10 sm:h-10 ${post.iconColor} group-hover:scale-110 transition-transform duration-300`} />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <div className="p-5 sm:p-6">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-primary bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20 hover:bg-primary/15 transition-colors">
+                        {post.category}
+                      </span>
+                    </div>
+                    <h3 className="text-lg sm:text-xl font-bold text-card-foreground mb-3 group-hover:text-primary transition-colors duration-300 line-clamp-2 leading-tight">
+                      {post.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2 leading-relaxed">
+                      {post.excerpt}
+                    </p>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground pt-4 border-t border-border/50">
+                      <div className="flex items-center gap-1.5 font-medium">
+                        <Clock className="w-3.5 h-3.5" />
+                        {post.readTime}
+                      </div>
+                      <span className="font-medium">{post.date}</span>
+                    </div>
+                  </div>
+                  {/* Hover arrow indicator */}
+                  <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-background/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
+                    <ArrowRight className="w-4 h-4 text-primary" />
+                  </div>
+                </article>
+              </Link>
+              );
+            })}
+          </div>
+
+          <div className="text-center mt-10 sm:mt-12">
+            <Link to="/blog">
+              <Button variant="outline" size="lg" className="rounded-xl px-6 sm:px-8">
+                View All Articles
+                <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </Link>
           </div>

@@ -68,7 +68,6 @@ export default function EmailVerification() {
                 }, 1500);
                 return;
               } catch (error: any) {
-                console.error("Failed to save resume after verification:", error);
                 toast({
                   title: "Error Saving Resume",
                   description: error.message || "Failed to save your resume. You can create it again.",

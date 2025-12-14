@@ -1,0 +1,274 @@
+# Cursor Rules – Resume Builder Project
+
+These rules define how Cursor must behave when working on this codebase.
+They are designed to protect core functionality, prevent goal drift, and ensure a high-quality, reusable resume system.
+
+---
+
+## 1. Primary Mission (NON‑NEGOTIABLE)
+
+**Primary Goal:**
+
+- Generate clean, reusable, ATS‑friendly resume data
+- Ensure correctness and stability of parsed resume content
+- Enable reliable reuse across templates, exports, and versions
+
+If a proposed change conflicts with this goal:
+
+- **DO NOT implement it**
+
+UI, styling, scoring, and advanced features are **secondary** to data correctness.
+
+---
+
+## 2. Core Functionality Protection (READ‑ONLY ZONE)
+
+The following are CORE and must not be broken, removed, or silently refactored:
+
+- Resume data schema (personalInfo, workExperience, education, skills, etc.)
+- PDF text extraction pipeline (pdfplumber)
+- Section detection logic
+- Work experience extraction logic
+- Education extraction logic
+- Existing frontend ↔ backend API contracts
+
+Rules:
+
+- Do NOT rename core fields
+- Do NOT change return types
+- Do NOT alter function signatures
+- Do NOT delete working logic to "simplify" code
+
+If modification is required:
+
+- Explain the risk and full impact
+- Ask for explicit confirmation
+- Provide alternative approaches if possible
+- Core functionality may be modified only after explicit approval and impact analysis
+
+---
+
+## 3. Minimal Change Principle
+
+- Make the smallest possible change that solves the problem
+- Avoid rewrites, cleanups, or modernization unless requested
+- Touch as few files as possible
+- Never refactor unrelated code
+
+**Note on file splitting:** When splitting large files to meet size limits, prioritize logical cohesion over strict line counts. A well-organized 350-line file is better than artificially split files that harm readability.
+
+If a change exceeds scope:
+
+- Stop and explain why
+
+---
+
+## 4. File Size & Structure Rules
+
+- No file may exceed **300 lines** unless explicitly approved, or when splitting would harm cohesion (e.g., complex parsers, large form components, tightly coupled logic)
+- Prefer multiple small, focused files over large ones
+- One responsibility per file
+- When a file legitimately exceeds 300 lines, ensure it maintains clear structure with well-defined sections
+
+Forbidden:
+
+- 1,000+ line "god files"
+- Massive utility files with mixed concerns
+- Files that mix parsing, UI, and business logic
+
+---
+
+## 5. Resume Parsing Strategy Rules
+
+- Text‑based PDFs only (no OCR unless requested)
+- Regex + rule‑based parsing is the default
+- NER / ML is optional and must never replace deterministic logic
+
+Parsing must be:
+
+- Deterministic
+- Explainable
+- Debuggable
+
+Never silently degrade extraction quality.
+
+---
+
+## 6. Section Detection Rules
+
+- Detect sections using headers, spacing, capitalization, and keywords
+- Support common variants (e.g. "Work Experience", "Experience")
+- Section detection must be tolerant, not strict
+
+Do NOT:
+
+- Assume fixed layouts
+- Assume single‑column PDFs
+
+---
+
+## 7. Safe Feature Implementation
+
+When adding a feature:
+
+1. Verify core parsing output is unchanged
+2. Implement as an extension, not a replacement
+3. Prefer optional flags or additive logic
+
+If a feature requires core logic changes:
+
+- Stop
+- Explain impact
+- Propose alternatives
+
+---
+
+## 8. Regression Prevention
+
+Before finalizing changes, Cursor MUST:
+
+- Ensure resume parsing still works
+- Ensure no core fields are missing
+- Ensure extraction quality did not regress
+
+If uncertain:
+
+- Say so explicitly
+- Do NOT guess
+
+---
+
+## 9. Logging & Debug Output Discipline (CRITICAL)
+
+Logs are **temporary debugging tools**, not features.
+
+Rules:
+
+- No verbose logging by default
+- No printing raw resume text
+- No logging full parsed objects (PII risk)
+- No decorative or emoji‑heavy logs
+- No console.log/console.error in production code (use proper error handling instead)
+
+Allowed logs:
+
+- Short, purpose‑driven messages
+- Counts and summaries only
+- Error logging for actual failures (without PII)
+
+Examples:
+
+- "Detected sections: experience, education"
+- "Extracted 2 work experience entries"
+
+Lifecycle rule:
+
+- Any debug log added during development MUST be removed before merging to main/production branches
+- Debug logs are temporary - remove them once the debugging goal is achieved
+- Final implementation should be mostly silent
+- Use proper error handling (try/catch, error boundaries) instead of console.error for production
+
+---
+
+## 10. Goal Drift Prevention
+
+Cursor must NOT:
+
+- Optimize UI at the cost of data correctness
+- Introduce new frameworks unnecessarily
+- Rewrite working code for style reasons
+- Add complexity without clear benefit
+
+Every change must answer:
+
+- Does this improve correctness?
+- Does this improve reusability?
+- Does this reduce user effort?
+
+If all answers are NO → do not implement.
+
+---
+
+## 11. Frontend Responsiveness & UX Safety
+
+The application must remain usable on:
+
+- Mobile
+- Tablet
+- Desktop
+
+Rules:
+
+- Mobile‑first thinking
+- Avoid fixed widths/heights
+- Prefer flex/grid + responsive breakpoints
+
+Must ensure:
+
+- Forms usable on small screens
+- Live preview does not overflow
+- Long resumes remain scrollable
+- Touch‑friendly interactions
+
+Do NOT:
+
+- Break mobile layout for desktop aesthetics
+- Add non‑responsive components
+
+Before finalizing frontend changes:
+
+- State how responsiveness was preserved
+- Mention breakpoints considered
+
+---
+
+## 12. Stability Over Cleverness
+
+Prefer:
+
+- Simple logic
+- Clear intent
+- Predictable behavior
+- Straightforward solutions that are easy to understand and maintain
+
+Avoid:
+
+- Over‑engineering
+- Fancy abstractions
+- Experimental patterns
+- Solutions requiring more than 2 levels of abstraction or 3 helper functions (reconsider if this threshold is exceeded)
+
+**Guideline:** If a solution requires extensive documentation to understand, it's likely too clever. Choose the approach a junior developer can understand and maintain.
+
+---
+
+## 13. Explicit Impact Summary (REQUIRED)
+
+For any change affecting core parsing logic, API contracts, or data schema, Cursor must provide an explicit impact summary stating:
+
+- What changed
+- What core logic was NOT touched
+- Why this does not break resume generation
+- What testing was performed (if applicable)
+
+**Scope:** Required for changes to:
+
+- Resume parsing logic
+- Data schema modifications
+- API endpoint changes
+- Core extraction functions
+- Section detection logic
+
+For UI-only or styling changes, a brief summary is sufficient.
+
+---
+
+## 14. Default Behavior
+
+If unsure at any point:
+
+- Ask before changing
+- Choose the safer option
+- Preserve existing behavior
+
+**The resume must always remain correct, reusable, and professional.**

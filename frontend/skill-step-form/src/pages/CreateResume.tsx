@@ -119,9 +119,7 @@ const CreateResume = () => {
         try {
           const resumeData = JSON.parse(pendingResume);
           setInitialData(resumeData);
-          console.log("📋 Restored pending resume data from localStorage");
         } catch (error) {
-          console.error("Failed to parse pending resume data:", error);
           setInitialData(undefined);
         }
       } else {
@@ -143,7 +141,6 @@ const CreateResume = () => {
         setInitialData(mapped);
       } catch (e: any) {
         if (!isMounted) return;
-        console.error("Failed to load resume for editing:", e);
         setError(e?.message || "Failed to load resume data.");
       } finally {
         if (isMounted) setIsLoading(false);

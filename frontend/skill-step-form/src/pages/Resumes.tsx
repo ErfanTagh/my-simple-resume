@@ -14,9 +14,10 @@ import {
   Clock,
   Star,
   Edit,
-  Download,
   X,
+  Download,
 } from 'lucide-react';
+import { downloadResumePDF } from '@/lib/resumePdfUtils';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -65,7 +66,6 @@ export default function Resumes() {
     
     // Listen for resume saved event (from AuthContext after login)
     const handleResumeSaved = () => {
-      console.log('📢 Resume saved event received, reloading...');
       loadResumes();
     };
     
@@ -114,7 +114,6 @@ export default function Resumes() {
       const year = String(date.getFullYear()).slice(-2);
       return `${day}/${month}/${year}`;
     } catch (error) {
-      console.error('Error formatting date:', dateString, error);
       return 'Invalid date';
     }
   };
@@ -131,15 +130,22 @@ export default function Resumes() {
     return "Needs Work";
   };
 
-  const handleDownload = (resume: Resume) => {
-    // Open resume in new tab where user can download PDF directly
-    const url = `/resume/${resume.id}`;
-    window.open(url, '_blank');
-    
-    toast({
-      title: 'Opening Resume',
-      description: 'Click "Download PDF" button to download your resume',
-    });
+  const handleDownloadPDF = async (resume: Resume) => {
+    try {
+      // Fetch the full resume data
+      const fullResume = await resumeAPI.getById(resume.id);
+      await downloadResumePDF(fullResume);
+      toast({
+        title: 'PDF Downloaded',
+        description: 'Your resume has been downloaded successfully.',
+      });
+    } catch (err: any) {
+      toast({
+        title: 'Error',
+        description: err.message || 'Failed to generate PDF',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
@@ -277,7 +283,8 @@ export default function Resumes() {
                         variant="outline" 
                         className="flex-1" 
                         size="sm"
-                        onClick={() => handleDownload(resume)}
+                        onClick={() => handleDownloadPDF(resume)}
+                        title="Download PDF"
                       >
                         <Download className="h-3 w-3 mr-1" />
                         PDF

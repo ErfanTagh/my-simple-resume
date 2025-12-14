@@ -1,0 +1,67 @@
+/* Certifications Section */
+.certification-item {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.certification-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.certification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.certification-header h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2c3e50;
+  line-height: 1.3;
+}
+
+.certification-header h4 strong {
+  font-weight: 700;
+}
+
+.certification-issuer {
+  font-weight: 500;
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.certification-date {
+  color: #667eea;
+  font-weight: 500;
+  font-size: 0.85rem;
+  font-style: italic;
+  margin-bottom: 8px;
+}
+
+.certification-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #667eea;
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.certification-link:hover {
+  color: #5a6fd8;
+  text-decoration: underline;
+}
+
+.certification-link i {
+  font-size: 0.75rem;
+}
+

@@ -1,0 +1,21 @@
+/* Section Styles */
+.resume-section {
+  margin-bottom: 32px;
+}
+
+.resume-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e9ecef;
+  line-height: 1.2;
+}
+
+/* Removed icon styles - ATS-friendly, no icons */
+

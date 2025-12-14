@@ -1,0 +1,24 @@
+/* Interests Section */
+.interests-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.interest-tag {
+  background: #f8f9fa;
+  color: #495057;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 400;
+  border: 1px solid #dee2e6;
+  transition: all 0.2s ease;
+  line-height: 1.1;
+}
+
+.interest-tag:hover {
+  background: #e9ecef;
+  transform: translateY(-1px);
+}
+

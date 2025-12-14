@@ -34,12 +34,9 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
   // Update form when parsed data is available
   useEffect(() => {
     if (!parsedData) return;
-
-    console.log("📥 Received parsed data:", parsedData);
     
     // Merge parsed data with current form values
     const currentValues = form.getValues();
-    console.log("📋 Current form values:", currentValues);
     
     const mergedData = {
       ...currentValues,
@@ -54,10 +51,7 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
       skills: parsedData.skills || currentValues.skills,
     };
     
-    console.log("🔄 Merged data to set:", mergedData);
-    
     form.reset(mergedData);
-    console.log("✅ Form reset completed");
 
     // Clear parsed data after updating form
     setParsedData(null);

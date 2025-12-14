@@ -77,3 +77,4 @@ frontend/skill-step-form-ui/
 
 # Temporary scripts
 backend/runserver_quiet.sh
+backend/test_ner_model.py

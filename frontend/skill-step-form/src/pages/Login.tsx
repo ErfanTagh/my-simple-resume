@@ -88,7 +88,6 @@ export default function Login() {
               navigate('/resumes');
             }, 1000);
           } catch (error: any) {
-            console.error("Failed to save resume:", error);
             toast({
               title: "Error Saving Resume",
               description: error.message || "Failed to save your resume. You can create it again from the dashboard.",

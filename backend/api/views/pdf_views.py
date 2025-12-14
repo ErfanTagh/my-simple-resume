@@ -1,0 +1,137 @@
+"""
+PDF Generation Views using Playwright
+"""
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from django.http import HttpResponse
+from bson import ObjectId
+from playwright.sync_api import sync_playwright
+import base64
+import json
+
+
+def generate_pdf_from_html(html_content: str) -> bytes:
+    """
+    Generate PDF from HTML content using Playwright (synchronous)
+    """
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page()
+        
+        # Set content and wait for it to load
+        page.set_content(html_content, wait_until='networkidle')
+        
+        # Generate PDF with A4 format and margins matching print CSS
+        pdf_bytes = page.pdf(
+            format='A4',
+            margin={
+                'top': '18mm',
+                'right': '18mm',
+                'bottom': '18mm',
+                'left': '18mm'
+            },
+            print_background=True,
+        )
+        
+        browser.close()
+        return pdf_bytes
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def generate_resume_pdf(request, resume_id):
+    """
+    Generate PDF for a resume
+    
+    Expects POST request with HTML content in the request body as JSON:
+    {
+        "html": "<html>...</html>" or base64 encoded string
+    }
+    """
+    try:
+        # Validate resume exists and belongs to user
+        from pymongo import MongoClient
+        import os
+        
+        # Connect to MongoDB
+        connection_string = os.getenv('MONGODB_CONNECTION_STRING')
+        if connection_string:
+            try:
+                client = MongoClient(connection_string)
+                client.admin.command('ping')
+            except Exception:
+                connection_string = None
+        
+        if not connection_string:
+            mongo_host = os.getenv('MONGODB_HOST', 'mongodb')
+            mongo_port = int(os.getenv('MONGODB_PORT', 27017))
+            mongo_db = os.getenv('MONGODB_NAME', 'resume_db')
+            mongo_username = os.getenv('MONGODB_USERNAME', '')
+            mongo_password = os.getenv('MONGODB_PASSWORD', '')
+            
+            if mongo_username and mongo_password:
+                client = MongoClient(
+                    mongo_host,
+                    mongo_port,
+                    username=mongo_username,
+                    password=mongo_password,
+                    authSource='admin',
+                    authMechanism='SCRAM-SHA-1'
+                )
+            else:
+                client = MongoClient(mongo_host, mongo_port)
+        
+        mongo_db = os.getenv('MONGODB_NAME', 'resume_db')
+        db = client[mongo_db]
+        
+        # Validate ObjectId
+        try:
+            resume_object_id = ObjectId(resume_id)
+        except Exception:
+            return Response(
+                {'error': 'Invalid resume ID format'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Check if resume exists and belongs to user
+        resume_doc = db.resumes.find_one({'_id': resume_object_id, 'user_id': request.user.id})
+        if not resume_doc:
+            return Response(
+                {'error': 'Resume not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Get HTML from request body
+        html_content = request.data.get('html') or request.POST.get('html')
+        
+        if not html_content:
+            return Response(
+                {'error': 'HTML content is required. Please provide rendered HTML in request body.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Decode base64 HTML if needed, or use directly
+        try:
+            # Try to decode as base64 first
+            html_content = base64.b64decode(html_content).decode('utf-8')
+        except:
+            # If decoding fails, use as-is (might be plain HTML)
+            pass
+        
+        # Generate PDF
+        pdf_bytes = generate_pdf_from_html(html_content)
+        
+        # Return PDF as response
+        response = HttpResponse(pdf_bytes, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="resume_{resume_id}.pdf"'
+        return response
+        
+    except Exception as e:
+        import traceback
+        return Response(
+            {'error': f'Failed to generate PDF: {str(e)}', 'detail': str(traceback.format_exc())},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+

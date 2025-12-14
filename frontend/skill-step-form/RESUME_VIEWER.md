@@ -71,7 +71,18 @@ When you complete the CV form and click "Complete CV":
 ```
 /home/erfan/resume-app/frontend/skill-step-form/
 ├── public/
-│   └── resume-styles.css          # Professional resume styling
+│   ├── resume-base.css            # Base styles and reset
+│   ├── resume-header.css          # Header and contact info
+│   ├── resume-sections.css        # Common section styles
+│   ├── resume-education.css      # Education section
+│   ├── resume-experience.css     # Work experience section
+│   ├── resume-projects.css       # Projects section
+│   ├── resume-skills.css         # Skills section
+│   ├── resume-languages.css      # Languages section
+│   ├── resume-certifications.css # Certifications section
+│   ├── resume-interests.css      # Interests section
+│   ├── resume-responsive.css     # Responsive media queries
+│   └── resume-print.css         # Print styles (A4)
 ├── src/
 │   ├── pages/
 │   │   └── ResumeView.tsx         # Resume viewer component
@@ -106,7 +117,7 @@ The resume is rendered with the following sections:
 
 ### CSS Classes
 
-The resume uses semantic CSS classes from `resume-styles.css`:
+The resume uses semantic CSS classes from the partitioned resume CSS files:
 
 - `.resume-container`: Main wrapper
 - `.resume-header`: Header section with name and photo
@@ -130,7 +141,7 @@ The CSS includes special `@media print` rules that:
 
 ### Styling Changes
 
-To modify the resume appearance, edit `/public/resume-styles.css`. Key areas:
+To modify the resume appearance, edit the relevant CSS file in `/public/`. Key areas:
 
 - **Colors**: Search for `#667eea` (primary purple) and `#495057` (dark gray)
 - **Fonts**: Currently using 'Inter' from Google Fonts
@@ -231,7 +242,7 @@ Potential improvements:
 
 ### Styling Issues
 
-1. Verify `/public/resume-styles.css` is accessible
+1. Verify all `/public/resume-*.css` files are accessible
 2. Check browser console for CSS loading errors
 3. Clear browser cache and reload
 

@@ -28,7 +28,6 @@ export const generatePDF = async (element: HTMLElement, filename: string = 'resu
     await html2pdf().set(opt).from(element).save();
     return true;
   } catch (error) {
-    console.error('Error generating PDF:', error);
     throw error;
   }
 };

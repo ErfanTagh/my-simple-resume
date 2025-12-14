@@ -3,7 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { resumeAPI, Resume } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { ArrowLeft, AlertCircle, Printer } from 'lucide-react';
+import { ArrowLeft, AlertCircle, Printer, Download } from 'lucide-react';
+import { downloadResumePDFFromElement } from '@/lib/resumePdfUtils';
 
 export default function ResumeView() {
   const { id } = useParams<{ id: string }>();
@@ -20,28 +21,47 @@ export default function ResumeView() {
   }, [id]);
 
   useEffect(() => {
-    // Load the external resume styles
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = '/resume-styles.css';
-    document.head.appendChild(link);
+    // Load partitioned resume stylesheets in correct order
+    const cssFiles = [
+      '/resume-base.css',
+      '/resume-header.css',
+      '/resume-sections.css',
+      '/resume-education.css',
+      '/resume-experience.css',
+      '/resume-projects.css',
+      '/resume-skills.css',
+      '/resume-languages.css',
+      '/resume-certifications.css',
+      '/resume-interests.css',
+      '/resume-responsive.css',
+      '/resume-print.css',
+    ];
 
-    // Load Font Awesome
-    const fontAwesome = document.createElement('link');
-    fontAwesome.rel = 'stylesheet';
-    fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css';
-    document.head.appendChild(fontAwesome);
+    const links: HTMLLinkElement[] = [];
 
-    // Load Google Fonts
+    // Load all CSS files
+    cssFiles.forEach((href) => {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = href;
+      document.head.appendChild(link);
+      links.push(link);
+    });
+
+    // Load Google Fonts (Inter)
     const googleFonts = document.createElement('link');
     googleFonts.rel = 'stylesheet';
-    googleFonts.href = 'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap';
+    googleFonts.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap';
     document.head.appendChild(googleFonts);
+    links.push(googleFonts);
 
     return () => {
-      document.head.removeChild(link);
-      document.head.removeChild(fontAwesome);
-      document.head.removeChild(googleFonts);
+      // Cleanup: remove all links
+      links.forEach((link) => {
+        if (document.head.contains(link)) {
+          document.head.removeChild(link);
+        }
+      });
     };
   }, []);
 
@@ -61,6 +81,16 @@ export default function ResumeView() {
   const handlePrint = () => {
     // Open browser print dialog - users can choose to print or save as PDF
     window.print();
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!resumeContentRef.current || !id || !resume) return;
+
+    try {
+      await downloadResumePDFFromElement(id, resumeContentRef.current, resume);
+    } catch (error: any) {
+      setError(error.message || 'Failed to generate PDF');
+    }
   };
 
   if (isLoading) {
@@ -102,9 +132,13 @@ export default function ResumeView() {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
-          <Button onClick={handlePrint}>
+          <Button onClick={handlePrint} variant="outline">
             <Printer className="mr-2 h-4 w-4" />
-            Print / Download PDF
+            Print
+          </Button>
+          <Button onClick={handleDownloadPDF}>
+            <Download className="mr-2 h-4 w-4" />
+            Download PDF
           </Button>
         </div>
       </div>
@@ -129,51 +163,46 @@ export default function ResumeView() {
         {/* Main Content - Single Column */}
         <main className="resume-main">
           
+          {/* Professional Summary Section */}
+          {personalInfo.summary && personalInfo.summary.trim() && (
+            <section className="resume-section">
+              <h3 className="section-title">Professional Summary</h3>
+              <p style={{ fontSize: '0.9em', lineHeight: '1.5', color: '#495057' }}>
+                {personalInfo.summary}
+              </p>
+            </section>
+          )}
+
           {/* Contact Section */}
           <section className="resume-section">
-            <h3 className="section-title">
-              <i className="fas fa-address-book"></i>
-              Contact
-            </h3>
-            <div className="contact-info-horizontal">
+            <h3 className="section-title">Contact</h3>
+            <div className="contact-info">
               {personalInfo.phone && (
                 <div className="contact-item">
-                  <i className="fas fa-phone"></i>
-                  <span>{personalInfo.phone}</span>
+                  <span>Phone: {personalInfo.phone}</span>
                 </div>
               )}
               <div className="contact-item">
-                <i className="fas fa-envelope"></i>
-                <span>{personalInfo.email}</span>
+                <span>Email: {personalInfo.email}</span>
               </div>
               {personalInfo.location && (
                 <div className="contact-item">
-                  <i className="fas fa-map-marker-alt"></i>
-                  <span>{personalInfo.location}</span>
+                  <span>Location: {personalInfo.location}</span>
                 </div>
               )}
               {personalInfo.github && (
                 <div className="contact-item">
-                  <i className="fab fa-github"></i>
-                  <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="contact-link">
-                    {personalInfo.github}
-                  </a>
+                  <span>GitHub: <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="contact-link">{personalInfo.github}</a></span>
                 </div>
               )}
               {personalInfo.linkedin && (
                 <div className="contact-item">
-                  <i className="fab fa-linkedin"></i>
-                  <a href={personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="contact-link">
-                    {personalInfo.linkedin}
-                  </a>
+                  <span>LinkedIn: <a href={personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="contact-link">{personalInfo.linkedin}</a></span>
                 </div>
               )}
               {personalInfo.website && (
                 <div className="contact-item">
-                  <i className="fas fa-globe"></i>
-                  <a href={personalInfo.website} target="_blank" rel="noopener noreferrer" className="contact-link">
-                    {personalInfo.website}
-                  </a>
+                  <span>Website: <a href={personalInfo.website} target="_blank" rel="noopener noreferrer" className="contact-link">{personalInfo.website}</a></span>
                 </div>
               )}
             </div>
@@ -183,10 +212,7 @@ export default function ResumeView() {
           {resume.education && resume.education.length > 0 && 
            resume.education.some((edu) => edu.degree || edu.institution) && (
             <section className="resume-section">
-              <h3 className="section-title">
-                <i className="fas fa-graduation-cap"></i>
-                Education
-              </h3>
+              <h3 className="section-title">Education</h3>
               {resume.education.filter((edu) => edu.degree || edu.institution).map((edu, index) => (
                 <div key={index} className="education-item">
                   <h4><strong>{edu.degree}</strong></h4>
@@ -220,19 +246,14 @@ export default function ResumeView() {
           {resume.workExperience && resume.workExperience.length > 0 && 
            resume.workExperience.some((exp) => exp.position || exp.company) && (
             <section className="resume-section">
-              <h3 className="section-title">
-                <i className="fas fa-briefcase"></i>
-                Work Experience
-              </h3>
+              <h3 className="section-title">Work Experience</h3>
               {resume.workExperience.filter((exp) => exp.position || exp.company).map((exp, index) => (
                 <div key={index} className="experience-item">
                   <div className="experience-header">
                     <h4><strong>{exp.position}</strong></h4>
                   </div>
                   <div className="experience-place">
-                    <span className="company">
-                      <i className="fas fa-building"></i> <strong>{exp.company}</strong>
-                    </span>
+                    <span className="company"><strong>{exp.company}</strong></span>
                     {(exp.startDate || exp.endDate) && (
                       <span className="period">
                         {exp.startDate} - {exp.endDate || 'Present'}
@@ -241,7 +262,6 @@ export default function ResumeView() {
                   </div>
                   {exp.location && (
                     <div className="experience-location">
-                      <i className="fas fa-map-marker-alt"></i>
                       <span>{exp.location}</span>
                     </div>
                   )}
@@ -281,17 +301,13 @@ export default function ResumeView() {
           {resume.projects && resume.projects.length > 0 && 
            resume.projects.some((project) => project.name && project.name.trim()) && (
             <section className="resume-section">
-              <h3 className="section-title">
-                <i className="fas fa-project-diagram"></i>
-                Projects
-              </h3>
+              <h3 className="section-title">Projects</h3>
               {resume.projects.filter((project) => project.name && project.name.trim()).map((project, index) => (
                 <div key={index} className="project-item">
                   <div className="project-header">
                     <h4><strong>{project.name}</strong></h4>
                     {project.link && (
                       <a href={project.link} target="_blank" rel="noopener noreferrer" className="project-link">
-                        <i className="fas fa-external-link-alt"></i>
                         View Project
                       </a>
                     )}
@@ -318,10 +334,7 @@ export default function ResumeView() {
           {resume.certificates && resume.certificates.length > 0 && 
            resume.certificates.some((cert) => cert.name && cert.name.trim()) && (
             <section className="resume-section">
-              <h3 className="section-title">
-                <i className="fas fa-certificate"></i>
-                Certifications
-              </h3>
+              <h3 className="section-title">Certifications</h3>
               {resume.certificates.filter((cert) => cert.name && cert.name.trim()).map((cert, index) => (
                 <div key={index} className="certification-item">
                   <div className="certification-header">
@@ -335,7 +348,6 @@ export default function ResumeView() {
                   )}
                   {cert.url && (
                     <a href={cert.url} target="_blank" rel="noopener noreferrer" className="certification-link">
-                      <i className="fas fa-external-link-alt"></i>
                       View Certificate
                     </a>
                   )}
@@ -344,15 +356,26 @@ export default function ResumeView() {
             </section>
           )}
 
+          {/* Skills Section */}
+          {resume.skills && resume.skills.length > 0 && (
+            <section className="resume-section">
+              <h3 className="section-title">Skills</h3>
+              <div className="skill-tags">
+                {resume.skills
+                  .filter((skillObj) => skillObj.skill && skillObj.skill.trim())
+                  .map((skillObj, index) => (
+                    <span key={index} className="skill-tag">{skillObj.skill}</span>
+                  ))}
+              </div>
+            </section>
+          )}
+
           {/* Languages Section */}
           {resume.languages && resume.languages.length > 0 && 
            resume.languages.some((lang) => lang.language && lang.language.trim()) && (
             <section className="resume-section">
-              <h3 className="section-title">
-                <i className="fas fa-language"></i>
-                Languages
-              </h3>
-              <div className="languages-list-horizontal">
+              <h3 className="section-title">Languages</h3>
+              <div className="languages-list">
                 {resume.languages
                   .filter((lang) => lang.language && lang.language.trim())
                   .map((lang, index) => (
@@ -369,10 +392,7 @@ export default function ResumeView() {
           {personalInfo.interests && personalInfo.interests.length > 0 && 
            personalInfo.interests.some((interest) => interest.interest && interest.interest.trim()) && (
             <section className="resume-section">
-              <h3 className="section-title">
-                <i className="fas fa-heart"></i>
-                Interests
-              </h3>
+              <h3 className="section-title">Interests</h3>
               <div className="interests-list">
                 {personalInfo.interests
                   .filter((interest) => interest.interest && interest.interest.trim())

@@ -67,15 +67,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       // Get response text first to handle non-JSON responses
       const responseText = await response.text();
-      console.log('Login response status:', response.status);
-      console.log('Login response text:', responseText);
       
       let data: any = {};
       try {
         data = responseText ? JSON.parse(responseText) : {};
       } catch (parseError) {
-        console.error('Failed to parse JSON response:', parseError);
-        console.error('Response text was:', responseText);
         throw new Error(`Server returned invalid response. Status: ${response.status}. Response: ${responseText.substring(0, 200)}`);
       }
 
@@ -101,26 +97,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         (async () => {
           try {
             const resumeData = JSON.parse(pendingResume);
-            console.log('💾 Found pending resume, saving to backend after login...');
             
             // Import API dynamically to avoid circular dependencies
             const { resumeAPI } = await import('@/lib/api');
             
-            const savedResume = await resumeAPI.create(resumeData);
-            console.log('✅ Resume saved successfully:', savedResume);
+            await resumeAPI.create(resumeData);
             
             localStorage.removeItem('pendingResume');
             
             // Dispatch custom event to notify Resumes page
             window.dispatchEvent(new CustomEvent('resumeSaved'));
           } catch (err: any) {
-            console.error('❌ Failed to save pending resume after login:', err);
             // Keep the resume in localStorage so user can try again
           }
         })();
       }
     } catch (error) {
-      console.error('Login error:', error);
       throw error;
     }
   };
@@ -149,15 +141,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       // Get response text first to handle non-JSON responses
       const responseText = await response.text();
-      console.log('Register response status:', response.status);
-      console.log('Register response text:', responseText);
       
       let data: any = {};
       try {
         data = responseText ? JSON.parse(responseText) : {};
       } catch (parseError) {
-        console.error('Failed to parse JSON response:', parseError);
-        console.error('Response text was:', responseText);
         throw new Error(`Server returned invalid response. Status: ${response.status}. Response: ${responseText.substring(0, 200)}`);
       }
 
@@ -171,7 +159,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       
       return data; // Return the response so Signup page can show the message
     } catch (error) {
-      console.error('Registration error:', error);
       throw error;
     }
   };
@@ -189,7 +176,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         });
       }
     } catch (error) {
-      console.error('Logout error:', error);
+      // Silently handle logout errors
     } finally {
       setUser(null);
       setTokens(null);

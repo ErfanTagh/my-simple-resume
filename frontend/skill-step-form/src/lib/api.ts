@@ -17,11 +17,6 @@ const getApiBaseUrl = () => {
 };
 const API_BASE_URL = getApiBaseUrl();
 
-// Log API base URL on module load
-console.log('🔗 API Base URL:', API_BASE_URL);
-console.log('🔗 VITE_API_URL env:', import.meta.env.VITE_API_URL);
-console.log('🔗 DEV mode:', import.meta.env.DEV);
-
 // Helper function to convert camelCase to snake_case
 const camelToSnake = (str: string): string => {
   return str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
@@ -80,7 +75,6 @@ const createHeaders = (includeAuth = true) => {
 
   if (includeAuth) {
     const token = getAccessToken();
-    console.log('Access token:', token ? 'Token exists' : 'No token found');
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
@@ -116,7 +110,6 @@ const tryRefreshToken = async (): Promise<boolean> => {
     localStorage.removeItem('user');
     return false;
   } catch (error) {
-    console.error('Token refresh failed:', error);
     return false;
   }
 };
@@ -128,10 +121,8 @@ const handleResponse = async (response: Response, retryFn?: () => Promise<Respon
     let error: any = {};
     try {
       const text = await response.text();
-      console.error('Error response text:', text);
       error = text ? JSON.parse(text) : {};
     } catch (e) {
-      console.error('Failed to parse error response:', e);
       error = { detail: `HTTP ${response.status}: ${response.statusText}` };
     }
     
@@ -157,12 +148,6 @@ const handleResponse = async (response: Response, retryFn?: () => Promise<Respon
     
     // Provide more detailed error message
     const errorMessage = error.error || error.detail || error.message || `HTTP ${response.status}: ${response.statusText}`;
-    console.error('API Error:', {
-      status: response.status,
-      statusText: response.statusText,
-      error: error,
-      errorMessage: errorMessage
-    });
     throw new Error(errorMessage);
   }
   const data = await response.json();
@@ -185,7 +170,6 @@ export const authAPI = {
     first_name?: string;
     last_name?: string;
   }) => {
-    console.log('Register API Base URL:', API_BASE_URL);
     const response = await fetch(`${API_BASE_URL}/auth/register/`, {
       method: 'POST',
       headers: createHeaders(false),
@@ -198,7 +182,6 @@ export const authAPI = {
    * Login user
    */
   login: async (data: { username: string; password: string }) => {
-    console.log('Login API Base URL:', API_BASE_URL);
     const response = await fetch(`${API_BASE_URL}/auth/login/`, {
       method: 'POST',
       headers: createHeaders(false),
@@ -350,9 +333,6 @@ export const resumeAPI = {
     // Convert camelCase to snake_case for backend
     const snakeCaseData = camelToSnakeObject(data);
     const fullUrl = `${API_BASE_URL}/resumes/`;
-    console.log('API Base URL:', API_BASE_URL);
-    console.log('Full URL:', fullUrl);
-    console.log('VITE_API_URL env:', import.meta.env.VITE_API_URL);
     const makeRequest = () => fetch(fullUrl, {
       method: 'POST',
       headers: createHeaders(true),
@@ -417,6 +397,27 @@ export const resumeAPI = {
     
     // Convert snake_case back to camelCase
     return snakeToCamelObject(parsedData);
+  },
+
+  /**
+   * Generate PDF from HTML content using server-side Puppeteer
+   */
+  generatePDF: async (id: string, htmlContent: string): Promise<Blob> => {
+    const response = await fetch(`${API_BASE_URL}/resumes/${id}/pdf/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...createHeaders(true),
+      },
+      body: JSON.stringify({ html: htmlContent }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.error || 'Failed to generate PDF');
+    }
+
+    return await response.blob();
   },
 
   /**

@@ -1,0 +1,84 @@
+/* Skills Section */
+.skills-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.skill-category h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 10px;
+  line-height: 1.2;
+}
+
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skill-tag {
+  background: #e9ecef;
+  color: #495057;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid #dee2e6;
+  line-height: 1.2;
+  transition: all 0.2s ease;
+}
+
+.skill-tag:hover {
+  background: #667eea;
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* Competencies Section */
+.competencies-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.competency-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.competency-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.competency-name {
+  font-weight: 500;
+  color: #495057;
+  font-size: 0.95rem;
+}
+
+.competency-level {
+  font-size: 0.85rem;
+  color: #6c757d;
+  font-weight: 400;
+}
+
+.competency-bar {
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.competency-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+

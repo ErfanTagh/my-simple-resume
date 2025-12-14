@@ -6,9 +6,9 @@
 }
 
 body {
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.6;
-  color: #212529;
+  color: #333;
   background-color: #f8f9fa;
   font-size: 14px;
   font-weight: 400;
@@ -26,7 +26,7 @@ body {
 
 /* Header Section */
 .resume-header {
-  padding: 20px 30px;
+  padding: 35px 40px;
 }
 
 .header-content {
@@ -46,15 +46,15 @@ body {
 }
 
 .profile-image {
-  width: 70px;
-  height: 70px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #e9ecef;
+  border: 3px solid #e9ecef;
   object-position: 50% 30%;
   flex-shrink: 0;
   position: absolute;
-  right: 30px;
+  right: 40px;
 }
 
 
@@ -66,24 +66,20 @@ body {
 }
 
 .name {
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 3px;
+  margin-bottom: 5px;
   letter-spacing: -0.5px;
   line-height: 1.1;
-  color: #212529;
-}
-
-.name strong {
-  font-weight: 700;
+  color: #333;
 }
 
 .title {
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 500;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
   color: #6c757d;
-  line-height: 1.2;
+  line-height: 1.3;
 }
 
 .summary {
@@ -97,14 +93,7 @@ body {
 .contact-info {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-}
-
-.contact-info-horizontal {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px 30px;
-  justify-content: flex-start;
+  gap: 8px;
 }
 
 .contact-item {
@@ -149,7 +138,7 @@ body {
 
 /* Main Content */
 .resume-main {
-  padding: 20px 30px;
+  padding: 40px;
 }
 
 .content-grid {
@@ -159,7 +148,7 @@ body {
 
 /* Section Styles */
 .resume-section {
-  margin-bottom: 18px;
+  margin-bottom: 32px;
 }
 
 .resume-section:last-child {
@@ -167,14 +156,11 @@ body {
 }
 
 .section-title {
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   font-weight: 600;
-  color: #000000;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding-bottom: 5px;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  padding-bottom: 8px;
   border-bottom: 2px solid #e9ecef;
   line-height: 1.2;
 }
@@ -217,8 +203,8 @@ body {
 
 /* Education Section */
 .education-item {
-  margin-bottom: 12px;
-  padding-bottom: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 24px;
   border-bottom: 1px solid #f1f3f4;
 }
 
@@ -229,15 +215,11 @@ body {
 }
 
 .education-item h4 {
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
-  color: #000000;
-  margin-bottom: 4px;
-  line-height: 1.2;
-}
-
-.education-item h4 strong {
-  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 8px;
+  line-height: 1.3;
 }
 
 .education-header {
@@ -248,13 +230,9 @@ body {
 
 .education-item .institution {
   font-weight: 500;
-  color: #212529;
+  color: #495057;
   font-size: 0.95rem;
   margin: 0;
-}
-
-.education-item .institution strong {
-  font-weight: 700;
 }
 
 .education-item .location {
@@ -273,21 +251,21 @@ body {
 }
 
 .key-courses {
-  margin-top: 6px;
+  margin-top: 10px;
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 6px;
 }
 
 .course-tag {
   background: #f8f9fa;
   color: #667eea;
-  padding: 2px 6px;
+  padding: 3px 8px;
   border-radius: 6px;
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 500;
   border: 1px solid #667eea;
-  line-height: 1.1;
+  line-height: 1.2;
   transition: all 0.2s ease;
 }
 
@@ -339,33 +317,29 @@ body {
 .languages-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-}
-
-.languages-list-horizontal {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px 40px;
-  justify-content: flex-start;
+  gap: 16px;
 }
 
 .language-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  gap: 16px;
 }
 
 .language-name {
   font-weight: 500;
   color: #495057;
-  font-size: 0.85rem;
+  min-width: 80px;
+  font-size: 0.95rem;
 }
 
 .language-level {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: #6c757d;
-  font-weight: 600;
+  font-weight: 500;
+  width: 24px;
+  text-align: right;
   font-family: monospace;
 }
 
@@ -393,8 +367,8 @@ body {
 
 /* Certifications Section */
 .certification-item {
-  margin-bottom: 10px;
-  padding-bottom: 10px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
   border-bottom: 1px solid #f1f3f4;
 }
 
@@ -414,14 +388,10 @@ body {
 }
 
 .certification-header h4 {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  color: #000000;
-  line-height: 1.2;
-}
-
-.certification-header h4 strong {
-  font-weight: 700;
+  color: #2c3e50;
+  line-height: 1.3;
 }
 
 .certification-issuer {
@@ -460,7 +430,7 @@ body {
 
 /* Experience Section */
 .experience-item {
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
 .experience-item:last-child {
@@ -472,24 +442,16 @@ body {
 }
 
 .experience-header h4 {
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
-  color: #000000;
-  line-height: 1.2;
-}
-
-.experience-header h4 strong {
-  font-weight: 700;
+  color: #2c3e50;
+  line-height: 1.3;
 }
 
 .company {
   font-weight: 500;
-  color: #212529;
+  color: #495057;
   font-size: 0.95rem;
-}
-
-.company strong {
-  font-weight: 700;
 }
 
 .period {
@@ -530,11 +492,11 @@ body {
 
 .experience-details li {
   position: relative;
-  padding-left: 16px;
-  margin-bottom: 3px;
-  color: #212529;
-  line-height: 1.3;
-  font-size: 0.75rem;
+  padding-left: 20px;
+  margin-bottom: 6px;
+  color: #495057;
+  line-height: 1.4;
+  font-size: 0.85rem;
 }
 
 .experience-details li:last-child {
@@ -596,8 +558,8 @@ body {
 
 /* Projects Section */
 .project-item {
-  margin-bottom: 12px;
-  padding-bottom: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
   border-bottom: 1px solid #f1f3f4;
 }
 
@@ -617,14 +579,10 @@ body {
 }
 
 .project-header h4 {
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
-  color: #000000;
-  line-height: 1.2;
-}
-
-.project-header h4 strong {
-  font-weight: 700;
+  color: #2c3e50;
+  line-height: 1.3;
 }
 
 .project-link {
@@ -648,52 +606,45 @@ body {
 }
 
 .project-description {
-  font-size: 0.75rem;
-  line-height: 1.3;
-  color: #212529;
-  margin-bottom: 6px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #495057;
+  margin-bottom: 12px;
   font-weight: 400;
 }
 
 .project-tech {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-}
-
-.job-tech {
-  margin-top: 6px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
+  gap: 6px;
 }
 
 .tech-tag {
   background: #f8f9fa;
   color: #495057;
-  padding: 2px 6px;
-  border-radius: 10px;
-  font-size: 0.65rem;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
   border: 1px solid #dee2e6;
-  line-height: 1.1;
+  line-height: 1.2;
 }
 
 .job-competencies {
-  margin-top: 6px;
+  margin-top: 8px;
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 6px;
 }
 
 .competency-bubble {
   background: #667eea;
   color: white;
-  padding: 2px 6px;
-  border-radius: 10px;
-  font-size: 0.65rem;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
-  line-height: 1.1;
+  line-height: 1.2;
   display: inline-block;
 }
 
@@ -706,19 +657,19 @@ body {
 .interests-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 8px;
 }
 
 .interest-tag {
   background: #f8f9fa;
   color: #495057;
-  padding: 3px 8px;
-  border-radius: 12px;
-  font-size: 0.75rem;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 0.85rem;
   font-weight: 400;
   border: 1px solid #dee2e6;
   transition: all 0.2s ease;
-  line-height: 1.1;
+  line-height: 1.2;
 }
 
 .interest-tag:hover {
@@ -878,7 +829,7 @@ body {
   }
   
   @page {
-    margin: 18mm 18mm;
+    margin: 15mm 20mm;
     size: A4;
   }
   
@@ -896,8 +847,18 @@ body {
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
     print-color-adjust: exact;
-    padding: 25px 30px 20px 30px !important;
+    padding: 20px 0 15px 0 !important;
     page-break-after: avoid;
+  }
+  
+  .resume-main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  .left-column,
+  .right-column {
+    padding: 0 5mm !important;
   }
   
   .level-fill,
@@ -919,65 +880,44 @@ body {
   }
   
   .resume-main {
-    padding: 0 30px 25px 30px !important;
+    padding: 0 !important;
     margin: 0 !important;
   }
   
   .content-grid {
     display: block !important;
-    width: 100% !important;
+    gap: 0 !important;
   }
   
-  /* Ensure all sections have consistent spacing */
+  .left-column,
+  .right-column {
+    width: 100% !important;
+    float: none !important;
+  }
+  
   .resume-section {
-    margin-bottom: 12px !important;
-    margin-top: 0 !important;
-    padding-top: 18px !important;
+    margin-bottom: 18px !important;
     page-break-inside: avoid;
     orphans: 3;
     widows: 3;
   }
   
-  /* First section on page 1 needs less top spacing */
-  .resume-section:first-of-type {
-    padding-top: 0 !important;
-    page-break-before: avoid;
+  .resume-section:last-child {
+    margin-bottom: 0 !important;
   }
   
-  /* Section titles should stay with their content */
   .section-title {
-    margin-bottom: 8px !important;
-    padding-bottom: 4px !important;
     page-break-after: avoid;
-    orphans: 3;
-  }
-  
-  /* Items should stay together */
-  .project-item,
-  .certification-item {
     margin-bottom: 10px !important;
-    padding-bottom: 10px !important;
-    page-break-inside: avoid;
-    orphans: 2;
-    widows: 2;
   }
   
   .experience-item {
-    margin-bottom: 12px !important;
+    margin-bottom: 15px !important;
     page-break-inside: avoid;
     orphans: 3;
     widows: 3;
   }
   
-  .education-item {
-    margin-bottom: 10px !important;
-    padding-bottom: 10px !important;
-    page-break-inside: avoid;
-    orphans: 2;
-    widows: 2;
-  }
-  
-  /* Keep list items together with their headers */
   .experience-header {
     page-break-after: avoid;
   }
@@ -987,60 +927,68 @@ body {
   }
   
   .experience-details li {
-    margin-bottom: 2px !important;
-    line-height: 1.2 !important;
     page-break-inside: avoid;
+    margin-bottom: 4px !important;
   }
   
-  /* Compact spacing for tags */
+  .education-item {
+    margin-bottom: 12px !important;
+    padding-bottom: 12px !important;
+    page-break-inside: avoid;
+    orphans: 2;
+    widows: 2;
+  }
+  
+  .project-item,
+  .certification-item {
+    margin-bottom: 12px !important;
+    padding-bottom: 12px !important;
+    page-break-inside: avoid;
+    orphans: 2;
+    widows: 2;
+  }
+  
   .skills-grid {
-    gap: 12px !important;
+    gap: 15px !important;
   }
   
   .competencies-grid {
+    gap: 12px !important;
+  }
+  
+  .languages-list {
     gap: 10px !important;
   }
   
-  .languages-list,
-  .languages-list-horizontal {
-    gap: 6px !important;
-  }
-  
   .project-tech,
-  .job-tech {
-    gap: 3px !important;
-    margin-top: 4px !important;
+  .job-tech,
+  .job-competencies {
+    gap: 4px !important;
+    margin-top: 6px !important;
     page-break-before: avoid;
   }
   
-  .job-competencies {
-    gap: 3px !important;
-    margin-top: 4px !important;
-  }
-  
   .skill-tags {
-    gap: 4px !important;
+    gap: 5px !important;
   }
   
   .interests-list {
-    gap: 3px !important;
+    gap: 5px !important;
   }
   
-  .profile-image {
-    width: 60px !important;
-    height: 60px !important;
-  }
-  
-  /* Avoid page breaks after headers */
   h1, h2, h3, h4, h5, h6 {
     page-break-after: avoid;
     orphans: 3;
     widows: 3;
   }
   
-  /* Contact info should not break */
-  .contact-info-horizontal {
+  .contact-info {
+    page-break-inside: avoid;
+  }
+  
+  .key-courses {
     page-break-inside: avoid;
   }
 }
+
 

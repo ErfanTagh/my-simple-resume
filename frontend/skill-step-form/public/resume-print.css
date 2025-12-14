@@ -1,0 +1,454 @@
+/* ============================================================
+   CROSS-BROWSER PRINT STYLES
+   Tested on: Chrome, Firefox, Safari, Edge
+   ============================================================ */
+
+@media print {
+  /* ==================== BASE SETUP ==================== */
+  
+  body {
+    background: white !important;
+    margin: 0;
+    padding: 0;
+    /* Font smoothing - works across browsers */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow: visible !important;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+  
+  /* ==================== PAGE SETUP ==================== */
+  
+  @page {
+    margin: 18mm 18mm;
+    size: A4;
+  }
+  
+  /* First page - Safari and Firefox handle this differently */
+  @page :first {
+    margin-top: 15mm;
+  }
+  
+  /* ==================== CONTAINER ==================== */
+  
+  .resume-container {
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+    display: block !important;
+    position: relative;
+    /* Remove transforms - problematic in Safari */
+    transform: none !important;
+    -webkit-transform: none !important;
+  }
+  
+  /* ==================== HEADER ==================== */
+  
+  .resume-header {
+    background: white !important;
+    /* Color preservation - different property names for different browsers */
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    padding: 25px 30px 20px 30px !important;
+    /* Page break - old and new syntax for compatibility */
+    page-break-after: avoid;
+    break-after: avoid;
+    -webkit-column-break-after: avoid;
+  }
+  
+  .profile-image {
+    width: 60px !important;
+    height: 60px !important;
+    /* Ensure images print - Safari issue */
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    opacity: 1 !important;
+  }
+  
+  .contact-info {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+  }
+  
+  /* ==================== MAIN CONTENT ==================== */
+  
+  .resume-main {
+    padding: 0 30px 25px 30px !important;
+    margin: 0 !important;
+    transform: none !important;
+    -webkit-transform: none !important;
+  }
+  
+  .content-grid {
+    display: block !important;
+    width: 100% !important;
+  }
+  
+  /* ==================== SECTIONS ==================== */
+  
+  .resume-section {
+    margin-bottom: 12px !important;
+    margin-top: 0 !important;
+    padding-top: 18px !important;
+    /* Triple declaration for cross-browser support */
+    page-break-inside: avoid;
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    /* Orphans/widows - not supported in all browsers but doesn't hurt */
+    orphans: 3;
+    widows: 3;
+  }
+  
+  .resume-section:first-of-type {
+    padding-top: 0 !important;
+    page-break-before: avoid;
+    break-before: avoid;
+    -webkit-column-break-before: avoid;
+  }
+  
+  .section-title {
+    margin-bottom: 8px !important;
+    padding-bottom: 4px !important;
+    page-break-after: avoid;
+    break-after: avoid;
+    -webkit-column-break-after: avoid;
+    orphans: 3;
+  }
+  
+  /* ==================== WORK EXPERIENCE ==================== */
+  
+  .experience-item {
+    margin-bottom: 12px !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    orphans: 3;
+    widows: 3;
+  }
+  
+  .experience-header {
+    page-break-after: avoid;
+    break-after: avoid;
+    -webkit-column-break-after: avoid;
+  }
+  
+  .experience-details {
+    page-break-before: avoid;
+    break-before: avoid;
+    -webkit-column-break-before: avoid;
+  }
+  
+  .experience-details li {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    margin-bottom: 4px !important;
+    orphans: 2;
+    widows: 2;
+  }
+  
+  /* ==================== EDUCATION ==================== */
+  
+  .education-item {
+    margin-bottom: 10px !important;
+    padding-bottom: 10px !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    orphans: 2;
+    widows: 2;
+  }
+  
+  .key-courses {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+  }
+  
+  /* ==================== PROJECTS & CERTIFICATIONS ==================== */
+  
+  .project-item,
+  .certification-item {
+    margin-bottom: 10px !important;
+    padding-bottom: 10px !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    orphans: 2;
+    widows: 2;
+  }
+  
+  /* ==================== SKILLS & COMPETENCIES ==================== */
+  
+  /* Color preservation with multiple fallbacks */
+  .level-fill,
+  .competency-fill {
+    background-color: #667eea !important;
+    /* Multiple color-adjust properties for cross-browser support */
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    /* Fallback: Border in case background doesn't print (Safari issue) */
+    border: 2px solid #667eea !important;
+  }
+  
+  /* Grid fallbacks - Safari and Firefox handle flex/grid differently in print */
+  .skills-grid,
+  .competencies-grid,
+  .languages-list {
+    /* Force block layout - most reliable across browsers */
+    display: block !important;
+  }
+  
+  .skills-grid {
+    margin-bottom: 12px !important;
+  }
+  
+  .competencies-grid {
+    margin-bottom: 10px !important;
+  }
+  
+  .languages-list {
+    margin-bottom: 8px !important;
+  }
+  
+  /* Tag items - inline-block is most reliable for print */
+  .skill-tag,
+  .competency-item,
+  .language-item,
+  .interest-tag {
+    display: inline-block !important;
+    margin-right: 8px !important;
+    margin-bottom: 8px !important;
+    vertical-align: top;
+    /* Prevent breaks inside tags */
+    page-break-inside: avoid;
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+  }
+  
+  .skill-tags,
+  .interests-list {
+    display: block !important;
+    margin-top: 4px !important;
+  }
+  
+  /* Technology & competency tags */
+  .project-tech,
+  .job-tech,
+  .job-competencies {
+    display: block !important;
+    margin-top: 6px !important;
+    page-break-before: avoid;
+    break-before: avoid;
+    -webkit-column-break-before: avoid;
+  }
+  
+  .project-tech .skill-tag,
+  .job-tech .skill-tag,
+  .job-competencies .skill-tag {
+    margin-right: 6px !important;
+    margin-bottom: 6px !important;
+  }
+  
+  /* ==================== LINKS ==================== */
+  
+  a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+  
+  /* Optional: Show URLs for external links */
+  /* Commented out by default - uncomment if you want URLs printed */
+  /*
+  a[href^="http"]:not(.no-print-url)::after {
+    content: " (" attr(href) ")";
+    font-size: 0.7em;
+    color: #666;
+    word-break: break-all;
+  }
+  */
+  
+  /* Never show URLs for these elements */
+  a[href^="#"]::after,
+  .project-link::after,
+  .certification-link::after,
+  .skill-tag a::after,
+  .interest-tag a::after {
+    content: none !important;
+  }
+  
+  /* ==================== TYPOGRAPHY ==================== */
+  
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    break-after: avoid;
+    -webkit-column-break-after: avoid;
+    orphans: 3;
+    widows: 3;
+  }
+  
+  p, li {
+    orphans: 3;
+    widows: 3;
+  }
+  
+  /* ==================== REMOVE INTERACTIVE ELEMENTS ==================== */
+  
+  .no-print,
+  button,
+  .print-button,
+  .edit-button,
+  .delete-button,
+  [role="button"],
+  input[type="button"],
+  input[type="submit"] {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  
+  /* Remove all hover/focus states */
+  *:hover,
+  *:focus,
+  *:active {
+    transform: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+  
+  /* ==================== BROWSER-SPECIFIC FIXES ==================== */
+  
+  /* Safari: Fix margin collapsing */
+  .resume-section:first-child {
+    margin-top: 0 !important;
+  }
+  
+  .resume-main > *:last-child {
+    margin-bottom: 0 !important;
+  }
+  
+  /* Firefox: Ensure backgrounds print */
+  * {
+    -moz-print-color-adjust: exact;
+  }
+  
+  /* Safari & Firefox: Fix image rendering */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+    page-break-inside: avoid;
+    display: block;
+  }
+  
+  /* Edge: Fix flexbox issues */
+  .resume-container,
+  .resume-main,
+  .resume-section {
+    display: block !important;
+  }
+  
+  /* ==================== DARK MODE OVERRIDE ==================== */
+  
+  /* Force light mode - critical for Safari/Firefox dark mode */
+  @media (prefers-color-scheme: dark) {
+    * {
+      background: white !important;
+      color: black !important;
+    }
+    
+    body,
+    .resume-container,
+    .resume-header,
+    .resume-main {
+      background: white !important;
+      color: black !important;
+    }
+    
+    /* Preserve intentional colors */
+    .level-fill,
+    .competency-fill {
+      background-color: #667eea !important;
+      border: 2px solid #667eea !important;
+      color: white !important;
+    }
+    
+    .section-title {
+      border-bottom-color: #e5e7eb !important;
+    }
+  }
+  
+  /* ==================== WEBKIT-SPECIFIC (Safari) ==================== */
+  
+  @supports (-webkit-appearance: none) {
+    /* Safari: Fix text rendering */
+    * {
+      -webkit-text-size-adjust: 100%;
+    }
+    
+    /* Safari: Ensure backgrounds print */
+    * {
+      -webkit-print-color-adjust: exact !important;
+    }
+  }
+  
+  /* ==================== FIREFOX-SPECIFIC ==================== */
+  
+  @-moz-document url-prefix() {
+    /* Firefox: Fix page break issues */
+    .experience-item,
+    .education-item,
+    .project-item {
+      display: block !important;
+    }
+  }
+}
+
+/* ==================== PRINT-SPECIFIC UTILITY CLASSES ==================== */
+
+/* Force page break before element */
+.print-page-break {
+  page-break-before: always !important;
+  break-before: page !important;
+  -webkit-column-break-before: always !important;
+}
+
+/* Prevent any breaks within element */
+.print-keep-together {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+  -webkit-column-break-inside: avoid !important;
+}
+
+/* Hide element only in print */
+.print-hide {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Show element only in print */
+.print-only {
+  display: none;
+}
+
+@media print {
+  .print-only {
+    display: block !important;
+  }
+  
+  .print-only-inline {
+    display: inline !important;
+  }
+  
+  .print-only-inline-block {
+    display: inline-block !important;
+  }
+}

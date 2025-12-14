@@ -16,6 +16,8 @@ import ResetPassword from "./pages/ResetPassword";
 import Resumes from "./pages/Resumes";
 import CreateResume from "./pages/CreateResume";
 import ResumeView from "./pages/ResumeView";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,9 +34,9 @@ const LandingOrRedirect = () => {
 // Component to handle conditional rendering of Header (must be inside Router)
 const AppRoutes = () => {
   const location = useLocation();
-  // Don't show header on landing, login, signup, or resume view pages
+  // Don't show header on landing, login, signup, blog pages, or resume view pages
   const hideHeaderPaths = ['/', '/login', '/signup'];
-  const showHeader = !hideHeaderPaths.includes(location.pathname) && !location.pathname.startsWith('/resume/');
+  const showHeader = !hideHeaderPaths.includes(location.pathname) && !location.pathname.startsWith('/resume/') && !location.pathname.startsWith('/blog');
 
   return (
     <>
@@ -71,6 +73,8 @@ const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:id" element={<BlogPost />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
