@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   mongodb:
     image: mongo:6.0
@@ -52,12 +50,12 @@ services:
     build:
       context: ./frontend/skill-step-form
       dockerfile: Dockerfile.prod
+      args:
+        VITE_API_URL: https://${DOMAIN}/api
     container_name: resume_frontend
     restart: always
     expose:
       - "80"
-    environment:
-      - VITE_API_URL=https://${DOMAIN}/api
     volumes:
       - frontend_volume:/usr/share/nginx/html
     networks:

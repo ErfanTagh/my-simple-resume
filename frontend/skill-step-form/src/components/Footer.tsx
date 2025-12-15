@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import { FileText } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const Footer = () => {
+  const { t } = useLanguage();
   return (
-    <footer className="bg-card border-t border-border mt-auto">
+    <footer className="bg-card border-t border-border mt-auto no-print">
       <div className="container mx-auto max-w-6xl px-4 sm:px-6">
         {/* Main Footer Content */}
         <div className="py-12 sm:py-16 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
@@ -13,10 +15,10 @@ export const Footer = () => {
               <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
                 <FileText className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold text-foreground">123Resume</span>
+              <span className="text-xl font-bold text-foreground">{t('common.appName')}</span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-              Build professional, ATS-friendly resumes with AI-powered suggestions. Your dream career starts here.
+              {t('footer.tagline')}
             </p>
             <div className="flex items-center gap-3">
               <a href="#" className="w-9 h-9 rounded-lg bg-muted hover:bg-primary/10 hover:text-primary flex items-center justify-center transition-colors">
@@ -33,35 +35,35 @@ export const Footer = () => {
 
           {/* Product Column */}
           <div>
-            <h3 className="font-semibold text-foreground mb-4">Product</h3>
+            <h3 className="font-semibold text-foreground mb-4">{t('footer.product')}</h3>
             <ul className="space-y-3">
-              <li><Link to="/" className="text-sm text-muted-foreground hover:text-primary transition-colors">Home</Link></li>
-              <li><Link to="/create" className="text-sm text-muted-foreground hover:text-primary transition-colors">Resume Builder</Link></li>
-              <li><Link to="/resumes" className="text-sm text-muted-foreground hover:text-primary transition-colors">My Resumes</Link></li>
-              <li><Link to="/templates" className="text-sm text-muted-foreground hover:text-primary transition-colors">Templates</Link></li>
-              <li><Link to="/pricing" className="text-sm text-muted-foreground hover:text-primary transition-colors">Pricing</Link></li>
+              <li><Link to="/" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('footer.home')}</Link></li>
+              <li><Link to="/create" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('footer.resumeBuilder')}</Link></li>
+              <li><Link to="/resumes" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('footer.myResumes')}</Link></li>
+              <li><Link to="/templates" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('footer.templates')}</Link></li>
+              <li><Link to="/pricing" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('footer.pricing')}</Link></li>
             </ul>
           </div>
 
           {/* Company Column */}
           <div>
-            <h3 className="font-semibold text-foreground mb-4">Company</h3>
+            <h3 className="font-semibold text-foreground mb-4">{t('footer.company')}</h3>
             <ul className="space-y-3">
-              <li><Link to="/about" className="text-sm text-muted-foreground hover:text-primary transition-colors">About Us</Link></li>
-              <li><Link to="/blog" className="text-sm text-muted-foreground hover:text-primary transition-colors">Blog</Link></li>
-              <li><Link to="/careers" className="text-sm text-muted-foreground hover:text-primary transition-colors">Careers</Link></li>
-              <li><Link to="/contact" className="text-sm text-muted-foreground hover:text-primary transition-colors">Contact</Link></li>
+              <li><Link to="/about" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('footer.aboutUs')}</Link></li>
+              <li><Link to="/blog" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('footer.blog')}</Link></li>
+              <li><Link to="/careers" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('footer.careers')}</Link></li>
+              <li><Link to="/contact" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('footer.contact')}</Link></li>
             </ul>
           </div>
 
           {/* Legal Column */}
           <div>
-            <h3 className="font-semibold text-foreground mb-4">Legal</h3>
+            <h3 className="font-semibold text-foreground mb-4">{t('footer.legal')}</h3>
             <ul className="space-y-3">
-              <li><Link to="/privacy" className="text-sm text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link></li>
-              <li><Link to="/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors">Terms of Service</Link></li>
-              <li><Link to="/data-protection" className="text-sm text-muted-foreground hover:text-primary transition-colors">Data Protection</Link></li>
-              <li><Link to="/cookies" className="text-sm text-muted-foreground hover:text-primary transition-colors">Cookie Policy</Link></li>
+              <li><Link to="/privacy" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('footer.privacyPolicy')}</Link></li>
+              <li><Link to="/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('footer.termsOfService')}</Link></li>
+              <li><Link to="/data-protection" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('footer.dataProtection')}</Link></li>
+              <li><Link to="/cookies" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('footer.cookiePolicy')}</Link></li>
             </ul>
           </div>
         </div>
@@ -69,7 +71,7 @@ export const Footer = () => {
         {/* Bottom Bar */}
         <div className="py-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            © 2025 123Resume. All rights reserved.
+            {t('footer.allRightsReserved')}
           </p>
           <div className="flex items-center gap-6">
             <a href="mailto:contact@123resume.de" className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-2">

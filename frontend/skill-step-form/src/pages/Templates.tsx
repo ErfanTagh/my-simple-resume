@@ -3,22 +3,24 @@ import { FileText, Sparkles, Palette, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { LandingTemplatePreview } from "./LandingTemplatePreview";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Templates = () => {
+  const { t } = useLanguage();
   const templates = [
-    { name: 'Modern', key: 'modern' as const, description: 'Clean & Contemporary Design', icon: Sparkles },
-    { name: 'Classic', key: 'classic' as const, description: 'Traditional & Professional', icon: FileText },
-    { name: 'Creative', key: 'creative' as const, description: 'Bold & Eye-Catching', icon: Palette },
-    { name: 'Minimal', key: 'minimal' as const, description: 'Minimalist & Elegant', icon: Minus },
+    { name: t('resume.templates.modern'), key: 'modern' as const, description: t('landing.templateModernDesc'), icon: Sparkles },
+    { name: t('resume.templates.classic'), key: 'classic' as const, description: t('landing.templateClassicDesc'), icon: FileText },
+    { name: t('resume.templates.creative'), key: 'creative' as const, description: t('landing.templateCreativeDesc'), icon: Palette },
+    { name: t('resume.templates.minimal'), key: 'minimal' as const, description: t('landing.templateMinimalDesc'), icon: Minus },
   ];
 
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 sm:px-6 py-16 sm:py-24 max-w-6xl">
         <div className="text-center mb-12">
-          <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">Resume Templates</h1>
+          <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">{t('pages.templates.title')}</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Choose from our professionally designed templates. All templates are ATS-friendly and optimized for success.
+            {t('pages.templates.subtitle')}
           </p>
         </div>
 
@@ -36,22 +38,22 @@ const Templates = () => {
               <div className="flex items-start gap-3 mb-4">
                 <template.icon className="w-6 h-6 text-primary mt-1" />
                 <div>
-                  <h3 className="font-bold text-xl text-foreground mb-1">{template.name} Template</h3>
+                  <h3 className="font-bold text-xl text-foreground mb-1">{template.name} {t('pages.templates.template')}</h3>
                   <p className="text-sm text-muted-foreground">{template.description}</p>
                 </div>
               </div>
               <ul className="space-y-2 text-sm text-muted-foreground mb-4">
                 <li className="flex items-center gap-2">
                   <span className="text-primary">✓</span>
-                  <span>ATS-optimized formatting</span>
+                  <span>{t('pages.templates.atsOptimizedFormatting')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-primary">✓</span>
-                  <span>Professional design</span>
+                  <span>{t('pages.templates.professionalDesign')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-primary">✓</span>
-                  <span>Print-ready PDF export</span>
+                  <span>{t('pages.templates.pdfExport')}</span>
                 </li>
               </ul>
             </div>
@@ -61,7 +63,7 @@ const Templates = () => {
         <div className="text-center">
           <Link to="/create">
             <Button size="lg" className="bg-primary hover:bg-primary/90">
-              Start Building Your Resume
+              {t('pages.about.startBuilding')}
               <ArrowRight className="ml-2 w-4 h-4" />
             </Button>
           </Link>

@@ -7,12 +7,14 @@ import { Separator } from "@/components/ui/separator";
 import { MonthPicker } from "@/components/ui/month-picker";
 import { Plus, Trash2 } from "lucide-react";
 import { CVFormData } from "./types";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface EducationStepProps {
   form: UseFormReturn<CVFormData>;
 }
 
 const EducationItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: number }) => {
+  const { t } = useLanguage();
   const { fields: courseFields, append: appendCourse, remove: removeCourse } = useFieldArray({
     control: form.control,
     name: `education.${index}.keyCourses`,
@@ -21,32 +23,32 @@ const EducationItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index
   return (
     <>
       <div className="space-y-2">
-        <Label htmlFor={`education.${index}.degree`}>Degree *</Label>
+        <Label htmlFor={`education.${index}.degree`}>{t('resume.fields.degree')} *</Label>
         <Input
           {...form.register(`education.${index}.degree`)}
-          placeholder="Bachelor of Science"
+          placeholder={t('resume.placeholders.degree')}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor={`education.${index}.institution`}>Institution *</Label>
+        <Label htmlFor={`education.${index}.institution`}>{t('resume.fields.institution')} *</Label>
         <Input
           {...form.register(`education.${index}.institution`)}
-          placeholder="University Name"
+          placeholder={t('resume.placeholders.institution')}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor={`education.${index}.location`}>Location</Label>
+        <Label htmlFor={`education.${index}.location`}>{t('resume.fields.location')}</Label>
         <Input
           {...form.register(`education.${index}.location`)}
-          placeholder="Boston, USA"
+          placeholder={t('resume.placeholders.location')}
         />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div className="space-y-2">
-          <Label>Start Date</Label>
+          <Label>{t('resume.fields.startDate')}</Label>
           <Controller
             control={form.control}
             name={`education.${index}.startDate`}
@@ -54,14 +56,14 @@ const EducationItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index
               <MonthPicker
                 value={field.value}
                 onChange={field.onChange}
-                placeholder="Select start date"
+                placeholder={t('resume.placeholders.selectStartDate')}
               />
             )}
           />
         </div>
         
         <div className="space-y-2">
-          <Label>End Date</Label>
+          <Label>{t('resume.fields.endDate')}</Label>
           <Controller
             control={form.control}
             name={`education.${index}.endDate`}
@@ -69,7 +71,7 @@ const EducationItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index
               <MonthPicker
                 value={field.value}
                 onChange={field.onChange}
-                placeholder="Select end date"
+                placeholder={t('resume.placeholders.selectEndDate')}
               />
             )}
           />
@@ -77,24 +79,24 @@ const EducationItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor={`education.${index}.field`}>Field of Study</Label>
+        <Label htmlFor={`education.${index}.field`}>{t('resume.fields.field')}</Label>
         <Input
           {...form.register(`education.${index}.field`)}
-          placeholder="Computer Science"
+          placeholder={t('resume.placeholders.fieldOfStudy')}
         />
       </div>
 
       <div className="space-y-3">
         <div>
-          <Label>Key Courses</Label>
-          <p className="text-xs text-muted-foreground mt-1">Add notable courses you completed</p>
+          <Label>{t('resume.labels.keyCourses')}</Label>
+          <p className="text-xs text-muted-foreground mt-1">{t('resume.labels.keyCoursesHint')}</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {courseFields.map((field, courseIndex) => (
             <div key={field.id} className="flex gap-1">
               <Input
                 {...form.register(`education.${index}.keyCourses.${courseIndex}.course`)}
-                placeholder="e.g., Data Structures"
+                placeholder={t('resume.placeholders.course')}
                 className="text-sm"
               />
               {courseFields.length > 0 && (
@@ -118,7 +120,7 @@ const EducationItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index
           onClick={() => appendCourse({ course: "" })}
         >
           <Plus className="mr-1 h-3 w-3" />
-          Add Course
+          {t('resume.labels.addCourse')}
         </Button>
       </div>
     </>
@@ -126,6 +128,7 @@ const EducationItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index
 };
 
 export const EducationStep = ({ form }: EducationStepProps) => {
+  const { t } = useLanguage();
   const { fields: educationFields, append: appendEducation, remove: removeEducation } = useFieldArray({
     control: form.control,
     name: "education",
@@ -160,8 +163,8 @@ export const EducationStep = ({ form }: EducationStepProps) => {
       {/* Education Section */}
       <div>
         <div className="mb-4 sm:mb-6">
-          <h2 className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">Education</h2>
-          <p className="text-muted-foreground text-sm sm:text-base">Tell us about your educational background</p>
+          <h2 className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">{t('resume.steps.education')}</h2>
+          <p className="text-muted-foreground text-sm sm:text-base">{t('resume.labels.educationDesc')}</p>
         </div>
 
         {educationFields.map((field, index) => (
@@ -198,7 +201,7 @@ export const EducationStep = ({ form }: EducationStepProps) => {
             className="w-full"
           >
             <Plus className="mr-2 h-4 w-4" />
-            Add Another Education
+            {t('resume.actions.addAnotherEducation')}
           </Button>
         )}
       </div>
@@ -208,20 +211,20 @@ export const EducationStep = ({ form }: EducationStepProps) => {
       {/* Certificates Section */}
       <div>
         <div className="mb-4 sm:mb-6">
-          <h2 className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">Certificates & Licenses (Optional)</h2>
-          <p className="text-muted-foreground text-sm sm:text-base">Add your professional certifications and licenses - skip if not applicable</p>
+          <h2 className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">{t('resume.labels.certificatesTitle')}</h2>
+          <p className="text-muted-foreground text-sm sm:text-base">{t('resume.labels.certificatesDesc')}</p>
         </div>
 
         {certificateFields.length === 0 && (
           <div className="text-center py-8 border-2 border-dashed rounded-lg mb-4">
-            <p className="text-muted-foreground mb-4">No certificates added yet</p>
+            <p className="text-muted-foreground mb-4">{t('resume.labels.noCertificates')}</p>
             <Button
               type="button"
               variant="outline"
               onClick={() => appendCertificate({ name: "", organization: "", issueDate: "", expirationDate: "", credentialId: "", url: "" })}
             >
               <Plus className="mr-2 h-4 w-4" />
-              Add Your First Certificate
+              {t('resume.labels.addFirstCertificate')}
             </Button>
           </div>
         )}
@@ -239,24 +242,24 @@ export const EducationStep = ({ form }: EducationStepProps) => {
             </Button>
             
             <div className="space-y-2">
-              <Label htmlFor={`certificates.${index}.name`}>Certificate Name</Label>
+              <Label htmlFor={`certificates.${index}.name`}>{t('resume.fields.certificateName')}</Label>
               <Input
                 {...form.register(`certificates.${index}.name`)}
-                placeholder="AWS Certified Solutions Architect"
+                placeholder={t('resume.placeholders.certificateName')}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor={`certificates.${index}.organization`}>Issuing Organization</Label>
+              <Label htmlFor={`certificates.${index}.organization`}>{t('resume.labels.issuingOrganization')}</Label>
               <Input
                 {...form.register(`certificates.${index}.organization`)}
-                placeholder="Amazon Web Services"
+                placeholder={t('resume.placeholders.certOrg')}
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-2">
-                <Label>Issue Date</Label>
+                <Label>{t('resume.fields.issueDate')}</Label>
                 <Controller
                   control={form.control}
                   name={`certificates.${index}.issueDate`}
@@ -264,14 +267,14 @@ export const EducationStep = ({ form }: EducationStepProps) => {
                     <MonthPicker
                       value={field.value}
                       onChange={field.onChange}
-                      placeholder="Select issue date"
+                      placeholder={t('resume.placeholders.selectIssueDate')}
                     />
                   )}
                 />
               </div>
               
               <div className="space-y-2">
-                <Label>Expiration Date</Label>
+                <Label>{t('resume.labels.expirationDate')}</Label>
                 <Controller
                   control={form.control}
                   name={`certificates.${index}.expirationDate`}
@@ -279,7 +282,7 @@ export const EducationStep = ({ form }: EducationStepProps) => {
                     <MonthPicker
                       value={field.value}
                       onChange={field.onChange}
-                      placeholder="No expiration"
+                      placeholder={t('resume.placeholders.noExpiration')}
                     />
                   )}
                 />
@@ -287,7 +290,7 @@ export const EducationStep = ({ form }: EducationStepProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor={`certificates.${index}.credentialId`}>Credential ID</Label>
+              <Label htmlFor={`certificates.${index}.credentialId`}>{t('resume.labels.credentialId')}</Label>
               <Input
                 {...form.register(`certificates.${index}.credentialId`)}
                 placeholder="ABC123XYZ456"
@@ -295,7 +298,7 @@ export const EducationStep = ({ form }: EducationStepProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor={`certificates.${index}.url`}>Credential URL</Label>
+              <Label htmlFor={`certificates.${index}.url`}>{t('resume.labels.credentialUrl')}</Label>
               <Input
                 type="url"
                 {...form.register(`certificates.${index}.url`)}
@@ -318,7 +321,7 @@ export const EducationStep = ({ form }: EducationStepProps) => {
             className="w-full"
           >
             <Plus className="mr-2 h-4 w-4" />
-            Add Another Certificate
+            {t('resume.actions.addAnotherCertificate')}
           </Button>
         )}
       </div>

@@ -317,6 +317,17 @@
     visibility: hidden !important;
   }
   
+  /* ==================== HIDE HEADER AND FOOTER ==================== */
+  
+  /* Hide site header and footer when printing resume */
+  header:not(.resume-header),
+  footer,
+  .header,
+  .footer {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  
   /* Remove all hover/focus states */
   *:hover,
   *:focus,

@@ -8,12 +8,14 @@ import { CVFormData } from "./types";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { ResumeUpload } from "./ResumeUpload";
 import { Separator } from "@/components/ui/separator";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PersonalInfoStepProps {
   form: UseFormReturn<CVFormData>;
 }
 
 export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
+  const { t } = useLanguage();
   const { fields: interestFields, append: appendInterest, remove: removeInterest } = useFieldArray({
     control: form.control,
     name: "personalInfo.interests",
@@ -62,13 +64,13 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
     if (file) {
       // Check file size (max 2MB)
       if (file.size > 2 * 1024 * 1024) {
-        alert("Image size should be less than 2MB");
+        alert(t('resume.alerts.imageSizeError'));
         return;
       }
 
       // Check file type
       if (!file.type.startsWith("image/")) {
-        alert("Please upload an image file");
+        alert(t('resume.alerts.imageTypeError'));
         return;
       }
 
@@ -98,8 +100,8 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
   return (
     <div className="space-y-4 sm:space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
       <div>
-        <h2 className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">Personal Information</h2>
-        <p className="text-muted-foreground text-sm sm:text-base">Let's start with your basic details</p>
+        <h2 className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">{t('resume.steps.personalInfo')}</h2>
+        <p className="text-muted-foreground text-sm sm:text-base">{t('resume.steps.personalInfoDesc')}</p>
       </div>
 
       {/* Resume Upload Option */}
@@ -108,11 +110,11 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
       
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div className="space-y-2">
-          <Label htmlFor="firstName">First Name *</Label>
+          <Label htmlFor="firstName">{t('resume.fields.firstName')} *</Label>
           <Input
             id="firstName"
             {...form.register("personalInfo.firstName")}
-            placeholder="John"
+            placeholder={t('resume.placeholders.firstName')}
           />
           {form.formState.errors.personalInfo?.firstName && (
             <p className="text-sm text-destructive">
@@ -122,11 +124,11 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="lastName">Last Name *</Label>
+          <Label htmlFor="lastName">{t('resume.fields.lastName')} *</Label>
           <Input
             id="lastName"
             {...form.register("personalInfo.lastName")}
-            placeholder="Doe"
+            placeholder={t('resume.placeholders.lastName')}
           />
           {form.formState.errors.personalInfo?.lastName && (
             <p className="text-sm text-destructive">
@@ -137,16 +139,16 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="professionalTitle">Professional Title</Label>
+        <Label htmlFor="professionalTitle">{t('resume.fields.professionalTitle')}</Label>
         <Input
           id="professionalTitle"
           {...form.register("personalInfo.professionalTitle")}
-          placeholder="e.g., Web Application Developer, Software Engineer"
+          placeholder={t('resume.placeholders.professionalTitle')}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="profileImage">Profile Image</Label>
+        <Label htmlFor="profileImage">{t('resume.labels.profileImage')}</Label>
         <div className="flex flex-col gap-4">
           {imagePreview && (
             <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-border">
@@ -182,22 +184,22 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
               className="flex-1"
             >
               <Upload className="mr-2 h-4 w-4" />
-              {imagePreview ? "Change Image" : "Upload Image"}
+              {imagePreview ? t('resume.placeholders.changeImage') : t('resume.placeholders.uploadImage')}
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">
-            Upload a profile picture (JPG, PNG, max 2MB)
+            {t('resume.placeholders.imageHint')}
           </p>
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email">Email *</Label>
+        <Label htmlFor="email">{t('resume.fields.email')} *</Label>
         <Input
           id="email"
           type="email"
           {...form.register("personalInfo.email")}
-          placeholder="john.doe@example.com"
+          placeholder={t('resume.placeholders.email')}
         />
         {form.formState.errors.personalInfo?.email && (
           <p className="text-sm text-destructive">
@@ -208,31 +210,31 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div className="space-y-2">
-          <Label htmlFor="phone">Phone</Label>
+          <Label htmlFor="phone">{t('resume.fields.phone')}</Label>
           <Input
             id="phone"
             {...form.register("personalInfo.phone")}
-            placeholder="+1 (555) 000-0000"
+            placeholder={t('resume.placeholders.phone')}
           />
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="location">Location</Label>
+          <Label htmlFor="location">{t('resume.fields.location')}</Label>
           <Input
             id="location"
             {...form.register("personalInfo.location")}
-            placeholder="New York, USA"
+            placeholder={t('resume.placeholders.location')}
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="linkedin">LinkedIn Profile</Label>
+        <Label htmlFor="linkedin">{t('resume.fields.linkedin')}</Label>
         <Input
           id="linkedin"
           type="url"
           {...form.register("personalInfo.linkedin")}
-          placeholder="https://linkedin.com/in/yourprofile"
+          placeholder={t('resume.placeholders.linkedin')}
         />
         {form.formState.errors.personalInfo?.linkedin && (
           <p className="text-sm text-destructive">
@@ -243,12 +245,12 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div className="space-y-2">
-          <Label htmlFor="github">GitHub Profile</Label>
+          <Label htmlFor="github">{t('resume.fields.github')}</Label>
           <Input
             id="github"
             type="url"
             {...form.register("personalInfo.github")}
-            placeholder="https://github.com/yourusername"
+            placeholder={t('resume.placeholders.github')}
           />
           {form.formState.errors.personalInfo?.github && (
             <p className="text-sm text-destructive">
@@ -258,12 +260,12 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="website">Personal Website</Label>
+          <Label htmlFor="website">{t('resume.labels.personalWebsite')}</Label>
           <Input
             id="website"
             type="url"
             {...form.register("personalInfo.website")}
-            placeholder="https://yourwebsite.com"
+            placeholder={t('resume.placeholders.website')}
           />
           {form.formState.errors.personalInfo?.website && (
             <p className="text-sm text-destructive">
@@ -274,11 +276,11 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="summary">Professional Summary</Label>
+        <Label htmlFor="summary">{t('resume.sections.professionalSummary')}</Label>
         <Textarea
           id="summary"
           {...form.register("personalInfo.summary")}
-          placeholder="A brief overview of your professional background and goals..."
+          placeholder={t('resume.placeholders.summary')}
           rows={4}
           className="resize-none"
         />
@@ -286,8 +288,8 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
 
       <div className="space-y-4">
         <div>
-          <Label>Interests & Hobbies</Label>
-          <p className="text-xs text-muted-foreground mt-1">Add individual interests as keywords</p>
+          <Label>{t('resume.labels.interestsHobbies')}</Label>
+          <p className="text-xs text-muted-foreground mt-1">{t('resume.labels.interestsHint')}</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {interestFields.map((field, index) => (
@@ -295,7 +297,7 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
               <div className="flex-1 space-y-2">
                 <Input
                   {...form.register(`personalInfo.interests.${index}.interest`)}
-                  placeholder="e.g., Running, Cycling, Language Learning"
+                  placeholder={t('resume.placeholders.interests')}
                 />
               </div>
               {interestFields.length > 1 && (
@@ -318,7 +320,7 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
           className="w-full"
         >
           <Plus className="mr-2 h-4 w-4" />
-          Add Interest
+          {t('resume.actions.addInterest')}
         </Button>
       </div>
     </div>

@@ -11,11 +11,13 @@ import {
   Twitter,
   Linkedin
 } from "lucide-react";
-import { blogPosts } from "./Blog";
+import { getBlogPost, getBlogPosts } from "@/lib/blogPosts";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const BlogPost = () => {
   const { id } = useParams<{ id: string }>();
-  const post = blogPosts.find(p => p.id === id);
+  const { language, t } = useLanguage();
+  const post = getBlogPost(id || '', language);
   
   // Scroll to top when component mounts or id changes
   useEffect(() => {
@@ -26,9 +28,10 @@ const BlogPost = () => {
     return <Navigate to="/blog" replace />;
   }
 
-  const currentIndex = blogPosts.findIndex(p => p.id === id);
-  const prevPost = currentIndex > 0 ? blogPosts[currentIndex - 1] : null;
-  const nextPost = currentIndex < blogPosts.length - 1 ? blogPosts[currentIndex + 1] : null;
+  const allPosts = getBlogPosts(language);
+  const currentIndex = allPosts.findIndex(p => p.id === id);
+  const prevPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
+  const nextPost = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null;
 
   // Simple markdown-like rendering
   const renderContent = (content: string) => {
@@ -108,7 +111,7 @@ const BlogPost = () => {
             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary flex items-center justify-center">
               <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
             </div>
-            <span className="text-lg sm:text-xl font-bold text-foreground">123Resume</span>
+            <span className="text-lg sm:text-xl font-bold text-foreground">{t('common.appName')}</span>
           </Link>
           <div className="flex items-center gap-2 sm:gap-4">
             <Link to="/blog">
@@ -132,7 +135,7 @@ const BlogPost = () => {
         <div className="container mx-auto max-w-3xl">
           <Link to="/blog" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-6">
             <ArrowLeft className="w-4 h-4" />
-            Back to all articles
+            {t('common.back')}
           </Link>
           
           <div className="flex items-center gap-3 mb-4">
@@ -213,14 +216,14 @@ const BlogPost = () => {
         <div className="container mx-auto max-w-3xl">
           <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-2xl p-8 sm:p-12 border border-primary/20 text-center">
             <h3 className="text-2xl sm:text-3xl font-bold text-foreground mb-3">
-              Ready to Apply These Tips?
+              {t('blog.ctaTitle')}
             </h3>
             <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
-              Create a professional, ATS-friendly resume in minutes with our AI-powered builder
+              {t('blog.ctaSubtitle')}
             </p>
             <Link to="/create">
               <Button size="lg" className="bg-primary hover:bg-primary/90 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 rounded-xl">
-                Start Building Free
+                {t('navigation.startBuildingFree')}
                 <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
               </Button>
             </Link>
@@ -237,7 +240,7 @@ const BlogPost = () => {
                 <div className="p-4 sm:p-6 rounded-xl border border-border hover:border-primary/30 hover:bg-muted/50 transition-all">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                     <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                    Previous
+                    {t('common.previous')}
                   </div>
                   <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2">
                     {prevPost.title}
@@ -249,7 +252,7 @@ const BlogPost = () => {
               <Link to={`/blog/${nextPost.id}`} className="group sm:ml-auto">
                 <div className="p-4 sm:p-6 rounded-xl border border-border hover:border-primary/30 hover:bg-muted/50 transition-all text-right">
                   <div className="flex items-center justify-end gap-2 text-sm text-muted-foreground mb-2">
-                    Next
+                    {t('common.next')}
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                   <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2">

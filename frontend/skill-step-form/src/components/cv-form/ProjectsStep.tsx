@@ -6,12 +6,14 @@ import { Button } from "@/components/ui/button";
 import { MonthPicker } from "@/components/ui/month-picker";
 import { Plus, Trash2 } from "lucide-react";
 import { CVFormData } from "./types";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ProjectsStepProps {
   form: UseFormReturn<CVFormData>;
 }
 
 const ProjectItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: number }) => {
+  const { t } = useLanguage();
   const { fields: techFields, append: appendTech, remove: removeTech } = useFieldArray({
     control: form.control,
     name: `projects.${index}.technologies`,
@@ -20,18 +22,18 @@ const ProjectItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: 
   return (
     <>
       <div className="space-y-2">
-        <Label htmlFor={`projects.${index}.name`}>Project Name</Label>
+        <Label htmlFor={`projects.${index}.name`}>{t('resume.fields.projectName')}</Label>
         <Input
           {...form.register(`projects.${index}.name`)}
-          placeholder="E-commerce Platform"
+          placeholder={t('resume.placeholders.projectName')}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor={`projects.${index}.description`}>Description</Label>
+        <Label htmlFor={`projects.${index}.description`}>{t('resume.fields.description')}</Label>
         <Textarea
           {...form.register(`projects.${index}.description`)}
-          placeholder="Describe the project, your role, and key achievements..."
+          placeholder={t('resume.placeholders.projectDescription')}
           rows={3}
           className="resize-none"
         />
@@ -39,15 +41,15 @@ const ProjectItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: 
 
       <div className="space-y-3">
         <div>
-          <Label>Technologies Used</Label>
-          <p className="text-xs text-muted-foreground mt-1">Add technologies used in this project</p>
+          <Label>{t('resume.labels.technologies')}</Label>
+          <p className="text-xs text-muted-foreground mt-1">{t('resume.labels.technologiesHint')}</p>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {techFields.map((field, techIndex) => (
             <div key={field.id} className="flex gap-1">
               <Input
                 {...form.register(`projects.${index}.technologies.${techIndex}.technology`)}
-                placeholder="e.g., React"
+                placeholder={t('resume.placeholders.technology')}
                 className="text-sm"
               />
               {techFields.length > 0 && (
@@ -71,13 +73,13 @@ const ProjectItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: 
           onClick={() => appendTech({ technology: "" })}
         >
           <Plus className="mr-1 h-3 w-3" />
-          Add Technology
+          {t('resume.labels.addTechnology')}
         </Button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div className="space-y-2">
-          <Label>Start Date</Label>
+          <Label>{t('resume.fields.startDate')}</Label>
           <Controller
             control={form.control}
             name={`projects.${index}.startDate`}
@@ -85,14 +87,14 @@ const ProjectItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: 
               <MonthPicker
                 value={field.value}
                 onChange={field.onChange}
-                placeholder="Select start date"
+                placeholder={t('resume.placeholders.selectStartDate')}
               />
             )}
           />
         </div>
         
         <div className="space-y-2">
-          <Label>End Date</Label>
+          <Label>{t('resume.fields.endDate')}</Label>
           <Controller
             control={form.control}
             name={`projects.${index}.endDate`}
@@ -100,7 +102,7 @@ const ProjectItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: 
               <MonthPicker
                 value={field.value}
                 onChange={field.onChange}
-                placeholder="Present"
+                placeholder={t('resume.fields.present')}
               />
             )}
           />
@@ -108,7 +110,7 @@ const ProjectItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: 
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor={`projects.${index}.link`}>Project Link</Label>
+        <Label htmlFor={`projects.${index}.link`}>{t('resume.labels.projectLink')}</Label>
         <Input
           type="url"
           {...form.register(`projects.${index}.link`)}
@@ -125,6 +127,7 @@ const ProjectItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: 
 };
 
 export const ProjectsStep = ({ form }: ProjectsStepProps) => {
+  const { t } = useLanguage();
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "projects",
@@ -133,13 +136,13 @@ export const ProjectsStep = ({ form }: ProjectsStepProps) => {
   return (
     <div className="space-y-4 sm:space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
       <div>
-        <h2 className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">Projects (Optional)</h2>
-        <p className="text-muted-foreground text-sm sm:text-base">Showcase your notable projects and achievements - skip if not applicable</p>
+        <h2 className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">{t('resume.labels.projectsTitle')}</h2>
+        <p className="text-muted-foreground text-sm sm:text-base">{t('resume.labels.projectsDesc')}</p>
       </div>
 
       {fields.length === 0 && (
         <div className="text-center py-8 border-2 border-dashed rounded-lg">
-          <p className="text-muted-foreground mb-4">No projects added yet</p>
+          <p className="text-muted-foreground mb-4">{t('resume.labels.noProjects')}</p>
           <Button
             type="button"
             variant="outline"
@@ -153,7 +156,7 @@ export const ProjectsStep = ({ form }: ProjectsStepProps) => {
             })}
           >
             <Plus className="mr-2 h-4 w-4" />
-            Add Your First Project
+            {t('resume.labels.addFirstProject')}
           </Button>
         </div>
       )}
@@ -189,7 +192,7 @@ export const ProjectsStep = ({ form }: ProjectsStepProps) => {
           className="w-full"
         >
           <Plus className="mr-2 h-4 w-4" />
-          Add Another Project
+          {t('resume.actions.addAnotherProject')}
         </Button>
       )}
     </div>

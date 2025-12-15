@@ -1,12 +1,14 @@
 import { CVFormData } from "../types";
 import { Mail, Phone, MapPin, Linkedin, Github, Globe, Calendar } from "lucide-react";
 import { formatDateRange } from "@/lib/dateFormatter";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ClassicTemplateProps {
   data: CVFormData;
 }
 
 export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
+  const { t } = useLanguage();
   const { personalInfo, workExperience, education, projects, certificates, languages, skills, sectionOrder } = data;
   
   const defaultOrder = ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"];
@@ -17,7 +19,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
       case "summary":
         return personalInfo.summary ? (
           <div key="summary" className="mb-5">
-            <h2 className="text-base font-bold mb-2 text-foreground uppercase tracking-wide">Summary</h2>
+            <h2 className="text-base font-bold mb-2 text-foreground uppercase tracking-wide">{t('resume.sections.summary').toUpperCase()}</h2>
             <p className="text-sm text-foreground leading-relaxed">{personalInfo.summary}</p>
           </div>
         ) : null;
@@ -25,7 +27,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
       case "workExperience":
         return workExperience.some(exp => exp.position || exp.company) ? (
           <div key="workExperience" className="mb-5">
-            <h2 className="text-base font-bold mb-2 text-foreground uppercase tracking-wide">Work Experience</h2>
+            <h2 className="text-base font-bold mb-2 text-foreground uppercase tracking-wide">{t('resume.sections.workExperience').toUpperCase()}</h2>
             <div className="space-y-3">
               {workExperience.map((exp, index) => (
                 (exp.position || exp.company) && (
@@ -69,7 +71,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
       case "education":
         return education.some(edu => edu.degree || edu.institution) ? (
           <div key="education" className="mb-5">
-            <h2 className="text-base font-bold mb-2 text-foreground uppercase tracking-wide">Education</h2>
+            <h2 className="text-base font-bold mb-2 text-foreground uppercase tracking-wide">{t('resume.sections.education').toUpperCase()}</h2>
             <div className="space-y-3">
               {education.map((edu, index) => (
                 (edu.degree || edu.institution) && (
@@ -94,7 +96,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
       case "projects":
         return projects.some(proj => proj.name) ? (
           <div key="projects" className="mb-5">
-            <h2 className="text-base font-bold mb-2 text-foreground uppercase tracking-wide">Projects</h2>
+            <h2 className="text-base font-bold mb-2 text-foreground uppercase tracking-wide">{t('resume.sections.projects').toUpperCase()}</h2>
             <div className="space-y-3">
               {projects.map((proj, index) => (
                 proj.name && (
@@ -112,7 +114,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
                     )}
                     {proj.technologies && proj.technologies.length > 0 && (
                       <p className="text-xs text-muted-foreground mt-1">
-                        Technologies: {proj.technologies.map(t => t.technology).filter(Boolean).join(", ")}
+                        {t('resume.sections.technologies')}: {proj.technologies.map(techItem => techItem.technology).filter(Boolean).join(", ")}
                       </p>
                     )}
                   </div>
@@ -125,7 +127,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
       case "certificates":
         return certificates.some(cert => cert.name) ? (
           <div key="certificates" className="mb-5">
-            <h2 className="text-base font-bold mb-2 text-foreground uppercase tracking-wide">Certifications</h2>
+            <h2 className="text-base font-bold mb-2 text-foreground uppercase tracking-wide">{t('resume.sections.certifications').toUpperCase()}</h2>
             <div className="space-y-2">
               {certificates.map((cert, index) => (
                 cert.name && (
@@ -142,7 +144,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
       case "skills":
         return skills.some(s => s.skill) ? (
           <div key="skills" className="mb-5">
-            <h2 className="text-base font-bold mb-2 text-foreground uppercase tracking-wide">Skills</h2>
+            <h2 className="text-base font-bold mb-2 text-foreground uppercase tracking-wide">{t('resume.sections.skills').toUpperCase()}</h2>
             <p className="text-sm text-foreground">
               {skills.filter(s => s.skill).map(s => s.skill).join(" • ")}
             </p>
@@ -152,7 +154,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
       case "languages":
         return languages.some(lang => lang.language) ? (
           <div key="languages" className="mb-5">
-            <h2 className="text-base font-bold mb-2 text-foreground uppercase tracking-wide">Languages</h2>
+            <h2 className="text-base font-bold mb-2 text-foreground uppercase tracking-wide">{t('resume.sections.languages').toUpperCase()}</h2>
             <div className="space-y-1">
               {languages.map((lang, index) => (
                 lang.language && (
@@ -168,7 +170,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
       case "interests":
         return personalInfo.interests && personalInfo.interests.length > 0 && personalInfo.interests.some(i => i.interest) ? (
           <div key="interests" className="mb-5">
-            <h2 className="text-base font-bold mb-2 text-foreground uppercase tracking-wide">Interests</h2>
+            <h2 className="text-base font-bold mb-2 text-foreground uppercase tracking-wide">{t('resume.sections.interests').toUpperCase()}</h2>
             <p className="text-sm text-foreground">{personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}</p>
           </div>
         ) : null;

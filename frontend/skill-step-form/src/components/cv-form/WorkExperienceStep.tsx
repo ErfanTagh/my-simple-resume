@@ -7,12 +7,14 @@ import { Button } from "@/components/ui/button";
 import { MonthPicker } from "@/components/ui/month-picker";
 import { Plus, Trash2 } from "lucide-react";
 import { CVFormData } from "./types";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface WorkExperienceStepProps {
   form: UseFormReturn<CVFormData>;
 }
 
 const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: number }) => {
+  const { t } = useLanguage();
   const { fields: respFields, append: appendResp, remove: removeResp } = useFieldArray({
     control: form.control,
     name: `workExperience.${index}.responsibilities`,
@@ -31,32 +33,32 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
   return (
     <>
       <div className="space-y-2">
-        <Label htmlFor={`workExperience.${index}.position`}>Position *</Label>
+        <Label htmlFor={`workExperience.${index}.position`}>{t('resume.fields.position')} *</Label>
         <Input
           {...form.register(`workExperience.${index}.position`)}
-          placeholder="Software Engineer"
+          placeholder={t('resume.placeholders.position')}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor={`workExperience.${index}.company`}>Company *</Label>
+        <Label htmlFor={`workExperience.${index}.company`}>{t('resume.fields.company')} *</Label>
         <Input
           {...form.register(`workExperience.${index}.company`)}
-          placeholder="Tech Corp"
+          placeholder={t('resume.placeholders.company')}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor={`workExperience.${index}.location`}>Location</Label>
+        <Label htmlFor={`workExperience.${index}.location`}>{t('resume.fields.location')}</Label>
         <Input
           {...form.register(`workExperience.${index}.location`)}
-          placeholder="San Francisco, USA"
+          placeholder={t('resume.placeholders.jobLocation')}
         />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div className="space-y-2">
-          <Label>Start Date</Label>
+          <Label>{t('resume.fields.startDate')}</Label>
           <Controller
             control={form.control}
             name={`workExperience.${index}.startDate`}
@@ -64,14 +66,14 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
               <MonthPicker
                 value={field.value}
                 onChange={field.onChange}
-                placeholder="Select start date"
+                placeholder={t('resume.placeholders.selectStartDate')}
               />
             )}
           />
         </div>
         
         <div className="space-y-2">
-          <Label>End Date</Label>
+          <Label>{t('resume.fields.endDate')}</Label>
           <Controller
             control={form.control}
             name={`workExperience.${index}.endDate`}
@@ -79,7 +81,7 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
               <MonthPicker
                 value={field.value}
                 onChange={field.onChange}
-                placeholder="Select end date"
+                placeholder={t('resume.placeholders.selectEndDate')}
               />
             )}
           />
@@ -88,7 +90,7 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <Label>Key Responsibilities & Achievements</Label>
+          <Label>{t('resume.labels.keyResponsibilities')}</Label>
           <Button
             type="button"
             variant="outline"
@@ -97,7 +99,7 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
             className="h-8"
           >
             <Plus className="h-4 w-4 mr-1" />
-            Add
+            {t('resume.labels.add')}
           </Button>
         </div>
         <div className="space-y-2">
@@ -105,7 +107,7 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
             <div key={field.id} className="flex gap-2">
               <Input
                 {...form.register(`workExperience.${index}.responsibilities.${respIndex}.responsibility`)}
-                placeholder="e.g., Led development of microservices architecture"
+                placeholder={t('resume.placeholders.responsibility')}
                 className="flex-1"
               />
               <Button
@@ -156,21 +158,21 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
           onClick={() => appendTech({ technology: "" })}
         >
           <Plus className="mr-1 h-3 w-3" />
-          Add Technology
+          {t('resume.labels.addTechnology')}
         </Button>
       </div>
 
       <div className="space-y-3">
         <div>
-          <Label>Key Competencies</Label>
-          <p className="text-xs text-muted-foreground mt-1">Add key skills demonstrated in this role</p>
+          <Label>{t('resume.labels.keyCompetencies')}</Label>
+          <p className="text-xs text-muted-foreground mt-1">{t('resume.labels.competenciesHint')}</p>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {compFields.map((field, compIndex) => (
             <div key={field.id} className="flex gap-1">
               <Input
                 {...form.register(`workExperience.${index}.competencies.${compIndex}.competency`)}
-                placeholder="e.g., Teamwork"
+                placeholder={t('resume.placeholders.competency')}
                 className="text-sm"
               />
               {compFields.length > 0 && (
@@ -194,7 +196,7 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
           onClick={() => appendComp({ competency: "" })}
         >
           <Plus className="mr-1 h-3 w-3" />
-          Add Competency
+          {t('resume.labels.addCompetency')}
         </Button>
       </div>
     </>
@@ -202,6 +204,7 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
 };
 
 export const WorkExperienceStep = ({ form }: WorkExperienceStepProps) => {
+  const { t } = useLanguage();
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "workExperience",
@@ -252,8 +255,8 @@ export const WorkExperienceStep = ({ form }: WorkExperienceStepProps) => {
   return (
     <div className="space-y-4 sm:space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
       <div>
-        <h2 className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">Work Experience</h2>
-        <p className="text-muted-foreground text-sm sm:text-base">Add your professional experience</p>
+        <h2 className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">{t('resume.steps.workExperience')}</h2>
+        <p className="text-muted-foreground text-sm sm:text-base">{t('resume.steps.workExperienceDesc')}</p>
       </div>
 
       {fields.map((field, index) => (
@@ -292,7 +295,7 @@ export const WorkExperienceStep = ({ form }: WorkExperienceStepProps) => {
           className="w-full"
         >
           <Plus className="mr-2 h-4 w-4" />
-          Add Another Experience
+          {t('resume.actions.addExperience')}
         </Button>
       )}
     </div>

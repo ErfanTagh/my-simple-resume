@@ -1,11 +1,13 @@
 import { CVFormData } from "../types";
 import { Mail, Phone, MapPin, Linkedin, Github, Globe, Calendar } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ModernTemplateProps {
   data: CVFormData;
 }
 
 export const ModernTemplate = ({ data }: ModernTemplateProps) => {
+  const { t } = useLanguage();
   const { personalInfo, workExperience, education, projects, certificates, languages, skills, sectionOrder } = data;
   
   const defaultOrder = ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"];
@@ -16,7 +18,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
       case "summary":
         return personalInfo.summary ? (
           <div key="summary" className="mb-6">
-            <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">PROFESSIONAL SUMMARY</h2>
+            <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">{t('resume.sections.professionalSummary').toUpperCase()}</h2>
             <p className="text-sm text-foreground leading-relaxed">{personalInfo.summary}</p>
           </div>
         ) : null;
@@ -24,7 +26,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
       case "workExperience":
         return workExperience.some(exp => exp.position || exp.company) ? (
           <div key="workExperience" className="mb-6">
-            <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">EXPERIENCE</h2>
+            <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">{t('resume.sections.experience').toUpperCase()}</h2>
             <div className="space-y-4">
               {workExperience.map((exp, index) => (
                 (exp.position || exp.company) && (
@@ -37,7 +39,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                       {(exp.startDate || exp.endDate) && (
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Calendar className="h-3 w-3" />
-                          <span>{exp.startDate} - {exp.endDate || "Present"}</span>
+                          <span>{exp.startDate} - {exp.endDate || t('resume.fields.present')}</span>
                         </div>
                       )}
                     </div>
@@ -52,7 +54,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
       case "education":
         return education.some(edu => edu.degree || edu.institution) ? (
           <div key="education" className="mb-6">
-            <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">EDUCATION</h2>
+            <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">{t('resume.sections.education').toUpperCase()}</h2>
             <div className="space-y-3">
               {education.map((edu, index) => (
                 (edu.degree || edu.institution) && (
@@ -64,7 +66,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                         {edu.field && <p className="text-sm text-muted-foreground italic">{edu.field}</p>}
                       </div>
                       {(edu.startDate || edu.endDate) && (
-                        <span className="text-xs text-muted-foreground">{edu.startDate} - {edu.endDate || "Present"}</span>
+                        <span className="text-xs text-muted-foreground">{edu.startDate} - {edu.endDate || t('resume.fields.present')}</span>
                       )}
                     </div>
                   </div>
@@ -77,7 +79,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
       case "projects":
         return projects.some(proj => proj.name) ? (
           <div key="projects" className="mb-6">
-            <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">PROJECTS</h2>
+            <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">{t('resume.sections.projects').toUpperCase()}</h2>
             <div className="space-y-3">
               {projects.map((proj, index) => (
                 proj.name && (
@@ -99,7 +101,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
       case "certificates":
         return certificates.some(cert => cert.name) ? (
           <div key="certificates" className="mb-6">
-            <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">CERTIFICATIONS</h2>
+            <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">{t('resume.sections.certifications').toUpperCase()}</h2>
             <div className="space-y-2">
               {certificates.map((cert, index) => (
                 cert.name && (
@@ -116,7 +118,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
       case "skills":
         return skills.some(s => s.skill) ? (
           <div key="skills" className="mb-6">
-            <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">SKILLS</h2>
+            <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">{t('resume.sections.skills').toUpperCase()}</h2>
             <div className="flex flex-wrap gap-2">
               {skills.map((s, index) => (
                 s.skill && (
@@ -132,7 +134,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
       case "languages":
         return languages.some(lang => lang.language) ? (
           <div key="languages" className="mb-6">
-            <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">LANGUAGES</h2>
+            <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">{t('resume.sections.languages').toUpperCase()}</h2>
             <div className="grid grid-cols-2 gap-2">
               {languages.map((lang, index) => (
                 lang.language && (
@@ -149,7 +151,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
       case "interests":
         return personalInfo.interests && personalInfo.interests.length > 0 && personalInfo.interests.some(i => i.interest) ? (
           <div key="interests" className="mb-6">
-            <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">INTERESTS</h2>
+            <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">{t('resume.sections.interests').toUpperCase()}</h2>
             <p className="text-sm text-muted-foreground">{personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}</p>
           </div>
         ) : null;

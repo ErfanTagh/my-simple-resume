@@ -6,12 +6,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { Plus, Trash2 } from "lucide-react";
 import { CVFormData } from "./types";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface SkillsStepProps {
   form: UseFormReturn<CVFormData>;
 }
 
 export const SkillsStep = ({ form }: SkillsStepProps) => {
+  const { t } = useLanguage();
   const { fields: skillFields, append: appendSkill, remove: removeSkill } = useFieldArray({
     control: form.control,
     name: "skills",
@@ -22,21 +24,20 @@ export const SkillsStep = ({ form }: SkillsStepProps) => {
     name: "languages",
   });
 
-  const proficiencyLevels = [
-    "Native",
-    "Fluent",
-    "Advanced",
-    "Intermediate",
-    "Basic"
-  ];
+  const proficiencyLevels = ["Native", "Fluent", "Advanced", "Intermediate", "Basic"];
+  const getProficiencyTranslation = (level: string) => {
+    const key = level.toLowerCase();
+    const translation = t(`resume.proficiency.${key}`);
+    return translation !== `resume.proficiency.${key}` ? translation : level;
+  };
 
   return (
     <div className="space-y-4 sm:space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
       {/* Skills Section */}
       <div>
         <div className="mb-4 sm:mb-6">
-          <h2 className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">Skills</h2>
-          <p className="text-muted-foreground text-sm sm:text-base">Add your professional skills and competencies</p>
+          <h2 className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">{t('resume.steps.skills')}</h2>
+          <p className="text-muted-foreground text-sm sm:text-base">{t('resume.labels.skillsDesc')}</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
@@ -45,7 +46,7 @@ export const SkillsStep = ({ form }: SkillsStepProps) => {
               <div className="flex-1 space-y-2">
                 <Input
                   {...form.register(`skills.${index}.skill`)}
-                  placeholder="e.g., JavaScript, Project Management"
+                  placeholder={t('resume.placeholders.skill')}
                 />
               </div>
               {skillFields.length > 1 && (
@@ -69,7 +70,7 @@ export const SkillsStep = ({ form }: SkillsStepProps) => {
           className="w-full"
         >
           <Plus className="mr-2 h-4 w-4" />
-          Add Skill
+          {t('resume.actions.addSkill')}
         </Button>
       </div>
 
@@ -78,8 +79,8 @@ export const SkillsStep = ({ form }: SkillsStepProps) => {
       {/* Languages Section */}
       <div>
         <div className="mb-4 sm:mb-6">
-          <h2 className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">Languages</h2>
-          <p className="text-muted-foreground text-sm sm:text-base">What languages do you speak?</p>
+          <h2 className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">{t('resume.steps.languages')}</h2>
+          <p className="text-muted-foreground text-sm sm:text-base">{t('resume.labels.languagesDesc')}</p>
         </div>
 
         {languageFields.map((field, index) => (
@@ -98,26 +99,26 @@ export const SkillsStep = ({ form }: SkillsStepProps) => {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-2">
-                <Label htmlFor={`languages.${index}.language`}>Language *</Label>
+                <Label htmlFor={`languages.${index}.language`}>{t('resume.fields.language')} *</Label>
                 <Input
                   {...form.register(`languages.${index}.language`)}
-                  placeholder="English"
+                  placeholder={t('resume.fields.language')}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor={`languages.${index}.proficiency`}>Proficiency *</Label>
+                <Label htmlFor={`languages.${index}.proficiency`}>{t('resume.fields.proficiency')} *</Label>
                 <Select
                   onValueChange={(value) => form.setValue(`languages.${index}.proficiency`, value)}
                   value={field.proficiency || ""}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select level" />
+                    <SelectValue placeholder={t('resume.placeholders.selectLevel')} />
                   </SelectTrigger>
                   <SelectContent>
                     {proficiencyLevels.map((level) => (
                       <SelectItem key={level} value={level}>
-                        {level}
+                        {getProficiencyTranslation(level)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -134,7 +135,7 @@ export const SkillsStep = ({ form }: SkillsStepProps) => {
           className="w-full"
         >
           <Plus className="mr-2 h-4 w-4" />
-          Add Language
+          {t('resume.actions.addLanguage')}
         </Button>
       </div>
     </div>

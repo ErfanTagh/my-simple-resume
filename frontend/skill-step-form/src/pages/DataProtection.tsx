@@ -1,10 +1,13 @@
+import { useLanguage } from "@/contexts/LanguageContext";
+
 const DataProtection = () => {
+  const { t } = useLanguage();
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 sm:px-6 py-16 sm:py-24 max-w-4xl">
-        <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-8">Data Protection</h1>
+        <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-8">{t('pages.dataProtection.title')}</h1>
         <div className="prose prose-slate max-w-none space-y-6 text-muted-foreground">
-          <p className="text-sm text-muted-foreground/80">Last updated: December 2024</p>
+          <p className="text-sm text-muted-foreground/80">{t('pages.dataProtection.lastUpdated')}</p>
 
           <section>
             <h2 className="text-2xl font-semibold text-foreground mb-4">1. Data Controller</h2>

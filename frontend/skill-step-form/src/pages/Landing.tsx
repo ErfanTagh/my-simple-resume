@@ -12,9 +12,13 @@ import {
   BookOpen
 } from "lucide-react";
 import { LandingTemplatePreview } from "./LandingTemplatePreview";
-import { blogPosts } from "./Blog";
+import { getBlogPosts } from "@/lib/blogPosts";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useMemo } from "react";
 
 const Landing = () => {
+  const { language, t } = useLanguage();
+  const blogPosts = useMemo(() => getBlogPosts(language), [language]);
   return (
     <div className="min-h-screen bg-background overflow-hidden">
       {/* Hero Section */}
@@ -33,39 +37,39 @@ const Landing = () => {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-primary/10 border border-primary/20 text-xs sm:text-sm font-semibold text-primary animate-fade-in">
               <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              AI-Powered Resume Builder
+              {t('landing.badge')}
               <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             </div>
 
             {/* Headline */}
             <div className="space-y-2 animate-fade-in" style={{ animationDelay: '0.1s' }}>
               <h1 className="text-4xl sm:text-6xl md:text-8xl font-extrabold text-foreground leading-[1.1] tracking-tight">
-                Build Your Dream
+                {t('landing.headline1')}
               </h1>
               <h1 className="text-4xl sm:text-6xl md:text-8xl font-extrabold leading-[1.1] tracking-tight">
                 <span className="bg-gradient-to-r from-primary via-primary to-primary/70 bg-clip-text text-transparent">
-                  Resume in Minutes
+                  {t('landing.headline2')}
                 </span>
               </h1>
             </div>
 
             {/* Subheadline */}
             <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              Create professional, ATS-friendly resumes with AI-powered suggestions. 
-              <span className="text-foreground font-medium"> Stand out and land your dream job.</span>
+              {t('landing.subheadline').split(t('landing.subheadlineHighlight'))[0]}
+              <span className="text-foreground font-medium">{t('landing.subheadlineHighlight')}</span>
             </p>
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-5 pt-2 animate-fade-in" style={{ animationDelay: '0.3s' }}>
               <Link to="/create" className="w-full sm:w-auto">
                 <Button size="lg" className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-base sm:text-lg px-8 sm:px-10 py-6 sm:py-7 rounded-2xl shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 font-semibold">
-                  Start Building Free
+                  {t('landing.ctaStartBuilding')}
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
               <Link to="/login" className="w-full sm:w-auto">
                 <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-6 sm:py-7 rounded-2xl border-2 hover:bg-accent hover:-translate-y-0.5 transition-all duration-300 font-semibold">
-                  Log In
+                  {t('landing.ctaLogin')}
                 </Button>
               </Link>
             </div>
@@ -75,10 +79,10 @@ const Landing = () => {
           <div className="mt-12 sm:mt-20">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto">
               {[
-                { name: 'Modern', key: 'modern' as const, description: 'Clean & Contemporary Design' },
-                { name: 'Classic', key: 'classic' as const, description: 'Traditional & Professional' },
-                { name: 'Creative', key: 'creative' as const, description: 'Bold & Eye-Catching' },
-                { name: 'Minimal', key: 'minimal' as const, description: 'Minimalist & Elegant' }
+                { nameKey: 'templateModern', descKey: 'templateModernDesc', key: 'modern' as const },
+                { nameKey: 'templateClassic', descKey: 'templateClassicDesc', key: 'classic' as const },
+                { nameKey: 'templateCreative', descKey: 'templateCreativeDesc', key: 'creative' as const },
+                { nameKey: 'templateMinimal', descKey: 'templateMinimalDesc', key: 'minimal' as const }
               ].map((template, i) => (
                 <div
                   key={template.key}
@@ -91,8 +95,8 @@ const Landing = () => {
                     </div>
                   </div>
                   <div className="space-y-1 pt-1">
-                    <h3 className="font-bold text-base sm:text-lg" style={{ color: 'hsl(215 25% 15%)' }}>{template.name} Template</h3>
-                    <p className="text-xs sm:text-sm font-medium" style={{ color: 'hsl(214 95% 45%)' }}>{template.description}</p>
+                    <h3 className="font-bold text-base sm:text-lg" style={{ color: 'hsl(215 25% 15%)' }}>{t(`landing.${template.nameKey}`)} {t('landing.templateLabel')}</h3>
+                    <p className="text-xs sm:text-sm font-medium" style={{ color: 'hsl(214 95% 45%)' }}>{t(`landing.${template.descKey}`)}</p>
                   </div>
                 </div>
               ))}
@@ -106,10 +110,10 @@ const Landing = () => {
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-10 sm:mb-16">
             <h2 className="text-2xl sm:text-4xl font-bold text-foreground mb-3 sm:mb-4">
-              Everything You Need to Succeed
+              {t('landing.featuresTitle')}
             </h2>
             <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
-              Our powerful features help you create the perfect resume in no time
+              {t('landing.featuresSubtitle')}
             </p>
           </div>
 
@@ -117,44 +121,44 @@ const Landing = () => {
             {[
               {
                 icon: Layout,
-                title: "Multiple Templates",
-                description: "Choose from 4 professionally designed templates that suit your style"
+                titleKey: "featureMultipleTemplates",
+                descKey: "featureMultipleTemplatesDesc"
               },
               {
                 icon: Sparkles,
-                title: "AI-Powered Rating",
-                description: "Get instant feedback and suggestions to improve your resume"
+                titleKey: "featureAIRating",
+                descKey: "featureAIRatingDesc"
               },
               {
                 icon: Zap,
-                title: "Quick & Easy",
-                description: "Build your resume step-by-step with our intuitive form wizard"
+                titleKey: "featureQuickEasy",
+                descKey: "featureQuickEasyDesc"
               },
               {
                 icon: Download,
-                title: "Export Anywhere",
-                description: "Download your resume as PDF ready for any application"
+                titleKey: "featureExportAnywhere",
+                descKey: "featureExportAnywhereDesc"
               },
               {
                 icon: CheckCircle2,
-                title: "ATS Optimized",
-                description: "Ensure your resume passes Applicant Tracking Systems"
+                titleKey: "featureATSOptimized",
+                descKey: "featureATSOptimizedDesc"
               },
               {
                 icon: Star,
-                title: "Save & Edit",
-                description: "Store multiple versions and come back to edit anytime"
+                titleKey: "featureSaveEdit",
+                descKey: "featureSaveEditDesc"
               }
             ].map((feature, i) => (
               <div
-                key={feature.title}
+                key={feature.titleKey}
                 className="p-4 sm:p-6 rounded-2xl bg-card border border-border hover:border-primary/30 transition-all group"
               >
                 <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-3 sm:mb-4 group-hover:bg-primary/20 transition-colors">
                   <feature.icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                 </div>
-                <h3 className="text-lg sm:text-xl font-semibold text-card-foreground mb-1 sm:mb-2">{feature.title}</h3>
-                <p className="text-sm sm:text-base text-muted-foreground">{feature.description}</p>
+                <h3 className="text-lg sm:text-xl font-semibold text-card-foreground mb-1 sm:mb-2">{t(`landing.${feature.titleKey}`)}</h3>
+                <p className="text-sm sm:text-base text-muted-foreground">{t(`landing.${feature.descKey}`)}</p>
               </div>
             ))}
           </div>
@@ -166,26 +170,26 @@ const Landing = () => {
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-10 sm:mb-16">
             <h2 className="text-2xl sm:text-4xl font-bold text-foreground mb-3 sm:mb-4">
-              How It Works
+              {t('landing.howItWorksTitle')}
             </h2>
             <p className="text-base sm:text-lg text-muted-foreground">
-              Three simple steps to your perfect resume
+              {t('landing.howItWorksSubtitle')}
             </p>
           </div>
 
           <div className="space-y-8 sm:space-y-12">
             {[
-              { step: 1, title: "Fill in your details", description: "Enter your personal info, experience, education, and skills" },
-              { step: 2, title: "Choose a template", description: "Pick from our professional templates that match your style" },
-              { step: 3, title: "Download & Apply", description: "Export your resume and start applying to your dream jobs" }
+              { step: 1, titleKey: "step1Title", descKey: "step1Desc" },
+              { step: 2, titleKey: "step2Title", descKey: "step2Desc" },
+              { step: 3, titleKey: "step3Title", descKey: "step3Desc" }
             ].map((item, i) => (
               <div key={item.step} className="flex items-start sm:items-center gap-4 sm:gap-8">
                 <div className="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xl sm:text-2xl font-bold">
                   {item.step}
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-1">{item.title}</h3>
-                  <p className="text-sm sm:text-base text-muted-foreground">{item.description}</p>
+                  <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-1">{t(`landing.${item.titleKey}`)}</h3>
+                  <p className="text-sm sm:text-base text-muted-foreground">{t(`landing.${item.descKey}`)}</p>
                 </div>
               </div>
             ))}
@@ -194,7 +198,7 @@ const Landing = () => {
           <div className="text-center mt-12 sm:mt-16">
             <Link to="/create">
               <Button size="lg" className="bg-primary hover:bg-primary/90 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 rounded-xl">
-                Start Building Now
+                {t('landing.ctaStartBuildingNow')}
                 <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
               </Button>
             </Link>
@@ -208,13 +212,13 @@ const Landing = () => {
           <div className="text-center mb-10 sm:mb-16">
             <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-accent border border-border text-xs sm:text-sm font-medium text-accent-foreground mb-4">
               <BookOpen className="w-3 h-3 sm:w-4 sm:h-4" />
-              Career Insights
+              {t('landing.blogSectionBadge')}
             </div>
             <h2 className="text-2xl sm:text-4xl font-bold text-foreground mb-3 sm:mb-4">
-              Resume Tips & Career Advice
+              {t('landing.blogSectionTitle')}
             </h2>
             <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
-              Expert guidance to help you land your dream job faster
+              {t('landing.blogSectionSubtitle')}
             </p>
           </div>
 
@@ -283,7 +287,7 @@ const Landing = () => {
           <div className="text-center mt-10 sm:mt-12">
             <Link to="/blog">
               <Button variant="outline" size="lg" className="rounded-xl px-6 sm:px-8">
-                View All Articles
+                {t('landing.viewAllArticles')}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </Link>

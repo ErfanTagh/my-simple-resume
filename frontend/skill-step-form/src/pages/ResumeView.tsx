@@ -5,10 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ArrowLeft, AlertCircle, Printer, Download } from 'lucide-react';
 import { downloadResumePDFFromElement } from '@/lib/resumePdfUtils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function ResumeView() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [resume, setResume] = useState<Resume | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -130,15 +132,15 @@ export default function ResumeView() {
         <div style={{ maxWidth: '210mm', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Button variant="outline" onClick={() => navigate('/resumes')}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
+            {t('common.back')}
           </Button>
           <Button onClick={handlePrint} variant="outline">
             <Printer className="mr-2 h-4 w-4" />
-            Print
+            {t('common.print')}
           </Button>
           <Button onClick={handleDownloadPDF}>
             <Download className="mr-2 h-4 w-4" />
-            Download PDF
+            {t('common.downloadPDF')}
           </Button>
         </div>
       </div>
@@ -166,7 +168,7 @@ export default function ResumeView() {
           {/* Professional Summary Section */}
           {personalInfo.summary && personalInfo.summary.trim() && (
             <section className="resume-section">
-              <h3 className="section-title">Professional Summary</h3>
+              <h3 className="section-title">{t('resume.sections.professionalSummary')}</h3>
               <p style={{ fontSize: '0.9em', lineHeight: '1.5', color: '#495057' }}>
                 {personalInfo.summary}
               </p>
@@ -175,34 +177,34 @@ export default function ResumeView() {
 
           {/* Contact Section */}
           <section className="resume-section">
-            <h3 className="section-title">Contact</h3>
+            <h3 className="section-title">{t('resume.sections.contact')}</h3>
             <div className="contact-info">
               {personalInfo.phone && (
                 <div className="contact-item">
-                  <span>Phone: {personalInfo.phone}</span>
+                  <span>{t('resume.fields.phone')}: {personalInfo.phone}</span>
                 </div>
               )}
               <div className="contact-item">
-                <span>Email: {personalInfo.email}</span>
+                <span>{t('resume.fields.email')}: {personalInfo.email}</span>
               </div>
               {personalInfo.location && (
                 <div className="contact-item">
-                  <span>Location: {personalInfo.location}</span>
+                  <span>{t('resume.fields.location')}: {personalInfo.location}</span>
                 </div>
               )}
               {personalInfo.github && (
                 <div className="contact-item">
-                  <span>GitHub: <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="contact-link">{personalInfo.github}</a></span>
+                  <span>{t('resume.fields.github')}: <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="contact-link">{personalInfo.github}</a></span>
                 </div>
               )}
               {personalInfo.linkedin && (
                 <div className="contact-item">
-                  <span>LinkedIn: <a href={personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="contact-link">{personalInfo.linkedin}</a></span>
+                  <span>{t('resume.fields.linkedin')}: <a href={personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="contact-link">{personalInfo.linkedin}</a></span>
                 </div>
               )}
               {personalInfo.website && (
                 <div className="contact-item">
-                  <span>Website: <a href={personalInfo.website} target="_blank" rel="noopener noreferrer" className="contact-link">{personalInfo.website}</a></span>
+                  <span>{t('resume.fields.website')}: <a href={personalInfo.website} target="_blank" rel="noopener noreferrer" className="contact-link">{personalInfo.website}</a></span>
                 </div>
               )}
             </div>
@@ -212,7 +214,7 @@ export default function ResumeView() {
           {resume.education && resume.education.length > 0 && 
            resume.education.some((edu) => edu.degree || edu.institution) && (
             <section className="resume-section">
-              <h3 className="section-title">Education</h3>
+              <h3 className="section-title">{t('resume.sections.education')}</h3>
               {resume.education.filter((edu) => edu.degree || edu.institution).map((edu, index) => (
                 <div key={index} className="education-item">
                   <h4><strong>{edu.degree}</strong></h4>
@@ -220,7 +222,7 @@ export default function ResumeView() {
                     <p className="institution"><strong>{edu.institution}</strong></p>
                     {(edu.startDate || edu.endDate) && (
                       <p className="period">
-                        {edu.startDate} - {edu.endDate || 'Present'}
+                        {edu.startDate} - {edu.endDate || t('resume.fields.present')}
                       </p>
                     )}
                   </div>
@@ -246,7 +248,7 @@ export default function ResumeView() {
           {resume.workExperience && resume.workExperience.length > 0 && 
            resume.workExperience.some((exp) => exp.position || exp.company) && (
             <section className="resume-section">
-              <h3 className="section-title">Work Experience</h3>
+              <h3 className="section-title">{t('resume.sections.workExperience')}</h3>
               {resume.workExperience.filter((exp) => exp.position || exp.company).map((exp, index) => (
                 <div key={index} className="experience-item">
                   <div className="experience-header">
@@ -256,7 +258,7 @@ export default function ResumeView() {
                     <span className="company"><strong>{exp.company}</strong></span>
                     {(exp.startDate || exp.endDate) && (
                       <span className="period">
-                        {exp.startDate} - {exp.endDate || 'Present'}
+                        {exp.startDate} - {exp.endDate || t('resume.fields.present')}
                       </span>
                     )}
                   </div>
@@ -301,14 +303,14 @@ export default function ResumeView() {
           {resume.projects && resume.projects.length > 0 && 
            resume.projects.some((project) => project.name && project.name.trim()) && (
             <section className="resume-section">
-              <h3 className="section-title">Projects</h3>
+              <h3 className="section-title">{t('resume.sections.projects')}</h3>
               {resume.projects.filter((project) => project.name && project.name.trim()).map((project, index) => (
                 <div key={index} className="project-item">
                   <div className="project-header">
                     <h4><strong>{project.name}</strong></h4>
                     {project.link && (
                       <a href={project.link} target="_blank" rel="noopener noreferrer" className="project-link">
-                        View Project
+                        {t('resume.labels.viewProject')}
                       </a>
                     )}
                   </div>
@@ -334,7 +336,7 @@ export default function ResumeView() {
           {resume.certificates && resume.certificates.length > 0 && 
            resume.certificates.some((cert) => cert.name && cert.name.trim()) && (
             <section className="resume-section">
-              <h3 className="section-title">Certifications</h3>
+              <h3 className="section-title">{t('resume.sections.certifications')}</h3>
               {resume.certificates.filter((cert) => cert.name && cert.name.trim()).map((cert, index) => (
                 <div key={index} className="certification-item">
                   <div className="certification-header">
@@ -348,7 +350,7 @@ export default function ResumeView() {
                   )}
                   {cert.url && (
                     <a href={cert.url} target="_blank" rel="noopener noreferrer" className="certification-link">
-                      View Certificate
+                      {t('resume.labels.viewCertificate')}
                     </a>
                   )}
                 </div>
@@ -359,7 +361,7 @@ export default function ResumeView() {
           {/* Skills Section */}
           {resume.skills && resume.skills.length > 0 && (
             <section className="resume-section">
-              <h3 className="section-title">Skills</h3>
+              <h3 className="section-title">{t('resume.sections.skills')}</h3>
               <div className="skill-tags">
                 {resume.skills
                   .filter((skillObj) => skillObj.skill && skillObj.skill.trim())
@@ -374,7 +376,7 @@ export default function ResumeView() {
           {resume.languages && resume.languages.length > 0 && 
            resume.languages.some((lang) => lang.language && lang.language.trim()) && (
             <section className="resume-section">
-              <h3 className="section-title">Languages</h3>
+              <h3 className="section-title">{t('resume.sections.languages')}</h3>
               <div className="languages-list">
                 {resume.languages
                   .filter((lang) => lang.language && lang.language.trim())
@@ -392,7 +394,7 @@ export default function ResumeView() {
           {personalInfo.interests && personalInfo.interests.length > 0 && 
            personalInfo.interests.some((interest) => interest.interest && interest.interest.trim()) && (
             <section className="resume-section">
-              <h3 className="section-title">Interests</h3>
+              <h3 className="section-title">{t('resume.sections.interests')}</h3>
               <div className="interests-list">
                 {personalInfo.interests
                   .filter((interest) => interest.interest && interest.interest.trim())
@@ -419,11 +421,14 @@ export default function ResumeView() {
             margin: 0;
           }
         }
-        /* Global print styles - hide header site-wide when printing */
+        /* Global print styles - hide header and footer site-wide when printing */
         @media print {
-          header.no-print,
-          .no-print {
+          header:not(.resume-header),
+          footer,
+          .no-print,
+          header.no-print {
             display: none !important;
+            visibility: hidden !important;
           }
         }
       `}</style>

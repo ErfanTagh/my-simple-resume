@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   mongodb:
     image: mongo:6.0
@@ -44,7 +42,7 @@ services:
       - resume-network
 
   frontend:
-    image: node:18-alpine
+    build: ./frontend/skill-step-form
     container_name: resume_frontend
     restart: always
     working_dir: /app

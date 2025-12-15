@@ -1,11 +1,13 @@
 import { CVFormData } from "../types";
 import { formatDateRange } from "@/lib/dateFormatter";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface MinimalTemplateProps {
   data: CVFormData;
 }
 
 export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
+  const { t } = useLanguage();
   const { personalInfo, workExperience, education, projects, certificates, languages, skills, sectionOrder } = data;
   
   const defaultOrder = ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"];
@@ -23,7 +25,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
       case "workExperience":
         return workExperience.some(exp => exp.position || exp.company) ? (
           <div key="workExperience" className="mb-8">
-            <h2 className="text-xs font-bold mb-4 text-foreground uppercase tracking-widest">Experience</h2>
+            <h2 className="text-xs font-bold mb-4 text-foreground uppercase tracking-widest">{t('resume.sections.experience').toUpperCase()}</h2>
             <div className="space-y-5">
               {workExperience.map((exp, index) => (
                 (exp.position || exp.company) && (
@@ -67,7 +69,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
       case "education":
         return education.some(edu => edu.degree || edu.institution) ? (
           <div key="education" className="mb-8">
-            <h2 className="text-xs font-bold mb-4 text-foreground uppercase tracking-widest">Education</h2>
+            <h2 className="text-xs font-bold mb-4 text-foreground uppercase tracking-widest">{t('resume.sections.education').toUpperCase()}</h2>
             <div className="space-y-4">
               {education.map((edu, index) => (
                 (edu.degree || edu.institution) && (
@@ -92,7 +94,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
       case "projects":
         return projects.some(proj => proj.name) ? (
           <div key="projects" className="mb-8">
-            <h2 className="text-xs font-bold mb-4 text-foreground uppercase tracking-widest">Projects</h2>
+            <h2 className="text-xs font-bold mb-4 text-foreground uppercase tracking-widest">{t('resume.sections.projects').toUpperCase()}</h2>
             <div className="space-y-4">
               {projects.map((proj, index) => (
                 proj.name && (
@@ -110,7 +112,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                     )}
                     {proj.technologies && proj.technologies.length > 0 && (
                       <p className="text-xs text-muted-foreground mt-1">
-                        {proj.technologies.map(t => t.technology).filter(Boolean).join(", ")}
+                        {t('resume.sections.technologies')}: {proj.technologies.map(techItem => techItem.technology).filter(Boolean).join(", ")}
                       </p>
                     )}
                   </div>
@@ -123,7 +125,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
       case "certificates":
         return certificates.some(cert => cert.name) ? (
           <div key="certificates" className="mb-8">
-            <h2 className="text-xs font-bold mb-4 text-foreground uppercase tracking-widest">Certifications</h2>
+            <h2 className="text-xs font-bold mb-4 text-foreground uppercase tracking-widest">{t('resume.sections.certifications').toUpperCase()}</h2>
             <div className="space-y-3">
               {certificates.map((cert, index) => (
                 cert.name && (
@@ -140,7 +142,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
       case "skills":
         return skills.some(s => s.skill) ? (
           <div key="skills" className="mb-8">
-            <h2 className="text-xs font-bold mb-4 text-foreground uppercase tracking-widest">Skills</h2>
+            <h2 className="text-xs font-bold mb-4 text-foreground uppercase tracking-widest">{t('resume.sections.skills').toUpperCase()}</h2>
             <p className="text-xs text-foreground leading-relaxed">
               {skills.filter(s => s.skill).map(s => s.skill).join(", ")}
             </p>
@@ -150,7 +152,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
       case "languages":
         return languages.some(lang => lang.language) ? (
           <div key="languages" className="mb-8">
-            <h2 className="text-xs font-bold mb-4 text-foreground uppercase tracking-widest">Languages</h2>
+            <h2 className="text-xs font-bold mb-4 text-foreground uppercase tracking-widest">{t('resume.sections.languages').toUpperCase()}</h2>
             <div className="space-y-1">
               {languages.map((lang, index) => (
                 lang.language && (
@@ -166,7 +168,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
       case "interests":
         return personalInfo.interests && personalInfo.interests.length > 0 && personalInfo.interests.some(i => i.interest) ? (
           <div key="interests" className="mb-8">
-            <h2 className="text-xs font-bold mb-4 text-foreground uppercase tracking-widest">Interests</h2>
+            <h2 className="text-xs font-bold mb-4 text-foreground uppercase tracking-widest">{t('resume.sections.interests').toUpperCase()}</h2>
             <p className="text-xs text-foreground leading-relaxed">{personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}</p>
           </div>
         ) : null;

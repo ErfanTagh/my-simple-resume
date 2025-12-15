@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { 
   BookOpen, 
@@ -8,7 +8,10 @@ import {
   Search
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { getBlogPosts } from "@/lib/blogPosts";
 
+// Legacy export for backwards compatibility (will be removed)
 export const blogPosts = [
   {
     id: "resume-mistakes",
@@ -391,6 +394,9 @@ Both documents serve different purposes. The resume provides facts and figures; 
 ];
 
 const Blog = () => {
+  const { language, t } = useLanguage();
+  const blogPosts = useMemo(() => getBlogPosts(language), [language]);
+  
   // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -403,20 +409,20 @@ const Blog = () => {
         <div className="container mx-auto max-w-4xl text-center">
           <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-accent border border-border text-xs sm:text-sm font-medium text-accent-foreground mb-4">
             <BookOpen className="w-3 h-3 sm:w-4 sm:h-4" />
-            Career Insights
+            {t('blog.badge')}
           </div>
           <h1 className="text-3xl sm:text-5xl font-bold text-foreground mb-4">
-            Resume Tips & Career Advice
+            {t('blog.title')}
           </h1>
           <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-            Expert guidance to help you land your dream job faster
+            {t('blog.subtitle')}
           </p>
           
           {/* Search Bar */}
           <div className="relative max-w-md mx-auto">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input 
-              placeholder="Search articles..." 
+              placeholder={t('blog.searchPlaceholder')} 
               className="pl-10 rounded-full bg-background border-border"
             />
           </div>
@@ -494,14 +500,14 @@ const Blog = () => {
       <section className="py-16 sm:py-24 px-4 sm:px-6 bg-muted/30">
         <div className="container mx-auto max-w-3xl text-center">
           <h2 className="text-2xl sm:text-4xl font-bold text-foreground mb-4">
-            Ready to Build Your Perfect Resume?
+            {t('blog.ctaTitle')}
           </h2>
           <p className="text-base sm:text-lg text-muted-foreground mb-8">
-            Put these tips into practice with our AI-powered resume builder
+            {t('blog.ctaSubtitle')}
           </p>
           <Link to="/create">
             <Button size="lg" className="bg-primary hover:bg-primary/90 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 rounded-xl">
-              Start Building Free
+              {t('navigation.startBuildingFree')}
               <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
           </Link>

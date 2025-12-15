@@ -2,16 +2,21 @@ FROM node:18-alpine as builder
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files first for better layer caching
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci
+# Install dependencies (including dev dependencies needed for build)
+RUN npm ci && \
+    npm cache clean --force
 
 # Copy source code
 COPY . .
 
-# Build the app
+# Build the app for production
+# Set build-time environment variable if needed
+ARG VITE_API_URL
+ENV VITE_API_URL=${VITE_API_URL}
+
 RUN npm run build
 
 # Production stage
@@ -21,6 +26,7 @@ FROM nginx:alpine
 COPY --from=builder /app/dist /app/build
 
 # Create entrypoint script to copy files to volume on startup
+# This allows the volume to be mounted and files copied at runtime
 RUN echo '#!/bin/sh' > /docker-entrypoint.sh && \
     echo 'echo "Copying frontend files to shared volume..."' >> /docker-entrypoint.sh && \
     echo 'cp -r /app/build/* /usr/share/nginx/html/ 2>/dev/null || true' >> /docker-entrypoint.sh && \

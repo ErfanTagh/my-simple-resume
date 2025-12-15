@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   optimizeDeps: {
-    include: ['react-pdftotext', 'react-pdf'],
+    include: ['react-pdftotext', 'react-pdf', 'react-i18next', 'i18next', 'i18next-browser-languagedetector'],
     esbuildOptions: {
       target: 'esnext',
     },

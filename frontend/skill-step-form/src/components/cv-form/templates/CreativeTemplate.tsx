@@ -1,12 +1,14 @@
 import { CVFormData } from "../types";
 import { Mail, Phone, MapPin, Linkedin, Github, Globe } from "lucide-react";
 import { formatDateRange } from "@/lib/dateFormatter";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface CreativeTemplateProps {
   data: CVFormData;
 }
 
 export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
+  const { t } = useLanguage();
   const { personalInfo, workExperience, education, projects, certificates, languages, skills, sectionOrder } = data;
   
   const defaultOrder = ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"];
@@ -18,7 +20,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
         return personalInfo.summary ? (
           <div key="summary" className="mb-6">
             <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="text-2xl font-black mb-3 text-primary italic">About Me</h2>
+              <h2 className="text-2xl font-black mb-3 text-primary italic">{t('resume.sections.aboutMe')}</h2>
               <p className="text-sm text-foreground leading-relaxed">{personalInfo.summary}</p>
             </div>
           </div>
@@ -28,7 +30,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
         return workExperience.some(exp => exp.position || exp.company) ? (
           <div key="workExperience" className="mb-6">
             <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="text-2xl font-black mb-4 text-primary italic">Experience</h2>
+              <h2 className="text-2xl font-black mb-4 text-primary italic">{t('resume.sections.experience')}</h2>
               <div className="space-y-5">
                 {workExperience.map((exp, index) => (
                   (exp.position || exp.company) && (
@@ -73,7 +75,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
         return education.some(edu => edu.degree || edu.institution) ? (
           <div key="education" className="mb-6">
             <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="text-2xl font-black mb-4 text-primary italic">Education</h2>
+              <h2 className="text-2xl font-black mb-4 text-primary italic">{t('resume.sections.education')}</h2>
               <div className="space-y-4">
                 {education.map((edu, index) => (
                   (edu.degree || edu.institution) && (
@@ -94,7 +96,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
         return projects.some(proj => proj.name) ? (
           <div key="projects" className="mb-6">
             <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="text-2xl font-black mb-4 text-primary italic">Projects</h2>
+              <h2 className="text-2xl font-black mb-4 text-primary italic">{t('resume.sections.projects')}</h2>
               <div className="space-y-4">
                 {projects.map((proj, index) => (
                   proj.name && (
@@ -134,7 +136,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
         return certificates.some(cert => cert.name) ? (
           <div key="certificates" className="mb-6">
             <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="text-2xl font-black mb-4 text-primary italic">Certifications</h2>
+              <h2 className="text-2xl font-black mb-4 text-primary italic">{t('resume.sections.certifications')}</h2>
               <div className="space-y-3">
                 {certificates.map((cert, index) => (
                   cert.name && (
@@ -154,7 +156,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
         return skills.some(s => s.skill) ? (
           <div key="skills" className="mb-6">
             <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="text-2xl font-black mb-4 text-primary italic">Skills</h2>
+              <h2 className="text-2xl font-black mb-4 text-primary italic">{t('resume.sections.skills')}</h2>
               <div className="flex flex-wrap gap-2">
                 {skills.map((s, index) => (
                   s.skill && (
@@ -172,7 +174,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
         return languages.some(lang => lang.language) ? (
           <div key="languages" className="mb-6">
             <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="text-2xl font-black mb-4 text-primary italic">Languages</h2>
+              <h2 className="text-2xl font-black mb-4 text-primary italic">{t('resume.sections.languages')}</h2>
               <div className="grid grid-cols-2 gap-3">
                 {languages.map((lang, index) => (
                   lang.language && (
@@ -191,7 +193,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
         return personalInfo.interests && personalInfo.interests.length > 0 && personalInfo.interests.some(i => i.interest) ? (
           <div key="interests" className="mb-6">
             <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="text-2xl font-black mb-3 text-primary italic">Interests</h2>
+              <h2 className="text-2xl font-black mb-3 text-primary italic">{t('resume.sections.interests')}</h2>
               <p className="text-sm text-foreground">{personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}</p>
             </div>
           </div>
