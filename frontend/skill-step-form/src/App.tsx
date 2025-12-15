@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Header } from "./components/Header";
+import { Footer } from "./components/Footer";
 import Landing from "./pages/Landing";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
@@ -18,6 +19,15 @@ import CreateResume from "./pages/CreateResume";
 import ResumeView from "./pages/ResumeView";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import About from "./pages/About";
+import Careers from "./pages/Careers";
+import Contact from "./pages/Contact";
+import Templates from "./pages/Templates";
+import Pricing from "./pages/Pricing";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import DataProtection from "./pages/DataProtection";
+import Cookies from "./pages/Cookies";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,17 +41,17 @@ const LandingOrRedirect = () => {
   return <Landing />;
 };
 
-// Component to handle conditional rendering of Header (must be inside Router)
+// Component to handle conditional rendering (must be inside Router)
 const AppRoutes = () => {
   const location = useLocation();
-  // Don't show header on landing, login, signup, blog pages, or resume view pages
-  const hideHeaderPaths = ['/', '/login', '/signup'];
-  const showHeader = !hideHeaderPaths.includes(location.pathname) && !location.pathname.startsWith('/resume/') && !location.pathname.startsWith('/blog');
-
+  // Hide header/footer on login and signup pages for focused experience
+  const hideHeaderFooter = location.pathname === '/login' || location.pathname === '/signup';
+  
   return (
-    <>
-      {showHeader && <Header />}
-      <Routes>
+    <div className="flex flex-col min-h-screen">
+      {!hideHeaderFooter && <Header />}
+      <main className="flex-1">
+        <Routes>
         <Route path="/" element={<LandingOrRedirect />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
@@ -75,10 +85,21 @@ const AppRoutes = () => {
         />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:id" element={<BlogPost />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/careers" element={<Careers />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/templates" element={<Templates />} />
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/data-protection" element={<DataProtection />} />
+        <Route path="/cookies" element={<Cookies />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
-      </Routes>
-    </>
+        </Routes>
+      </main>
+      {!hideHeaderFooter && <Footer />}
+    </div>
   );
 };
 

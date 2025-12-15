@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { 
-  FileText, 
   BookOpen, 
   Clock, 
   ArrowRight,
@@ -17,7 +16,7 @@ export const blogPosts = [
     excerpt: "Avoid these common pitfalls that hiring managers see every day. Learn what makes recruiters pass on otherwise qualified candidates.",
     category: "Resume Tips",
     readTime: "5 min read",
-    date: "Dec 10, 2024",
+    date: "Dec 10, 2025",
     gradient: "from-rose-500/20 via-orange-500/10 to-amber-500/5",
     iconColor: "text-rose-500",
     image: "/blog-resume-mistakes.png",
@@ -73,11 +72,11 @@ Avoiding these common mistakes will significantly improve your chances of landin
   },
   {
     id: "ats-friendly-resume",
-    title: "How to Write an ATS-Friendly Resume in 2024",
+    title: "How to Write an ATS-Friendly Resume in 2025",
     excerpt: "Master the art of getting past Applicant Tracking Systems. Discover the keywords and formatting tricks that get your resume seen.",
     category: "ATS Optimization",
     readTime: "7 min read",
-    date: "Dec 8, 2024",
+    date: "Dec 8, 2025",
     gradient: "from-blue-500/20 via-cyan-500/10 to-teal-500/5",
     iconColor: "text-blue-500",
     image: "/ats.png",
@@ -135,7 +134,7 @@ Remember that your resume ultimately needs to impress humans too. Find the balan
     excerpt: "Learn how to transform vague job descriptions into compelling achievements with numbers and metrics that impress employers.",
     category: "Career Growth",
     readTime: "4 min read",
-    date: "Dec 5, 2024",
+    date: "Dec 5, 2025",
     gradient: "from-emerald-500/20 via-green-500/10 to-lime-500/5",
     iconColor: "text-emerald-500",
     image: "/quatifying.png",
@@ -199,7 +198,7 @@ Be prepared to discuss your metrics in interviews. Keep records of your achievem
     excerpt: "Tailor your resume for remote positions. Highlight the skills and experiences that remote employers value most.",
     category: "Remote Work",
     readTime: "6 min read",
-    date: "Dec 3, 2024",
+    date: "Dec 3, 2025",
     gradient: "from-violet-500/20 via-purple-500/10 to-fuchsia-500/5",
     iconColor: "text-violet-500",
     image: "/VScode.png",
@@ -261,7 +260,7 @@ Don't suggest that you want remote work for convenience or to avoid commuting. F
     excerpt: "Pivoting to a new industry? Here's how to reframe your experience and skills to make a successful transition.",
     category: "Career Change",
     readTime: "8 min read",
-    date: "Nov 30, 2024",
+    date: "Nov 30, 2025",
     gradient: "from-amber-500/20 via-yellow-500/10 to-orange-500/5",
     iconColor: "text-amber-500",
     image: "/career-change.png",
@@ -332,7 +331,7 @@ Career changers should always include a cover letter. It's your opportunity to t
     excerpt: "Understand when to focus on your cover letter and when your resume does the heavy lifting in the application process.",
     category: "Job Search",
     readTime: "5 min read",
-    date: "Nov 28, 2024",
+    date: "Nov 28, 2025",
     gradient: "from-pink-500/20 via-rose-500/10 to-red-500/5",
     iconColor: "text-pink-500",
     image: "/cover-letter.png",
@@ -399,33 +398,8 @@ const Blog = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
-        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary flex items-center justify-center">
-              <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
-            </div>
-            <span className="text-lg sm:text-xl font-bold text-foreground">123Resume</span>
-          </Link>
-          <div className="flex items-center gap-2 sm:gap-4">
-            <Link to="/login">
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                Log In
-              </Button>
-            </Link>
-            <Link to="/create">
-              <Button size="sm" className="bg-primary hover:bg-primary/90 text-xs sm:text-sm">
-                <span className="hidden sm:inline">Start Building Free</span>
-                <span className="sm:hidden">Start Free</span>
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </nav>
-
       {/* Hero Section */}
-      <section className="pt-24 sm:pt-32 pb-12 sm:pb-16 px-4 sm:px-6 bg-muted/30">
+      <section className="pt-16 sm:pt-24 pb-12 sm:pb-16 px-4 sm:px-6 bg-muted/30">
         <div className="container mx-auto max-w-4xl text-center">
           <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-accent border border-border text-xs sm:text-sm font-medium text-accent-foreground mb-4">
             <BookOpen className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -466,7 +440,7 @@ const Blog = () => {
                         alt={post.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         onError={(e) => {
-                          console.error('Failed to load image:', post.image);
+                          // Image failed to load, fallback to gradient design
                         }}
                       />
                     </div>
@@ -533,23 +507,6 @@ const Blog = () => {
           </Link>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="py-8 sm:py-12 px-4 sm:px-6 border-t border-border">
-        <div className="container mx-auto max-w-6xl">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <FileText className="w-4 h-4 text-primary-foreground" />
-              </div>
-              <span className="font-semibold text-foreground">123Resume</span>
-            </Link>
-            <p className="text-xs sm:text-sm text-muted-foreground text-center">
-              © 2025 123Resume. Build your dream career.
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

@@ -21,18 +21,20 @@ export const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 no-print">
-      <div className="container flex h-16 items-center justify-between px-4">
-        <Link to="/" className="flex items-center space-x-2">
-          <FileText className="h-6 w-6 text-primary" />
-          <span className="text-xl font-bold">Resume Builder</span>
+    <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-lg no-print">
+      <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
+        <Link to="/" className="flex items-center gap-2">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary flex items-center justify-center">
+            <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
+          </div>
+          <span className="text-lg sm:text-xl font-bold text-foreground">123Resume</span>
         </Link>
 
-        <nav className="flex items-center space-x-4">
+        <nav className="flex items-center gap-2 sm:gap-4">
           {isAuthenticated ? (
             <>
               <span className="text-sm font-medium text-foreground hidden sm:inline">
-                {user?.first_name || user?.username} Resume!
+                {user?.first_name || user?.username}
               </span>
               
               <DropdownMenu>
@@ -70,12 +72,15 @@ export const Header = () => {
               </DropdownMenu>
             </>
           ) : (
-            <div className="flex items-center space-x-2">
-              <Button variant="ghost" asChild>
+            <div className="flex items-center gap-2 sm:gap-4">
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground" asChild>
                 <Link to="/login">Log In</Link>
               </Button>
-              <Button asChild>
-                <Link to="/signup">Sign Up</Link>
+              <Button size="sm" className="bg-primary hover:bg-primary/90 text-xs sm:text-sm" asChild>
+                <Link to="/create">
+                  <span className="hidden sm:inline">Start Building Free</span>
+                  <span className="sm:hidden">Start Free</span>
+                </Link>
               </Button>
             </div>
           )}

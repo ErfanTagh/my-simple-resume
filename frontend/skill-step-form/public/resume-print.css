@@ -23,14 +23,11 @@
   
   /* ==================== PAGE SETUP ==================== */
   
-  @page {
-    margin: 18mm 18mm;
-    size: A4;
-  }
+  /* Note: @page margin is set to 0 in ResumeView.tsx to hide page title/URL
+     We add padding to the resume container instead to provide proper spacing */
   
-  /* First page - Safari and Firefox handle this differently */
-  @page :first {
-    margin-top: 15mm;
+  @page {
+    size: A4;
   }
   
   /* ==================== CONTAINER ==================== */
@@ -38,7 +35,7 @@
   .resume-container {
     box-shadow: none !important;
     margin: 0 !important;
-    padding: 0 !important;
+    padding: 12mm 15mm !important;
     border-radius: 0 !important;
     max-width: none !important;
     width: 100% !important;
@@ -47,6 +44,9 @@
     /* Remove transforms - problematic in Safari */
     transform: none !important;
     -webkit-transform: none !important;
+    /* Ensure container uses full page height */
+    min-height: 100vh;
+    box-sizing: border-box;
   }
   
   /* ==================== HEADER ==================== */
@@ -57,7 +57,8 @@
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     color-adjust: exact !important;
-    padding: 25px 30px 20px 30px !important;
+    padding: 0 0 10px 0 !important;
+    margin-bottom: 0 !important;
     /* Page break - old and new syntax for compatibility */
     page-break-after: avoid;
     break-after: avoid;
@@ -82,7 +83,7 @@
   /* ==================== MAIN CONTENT ==================== */
   
   .resume-main {
-    padding: 0 30px 25px 30px !important;
+    padding: 0 !important;
     margin: 0 !important;
     transform: none !important;
     -webkit-transform: none !important;
@@ -96,9 +97,9 @@
   /* ==================== SECTIONS ==================== */
   
   .resume-section {
-    margin-bottom: 12px !important;
+    margin-bottom: 10px !important;
     margin-top: 0 !important;
-    padding-top: 18px !important;
+    padding-top: 12px !important;
     /* Triple declaration for cross-browser support */
     page-break-inside: avoid;
     break-inside: avoid;
@@ -116,8 +117,8 @@
   }
   
   .section-title {
-    margin-bottom: 8px !important;
-    padding-bottom: 4px !important;
+    margin-bottom: 6px !important;
+    padding-bottom: 3px !important;
     page-break-after: avoid;
     break-after: avoid;
     -webkit-column-break-after: avoid;
@@ -127,7 +128,7 @@
   /* ==================== WORK EXPERIENCE ==================== */
   
   .experience-item {
-    margin-bottom: 12px !important;
+    margin-bottom: 10px !important;
     page-break-inside: avoid;
     break-inside: avoid;
     -webkit-column-break-inside: avoid;
@@ -159,8 +160,8 @@
   /* ==================== EDUCATION ==================== */
   
   .education-item {
-    margin-bottom: 10px !important;
-    padding-bottom: 10px !important;
+    margin-bottom: 8px !important;
+    padding-bottom: 8px !important;
     page-break-inside: avoid;
     break-inside: avoid;
     -webkit-column-break-inside: avoid;
@@ -178,8 +179,8 @@
   
   .project-item,
   .certification-item {
-    margin-bottom: 10px !important;
-    padding-bottom: 10px !important;
+    margin-bottom: 8px !important;
+    padding-bottom: 8px !important;
     page-break-inside: avoid;
     break-inside: avoid;
     -webkit-column-break-inside: avoid;

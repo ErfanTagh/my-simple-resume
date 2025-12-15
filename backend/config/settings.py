@@ -192,7 +192,9 @@ EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'False') == 'True'
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '').strip()
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '').strip()
 
-# Gmail requires FROM email to match authenticated email exactly
+# Email FROM address configuration
+# For custom domain emails (e.g., registration@123resume.de), the FROM email 
+# should match the authenticated email (EMAIL_HOST_USER) to avoid blocking
 # If DEFAULT_FROM_EMAIL is set, use it; otherwise use EMAIL_HOST_USER
 # Remove any display name and use just the email address
 default_from = os.getenv('DEFAULT_FROM_EMAIL', '').strip()
@@ -205,8 +207,8 @@ if default_from:
     else:
         DEFAULT_FROM_EMAIL = default_from
 else:
-    # Fallback to authenticated email
-    DEFAULT_FROM_EMAIL = EMAIL_HOST_USER or 'noreply@123resume.de'
+    # Fallback to authenticated email or default registration email
+    DEFAULT_FROM_EMAIL = EMAIL_HOST_USER or 'registration@123resume.de'
 
 # Set SERVER_EMAIL to match for error reporting
 SERVER_EMAIL = DEFAULT_FROM_EMAIL

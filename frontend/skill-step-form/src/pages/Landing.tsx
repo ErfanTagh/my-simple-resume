@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { 
-  FileText, 
   Sparkles, 
   Layout, 
   Download, 
@@ -18,99 +17,82 @@ import { blogPosts } from "./Blog";
 const Landing = () => {
   return (
     <div className="min-h-screen bg-background overflow-hidden">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
-        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary flex items-center justify-center">
-              <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
-            </div>
-            <span className="text-lg sm:text-xl font-bold text-foreground">123Resume</span>
-          </div>
-          <div className="flex items-center gap-2 sm:gap-4">
-            <Link to="/login">
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                Log In
-              </Button>
-            </Link>
-            <Link to="/create">
-              <Button size="sm" className="bg-primary hover:bg-primary/90 text-xs sm:text-sm">
-                <span className="hidden sm:inline">Start Building Free</span>
-                <span className="sm:hidden">Start Free</span>
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </nav>
-
       {/* Hero Section */}
-      <section className="relative pt-24 sm:pt-32 pb-12 sm:pb-20 px-4 sm:px-6">
+      <section className="relative pt-28 sm:pt-40 pb-16 sm:pb-24 px-4 sm:px-6">
         {/* Background Effects */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-20 right-1/4 w-48 sm:w-80 h-48 sm:h-80 bg-primary/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-10 left-1/4 w-72 sm:w-[500px] h-72 sm:h-[500px] bg-primary/15 rounded-full blur-[100px] animate-pulse" />
+          <div className="absolute bottom-10 right-1/4 w-56 sm:w-96 h-56 sm:h-96 bg-primary/10 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 sm:w-[600px] h-80 sm:h-[600px] bg-gradient-to-br from-primary/5 via-transparent to-primary/5 rounded-full blur-3xl" />
+          {/* Grid pattern overlay */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.3)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.3)_1px,transparent_1px)] bg-[size:60px_60px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,black_40%,transparent_100%)]" />
         </div>
 
         <div className="container mx-auto max-w-6xl relative">
-          <div className="text-center space-y-6 sm:space-y-8">
+          <div className="text-center space-y-8 sm:space-y-10">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-accent border border-border text-xs sm:text-sm font-medium text-accent-foreground">
-              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
+            <div className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-primary/10 border border-primary/20 text-xs sm:text-sm font-semibold text-primary animate-fade-in">
+              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               AI-Powered Resume Builder
+              <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             </div>
 
             {/* Headline */}
-            <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold text-foreground leading-tight">
-              Build Your Dream
-              <span className="block bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                Resume in Minutes
-              </span>
-            </h1>
+            <div className="space-y-2 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              <h1 className="text-4xl sm:text-6xl md:text-8xl font-extrabold text-foreground leading-[1.1] tracking-tight">
+                Build Your Dream
+              </h1>
+              <h1 className="text-4xl sm:text-6xl md:text-8xl font-extrabold leading-[1.1] tracking-tight">
+                <span className="bg-gradient-to-r from-primary via-primary to-primary/70 bg-clip-text text-transparent">
+                  Resume in Minutes
+                </span>
+              </h1>
+            </div>
 
             {/* Subheadline */}
-            <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed px-4">
+            <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
               Create professional, ATS-friendly resumes with AI-powered suggestions. 
-              Stand out from the crowd and land your dream job.
+              <span className="text-foreground font-medium"> Stand out and land your dream job.</span>
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-5 pt-2 animate-fade-in" style={{ animationDelay: '0.3s' }}>
               <Link to="/create" className="w-full sm:w-auto">
-                <Button size="lg" className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all">
+                <Button size="lg" className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-base sm:text-lg px-8 sm:px-10 py-6 sm:py-7 rounded-2xl shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 font-semibold">
                   Start Building Free
-                  <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
+                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
               <Link to="/login" className="w-full sm:w-auto">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 rounded-xl border-2">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-6 sm:py-7 rounded-2xl border-2 hover:bg-accent hover:-translate-y-0.5 transition-all duration-300 font-semibold">
                   Log In
                 </Button>
               </Link>
             </div>
-
           </div>
 
           {/* Preview Cards */}
           <div className="mt-12 sm:mt-20">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto">
               {[
-                { name: 'Modern', key: 'modern' as const },
-                { name: 'Classic', key: 'classic' as const },
-                { name: 'Creative', key: 'creative' as const }
+                { name: 'Modern', key: 'modern' as const, description: 'Clean & Contemporary Design' },
+                { name: 'Classic', key: 'classic' as const, description: 'Traditional & Professional' },
+                { name: 'Creative', key: 'creative' as const, description: 'Bold & Eye-Catching' },
+                { name: 'Minimal', key: 'minimal' as const, description: 'Minimalist & Elegant' }
               ].map((template, i) => (
                 <div
                   key={template.key}
-                  className="bg-card rounded-2xl border border-border p-4 sm:p-6 shadow-lg hover:shadow-[0_8px_25px_-5px_hsl(var(--primary)/0.35)] transition-all duration-300 hover:-translate-y-1.5"
+                  className="bg-card rounded-2xl border border-border p-3 sm:p-4 shadow-lg hover:shadow-[0_8px_25px_-5px_hsl(var(--primary)/0.35)] transition-all duration-300 hover:-translate-y-1.5"
                   style={{ animationDelay: `${i * 0.1}s` }}
                 >
-                  <div className="aspect-[3/4] bg-white rounded-lg mb-3 sm:mb-4 overflow-hidden border border-border shadow-inner relative">
-                    <div className="absolute inset-0">
+                  <div className="aspect-[3/4] bg-white rounded-lg mb-3 sm:mb-4 overflow-hidden border border-border shadow-inner relative max-h-[280px] sm:max-h-[320px]">
+                    <div className="absolute inset-0 w-full h-full">
                       <LandingTemplatePreview templateName={template.key} />
                     </div>
                   </div>
-                  <div className="space-y-1 pt-2">
-                    <h3 className="font-bold text-lg sm:text-xl" style={{ color: 'hsl(215 25% 15%)' }}>{template.name} Template</h3>
-                    <p className="text-sm font-medium" style={{ color: 'hsl(214 95% 45%)' }}>Professional & ATS-friendly</p>
+                  <div className="space-y-1 pt-1">
+                    <h3 className="font-bold text-base sm:text-lg" style={{ color: 'hsl(215 25% 15%)' }}>{template.name} Template</h3>
+                    <p className="text-xs sm:text-sm font-medium" style={{ color: 'hsl(214 95% 45%)' }}>{template.description}</p>
                   </div>
                 </div>
               ))}
@@ -250,7 +232,7 @@ const Landing = () => {
                         alt={post.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         onError={(e) => {
-                          console.error('Failed to load image:', post.image);
+                          // Image failed to load, fallback to gradient design
                         }}
                       />
                     </div>
@@ -308,23 +290,6 @@ const Landing = () => {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="py-8 sm:py-12 px-4 sm:px-6 border-t border-border bg-muted/30">
-        <div className="container mx-auto max-w-6xl">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <FileText className="w-4 h-4 text-primary-foreground" />
-              </div>
-              <span className="font-semibold text-foreground">123Resume</span>
-            </div>
-            <p className="text-xs sm:text-sm text-muted-foreground text-center">
-              © 2025 123Resume. Build your dream career.
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };
