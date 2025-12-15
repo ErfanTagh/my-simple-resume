@@ -158,9 +158,10 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
             <div className="space-y-1">
               {languages.map((lang, index) => (
                 lang.language && (
-                  <p key={index} className="text-sm text-foreground">
-                    <span className="font-semibold">{lang.language}</span> - {lang.proficiency}
-                  </p>
+                  <div key={index} className="text-sm text-foreground flex justify-between items-center gap-4 pr-2">
+                    <span className="font-semibold">{lang.language}</span>
+                    <span className="text-muted-foreground whitespace-nowrap flex-shrink-0">- {lang.proficiency}</span>
+                  </div>
                 )
               ))}
             </div>

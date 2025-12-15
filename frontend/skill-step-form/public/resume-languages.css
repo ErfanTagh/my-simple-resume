@@ -11,23 +11,35 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  padding-right: 16px;
+  overflow: visible;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .language-name {
   font-weight: 500;
   color: #495057;
-  min-width: 80px;
   font-size: 0.95rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: visible;
+  word-wrap: break-word;
 }
 
 .language-level {
   font-size: 0.85rem;
   color: #6c757d;
   font-weight: 500;
-  width: 24px;
   text-align: right;
-  font-family: monospace;
+  flex-shrink: 0;
+  flex-grow: 0;
+  white-space: nowrap;
+  overflow: visible;
+  min-width: fit-content;
+  max-width: none;
+  padding-left: 8px;
 }
 
 .level-text {

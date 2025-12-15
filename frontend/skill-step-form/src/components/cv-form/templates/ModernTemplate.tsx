@@ -135,12 +135,12 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
         return languages.some(lang => lang.language) ? (
           <div key="languages" className="mb-6">
             <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">{t('resume.sections.languages').toUpperCase()}</h2>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-2">
               {languages.map((lang, index) => (
                 lang.language && (
-                  <div key={index} className="text-sm">
+                  <div key={index} className="text-sm flex justify-between items-center gap-4 pr-2">
                     <span className="font-semibold text-foreground">{lang.language}</span>
-                    <span className="text-muted-foreground"> - {lang.proficiency}</span>
+                    <span className="text-muted-foreground whitespace-nowrap flex-shrink-0">{lang.proficiency}</span>
                   </div>
                 )
               ))}

@@ -156,9 +156,10 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
             <div className="space-y-1">
               {languages.map((lang, index) => (
                 lang.language && (
-                  <p key={index} className="text-xs text-foreground">
-                    {lang.language} — {lang.proficiency}
-                  </p>
+                  <div key={index} className="text-xs text-foreground flex justify-between items-center gap-4 pr-2">
+                    <span>{lang.language}</span>
+                    <span className="text-muted-foreground whitespace-nowrap flex-shrink-0">— {lang.proficiency}</span>
+                  </div>
                 )
               ))}
             </div>

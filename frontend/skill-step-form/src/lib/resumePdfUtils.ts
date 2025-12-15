@@ -215,11 +215,11 @@ function generateResumeHTML(resume: Resume): string {
     return `
       <section class="resume-section">
         <h3 class="section-title">Languages</h3>
-        <div class="languages-list">
+        <div class="languages-list" style="width: 100%; overflow: visible; box-sizing: border-box;">
           ${validLangs.map((lang: any) => `
-            <div class="language-item">
-              <span class="language-name">${escapeHtml(lang.language)}</span>
-              ${lang.proficiency ? `<span class="language-level">${escapeHtml(lang.proficiency)}</span>` : ''}
+            <div class="language-item" style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-right: 16px; width: 100%; box-sizing: border-box; overflow: visible;">
+              <span class="language-name" style="flex: 1 1 auto; min-width: 0; overflow: visible;">${escapeHtml(lang.language)}</span>
+              ${lang.proficiency ? `<span class="language-level" style="flex-shrink: 0; white-space: nowrap; overflow: visible; min-width: fit-content; text-align: right; padding-left: 8px;">${escapeHtml(lang.proficiency)}</span>` : ''}
             </div>
           `).join('')}
         </div>
@@ -245,7 +245,7 @@ function generateResumeHTML(resume: Resume): string {
   };
 
   return `
-    <div class="resume-container">
+    <div class="resume-container" style="width: 100%; max-width: 100%; box-sizing: border-box; overflow: visible;">
       <header class="resume-header">
         <div class="header-content">
           <div class="profile-info">
@@ -255,7 +255,7 @@ function generateResumeHTML(resume: Resume): string {
           ${personalInfo.profileImage ? `<img src="${escapeHtml(personalInfo.profileImage)}" alt="${escapeHtml(personalInfo.firstName)} ${escapeHtml(personalInfo.lastName)}" class="profile-image" />` : ''}
         </div>
       </header>
-      <main class="resume-main">
+      <main class="resume-main" style="width: 100%; max-width: 100%; box-sizing: border-box; overflow: visible;">
         ${personalInfo.summary?.trim() ? `
           <section class="resume-section">
             <h3 class="section-title">Professional Summary</h3>
@@ -264,13 +264,13 @@ function generateResumeHTML(resume: Resume): string {
         ` : ''}
         <section class="resume-section">
           <h3 class="section-title">Contact</h3>
-          <div class="contact-info">
-            ${personalInfo.phone ? `<div class="contact-item"><span>Phone: ${escapeHtml(personalInfo.phone)}</span></div>` : ''}
-            <div class="contact-item"><span>Email: ${escapeHtml(personalInfo.email || '')}</span></div>
-            ${personalInfo.location ? `<div class="contact-item"><span>Location: ${escapeHtml(personalInfo.location)}</span></div>` : ''}
-            ${personalInfo.github ? `<div class="contact-item"><span>GitHub: <a href="${escapeHtml(personalInfo.github)}" target="_blank" rel="noopener noreferrer" class="contact-link">${escapeHtml(personalInfo.github)}</a></span></div>` : ''}
-            ${personalInfo.linkedin ? `<div class="contact-item"><span>LinkedIn: <a href="${escapeHtml(personalInfo.linkedin)}" target="_blank" rel="noopener noreferrer" class="contact-link">${escapeHtml(personalInfo.linkedin)}</a></span></div>` : ''}
-            ${personalInfo.website ? `<div class="contact-item"><span>Website: <a href="${escapeHtml(personalInfo.website)}" target="_blank" rel="noopener noreferrer" class="contact-link">${escapeHtml(personalInfo.website)}</a></span></div>` : ''}
+          <div class="contact-info" style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start; text-align: left; width: 100%;">
+            ${personalInfo.phone ? `<div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%;"><span>Phone: ${escapeHtml(personalInfo.phone)}</span></div>` : ''}
+            <div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%;"><span>Email: ${escapeHtml(personalInfo.email || '')}</span></div>
+            ${personalInfo.location ? `<div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%;"><span>Location: ${escapeHtml(personalInfo.location)}</span></div>` : ''}
+            ${personalInfo.github ? `<div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%;"><span>GitHub: <a href="${escapeHtml(personalInfo.github)}" target="_blank" rel="noopener noreferrer" class="contact-link">${escapeHtml(personalInfo.github)}</a></span></div>` : ''}
+            ${personalInfo.linkedin ? `<div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%;"><span>LinkedIn: <a href="${escapeHtml(personalInfo.linkedin)}" target="_blank" rel="noopener noreferrer" class="contact-link">${escapeHtml(personalInfo.linkedin)}</a></span></div>` : ''}
+            ${personalInfo.website ? `<div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%;"><span>Website: <a href="${escapeHtml(personalInfo.website)}" target="_blank" rel="noopener noreferrer" class="contact-link">${escapeHtml(personalInfo.website)}</a></span></div>` : ''}
           </div>
         </section>
         ${renderEducation()}
