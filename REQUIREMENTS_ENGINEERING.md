@@ -1,288 +1,235 @@
-# Requirements Engineering Analysis
+# Anforderungsanalyse
 
-## 123Resume - Professional Resume Builder Application
+## 123Resume - Professioneller Lebenslauf-Builder
 
-**Document Version:** 1.1  
-**Date:** December 2024
-
----
-
-## Table of Contents
-
-1. [Project Overview](#1-project-overview)
-2. [Drivers](#2-drivers)
-3. [Functional Requirements](#3-functional-requirements)
-4. [Non-Functional Requirements](#4-non-functional-requirements)
-5. [Constraints](#5-constraints)
+**Version:** 1.2  
+**Datum:** Dezember 2024
 
 ---
 
-## 1. Project Overview
+## Projektübersicht
 
-Web-based resume builder enabling users to create professional, ATS-friendly resumes through a multi-step form interface. Supports resume creation, editing, template customization, PDF export, and automatic parsing from uploaded PDFs.
+123Resume ist eine webbasierte Anwendung zum Erstellen professioneller, ATS-kompatibler Lebensläufe. Die Anwendung bietet eine mehrstufige Formularoberfläche und unterstützt das Erstellen, Bearbeiten, Anpassen von Vorlagen, PDF-Export und automatisches Parsen hochgeladener PDF-Dateien.
 
-**Key Capabilities:**
+**Hauptfunktionen:**
 
-- Multi-step resume building wizard
-- 4 professional templates (Modern, Classic, Minimal, Creative)
-- PDF generation and export
-- Resume parsing from PDF uploads
-- Quality scoring and feedback
-- User authentication and data persistence
-- Multi-language support (English/German)
-- Responsive design
-
----
-
-## 2. Drivers
-
-### 2.1 Stakeholders
-
-| Stakeholder      | Role            | Interest                                       |
-| ---------------- | --------------- | ---------------------------------------------- |
-| Job Seekers      | Primary Users   | Create professional resumes quickly and easily |
-| Recruiters/HR    | Secondary Users | Receive ATS-compatible, well-formatted resumes |
-| Development Team | Builders        | Maintainable, scalable codebase                |
-| Business Owners  | Decision Makers | User acquisition, retention, and revenue       |
-
-### 2.2 Business Drivers
-
-- Market need for ATS-compatible resume creation
-- Competitive advantage through AI-powered suggestions
-- Intuitive user experience
-- Free-to-use model with premium expansion potential
-- Multi-language support for European market
-
-### 2.3 Project Goals
-
-**Primary:** Enable resume creation in minutes, ensure ATS compatibility, provide professional templates, seamless PDF export, resume parsing.
-
-**Secondary:** Scalable codebase, multi-language interface, mobile responsiveness, data security, future premium features.
-
-### 2.4 Success Criteria
-
-- Resume creation in < 15 minutes
-- ATS-compatible output
-- < 2 second page load time
-- 99% uptime
-- Support 1000+ concurrent users
-- GDPR compliance
+- Mehrstufiger Assistent zum Erstellen von Lebensläufen
+- 4 professionelle Vorlagen (Modern, Classic, Minimal, Creative)
+- PDF-Generierung und Export
+- Parsen von Lebensläufen aus PDF-Uploads
+- Qualitätsbewertung und Feedback
+- Benutzerauthentifizierung und Datenspeicherung
+- Mehrsprachige Unterstützung (Deutsch/Englisch)
+- Responsive Design
 
 ---
 
-## 3. Functional Requirements
+## Treiber und Ziele
 
-### 3.1 User Authentication & Authorization
+### Stakeholder
 
-| ID          | Requirement                                | Priority |
-| ----------- | ------------------------------------------ | -------- |
-| FR-AUTH-001 | User registration with email verification  | High     |
-| FR-AUTH-002 | Email verification with resend capability  | High     |
-| FR-AUTH-003 | Secure login with JWT tokens               | High     |
-| FR-AUTH-004 | Password reset via email                   | Medium   |
-| FR-AUTH-005 | Session management (access/refresh tokens) | High     |
+Die wichtigsten Stakeholder sind Jobsuchende als primäre Nutzer, aber auch Recruiter und HR-Abteilungen profitieren von gut formatierten, ATS-kompatiblen Lebensläufen. Die Entwicklungsmannschaft benötigt einen wartbaren, skalierbaren Code, und die Geschäftsführung fokussiert sich auf Nutzerakquisition, Retention und potenzielle Einnahmen.
 
-### 3.2 Resume Management
+### Geschäftstreiber
 
-| ID            | Requirement                              | Priority |
-| ------------- | ---------------------------------------- | -------- |
-| FR-RESUME-001 | Create resume via multi-step form wizard | High     |
-| FR-RESUME-002 | Edit existing resumes                    | High     |
-| FR-RESUME-003 | Live preview in selected template        | High     |
-| FR-RESUME-004 | Delete resume with confirmation          | Medium   |
-| FR-RESUME-005 | List all saved resumes with metadata     | High     |
-| FR-RESUME-006 | Save unlimited resume versions per user  | High     |
+Der Markt braucht einfache Lösungen für die Erstellung ATS-kompatibler Lebensläufe. Durch KI-gestützte Vorschläge und Qualitätsbewertung können wir uns von der Konkurrenz abheben. Die intuitive Schritt-für-Schritt-Bedienung reduziert die Einstiegshürde erheblich. Der kostenlose Basis-Service mit Option für Premium-Features ermöglicht eine breite Nutzerbasis, während die Mehrsprachigkeit (Deutsch/Englisch) den europäischen Markt adressiert.
 
-### 3.3 Resume Sections
+### Projektziele
 
-All sections support multiple entries unless noted:
+**Primär:** Nutzer sollen innerhalb von Minuten professionelle Lebensläufe erstellen können. Die Lebensläufe müssen ATS-kompatibel sein und verschiedene professionelle Vorlagen zur Verfügung stehen. Der PDF-Export muss nahtlos funktionieren, und das Parsen bestehender PDF-Lebensläufe sollte möglich sein.
 
-- **Personal Information** (Required: name, email; Optional: phone, location, social links, profile image, summary, interests)
-- **Work Experience** (Position, company, dates, description, responsibilities, technologies, competencies)
-- **Education** (Degree, institution, field, dates, key courses)
-- **Skills** (Simple text list)
-- **Languages** (Language name, proficiency level)
-- **Projects** (Name, description, technologies, highlights, dates, URL)
-- **Certificates** (Name, organization, dates, credential ID, URL)
+**Sekundär:** Der Code soll skalierbar und wartbar sein. Die Oberfläche muss mehrsprachig sein, für mobile Geräte optimiert werden, Datensicherheit gewährleisten und Raum für zukünftige Premium-Features lassen.
 
-### 3.4 Template System
+### Erfolgskriterien
 
-| ID              | Requirement                               | Priority |
-| --------------- | ----------------------------------------- | -------- |
-| FR-TEMPLATE-001 | Select from 4 templates with preview      | High     |
-| FR-TEMPLATE-002 | Drag-and-drop section reordering          | Medium   |
-| FR-TEMPLATE-003 | Render resume in selected template format | High     |
-
-### 3.5 PDF Functionality
-
-| ID         | Requirement                                               | Priority |
-| ---------- | --------------------------------------------------------- | -------- |
-| FR-PDF-001 | Generate and download high-quality PDF (ATS-optimized)    | High     |
-| FR-PDF-002 | Parse PDF uploads and auto-populate form (English/German) | Medium   |
-
-### 3.6 Quality & Feedback
-
-| ID             | Requirement                                            | Priority |
-| -------------- | ------------------------------------------------------ | -------- |
-| FR-QUALITY-001 | Resume quality scoring (completeness, clarity, impact) | Medium   |
-| FR-QUALITY-002 | ATS optimization validation and warnings               | High     |
-
-### 3.7 Multi-Language Support
-
-| ID          | Requirement                                         | Priority |
-| ----------- | --------------------------------------------------- | -------- |
-| FR-LANG-001 | English and German interface with language switcher | High     |
-
-### 3.8 Content Management
-
-| ID             | Requirement                                | Priority |
-| -------------- | ------------------------------------------ | -------- |
-| FR-CONTENT-001 | Blog system with articles (multi-language) | Low      |
-
-### 3.9 Data Persistence
-
-| ID          | Requirement                                            | Priority |
-| ----------- | ------------------------------------------------------ | -------- |
-| FR-DATA-001 | Secure resume storage in MongoDB with user association | High     |
+- Lebenslauf-Erstellung in unter 15 Minuten
+- ATS-kompatible Ausgabe
+- Ladezeit unter 2 Sekunden
+- 99% Verfügbarkeit
+- Unterstützung für 1000+ gleichzeitige Nutzer
+- DSGVO-Konformität
 
 ---
 
-## 4. Non-Functional Requirements
+## Funktionale Anforderungen
 
-### 4.1 Performance
+### Authentifizierung
 
-| ID           | Requirement   | Target                                           |
-| ------------ | ------------- | ------------------------------------------------ |
-| NFR-PERF-001 | Response Time | Page load < 2s, API < 500ms, PDF generation < 5s |
-| NFR-PERF-002 | Scalability   | Support 1000+ concurrent users                   |
-| NFR-PERF-003 | Throughput    | 100+ requests/second                             |
+Nutzer können sich registrieren und müssen ihre E-Mail verifizieren. Der Login erfolgt sicher mit JWT-Tokens. Passwort-Reset ist per E-Mail möglich. Die Session-Verwaltung nutzt Access- und Refresh-Tokens.
 
-### 4.2 Usability
+### Lebenslauf-Verwaltung
 
-| ID           | Requirement       | Details                                    |
-| ------------ | ----------------- | ------------------------------------------ |
-| NFR-USAB-001 | User Interface    | Intuitive, modern design, clear navigation |
-| NFR-USAB-002 | Responsive Design | Mobile-first, works on all device sizes    |
-| NFR-USAB-003 | Accessibility     | WCAG 2.1 AA compliance (Medium priority)   |
-| NFR-USAB-004 | Learning Curve    | Self-explanatory, minimal tutorial needed  |
+Nutzer können neue Lebensläufe über einen mehrstufigen Formular-Assistenten erstellen. Bestehende Lebensläufe können bearbeitet werden, und es gibt eine Live-Vorschau in der gewählten Vorlage. Lebensläufe können gelöscht werden (mit Bestätigungsdialog), und alle gespeicherten Lebensläufe werden mit Metadaten angezeigt. Pro Nutzer können unbegrenzt viele Lebenslauf-Versionen gespeichert werden.
 
-### 4.3 Reliability
+### Lebenslauf-Abschnitte
 
-| ID          | Requirement     | Target                                          |
-| ----------- | --------------- | ----------------------------------------------- |
-| NFR-REL-001 | Availability    | 99% uptime                                      |
-| NFR-REL-002 | Fault Tolerance | Graceful error handling, user-friendly messages |
-| NFR-REL-003 | Data Integrity  | Input validation, database constraints, backups |
+Die Anwendung unterstützt folgende Abschnitte (alle mit mehreren Einträgen möglich):
 
-### 4.4 Security
+- **Persönliche Informationen:** Name, E-Mail (Pflicht), Telefon, Ort, Social-Media-Links, Profilbild, Zusammenfassung, Interessen (Optional)
+- **Berufserfahrung:** Position, Unternehmen, Zeitraum, Beschreibung, Verantwortlichkeiten, Technologien, Kompetenzen
+- **Ausbildung:** Abschluss, Institution, Fachrichtung, Zeitraum, wichtige Kurse
+- **Fähigkeiten:** Einfache Textliste
+- **Sprachen:** Sprachname, Kompetenzstufe
+- **Projekte:** Name, Beschreibung, Technologien, Highlights, Zeitraum, URL
+- **Zertifikate:** Name, Organisation, Zeitraum, Credential-ID, URL
 
-| ID          | Requirement             | Details                                                |
-| ----------- | ----------------------- | ------------------------------------------------------ |
-| NFR-SEC-001 | Authentication Security | Password hashing, JWT security, brute force protection |
-| NFR-SEC-002 | Data Protection         | HTTPS/TLS, encryption at rest, XSS/CSRF protection     |
-| NFR-SEC-003 | Privacy Compliance      | GDPR compliance, data minimization, user consent       |
-| NFR-SEC-004 | Access Control          | User-based permissions, API protection, rate limiting  |
+### Vorlagen-System
 
-### 4.5 Maintainability
+Es gibt 4 Vorlagen (Modern, Classic, Minimal, Creative) zur Auswahl mit Vorschau. Nutzer können die Reihenfolge der Abschnitte per Drag-and-Drop anpassen. Die Lebensläufe werden in der gewählten Vorlage formatiert.
 
-| ID           | Requirement   | Details                                      |
-| ------------ | ------------- | -------------------------------------------- |
-| NFR-MAIN-001 | Code Quality  | Clean code, TypeScript, modular architecture |
-| NFR-MAIN-002 | Testability   | Unit/integration test support                |
-| NFR-MAIN-003 | Documentation | API docs, code comments, deployment guides   |
+### PDF-Funktionalität
 
-### 4.6 Portability
+Lebensläufe können als hochwertige PDF-Dateien generiert und heruntergeladen werden (ATS-optimiert). Zusätzlich können PDF-Dateien hochgeladen und automatisch in das Formular übertragen werden (Unterstützung für Deutsch und Englisch).
 
-| ID           | Requirement           | Details                                         |
-| ------------ | --------------------- | ----------------------------------------------- |
-| NFR-PORT-001 | Cross-Platform        | Web-based, Docker containerization              |
-| NFR-PORT-002 | Browser Compatibility | Chrome, Firefox, Safari, Edge (modern browsers) |
+### Qualität und Feedback
 
-### 4.7 Scalability
+Die Anwendung bietet eine Qualitätsbewertung basierend auf Vollständigkeit, Klarheit und Wirkung. Es gibt ATS-Optimierungsvalidierung und Warnungen bei potenziellen Problemen.
 
-| ID           | Requirement             | Details                                   |
-| ------------ | ----------------------- | ----------------------------------------- |
-| NFR-SCAL-001 | Database Scalability    | MongoDB indexing, query optimization      |
-| NFR-SCAL-002 | Application Scalability | Stateless API, horizontal scaling support |
+### Mehrsprachigkeit
+
+Die Benutzeroberfläche ist auf Deutsch und Englisch verfügbar mit einem Sprachumschalter. Browser-Sprache wird automatisch erkannt.
+
+### Content-Management
+
+Es gibt ein Blog-System mit Artikeln zu Karriere- und Lebenslauf-Tipps, ebenfalls mehrsprachig.
+
+### Datenspeicherung
+
+Lebenslauf-Daten werden sicher in MongoDB gespeichert und mit Benutzerkonten verknüpft.
 
 ---
 
-## 5. Constraints
+## Nicht-funktionale Anforderungen
 
-### 5.1 Technical Constraints
+### Performance
 
-| ID           | Constraint                                                   | Impact |
-| ------------ | ------------------------------------------------------------ | ------ |
-| CON-TECH-001 | Fixed tech stack (React/TypeScript, Django, MongoDB, Docker) | High   |
-| CON-TECH-002 | Modern browsers only (no IE support)                         | Medium |
-| CON-TECH-003 | MongoDB with djongo (limited relational queries)             | Medium |
-| CON-TECH-004 | Docker-based deployment required                             | Medium |
+Die Anwendung muss schnell reagieren: Seitenladezeit unter 2 Sekunden, API-Antwortzeit unter 500ms, PDF-Generierung unter 5 Sekunden. Das System soll mindestens 1000 gleichzeitige Nutzer unterstützen und etwa 100+ Requests pro Sekunde verarbeiten können.
 
-### 5.2 Business Constraints
+### Benutzerfreundlichkeit
 
-| ID          | Constraint                             | Impact |
-| ----------- | -------------------------------------- | ------ |
-| CON-BUS-001 | Limited development and hosting budget | Medium |
-| CON-BUS-002 | Development timeline limitations       | Medium |
-| CON-BUS-003 | Core features must remain free         | High   |
+Die Benutzeroberfläche soll intuitiv, modern gestaltet und klar strukturiert sein. Das Design ist mobile-first und funktioniert auf allen Gerätegrößen. Accessibility (WCAG 2.1 AA) ist wünschenswert, aber nicht kritisch. Die Bedienung soll selbsterklärend sein, ohne dass ein ausführliches Tutorial nötig ist.
 
-### 5.3 Legal & Regulatory Constraints
+### Zuverlässigkeit
 
-| ID          | Constraint                               | Impact |
-| ----------- | ---------------------------------------- | ------ |
-| CON-LEG-001 | GDPR compliance required (EU users)      | High   |
-| CON-LEG-002 | Data protection and privacy requirements | High   |
+Das System sollte eine Verfügbarkeit von 99% haben. Fehler müssen abgefangen werden und benutzerfreundliche Fehlermeldungen anzeigen. Datenintegrität wird durch Eingabevalidierung, Datenbank-Constraints und Backups gewährleistet.
 
-### 5.4 Operational Constraints
+### Sicherheit
 
-| ID         | Constraint                               | Impact |
-| ---------- | ---------------------------------------- | ------ |
-| CON-OP-001 | Dependent on email service (SMTP)        | Medium |
-| CON-OP-002 | Requires domain, SSL, server maintenance | Medium |
-| CON-OP-003 | Ongoing maintenance and updates required | Medium |
+Authentifizierung erfolgt sicher mit Passwort-Hashing und JWT-Tokens. Schutz vor Brute-Force-Angriffen ist implementiert. Daten werden mit HTTPS/TLS verschlüsselt übertragen und verschlüsselt gespeichert. XSS- und CSRF-Schutz sind vorhanden. Die Anwendung ist DSGVO-konform mit Datenminimierung, Einwilligungsmanagement und Löschrechten. Zugriffskontrolle basiert auf Benutzerberechtigungen mit API-Schutz und Rate-Limiting.
 
-### 5.5 Resource Constraints
+### Wartbarkeit
 
-| ID          | Constraint                         | Impact |
-| ----------- | ---------------------------------- | ------ |
-| CON-RES-001 | Small development team             | Medium |
-| CON-RES-002 | Dependency on third-party services | Low    |
+Der Code sollte sauber, in TypeScript geschrieben und modular aufgebaut sein. Die Architektur unterstützt Unit- und Integrationstests. Dokumentation (API-Docs, Code-Kommentare, Deployment-Guides) sollte vorhanden sein.
 
-### 5.6 Functional Constraints
+### Portabilität
 
-| ID           | Constraint                                                      | Impact |
-| ------------ | --------------------------------------------------------------- | ------ |
-| CON-FUNC-001 | PDF parsing accuracy depends on PDF structure (text-based only) | Medium |
-| CON-FUNC-002 | Fixed number of templates (4)                                   | Low    |
-| CON-FUNC-003 | File upload size limits                                         | Low    |
+Die Anwendung ist webbasiert und läuft in Docker-Containern. Sie ist mit modernen Browsern (Chrome, Firefox, Safari, Edge) kompatibel.
+
+### Skalierbarkeit
+
+Die Datenbank (MongoDB) nutzt effiziente Indizierung und Query-Optimierung. Die Anwendungsarchitektur ist stateless gestaltet, um horizontale Skalierung zu ermöglichen.
 
 ---
 
-## 6. Assumptions
+## Einschränkungen
 
-- Users have modern browsers with JavaScript enabled
-- Users have email access for verification
-- Stable internet connection during resume creation
-- GDPR applies primarily to EU users
-- Email delivery is reliable (SPF/DKIM configured)
+### Technische Einschränkungen
+
+Wir sind an den Tech-Stack gebunden: React mit TypeScript im Frontend, Django REST Framework im Backend, MongoDB mit djongo, Docker für Deployment. Moderne Browser werden unterstützt (kein Internet Explorer). MongoDB mit djongo hat begrenzte relationale Query-Fähigkeiten. Das Deployment muss über Docker erfolgen.
+
+### Geschäftliche Einschränkungen
+
+Das Entwicklungs- und Hosting-Budget ist begrenzt. Die Entwicklungszeit ist knapp, daher müssen Prioritäten gesetzt werden. Die Kernfunktionen müssen kostenlos bleiben - Premium-Features sind optional.
+
+### Rechtliche und regulatorische Einschränkungen
+
+DSGVO-Konformität ist für EU-Nutzer verpflichtend. Datenschutz und Privatsphäre müssen streng eingehalten werden, inklusive Datenspeicherung, Verschlüsselung, Datenlöschung und Transparenz bei der Datenverarbeitung.
+
+### Betriebliche Einschränkungen
+
+Die Anwendung ist abhängig vom E-Mail-Service (SMTP) für Verifizierungen und Passwort-Resets. Domain, SSL-Zertifikat und Serverwartung müssen bereitgestellt werden. Laufende Wartung, Sicherheitsupdates und Bugfixes sind erforderlich.
+
+### Ressourcen-Einschränkungen
+
+Das Entwicklungsteam ist klein, was die Kapazität begrenzt. Es gibt Abhängigkeiten von externen Services (MongoDB, E-Mail, Hosting), die potenzielle Ausfallquellen darstellen.
+
+### Funktionale Einschränkungen
+
+Das PDF-Parsing ist abhängig von der PDF-Struktur und funktioniert nur mit textbasierten PDFs (kein OCR). Die Anzahl der Vorlagen ist fest auf 4 begrenzt. Datei-Uploads haben Größenbeschränkungen.
 
 ---
 
-## 7. Dependencies
+## Annahmen
 
-**External:** MongoDB, Email service (SMTP), Domain/SSL, Docker, Node.js/Python runtime
-
-**Internal:** Frontend → Backend API → MongoDB, Authentication → Email service, PDF generation → Playwright, PDF parsing → pdfplumber
+Wir gehen davon aus, dass die Nutzer moderne Browser verwenden und JavaScript aktiviert haben. Alle Nutzer benötigen Zugriff auf ihre E-Mail-Adresse, um die Registrierung zu bestätigen. Eine stabile Internetverbindung während der Lebenslauf-Erstellung wird vorausgesetzt. Die DSGVO-Anforderungen gelten hauptsächlich für Nutzer aus der EU. Für die E-Mail-Funktionalität setzen wir voraus, dass SPF und DKIM korrekt konfiguriert sind, damit die Verifizierungs- und Reset-E-Mails zuverlässig zugestellt werden können.
 
 ---
 
-## Document History
+## Abhängigkeiten
 
-| Version | Date          | Changes                                    |
-| ------- | ------------- | ------------------------------------------ |
-| 1.1     | December 2024 | Condensed version, removed verbose details |
-| 1.0     | December 2024 | Initial requirements document              |
+**Externe Abhängigkeiten:** MongoDB-Datenbank, E-Mail-Service (SMTP), Domain/SSL, Docker, Node.js/Python Runtime
+
+**Interne Abhängigkeiten:** Frontend hängt vom Backend-API ab, Backend benötigt MongoDB, Authentifizierung benötigt E-Mail-Service, PDF-Generierung benötigt Playwright, PDF-Parsing nutzt pdfplumber-Bibliothek
 
 ---
 
-**End of Document**
+## Zukünftige Erweiterungen
+
+Die folgenden Features wurden bewusst für spätere Versionen zurückgestellt, sind aber Teil der langfristigen Produktvision:
+
+### Premium-Features
+
+**Cover-Letter-Builder:** Ein zusätzliches Modul zum Erstellen von Anschreiben, die perfekt auf die erstellten Lebensläufe abgestimmt sind. Nutzer können mehrere Anschreiben-Vorlagen auswählen und ihre Lebensläufe als Grundlage verwenden.
+
+**Erweiterte KI-Analyse:** Tiefgreifende Analyse der Lebensläufe mit detaillierten Verbesserungsvorschlägen, Keyword-Optimierung für spezifische Job-Anzeigen und Vergleich mit erfolgreichen Lebensläufen in derselben Branche.
+
+**Resume-Analytics:** Statistiken und Insights zu den Lebensläufen - wie oft sie heruntergeladen wurden, welche Abschnitte am meisten bearbeitet werden, und Trends über die Zeit.
+
+**Individuelles Branding:** Möglichkeit, eigene Farben, Fonts und Logo hinzuzufügen für Unternehmens- oder persönliche Branding-Zwecke.
+
+**Prioritäts-Support:** Schnellere Antwortzeiten auf Support-Anfragen und direkter Zugang zum Support-Team.
+
+### Funktionale Erweiterungen
+
+**Weitere Sprachen:** Ausweitung der Mehrsprachigkeit auf weitere Sprachen wie Französisch, Spanisch oder Italienisch für den europäischen Markt.
+
+**OCR-Funktionalität:** Unterstützung für gescannte PDF-Dateien durch optische Zeichenerkennung, damit auch alte, nur als Bild vorliegende Lebensläufe importiert werden können.
+
+**LinkedIn-Import:** Direkter Import von Profildaten aus LinkedIn, um den Einstieg zu beschleunigen.
+
+**Job-Board-Integrationen:** Integration mit Job-Boards wie Indeed oder Xing, um Lebensläufe direkt zu bewerben oder für spezifische Stellenanzeigen zu optimieren.
+
+**Kollaborations-Features:** Möglichkeit, Lebensläufe mit anderen zu teilen, Feedback zu sammeln oder gemeinsam an Versionen zu arbeiten (z.B. mit Karriereberatern oder Mentoren).
+
+**Weitere Templates:** Erweiterung der Vorlagen-Auswahl mit branchenspezifischen Designs (z.B. für Kreative, Techniker, Führungskräfte).
+
+**Video-Integration:** Option, ein kurzes Video-Profil zum Lebenslauf hinzuzufügen oder QR-Codes zu integrieren.
+
+**Bewerbungs-Tracking:** Ein Tool zum Verwalten von Bewerbungen - wo wurde der Lebenslauf eingereicht, Status-Tracking, Follow-up-Erinnerungen.
+
+### Technische Verbesserungen
+
+**Mobile Apps:** Native iOS und Android Apps für bessere mobile Nutzung.
+
+**Offline-Modus:** Möglichkeit, Lebensläufe offline zu bearbeiten und später zu synchronisieren.
+
+**API für Drittanbieter:** Öffentliche API, damit andere Services auf die Lebenslauf-Daten zugreifen können (z.B. für Bewerbungsplattformen).
+
+**Erweiterte Export-Formate:** Unterstützung für Word-Dokumente, HTML-Versionen oder direktes Teilen via Link.
+
+Diese Features sind derzeit nicht im Scope, aber wurden dokumentiert, um die Produktentwicklung langfristig zu leiten und die Vision des Produkts klar zu kommunizieren.
+
+---
+
+## Versionshistorie
+
+| Version | Datum         | Änderungen                                       |
+| ------- | ------------- | ------------------------------------------------ |
+| 1.3     | Dezember 2024 | Abschnitt "Zukünftige Erweiterungen" hinzugefügt |
+| 1.2     | Dezember 2024 | Ins Deutsche übersetzt, natürlicherer Stil       |
+| 1.1     | Dezember 2024 | Kompakte Version, weniger Details                |
+| 1.0     | Dezember 2024 | Erstes Anforderungsdokument                      |
+
+---
+
+**Ende des Dokuments**
