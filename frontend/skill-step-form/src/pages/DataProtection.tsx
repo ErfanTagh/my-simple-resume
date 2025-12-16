@@ -10,10 +10,9 @@ const DataProtection = () => {
           <p className="text-sm text-muted-foreground/80">{t('pages.dataProtection.lastUpdated')}</p>
 
           <section>
-            <h2 className="text-2xl font-semibold text-foreground mb-4">1. Data Controller</h2>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">{t('pages.dataProtection.section1Title')}</h2>
             <p className="leading-relaxed">
-              The data controller responsible for processing your personal data is 123Resume. For any data protection 
-              inquiries, please contact us at{" "}
+              {t('pages.dataProtection.section1Text')}{" "}
               <a href="mailto:contact@123resume.de" className="text-primary hover:underline">
                 contact@123resume.de
               </a>
@@ -21,60 +20,55 @@ const DataProtection = () => {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-foreground mb-4">2. Legal Basis for Processing</h2>
-            <p className="leading-relaxed mb-3">We process your personal data based on:</p>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">{t('pages.dataProtection.section2Title')}</h2>
+            <p className="leading-relaxed mb-3">{t('pages.dataProtection.section2Text')}</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>Your consent when you create an account</li>
-              <li>Contractual necessity to provide our services</li>
-              <li>Legitimate interests in improving our service</li>
-              <li>Legal obligations where applicable</li>
+              <li>{t('pages.dataProtection.section2Item1')}</li>
+              <li>{t('pages.dataProtection.section2Item2')}</li>
+              <li>{t('pages.dataProtection.section2Item3')}</li>
+              <li>{t('pages.dataProtection.section2Item4')}</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-foreground mb-4">3. Data Retention</h2>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">{t('pages.dataProtection.section3Title')}</h2>
             <p className="leading-relaxed">
-              We retain your personal data only for as long as necessary to fulfill the purposes outlined in our Privacy 
-              Policy, unless a longer retention period is required by law. When you delete your account, we will delete 
-              or anonymize your personal data within 30 days.
+              {t('pages.dataProtection.section3Text')}
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-foreground mb-4">4. Data Transfers</h2>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">{t('pages.dataProtection.section4Title')}</h2>
             <p className="leading-relaxed">
-              Your data is stored securely on servers located within the European Union. We do not transfer your personal 
-              data to countries outside the EU/EEA without appropriate safeguards in place.
+              {t('pages.dataProtection.section4Text')}
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-foreground mb-4">5. Your Rights Under GDPR</h2>
-            <p className="leading-relaxed mb-3">As a data subject, you have the following rights:</p>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">{t('pages.dataProtection.section5Title')}</h2>
+            <p className="leading-relaxed mb-3">{t('pages.dataProtection.section5Text')}</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
-              <li><strong>Right of access:</strong> Request a copy of your personal data</li>
-              <li><strong>Right to rectification:</strong> Correct inaccurate or incomplete data</li>
-              <li><strong>Right to erasure:</strong> Request deletion of your data</li>
-              <li><strong>Right to restrict processing:</strong> Limit how we use your data</li>
-              <li><strong>Right to data portability:</strong> Receive your data in a structured format</li>
-              <li><strong>Right to object:</strong> Object to processing of your data</li>
-              <li><strong>Right to withdraw consent:</strong> Withdraw consent at any time</li>
+              <li>{t('pages.dataProtection.section5Item1')}</li>
+              <li>{t('pages.dataProtection.section5Item2')}</li>
+              <li>{t('pages.dataProtection.section5Item3')}</li>
+              <li>{t('pages.dataProtection.section5Item4')}</li>
+              <li>{t('pages.dataProtection.section5Item5')}</li>
+              <li>{t('pages.dataProtection.section5Item6')}</li>
+              <li>{t('pages.dataProtection.section5Item7')}</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-foreground mb-4">6. Data Security Measures</h2>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">{t('pages.dataProtection.section6Title')}</h2>
             <p className="leading-relaxed">
-              We implement industry-standard security measures including encryption, secure authentication, regular security 
-              audits, and access controls to protect your personal data from unauthorized access, alteration, disclosure, 
-              or destruction.
+              {t('pages.dataProtection.section6Text')}
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-foreground mb-4">7. Contact</h2>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">{t('pages.dataProtection.section7Title')}</h2>
             <p className="leading-relaxed">
-              To exercise your rights or for any data protection concerns, please contact us at{" "}
+              {t('pages.dataProtection.section7Text')}{" "}
               <a href="mailto:contact@123resume.de" className="text-primary hover:underline">
                 contact@123resume.de
               </a>

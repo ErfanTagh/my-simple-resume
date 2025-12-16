@@ -25,70 +25,72 @@ export const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-lg no-print">
-      <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary flex items-center justify-center">
-            <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
-          </div>
-          <span className="text-lg sm:text-xl font-bold text-foreground">123Resume</span>
-        </Link>
-
-        <nav className="flex items-center gap-2 sm:gap-4">
-          <LanguageSwitcher />
-          {isAuthenticated ? (
-            <>
-              <span className="text-sm font-medium text-foreground hidden sm:inline">
-                {user?.first_name || user?.username}
-              </span>
-              
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full">
-                    <User className="h-5 w-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium">{user?.username}</p>
-                      <p className="text-xs text-muted-foreground">{user?.email}</p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate('/resumes')}>
-                    <FileText className="mr-2 h-4 w-4" />
-                    <span>{t('navigation.myResumes')}</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/dashboard')}>
-                    <FileText className="mr-2 h-4 w-4" />
-                    <span>{t('navigation.dashboard')}</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/profile')}>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>{t('navigation.profileSettings')}</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="text-destructive">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>{t('navigation.logout')}</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </>
-          ) : (
-            <div className="flex items-center gap-2 sm:gap-4">
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground" asChild>
-                <Link to="/login">{t('navigation.login')}</Link>
-              </Button>
-              <Button size="sm" className="bg-primary hover:bg-primary/90 text-xs sm:text-sm" asChild>
-                <Link to="/create">
-                  <span className="hidden sm:inline">{t('navigation.startBuildingFree')}</span>
-                  <span className="sm:hidden">{t('navigation.startFree')}</span>
-                </Link>
-              </Button>
+      <div className="container mx-auto px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 md:py-4">
+        <div className="flex items-center justify-between gap-2 sm:gap-4 min-w-0">
+          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-shrink-0">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-xl bg-primary flex items-center justify-center flex-shrink-0">
+              <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-primary-foreground" />
             </div>
-          )}
-        </nav>
+            <span className="text-base sm:text-lg md:text-xl font-bold text-foreground whitespace-nowrap truncate">123Resume</span>
+          </Link>
+
+          <nav className="flex items-center gap-1 sm:gap-2 md:gap-4 flex-shrink-0">
+            <LanguageSwitcher />
+            {isAuthenticated ? (
+              <>
+                <span className="text-xs sm:text-sm font-medium text-foreground hidden md:inline whitespace-nowrap">
+                  {user?.first_name || user?.username}
+                </span>
+                
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="rounded-full h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 flex-shrink-0">
+                      <User className="h-4 w-4 sm:h-5 sm:w-5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium truncate">{user?.username}</p>
+                        <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate('/resumes')}>
+                      <FileText className="mr-2 h-4 w-4" />
+                      <span>{t('navigation.myResumes')}</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+                      <FileText className="mr-2 h-4 w-4" />
+                      <span>{t('navigation.dashboard')}</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/profile')}>
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>{t('navigation.profileSettings')}</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>{t('navigation.logout')}</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <div className="flex items-center gap-1.5 sm:gap-2 md:gap-4">
+                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9" asChild>
+                  <Link to="/login">{t('navigation.login')}</Link>
+                </Button>
+                <Button size="sm" className="bg-primary hover:bg-primary/90 text-xs sm:text-sm px-2 sm:px-3 md:px-4 h-8 sm:h-9 whitespace-nowrap" asChild>
+                  <Link to="/create">
+                    <span className="hidden md:inline">{t('navigation.startBuildingFree')}</span>
+                    <span className="md:hidden">{t('navigation.startFree')}</span>
+                  </Link>
+                </Button>
+              </div>
+            )}
+          </nav>
+        </div>
       </div>
     </header>
   );

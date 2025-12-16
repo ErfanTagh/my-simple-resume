@@ -10,61 +10,58 @@ const Privacy = () => {
           <p className="text-sm text-muted-foreground/80">{t('pages.privacy.lastUpdated')}</p>
 
           <section>
-            <h2 className="text-2xl font-semibold text-foreground mb-4">1. Introduction</h2>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">{t('pages.privacy.section1Title')}</h2>
             <p className="leading-relaxed">
-              At 123Resume ("we", "our", or "us"), we are committed to protecting your privacy. This Privacy Policy 
-              explains how we collect, use, disclose, and safeguard your information when you use our resume builder 
-              service.
+              {t('pages.privacy.section1Text')}
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-foreground mb-4">2. Information We Collect</h2>
-            <p className="leading-relaxed mb-3">We collect information that you provide directly to us, including:</p>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">{t('pages.privacy.section2Title')}</h2>
+            <p className="leading-relaxed mb-3">{t('pages.privacy.section2Text')}</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>Account information (email address, password)</li>
-              <li>Resume content and data you enter into our platform</li>
-              <li>Usage data and preferences</li>
-              <li>Communication data when you contact us</li>
+              <li>{t('pages.privacy.section2Item1')}</li>
+              <li>{t('pages.privacy.section2Item2')}</li>
+              <li>{t('pages.privacy.section2Item3')}</li>
+              <li>{t('pages.privacy.section2Item4')}</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-foreground mb-4">3. How We Use Your Information</h2>
-            <p className="leading-relaxed mb-3">We use the information we collect to:</p>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">{t('pages.privacy.section3Title')}</h2>
+            <p className="leading-relaxed mb-3">{t('pages.privacy.section3Text')}</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>Provide, maintain, and improve our services</li>
-              <li>Process your resume creation and storage requests</li>
-              <li>Send you service-related communications</li>
-              <li>Respond to your inquiries and provide support</li>
-              <li>Detect and prevent fraud or abuse</li>
+              <li>{t('pages.privacy.section3Item1')}</li>
+              <li>{t('pages.privacy.section3Item2')}</li>
+              <li>{t('pages.privacy.section3Item3')}</li>
+              <li>{t('pages.privacy.section3Item4')}</li>
+              <li>{t('pages.privacy.section3Item5')}</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-foreground mb-4">4. Data Security</h2>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">{t('pages.privacy.section4Title')}</h2>
             <p className="leading-relaxed">
-              We implement appropriate technical and organizational measures to protect your personal information. 
-              However, no method of transmission over the Internet is 100% secure, and we cannot guarantee absolute security.
+              {t('pages.privacy.section4Text')}
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-foreground mb-4">5. Your Rights</h2>
-            <p className="leading-relaxed mb-3">You have the right to:</p>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">{t('pages.privacy.section5Title')}</h2>
+            <p className="leading-relaxed mb-3">{t('pages.privacy.section5Text')}</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>Access your personal data</li>
-              <li>Correct inaccurate data</li>
-              <li>Request deletion of your data</li>
-              <li>Object to processing of your data</li>
-              <li>Export your resume data</li>
+              <li>{t('pages.privacy.section5Item1')}</li>
+              <li>{t('pages.privacy.section5Item2')}</li>
+              <li>{t('pages.privacy.section5Item3')}</li>
+              <li>{t('pages.privacy.section5Item4')}</li>
+              <li>{t('pages.privacy.section5Item5')}</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-foreground mb-4">6. Contact Us</h2>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">{t('pages.privacy.section6Title')}</h2>
             <p className="leading-relaxed">
-              If you have questions about this Privacy Policy, please contact us at{" "}
+              {t('pages.privacy.section6Text')}{" "}
               <a href="mailto:contact@123resume.de" className="text-primary hover:underline">
                 contact@123resume.de
               </a>
