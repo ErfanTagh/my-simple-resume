@@ -131,48 +131,6 @@ Die Datenbank (MongoDB) nutzt effiziente Indizierung und Query-Optimierung. Die 
 
 ---
 
-## Einschränkungen
-
-### Technische Einschränkungen
-
-Wir sind an den Tech-Stack gebunden: React mit TypeScript im Frontend, Django REST Framework im Backend, MongoDB mit djongo, Docker für Deployment. Moderne Browser werden unterstützt (kein Internet Explorer). MongoDB mit djongo hat begrenzte relationale Query-Fähigkeiten. Das Deployment muss über Docker erfolgen.
-
-### Geschäftliche Einschränkungen
-
-Das Entwicklungs- und Hosting-Budget ist begrenzt. Die Entwicklungszeit ist knapp, daher müssen Prioritäten gesetzt werden. Die Kernfunktionen müssen kostenlos bleiben - Premium-Features sind optional.
-
-### Rechtliche und regulatorische Einschränkungen
-
-DSGVO-Konformität ist für EU-Nutzer verpflichtend. Datenschutz und Privatsphäre müssen streng eingehalten werden, inklusive Datenspeicherung, Verschlüsselung, Datenlöschung und Transparenz bei der Datenverarbeitung.
-
-### Betriebliche Einschränkungen
-
-Die Anwendung ist abhängig vom E-Mail-Service (SMTP) für Verifizierungen und Passwort-Resets. Domain, SSL-Zertifikat und Serverwartung müssen bereitgestellt werden. Laufende Wartung, Sicherheitsupdates und Bugfixes sind erforderlich.
-
-### Ressourcen-Einschränkungen
-
-Das Entwicklungsteam ist klein, was die Kapazität begrenzt. Es gibt Abhängigkeiten von externen Services (MongoDB, E-Mail, Hosting), die potenzielle Ausfallquellen darstellen.
-
-### Funktionale Einschränkungen
-
-Das PDF-Parsing ist abhängig von der PDF-Struktur und funktioniert nur mit textbasierten PDFs (kein OCR). Die Anzahl der Vorlagen ist fest auf 4 begrenzt. Datei-Uploads haben Größenbeschränkungen.
-
----
-
-## Annahmen
-
-Wir gehen davon aus, dass die Nutzer moderne Browser verwenden und JavaScript aktiviert haben. Alle Nutzer benötigen Zugriff auf ihre E-Mail-Adresse, um die Registrierung zu bestätigen. Eine stabile Internetverbindung während der Lebenslauf-Erstellung wird vorausgesetzt. Die DSGVO-Anforderungen gelten hauptsächlich für Nutzer aus der EU. Für die E-Mail-Funktionalität setzen wir voraus, dass SPF und DKIM korrekt konfiguriert sind, damit die Verifizierungs- und Reset-E-Mails zuverlässig zugestellt werden können.
-
----
-
-## Abhängigkeiten
-
-**Externe Abhängigkeiten:** MongoDB-Datenbank, E-Mail-Service (SMTP), Domain/SSL, Docker, Node.js/Python Runtime
-
-**Interne Abhängigkeiten:** Frontend hängt vom Backend-API ab, Backend benötigt MongoDB, Authentifizierung benötigt E-Mail-Service, PDF-Generierung benötigt Playwright, PDF-Parsing nutzt pdfplumber-Bibliothek
-
----
-
 ## Zukünftige Erweiterungen
 
 Die folgenden Features wurden bewusst für spätere Versionen zurückgestellt, sind aber Teil der langfristigen Produktvision:
