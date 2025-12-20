@@ -208,14 +208,16 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
     <div className="bg-gradient-to-br from-background to-primary/5 text-foreground p-8 max-w-4xl mx-auto font-creative">
       {/* Bold creative header */}
       <div className="mb-8">
-        <h1 className="text-5xl font-black text-foreground mb-2 italic tracking-tight">
-          {personalInfo.firstName}
-        </h1>
-        <h1 className="text-5xl font-black text-primary mb-4 italic tracking-tight">
-          {personalInfo.lastName}
-        </h1>
-        
-        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mt-4">
+        <div className="flex items-start gap-6 mb-4">
+          <div className="flex-1">
+            <h1 className="text-5xl font-black text-foreground mb-2 italic tracking-tight">
+              {personalInfo.firstName}
+            </h1>
+            <h1 className="text-5xl font-black text-primary mb-4 italic tracking-tight">
+              {personalInfo.lastName}
+            </h1>
+            
+            <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mt-4">
           {personalInfo.email && (
             <div className="flex items-center gap-2 bg-background/50 px-3 py-1 rounded-full">
               <Mail className="h-4 w-4 text-primary" />
@@ -250,6 +252,21 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
             <div className="flex items-center gap-2 bg-background/50 px-3 py-1 rounded-full min-w-0 max-w-fit">
               <Globe className="h-4 w-4 text-primary flex-shrink-0" />
               <span className="truncate text-xs">{personalInfo.website.replace(/^https?:\/\/(www\.)?/, '')}</span>
+            </div>
+          )}
+            </div>
+          </div>
+          
+          {/* Profile image */}
+          {personalInfo.profileImage && (
+            <div className="flex-shrink-0">
+              <div className="w-28 h-28">
+                <img 
+                  src={personalInfo.profileImage} 
+                  alt={`${personalInfo.firstName} ${personalInfo.lastName} profile`}
+                  className="w-full h-full object-cover rounded-lg border-4 border-primary shadow-lg"
+                />
+              </div>
             </div>
           )}
         </div>

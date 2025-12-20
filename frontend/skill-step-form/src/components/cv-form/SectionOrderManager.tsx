@@ -18,22 +18,12 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface SectionOrderManagerProps {
   sectionOrder: string[];
   onReorder: (newOrder: string[]) => void;
 }
-
-const sectionLabels: Record<string, string> = {
-  summary: "Professional Summary",
-  workExperience: "Work Experience",
-  education: "Education",
-  projects: "Projects",
-  certificates: "Certificates",
-  skills: "Skills",
-  languages: "Languages",
-  interests: "Interests & Hobbies",
-};
 
 interface SortableItemProps {
   id: string;
@@ -45,6 +35,7 @@ interface SortableItemProps {
 }
 
 const SortableItem = ({ id, section, index, totalItems, onMoveUp, onMoveDown }: SortableItemProps) => {
+  const { t } = useLanguage();
   const {
     attributes,
     listeners,
@@ -58,6 +49,18 @@ const SortableItem = ({ id, section, index, totalItems, onMoveUp, onMoveDown }: 
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
+  };
+
+  const sectionLabels: Record<string, string> = {
+    summary: t('resume.sections.summary'),
+    workExperience: t('resume.sections.workExperience'),
+    experience: t('resume.sections.experience'),
+    education: t('resume.sections.education'),
+    projects: t('resume.sections.projects'),
+    certificates: t('resume.sections.certifications'),
+    skills: t('resume.sections.skills'),
+    languages: t('resume.sections.languages'),
+    interests: t('resume.sections.interests'),
   };
 
   return (
@@ -99,6 +102,7 @@ const SortableItem = ({ id, section, index, totalItems, onMoveUp, onMoveDown }: 
 };
 
 export const SectionOrderManager = ({ sectionOrder, onReorder }: SectionOrderManagerProps) => {
+  const { t } = useLanguage();
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -132,9 +136,9 @@ export const SectionOrderManager = ({ sectionOrder, onReorder }: SectionOrderMan
 
   return (
     <Card className="p-6">
-      <h3 className="text-lg font-semibold mb-4 text-foreground">Customize Section Order</h3>
+      <h3 className="text-lg font-semibold mb-4 text-foreground">{t('resume.settings.sectionOrderTitle') || 'Customize Section Order'}</h3>
       <p className="text-sm text-muted-foreground mb-4">
-        Drag sections to reorder or use the arrow buttons
+        {t('resume.settings.sectionOrderDesc') || 'Drag sections to reorder or use the arrow buttons'}
       </p>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={sectionOrder} strategy={verticalListSortingStrategy}>

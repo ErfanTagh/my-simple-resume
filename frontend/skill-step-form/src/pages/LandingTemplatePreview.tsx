@@ -3,6 +3,8 @@ import { ModernTemplate } from "@/components/cv-form/templates/ModernTemplate";
 import { ClassicTemplate } from "@/components/cv-form/templates/ClassicTemplate";
 import { CreativeTemplate } from "@/components/cv-form/templates/CreativeTemplate";
 import { MinimalTemplate } from "@/components/cv-form/templates/MinimalTemplate";
+import { LatexTemplate } from "@/components/cv-form/templates/LatexTemplate";
+import { StarRoverTemplate } from "@/components/cv-form/templates/StarRoverTemplate";
 
 // Sample data for preview - realistic resume data
 const sampleData: CVFormData = {
@@ -19,8 +21,14 @@ const sampleData: CVFormData = {
     summary:
       "Experienced software engineer with 8+ years building scalable web applications. Expertise in React, Node.js, and cloud architecture. Passionate about creating efficient, maintainable code and leading high-performing development teams. Strong background in full-stack development, system design, and DevOps practices.",
     profileImage: "",
-    website: "",
-    interests: [],
+    website: "alexmartinez.dev",
+    interests: [
+      { interest: "Open Source Contribution" },
+      { interest: "Tech Blogging" },
+      { interest: "Hiking" },
+      { interest: "Photography" },
+      { interest: "Reading" },
+    ],
   },
   workExperience: [
     {
@@ -36,10 +44,13 @@ const sampleData: CVFormData = {
         { technology: "Node.js" },
         { technology: "AWS" },
         { technology: "PostgreSQL" },
+        { technology: "Docker" },
+        { technology: "Kubernetes" },
       ],
       competencies: [
         { competency: "Team Leadership" },
         { competency: "System Design" },
+        { competency: "Agile Methodology" },
       ],
     },
     {
@@ -54,8 +65,12 @@ const sampleData: CVFormData = {
         { technology: "JavaScript" },
         { technology: "Python" },
         { technology: "Django" },
+        { technology: "Redis" },
+        { technology: "Git" },
       ],
-      competencies: [],
+      competencies: [
+        { competency: "Full-Stack Development" },
+      ],
     },
     {
       position: "Junior Developer",
@@ -69,6 +84,22 @@ const sampleData: CVFormData = {
         { technology: "React" },
         { technology: "Node.js" },
         { technology: "MongoDB" },
+        { technology: "Express" },
+      ],
+      competencies: [],
+    },
+    {
+      position: "Intern Software Developer",
+      company: "LocalTech Solutions",
+      location: "Berkeley, CA",
+      startDate: "2015-06",
+      endDate: "2016-05",
+      description:
+        "Assisted in developing web features and maintaining codebase. Learned best practices in software development and contributed to team projects.",
+      technologies: [
+        { technology: "HTML" },
+        { technology: "CSS" },
+        { technology: "JavaScript" },
       ],
       competencies: [],
     },
@@ -85,6 +116,9 @@ const sampleData: CVFormData = {
         { course: "Data Structures" },
         { course: "Algorithms" },
         { course: "Database Systems" },
+        { course: "Operating Systems" },
+        { course: "Software Engineering" },
+        { course: "Machine Learning" },
       ],
     },
   ],
@@ -97,6 +131,8 @@ const sampleData: CVFormData = {
         { technology: "React" },
         { technology: "Node.js" },
         { technology: "MongoDB" },
+        { technology: "Stripe API" },
+        { technology: "Redis" },
       ],
       startDate: "2023-01",
       endDate: "2023-06",
@@ -110,9 +146,23 @@ const sampleData: CVFormData = {
         { technology: "Python" },
         { technology: "FastAPI" },
         { technology: "PostgreSQL" },
+        { technology: "WebSockets" },
       ],
       startDate: "2022-03",
       endDate: "2022-08",
+      link: "",
+    },
+    {
+      name: "Mobile Fitness App",
+      description:
+        "Created cross-platform mobile application for fitness tracking with social features. Integrated with health APIs and implemented push notifications.",
+      technologies: [
+        { technology: "React Native" },
+        { technology: "Firebase" },
+        { technology: "Redux" },
+      ],
+      startDate: "2021-09",
+      endDate: "2022-02",
       link: "",
     },
   ],
@@ -133,23 +183,49 @@ const sampleData: CVFormData = {
       credentialId: "",
       url: "",
     },
+    {
+      name: "Certified Kubernetes Administrator",
+      organization: "Cloud Native Computing Foundation",
+      issueDate: "2021-08",
+      expirationDate: "",
+      credentialId: "",
+      url: "",
+    },
+    {
+      name: "MongoDB Certified Developer",
+      organization: "MongoDB University",
+      issueDate: "2020-12",
+      expirationDate: "",
+      credentialId: "",
+      url: "",
+    },
   ],
   languages: [
     { language: "English", proficiency: "Native" },
     { language: "Spanish", proficiency: "Fluent" },
+    { language: "French", proficiency: "Conversational" },
   ],
   skills: [
     { skill: "JavaScript" },
+    { skill: "TypeScript" },
     { skill: "React" },
     { skill: "Node.js" },
     { skill: "Python" },
+    { skill: "Java" },
     { skill: "AWS" },
     { skill: "Docker" },
+    { skill: "Kubernetes" },
+    { skill: "PostgreSQL" },
+    { skill: "MongoDB" },
+    { skill: "Git" },
+    { skill: "CI/CD" },
+    { skill: "Microservices" },
   ],
+  sectionOrder: ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"],
 };
 
 interface LandingTemplatePreviewProps {
-  templateName: "modern" | "classic" | "creative" | "minimal";
+  templateName: "modern" | "classic" | "creative" | "minimal" | "latex" | "starRover";
 }
 
 export const LandingTemplatePreview = ({
@@ -186,6 +262,8 @@ export const LandingTemplatePreview = ({
             {templateName === "classic" && <ClassicTemplate data={data} />}
             {templateName === "creative" && <CreativeTemplate data={data} />}
             {templateName === "minimal" && <MinimalTemplate data={data} />}
+            {templateName === "latex" && <LatexTemplate data={data} />}
+            {templateName === "starRover" && <StarRoverTemplate data={data} />}
           </div>
         </div>
       </div>

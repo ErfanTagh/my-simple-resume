@@ -18,6 +18,7 @@ import { ChevronLeft, ChevronRight, FileCheck, Beaker } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { getTestProfile, getTestProfileNames } from "@/lib/testData";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface CVFormContainerProps {
   initialData?: CVFormData;
@@ -30,6 +31,7 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
   const [templateSelected, setTemplateSelected] = useState(!!initialData?.template);
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   // Ensure overlay is ALWAYS hidden when navigating between steps - only show when explicitly clicking "Complete CV"
   useEffect(() => {
@@ -128,11 +130,11 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
   }, [initialData]);
 
   const steps = [
-    { component: PersonalInfoStep, label: "Personal" },
-    { component: ExperienceStep, label: "Experience" },
-    { component: EducationStep, label: "Education" },
-    { component: SkillsStep, label: "Skills" },
-    { component: ReviewStep, label: "Review" },
+    { component: PersonalInfoStep, label: t('resume.steps.personal') },
+    { component: ExperienceStep, label: t('resume.steps.experience') },
+    { component: EducationStep, label: t('resume.steps.education') },
+    { component: SkillsStep, label: t('resume.steps.skills') },
+    { component: ReviewStep, label: t('resume.steps.review') },
   ];
 
   const handleEditStep = (step: number) => {
@@ -261,14 +263,14 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
       <div className="max-w-7xl mx-auto">
         {!templateSelected ? (
           // Template Selection Screen (before starting the form)
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
+          <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
+            <div className="lg:col-span-4">
               <div className="text-center mb-8">
                 <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                  Choose Your CV Template
+                  {t('resume.templateSelection.title')}
                 </h1>
                 <p className="text-muted-foreground">
-                  Select a template that best fits your style. You can see a live preview as you fill out your information.
+                  {t('resume.templateSelection.subtitle')}
                 </p>
               </div>
 
@@ -284,8 +286,12 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
             </div>
 
             {/* Preview on template selection screen */}
-            <div className="hidden lg:block">
-              <CVPreview data={formData} />
+            <div className="hidden lg:block lg:col-span-3">
+              <CVPreview 
+                data={formData}
+                onTemplateChange={(template) => form.setValue("template", template)}
+                onSectionOrderChange={(sectionOrder) => form.setValue("sectionOrder", sectionOrder)}
+              />
             </div>
           </div>
         ) : (
@@ -293,16 +299,16 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
           <>
             <div className="text-center mb-8">
               <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                Build Your CV
+                {t('resume.form.title')}
               </h1>
               <p className="text-muted-foreground">
-                Fill in your information step by step to create your professional CV
+                {t('resume.form.subtitle')}
               </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Form Section - Takes 2 columns */}
-          <div className="lg:col-span-2">
+            <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
+          {/* Form Section - Takes 4 columns */}
+          <div className="lg:col-span-4">
             <Card className="p-8 shadow-elevated">
               <ProgressIndicator
                 currentStep={currentStep}
@@ -405,8 +411,12 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
           </div>
 
               {/* Right Sidebar - Always Visible Preview */}
-              <div className="hidden lg:block">
-                <CVPreview data={formData} />
+              <div className="hidden lg:block lg:col-span-3">
+                <CVPreview 
+                  data={formData} 
+                  onTemplateChange={(template) => form.setValue("template", template)}
+                  onSectionOrderChange={(sectionOrder) => form.setValue("sectionOrder", sectionOrder)}
+                />
               </div>
             </div>
           </>

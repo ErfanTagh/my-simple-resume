@@ -183,17 +183,34 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
     <div className="bg-background text-foreground p-12 max-w-3xl mx-auto font-minimal">
       {/* Ultra-minimal header */}
       <div className="mb-10">
-        <h1 className="text-xl font-bold text-foreground mb-1 tracking-tight">
-          {personalInfo.firstName} {personalInfo.lastName}
-        </h1>
-        
-        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground mt-3">
+        <div className="flex items-start gap-6 mb-4">
+          <div className="flex-1">
+            <h1 className="text-xl font-bold text-foreground mb-1 tracking-tight">
+              {personalInfo.firstName} {personalInfo.lastName}
+            </h1>
+            
+            <div className="flex flex-wrap gap-3 text-xs text-muted-foreground mt-3">
           {personalInfo.email && <span>{personalInfo.email}</span>}
           {personalInfo.phone && <span>{personalInfo.phone}</span>}
           {personalInfo.location && <span>{personalInfo.location}</span>}
           {personalInfo.linkedin && <span className="truncate max-w-[200px]">{personalInfo.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span>}
           {personalInfo.github && <span className="truncate max-w-[200px]">{personalInfo.github.replace(/^https?:\/\/(www\.)?/, '')}</span>}
           {personalInfo.website && <span className="truncate max-w-[200px]">{personalInfo.website.replace(/^https?:\/\/(www\.)?/, '')}</span>}
+            </div>
+          </div>
+          
+          {/* Profile image */}
+          {personalInfo.profileImage && (
+            <div className="flex-shrink-0">
+              <div className="w-20 h-20">
+                <img 
+                  src={personalInfo.profileImage} 
+                  alt={`${personalInfo.firstName} ${personalInfo.lastName} profile`}
+                  className="w-full h-full object-cover rounded-sm"
+                />
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

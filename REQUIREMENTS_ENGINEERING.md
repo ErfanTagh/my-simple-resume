@@ -3,7 +3,7 @@
 ## 123Resume - Professioneller Lebenslauf-Builder
 
 **Version:** 1.2  
-**Datum:** Dezember 2024
+**Datum:** Dezember 2025
 
 ---
 
@@ -181,12 +181,12 @@ Diese Features sind derzeit nicht im Scope, aber wurden dokumentiert, um die Pro
 
 ## Versionshistorie
 
-| Version | Datum         | Änderungen                                       |
-| ------- | ------------- | ------------------------------------------------ |
-| 1.3     | Dezember 2024 | Abschnitt "Zukünftige Erweiterungen" hinzugefügt |
-| 1.2     | Dezember 2024 | Ins Deutsche übersetzt, natürlicherer Stil       |
-| 1.1     | Dezember 2024 | Kompakte Version, weniger Details                |
-| 1.0     | Dezember 2024 | Erstes Anforderungsdokument                      |
+| Version | Datum          | Änderungen                                       |
+| ------- | -------------- | ------------------------------------------------ |
+| 1.3     | Dezember 2025  | Abschnitt "Zukünftige Erweiterungen" hinzugefügt |
+| 1.2     | Dezember 2025  | Ins Deutsche übersetzt, natürlicherer Stil       |
+| 1.1     | November 2025  | Kompakte Version, weniger Details                |
+| 1.0     | September 2025 | Erstes Anforderungsdokument                      |
 
 ---
 

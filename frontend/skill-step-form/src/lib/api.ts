@@ -289,7 +289,7 @@ export interface ResumeData {
     skill: string;
   }>;
   sectionOrder?: string[];
-  template?: "modern" | "classic" | "minimal" | "creative";
+  template?: "modern" | "classic" | "minimal" | "creative" | "latex" | "starRover";
 }
 
 export interface Resume extends ResumeData {

@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { UserPlus, AlertCircle, Mail, CheckCircle2 } from 'lucide-react';
+import { EmailConfirmationAnimation } from '@/components/EmailConfirmationAnimation';
 
 export default function Signup() {
   const [searchParams] = useSearchParams();
@@ -98,10 +99,10 @@ export default function Signup() {
       <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background flex items-center justify-center py-12 px-4">
         <Card className="w-full max-w-md p-8 shadow-elevated">
           <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 mb-4">
-              <CheckCircle2 className="w-8 h-8 text-green-600 dark:text-green-400" />
+            <div className="flex justify-center mb-4">
+              <EmailConfirmationAnimation />
             </div>
-            <h1 className="text-2xl font-bold mb-2 text-green-600 dark:text-green-400">
+            <h1 className="text-2xl font-bold mb-2 text-primary">
               Check Your Email!
             </h1>
             <p className="text-muted-foreground mb-6">

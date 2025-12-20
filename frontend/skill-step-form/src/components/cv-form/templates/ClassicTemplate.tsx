@@ -185,6 +185,19 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
     <div className="bg-background text-foreground p-8 max-w-3xl mx-auto font-classic">
       {/* Header - centered and traditional */}
       <div className="text-center mb-6 pb-4 border-b-2 border-foreground">
+        {/* Profile image */}
+        {personalInfo.profileImage && (
+          <div className="flex justify-center mb-4">
+            <div className="w-28 h-28">
+              <img 
+                src={personalInfo.profileImage} 
+                alt={`${personalInfo.firstName} ${personalInfo.lastName} profile`}
+                className="w-full h-full object-cover rounded-full border-2 border-foreground"
+              />
+            </div>
+          </div>
+        )}
+        
         <h1 className="text-2xl font-bold text-foreground mb-3 uppercase tracking-wide">
           {personalInfo.firstName} {personalInfo.lastName}
         </h1>

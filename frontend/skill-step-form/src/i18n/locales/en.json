@@ -17,7 +17,9 @@
     "no": "No",
     "print": "Print",
     "download": "Download",
-    "downloadPDF": "Download PDF"
+    "downloadPDF": "Download PDF",
+    "viewMore": "View More",
+    "showLess": "Show Less"
   },
   "navigation": {
     "home": "Home",
@@ -53,11 +55,15 @@
     "templateCreativeDesc": "Bold & Eye-Catching",
     "templateMinimal": "Minimal",
     "templateMinimalDesc": "Minimalist & Elegant",
+    "templateLatex": "LaTeX",
+    "templateLatexDesc": "Academic & Technical Style",
+    "templateStarRover": "Star Rover",
+    "templateStarRoverDesc": "Modern Professional with Navy Accents",
     "templateLabel": "Template",
     "featuresTitle": "Everything You Need to Succeed",
     "featuresSubtitle": "Our powerful features help you create the perfect resume in no time",
     "featureMultipleTemplates": "Multiple Templates",
-    "featureMultipleTemplatesDesc": "Choose from 4 professionally designed templates that suit your style",
+    "featureMultipleTemplatesDesc": "Choose from 5 professionally designed templates that suit your style",
     "featureAIRating": "AI-Powered Rating",
     "featureAIRatingDesc": "Get instant feedback and suggestions to improve your resume",
     "featureQuickEasy": "Quick & Easy",
@@ -222,19 +228,21 @@
       "imageTypeError": "Please upload an image file"
     },
     "steps": {
+      "personal": "Personal",
+      "experience": "Experience",
+      "education": "Education",
+      "skills": "Skills",
+      "review": "Review",
       "personalInfo": "Personal Information",
       "personalInfoDesc": "Let's start with your basic details",
       "workExperience": "Work Experience",
       "workExperienceDesc": "Add your professional work history",
-      "education": "Education",
       "educationDesc": "Add your educational background",
       "projects": "Projects",
       "projectsDesc": "Showcase your projects and achievements",
       "certificates": "Certificates",
       "certificatesDesc": "Add your certifications and credentials",
-      "skills": "Skills",
       "languages": "Languages",
-      "review": "Review & Complete",
       "reviewDesc": "Review all information before finalizing"
     },
     "actions": {
@@ -252,12 +260,34 @@
       "uploadResume": "Upload Resume",
       "completeCV": "Complete CV"
     },
+    "templateSelection": {
+      "title": "Choose Your CV Template",
+      "subtitle": "Select a template that best fits your style. You can see a live preview as you fill out your information.",
+      "label": "Choose CV Template",
+      "description": "Select a template that best fits your style and industry"
+    },
+    "form": {
+      "title": "Build Your CV",
+      "subtitle": "Fill in your information step by step to create your professional CV"
+    },
     "templates": {
       "modern": "Modern",
       "classic": "Classic",
       "creative": "Creative",
       "minimal": "Minimal",
+      "latex": "LaTeX",
+      "starRover": "Star Rover",
       "selectTemplate": "Select Template"
+    },
+    "tabs": {
+      "design": "Design",
+      "templates": "Templates",
+      "settings": "Settings",
+      "score": "Score"
+    },
+    "settings": {
+      "sectionOrderTitle": "Customize Section Order",
+      "sectionOrderDesc": "Drag sections to reorder or use the arrow buttons"
     }
   },
   "blog": {
@@ -322,6 +352,16 @@
     "allRightsReserved": "© 2025 123Resume. All rights reserved."
   },
   "pages": {
+    "dashboard": {
+      "welcomeBack": "Welcome back",
+      "subtitle": "Ready to build your professional resume?",
+      "createNewResume": "Create New Resume",
+      "createNewResumeDesc": "Start building a new resume from scratch",
+      "getStarted": "Get Started",
+      "myResumesTitle": "My Resumes",
+      "myResumesDesc": "View and manage your saved resumes",
+      "viewAll": "View All"
+    },
     "about": {
       "title": "About 123Resume",
       "subtitle": "Empowering job seekers to create professional resumes that get noticed",
@@ -518,4 +558,3 @@
     }
   }
 }
-

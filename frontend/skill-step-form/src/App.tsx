@@ -8,6 +8,7 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
+import { ScrollToTop } from "./components/ScrollToTop";
 import Landing from "./pages/Landing";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
@@ -112,6 +113,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <ScrollToTop />
             <AppRoutes />
           </BrowserRouter>
         </AuthProvider>

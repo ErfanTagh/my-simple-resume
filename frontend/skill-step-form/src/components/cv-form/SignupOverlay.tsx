@@ -7,6 +7,8 @@ import { ModernTemplate } from "./templates/ModernTemplate";
 import { ClassicTemplate } from "./templates/ClassicTemplate";
 import { MinimalTemplate } from "./templates/MinimalTemplate";
 import { CreativeTemplate } from "./templates/CreativeTemplate";
+import { LatexTemplate } from "./templates/LatexTemplate";
+import { StarRoverTemplate } from "./templates/StarRoverTemplate";
 
 interface SignupOverlayProps {
   resumeData: CVFormData;
@@ -24,6 +26,10 @@ export const SignupOverlay = ({ resumeData, onClose }: SignupOverlayProps) => {
         return <MinimalTemplate data={resumeData} />;
       case "creative":
         return <CreativeTemplate data={resumeData} />;
+      case "latex":
+        return <LatexTemplate data={resumeData} />;
+      case "starRover":
+        return <StarRoverTemplate data={resumeData} />;
       case "modern":
       default:
         return <ModernTemplate data={resumeData} />;

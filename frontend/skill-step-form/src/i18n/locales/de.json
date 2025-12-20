@@ -17,7 +17,9 @@
     "no": "Nein",
     "print": "Drucken",
     "download": "Herunterladen",
-    "downloadPDF": "PDF Herunterladen"
+    "downloadPDF": "PDF Herunterladen",
+    "viewMore": "Mehr anzeigen",
+    "showLess": "Weniger anzeigen"
   },
   "navigation": {
     "home": "Startseite",
@@ -53,11 +55,15 @@
     "templateCreativeDesc": "Mutig & auffällig",
     "templateMinimal": "Minimalistisch",
     "templateMinimalDesc": "Minimalistisch & elegant",
+    "templateLatex": "LaTeX",
+    "templateLatexDesc": "Akademisch & technisch",
+    "templateStarRover": "Star Rover",
+    "templateStarRoverDesc": "Modern professionell mit Marine-Akzenten",
     "templateLabel": "Vorlage",
     "featuresTitle": "Alles, was Sie zum Erfolg brauchen",
     "featuresSubtitle": "Unsere leistungsstarken Funktionen helfen Ihnen, den perfekten Lebenslauf im Handumdrehen zu erstellen",
     "featureMultipleTemplates": "Mehrere Vorlagen",
-    "featureMultipleTemplatesDesc": "Wählen Sie aus 4 professionell gestalteten Vorlagen, die zu Ihrem Stil passen",
+    "featureMultipleTemplatesDesc": "Wählen Sie aus 5 professionell gestalteten Vorlagen, die zu Ihrem Stil passen",
     "featureAIRating": "KI-gestützte Bewertung",
     "featureAIRatingDesc": "Erhalten Sie sofortiges Feedback und Vorschläge zur Verbesserung Ihres Lebenslaufs",
     "featureQuickEasy": "Schnell & Einfach",
@@ -222,19 +228,21 @@
       "imageTypeError": "Bitte laden Sie eine Bilddatei hoch"
     },
     "steps": {
+      "personal": "Persönlich",
+      "experience": "Erfahrung",
+      "education": "Bildung",
+      "skills": "Fähigkeiten",
+      "review": "Überprüfung",
       "personalInfo": "Persönliche Informationen",
       "personalInfoDesc": "Beginnen wir mit Ihren Grunddaten",
       "workExperience": "Berufserfahrung",
       "workExperienceDesc": "Fügen Sie Ihren beruflichen Werdegang hinzu",
-      "education": "Bildung",
       "educationDesc": "Fügen Sie Ihren Bildungsweg hinzu",
       "projects": "Projekte",
       "projectsDesc": "Zeigen Sie Ihre Projekte und Erfolge",
       "certificates": "Zertifikate",
       "certificatesDesc": "Fügen Sie Ihre Zertifizierungen und Qualifikationen hinzu",
-      "skills": "Fähigkeiten",
       "languages": "Sprachen",
-      "review": "Überprüfen & Abschließen",
       "reviewDesc": "Überprüfen Sie alle Informationen, bevor Sie abschließen"
     },
     "actions": {
@@ -252,12 +260,34 @@
       "uploadResume": "Lebenslauf hochladen",
       "completeCV": "Lebenslauf abschließen"
     },
+    "templateSelection": {
+      "title": "Wählen Sie Ihre CV-Vorlage",
+      "subtitle": "Wählen Sie eine Vorlage, die am besten zu Ihrem Stil passt. Sie können eine Live-Vorschau sehen, während Sie Ihre Informationen eingeben.",
+      "label": "CV-Vorlage wählen",
+      "description": "Wählen Sie eine Vorlage, die am besten zu Ihrem Stil und Ihrer Branche passt"
+    },
+    "form": {
+      "title": "Erstellen Sie Ihren Lebenslauf",
+      "subtitle": "Geben Sie Ihre Informationen Schritt für Schritt ein, um Ihren professionellen Lebenslauf zu erstellen"
+    },
     "templates": {
       "modern": "Modern",
       "classic": "Klassisch",
       "creative": "Kreativ",
       "minimal": "Minimalistisch",
+      "latex": "LaTeX",
+      "starRover": "Star Rover",
       "selectTemplate": "Vorlage auswählen"
+    },
+    "tabs": {
+      "design": "Design",
+      "templates": "Vorlagen",
+      "settings": "Einstellungen",
+      "score": "Bewertung"
+    },
+    "settings": {
+      "sectionOrderTitle": "Abschnittsreihenfolge anpassen",
+      "sectionOrderDesc": "Ziehen Sie Abschnitte, um sie neu anzuordnen, oder verwenden Sie die Pfeiltasten"
     }
   },
   "blog": {
@@ -322,6 +352,16 @@
     "allRightsReserved": "© 2025 123Resume. Alle Rechte vorbehalten."
   },
   "pages": {
+    "dashboard": {
+      "welcomeBack": "Willkommen zurück",
+      "subtitle": "Bereit, Ihren professionellen Lebenslauf zu erstellen?",
+      "createNewResume": "Neuen Lebenslauf erstellen",
+      "createNewResumeDesc": "Beginnen Sie mit einem neuen Lebenslauf von Grund auf",
+      "getStarted": "Loslegen",
+      "myResumesTitle": "Meine Lebensläufe",
+      "myResumesDesc": "Anzeigen und Verwalten Ihrer gespeicherten Lebensläufe",
+      "viewAll": "Alle anzeigen"
+    },
     "about": {
       "title": "Über 123Resume",
       "subtitle": "Jobsuchende dabei unterstützen, professionelle Lebensläufe zu erstellen, die auffallen",

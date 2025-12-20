@@ -100,8 +100,8 @@ export const cvFormSchema = z.object({
     })
   ).optional(),  // 🔧 Made array optional
   sectionOrder: z.array(z.string()).optional(),
-  template: z.enum(["modern", "classic", "minimal", "creative"]).default("modern"),
+  template: z.enum(["modern", "classic", "minimal", "creative", "latex", "starRover"]).default("modern"),
 });
 export type CVFormData = z.infer<typeof cvFormSchema>;
 
-export type CVTemplate = "modern" | "classic" | "minimal" | "creative";
+export type CVTemplate = "modern" | "classic" | "minimal" | "creative" | "latex" | "starRover";

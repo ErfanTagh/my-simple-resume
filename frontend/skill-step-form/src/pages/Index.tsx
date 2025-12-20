@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { FileText, Plus, List } from 'lucide-react';
@@ -7,16 +8,17 @@ import { FileText, Plus, List } from 'lucide-react';
 const Index = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background py-12 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold mb-4">
-            Welcome back, {user?.first_name || user?.username}! 👋
+            {t('pages.dashboard.welcomeBack')}, {user?.first_name || user?.username}! 👋
           </h1>
           <p className="text-xl text-muted-foreground">
-            Ready to build your professional resume?
+            {t('pages.dashboard.subtitle')}
           </p>
         </div>
 
@@ -27,12 +29,12 @@ const Index = () => {
                 <Plus className="h-8 w-8 text-primary" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold mb-2">Create New Resume</h2>
+                <h2 className="text-2xl font-bold mb-2">{t('pages.dashboard.createNewResume')}</h2>
                 <p className="text-muted-foreground">
-                  Start building a new resume from scratch
+                  {t('pages.dashboard.createNewResumeDesc')}
                 </p>
               </div>
-              <Button className="w-full">Get Started</Button>
+              <Button className="w-full">{t('pages.dashboard.getStarted')}</Button>
             </div>
           </Card>
 
@@ -42,14 +44,14 @@ const Index = () => {
                 <List className="h-8 w-8 text-primary" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold mb-2">My Resumes</h2>
+                <h2 className="text-2xl font-bold mb-2">{t('pages.dashboard.myResumesTitle')}</h2>
                 <p className="text-muted-foreground">
-                  View and manage your saved resumes
+                  {t('pages.dashboard.myResumesDesc')}
                 </p>
               </div>
               <Button variant="outline" className="w-full">
                 <FileText className="mr-2 h-4 w-4" />
-                View All
+                {t('pages.dashboard.viewAll')}
               </Button>
             </div>
           </Card>

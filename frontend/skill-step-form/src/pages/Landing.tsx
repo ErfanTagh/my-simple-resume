@@ -19,6 +19,15 @@ import { useMemo } from "react";
 const Landing = () => {
   const { language, t } = useLanguage();
   const blogPosts = useMemo(() => getBlogPosts(language), [language]);
+  
+  const allTemplates = [
+    { nameKey: 'templateModern', descKey: 'templateModernDesc', key: 'modern' as const },
+    { nameKey: 'templateClassic', descKey: 'templateClassicDesc', key: 'classic' as const },
+    { nameKey: 'templateCreative', descKey: 'templateCreativeDesc', key: 'creative' as const },
+    { nameKey: 'templateMinimal', descKey: 'templateMinimalDesc', key: 'minimal' as const },
+    { nameKey: 'templateLatex', descKey: 'templateLatexDesc', key: 'latex' as const },
+    { nameKey: 'templateStarRover', descKey: 'templateStarRoverDesc', key: 'starRover' as const }
+  ];
   return (
     <div className="min-h-screen bg-background overflow-hidden">
       {/* Hero Section */}
@@ -77,13 +86,8 @@ const Landing = () => {
 
           {/* Preview Cards */}
           <div className="mt-12 sm:mt-20">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto">
-              {[
-                { nameKey: 'templateModern', descKey: 'templateModernDesc', key: 'modern' as const },
-                { nameKey: 'templateClassic', descKey: 'templateClassicDesc', key: 'classic' as const },
-                { nameKey: 'templateCreative', descKey: 'templateCreativeDesc', key: 'creative' as const },
-                { nameKey: 'templateMinimal', descKey: 'templateMinimalDesc', key: 'minimal' as const }
-              ].map((template, i) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto">
+              {allTemplates.map((template, i) => (
                 <div
                   key={template.key}
                   className="bg-card rounded-2xl border border-border p-3 sm:p-4 shadow-lg hover:shadow-[0_8px_25px_-5px_hsl(var(--primary)/0.35)] transition-all duration-300 hover:-translate-y-1.5"
