@@ -231,8 +231,173 @@ interface LandingTemplatePreviewProps {
 export const LandingTemplatePreview = ({
   templateName,
 }: LandingTemplatePreviewProps) => {
-  const data: CVFormData = {
+  // Enhanced data specifically for LaTeX template to ensure it fills properly
+  const enhancedData: CVFormData = templateName === "latex" ? {
     ...sampleData,
+    template: templateName,
+    personalInfo: {
+      ...sampleData.personalInfo,
+      summary:
+        "Experienced software engineer with 8+ years building scalable web applications. Expertise in React, Node.js, and cloud architecture. Passionate about creating efficient, maintainable code and leading high-performing development teams. Strong background in full-stack development, system design, and DevOps practices. Proven track record of delivering high-quality software solutions that drive business value and improve user experiences.",
+    },
+    workExperience: [
+      ...sampleData.workExperience,
+      {
+        position: "Software Development Intern",
+        company: "Innovation Labs",
+        location: "Palo Alto, CA",
+        startDate: "2014-06",
+        endDate: "2015-05",
+        description:
+          "Worked on frontend development projects using modern JavaScript frameworks. Participated in code reviews and learned best practices. Contributed to open-source projects and improved code quality metrics. Developed responsive web components and assisted in maintaining legacy codebase. Collaborated with senior developers to implement new features and resolve technical issues.",
+        technologies: [
+          { technology: "JavaScript" },
+          { technology: "HTML" },
+          { technology: "CSS" },
+          { technology: "jQuery" },
+          { technology: "Bootstrap" },
+        ],
+        competencies: [
+          { competency: "Frontend Development" },
+        ],
+      },
+    ],
+    projects: [
+      ...sampleData.projects,
+      {
+        name: "Open Source Contribution Platform",
+        description:
+          "Contributed to open-source projects with 10K+ GitHub stars. Implemented new features, fixed bugs, and improved documentation. Received recognition from maintainers for quality contributions. Maintained active participation in code reviews and community discussions. Enhanced project accessibility and performance through optimized code contributions.",
+        technologies: [
+          { technology: "TypeScript" },
+          { technology: "React" },
+          { technology: "GraphQL" },
+          { technology: "Jest" },
+        ],
+        startDate: "2023-07",
+        endDate: "Present",
+        link: "",
+      },
+      {
+        name: "Real-Time Analytics Dashboard",
+        description:
+          "Built analytics dashboard with real-time data visualization. Integrated with multiple data sources and implemented advanced filtering and aggregation features. Improved decision-making capabilities for stakeholders. Created custom chart components and interactive data exploration tools. Optimized performance to handle large datasets efficiently.",
+        technologies: [
+          { technology: "Vue.js" },
+          { technology: "D3.js" },
+          { technology: "Python" },
+          { technology: "InfluxDB" },
+          { technology: "WebSockets" },
+        ],
+        startDate: "2022-09",
+        endDate: "2023-02",
+        link: "",
+      },
+      {
+        name: "Machine Learning API Service",
+        description:
+          "Developed microservice for machine learning model inference with RESTful API interface. Implemented caching layer and request queuing system. Deployed containerized service on Kubernetes cluster with auto-scaling capabilities. Reduced inference latency by 60% through optimization techniques.",
+        technologies: [
+          { technology: "Python" },
+          { technology: "FastAPI" },
+          { technology: "TensorFlow" },
+          { technology: "Redis" },
+          { technology: "Kubernetes" },
+        ],
+        startDate: "2021-03",
+        endDate: "2021-11",
+        link: "",
+      },
+    ],
+    certificates: [
+      ...sampleData.certificates,
+      {
+        name: "React Advanced Patterns",
+        organization: "React Training",
+        issueDate: "2020-06",
+        expirationDate: "",
+        credentialId: "",
+        url: "",
+      },
+      {
+        name: "System Design Certificate",
+        organization: "Tech Interview University",
+        issueDate: "2020-03",
+        expirationDate: "",
+        credentialId: "",
+        url: "",
+      },
+      {
+        name: "Docker Certified Associate",
+        organization: "Docker Inc.",
+        issueDate: "2020-09",
+        expirationDate: "",
+        credentialId: "",
+        url: "",
+      },
+      {
+        name: "Kubernetes Administration",
+        organization: "Linux Foundation",
+        issueDate: "2021-01",
+        expirationDate: "",
+        credentialId: "",
+        url: "",
+      },
+    ],
+    education: [
+      ...sampleData.education,
+      {
+        degree: "High School Diploma",
+        institution: "Berkeley High School",
+        location: "Berkeley, CA",
+        startDate: "2010",
+        endDate: "2014",
+        field: "Science & Technology",
+        keyCourses: [
+          { course: "Advanced Mathematics" },
+          { course: "Computer Science" },
+          { course: "Physics" },
+        ],
+      },
+    ],
+    languages: [
+      ...sampleData.languages,
+      { language: "German", proficiency: "Basic" },
+      { language: "Japanese", proficiency: "Basic" },
+    ],
+    skills: [
+      ...sampleData.skills,
+      { skill: "GraphQL" },
+      { skill: "REST APIs" },
+      { skill: "TypeScript" },
+      { skill: "Vue.js" },
+      { skill: "Angular" },
+      { skill: "System Design" },
+      { skill: "Agile" },
+      { skill: "Scrum" },
+      { skill: "TDD" },
+      { skill: "SOLID Principles" },
+      { skill: "Redis" },
+      { skill: "Elasticsearch" },
+      { skill: "RabbitMQ" },
+      { skill: "Nginx" },
+      { skill: "Jenkins" },
+      { skill: "GitLab CI" },
+      { skill: "Terraform" },
+      { skill: "Ansible" },
+      { skill: "Monitoring" },
+    ],
+    interests: [
+      ...(sampleData.personalInfo.interests || []),
+      { interest: "Machine Learning" },
+      { interest: "DevOps" },
+      { interest: "Architecture Design" },
+      { interest: "Code Reviews" },
+    ],
+  } : sampleData;
+
+  const data: CVFormData = {
+    ...enhancedData,
     template: templateName,
   };
 
