@@ -154,8 +154,9 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
     ? Math.max(...workDescriptions.map(d => d.length))
     : 0;
   const isConcise = avgLength > 0 && avgLength < 800 && maxLength < 1200; // Average less than 800 chars, max less than 1200 chars per description
-  if (isConcise || workDescriptions.length === 0) structureScore += 0.5;
-  else suggestions.push("Keep bullet points concise - aim for 1-2 lines maximum");
+  // Only give credit if there are actual descriptions that are concise - empty should not get bonus
+  if (isConcise) structureScore += 0.5;
+  else if (workDescriptions.length > 0) suggestions.push("Keep bullet points concise - aim for 1-2 lines maximum");
   
   // Appropriate length (0.5 pts) - estimate pages based on content
   const estimatedLength = estimateResumeLength(data);
@@ -165,89 +166,45 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   if (isAppropriateLength) structureScore += 0.5;
   else if (estimatedLength > 2.5) suggestions.push("Resume may be too long - aim for 1 page (under 5 years experience) or 2 pages (senior roles)");
   
-  // VERY harsh penalties for excessive text in each section
+  // Reduced penalties for excessive text - only penalize truly excessive lengths
   let lengthDeductions = 0;
   
-  // Work experience descriptions - VERY harsh penalties
+  // Work experience descriptions - only penalize extreme cases
   if (avgLength > 2000) {
-    lengthDeductions += 2.5; // Very harsh penalty for extremely long descriptions (avg > 2000 chars)
+    lengthDeductions += 1.0; // Penalty for extremely long descriptions (avg > 2000 chars)
   } else if (avgLength > 1500) {
-    lengthDeductions += 1.8; // Harsh penalty for very long descriptions (avg > 1500 chars)
-  } else if (avgLength > 1200) {
-    lengthDeductions += 1.2; // Significant penalty for long descriptions (avg > 1200 chars)
-  } else if (avgLength > 1000) {
-    lengthDeductions += 0.7; // Penalty for moderately long descriptions (avg > 1000 chars)
-  } else if (avgLength > 900) {
-    lengthDeductions += 0.4; // Small penalty for slightly long descriptions (avg > 900 chars)
+    lengthDeductions += 0.5; // Small penalty for very long descriptions (avg > 1500 chars)
   }
+  // Don't penalize descriptions under 1500 chars average
   
-  // Check for individual overly long descriptions - cumulative penalty (more aggressive)
+  // Check for individual extremely long descriptions
   const veryLongDescriptions = workDescriptions.filter(d => d.length > 2000).length;
-  const longDescriptions = workDescriptions.filter(d => d.length > 1500 && d.length <= 2000).length;
-  const moderatelyLongDescriptions = workDescriptions.filter(d => d.length > 1200 && d.length <= 1500).length;
-  if (veryLongDescriptions > 0) {
-    lengthDeductions += Math.min(veryLongDescriptions * 0.6, 1.5); // Up to 1.5 deduction for multiple extremely long entries
-  }
-  if (longDescriptions > 0) {
-    lengthDeductions += Math.min(longDescriptions * 0.3, 0.9); // Additional penalty for long entries
-  }
-  if (moderatelyLongDescriptions > 2) {
-    lengthDeductions += Math.min((moderatelyLongDescriptions - 2) * 0.15, 0.4); // Penalty for multiple moderately long entries
+  if (veryLongDescriptions > 2) {
+    lengthDeductions += Math.min((veryLongDescriptions - 2) * 0.2, 0.5); // Only penalize if 3+ extremely long entries
   }
   
-  // Check summary length - VERY harsher penalties
+  // Check summary length - only penalize extreme cases
   const summaryLength = (data.personalInfo.summary || '').length;
-  if (summaryLength > 600) {
-    lengthDeductions += 1.0; // Very harsh penalty for very long summary (> 600 chars)
-  } else if (summaryLength > 500) {
-    lengthDeductions += 0.7; // Harsh penalty for overly long summary (> 500 chars)
-  } else if (summaryLength > 400) {
-    lengthDeductions += 0.4; // Penalty for long summary (400-500 chars)
-  } else if (summaryLength > 350) {
-    lengthDeductions += 0.2; // Small penalty for slightly long summary (350-400 chars)
+  if (summaryLength > 700) {
+    lengthDeductions += 0.5; // Penalty for very long summary (> 700 chars)
   }
+  // Don't penalize summaries under 700 chars
   
-  // Check project descriptions - VERY harsher penalties
+  // Check project descriptions - only penalize extreme cases
   const projects = data.projects || [];
   const projectDescriptions = projects.map(p => (p.description || '').length);
   const avgProjectLength = projectDescriptions.length > 0
     ? projectDescriptions.reduce((sum, len) => sum + len, 0) / projectDescriptions.length
     : 0;
   const maxProjectLength = projectDescriptions.length > 0 ? Math.max(...projectDescriptions) : 0;
-  if (avgProjectLength > 600) {
-    lengthDeductions += 0.8; // Very harsh penalty for very long project descriptions
-  } else if (avgProjectLength > 400) {
-    lengthDeductions += 0.5; // Harsh penalty for long project descriptions
-  } else if (avgProjectLength > 300) {
-    lengthDeductions += 0.3; // Penalty for moderately long project descriptions
+  if (avgProjectLength > 800) {
+    lengthDeductions += 0.3; // Penalty for very long project descriptions
   }
-  // Penalty for individual very long project descriptions
-  if (maxProjectLength > 800) {
-    lengthDeductions += 0.5;
-  } else if (maxProjectLength > 600) {
-    lengthDeductions += 0.3;
+  if (maxProjectLength > 1000) {
+    lengthDeductions += 0.2; // Penalty for individual extremely long project descriptions
   }
   
-  // Check education field length if they exist
-  const educationEntries = data.education || [];
-  const educationFieldLengths = educationEntries.map(e => ((e.field || '') + (e.degree || '') + (e.institution || '')).length);
-  const avgEducationLength = educationFieldLengths.length > 0
-    ? educationFieldLengths.reduce((sum, len) => sum + len, 0) / educationFieldLengths.length
-    : 0;
-  if (avgEducationLength > 200) {
-    lengthDeductions += 0.3; // Penalty for long education fields
-  }
-  
-  // Compound penalty: if multiple sections are too long, add extra penalty
-  let longSectionsCount = 0;
-  if (avgLength > 1200) longSectionsCount++;
-  if (summaryLength > 400) longSectionsCount++;
-  if (avgProjectLength > 400) longSectionsCount++;
-  if (longSectionsCount >= 3) {
-    lengthDeductions += 1.0; // Extra harsh penalty if 3+ sections are too long
-  } else if (longSectionsCount >= 2) {
-    lengthDeductions += 0.5; // Extra penalty if 2 sections are too long
-  }
+  // Don't penalize education field length - it's usually short
   
   // Deduct from structure score (can't go below 0)
   structureScore = Math.max(0, structureScore - lengthDeductions);
@@ -255,8 +212,9 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   // Easy to scan (0.5 pts) - good use of bullet points and structure
   const hasBulletPoints = workDescriptions.some(desc => desc.includes('\n') || desc.includes('•'));
   const hasStructure = workExp.every(exp => exp.position && exp.company);
-  if ((hasBulletPoints || workDescriptions.length === 0) && hasStructure) structureScore += 0.5;
-  else suggestions.push("Use bullet points and clear structure to make your resume easy to scan");
+  // Only give credit if there are actual descriptions with good structure - empty should not get bonus
+  if (hasBulletPoints && hasStructure && workDescriptions.length > 0) structureScore += 0.5;
+  else if (workExp.length > 0) suggestions.push("Use bullet points and clear structure to make your resume easy to scan");
   
   categories.push({
     name: "Structure & Format",
@@ -314,8 +272,14 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
     exp.position && exp.company && exp.description && exp.description.length >= 50
   ).length;
   
-  if (recentWorkDetailed >= Math.min(recentWork.length, 1)) experienceScore += 0.5;
-  else if (workExp.length > 0) suggestions.push("Provide detailed descriptions for your most recent roles");
+  if (recentWorkDetailed >= Math.min(recentWork.length, 1)) {
+    experienceScore += 0.5;
+  } else if (workExp.length > 0) {
+    // Give base points for having work experience entries, even if minimal
+    const hasBasicWorkInfo = workExp.some(exp => exp.position && exp.company);
+    if (hasBasicWorkInfo) experienceScore += 0.2; // Base points for having work experience structure
+    suggestions.push("Provide detailed descriptions for your most recent roles");
+  }
   
   // Achievement-oriented (1 pt) - focuses on accomplishments (language-agnostic)
   const achievementOrientedCount = workExp.filter(exp => {
@@ -331,9 +295,15 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
     return hasAchievement && desc.length >= 50;
   }).length;
   
-  if (achievementOrientedCount >= Math.min(workExp.length, 2)) experienceScore += 1;
-  else if (workExp.length > 0) suggestions.push("Focus on achievements and outcomes in your work experience, not just responsibilities");
-  else suggestions.push("Add detailed work experience with focus on achievements");
+  if (achievementOrientedCount >= Math.min(workExp.length, 2)) {
+    experienceScore += 1;
+  } else if (workExp.length > 0) {
+    // Give base points for having work experience with descriptions, even if not achievement-focused yet
+    const hasDescriptions = workExp.some(exp => exp.description && exp.description.length > 0);
+    if (hasDescriptions) experienceScore += 0.3; // Base points for having descriptions
+    suggestions.push("Focus on achievements and outcomes in your work experience, not just responsibilities");
+  }
+  // Don't suggest adding experience if it doesn't exist - that's optional
   
   // Context provided (0.5 pts) - company info, industry/role context mentioned
   const hasContext = workExp.some(exp => {
@@ -345,8 +315,15 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
     return hasCompanyInfo && (hasLocation || mentionsIndustry || hasDetailedDescription);
   });
   
-  if (hasContext) experienceScore += 0.5;
-  else if (workExp.length > 0) suggestions.push("Add context like company size, industry, or technologies used in your experience");
+  if (hasContext) {
+    experienceScore += 0.5;
+  } else if (workExp.length > 0) {
+    // Give base points for having company info, even if context is minimal
+    const hasCompanyInfo = workExp.some(exp => exp.company && exp.company.length > 2);
+    if (hasCompanyInfo) experienceScore += 0.2; // Base points for having company information
+    suggestions.push("Add context like company size, industry, or technologies used in your experience");
+  }
+  // Don't penalize if no work experience - that's optional
   
   categories.push({
     name: "Experience Section",
@@ -365,10 +342,13 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   const validSkills = skills.length;
   
   // Organized (0.3 pts) - skills are present and not excessive
-  if (validSkills >= 3 && validSkills <= 20) skillsScore += 0.3;
-  else if (validSkills > 20) {
+  if (validSkills >= 3 && validSkills <= 20) {
+    skillsScore += 0.3;
+  } else if (validSkills > 20) {
     suggestions.push("Consider reducing your skills list - focus on the most relevant ones");
-  } else {
+  } else if (validSkills > 0) {
+    // Give base points for having skills, even if minimal
+    skillsScore += 0.1; // Base points for having at least some skills
     suggestions.push("Add more skills to showcase your expertise");
   }
   
@@ -381,8 +361,17 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
     skillsMatchExperience || 
     validSkills >= 8
   );
-  if (hasRelevantSkills) skillsScore += 0.4;
-  else if (validSkills > 0) suggestions.push("Add more relevant skills that match industry standards and your experience");
+  if (hasRelevantSkills) {
+    skillsScore += 0.4;
+  } else if (validSkills >= 3) {
+    // Give base points for having 3+ skills, even if not fully relevant
+    skillsScore += 0.2;
+    suggestions.push("Add more relevant skills that match industry standards and your experience");
+  } else if (validSkills > 0) {
+    // Already got 0.1 from organized section, just suggest adding more
+    suggestions.push("Add more relevant skills that match industry standards and your experience");
+  }
+  // Don't suggest if no skills - that's optional
   
   // Not oversaturated (0.3 pts) - focused list
   if (validSkills >= 5 && validSkills <= 15) skillsScore += 0.3;
@@ -409,9 +398,14 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
     edu.degree && edu.institution && (edu.startDate || edu.endDate)
   ).length;
   
-  if (completeEdu >= 1) educationScore += 0.25;
-  else if (education.length > 0) suggestions.push("Complete your education entries with degree, institution, and dates");
-  else suggestions.push("Add your education details");
+  if (completeEdu >= 1) {
+    educationScore += 0.25;
+  } else if (education.length > 0) {
+    // Give base points for having education entries, even if incomplete
+    const hasBasicEduInfo = education.some(edu => edu.degree && edu.institution);
+    if (hasBasicEduInfo) educationScore += 0.15; // Base points for having education structure
+    suggestions.push("Complete your education entries with degree, institution, and dates");
+  }
   
   // Relevant certs (0.25 pts) - industry-recognized certifications
   const certs = data.certificates || [];
@@ -472,48 +466,39 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
     suggestions.push("Use a professional email address (e.g., firstname.lastname@email.com)");
   }
   
-  // Vague or generic descriptions
+  // Vague or generic descriptions - only penalize if descriptions are actually generic, not just short
+  // Short descriptions are okay - they're better than no descriptions at all
   const vagueDescriptions = workDescriptions.filter(desc => {
-    const isShort = desc.length < 30;
+    // Don't penalize short descriptions - that's fine
     const hasGeneric = genericPhrases.some(phrase => desc.toLowerCase().includes(phrase));
-    return isShort || hasGeneric;
+    // Only penalize if it's generic AND has enough length to be meaningful
+    return hasGeneric && desc.length >= 30;
   }).length;
   
   if (vagueDescriptions > 0 && workDescriptions.length > 0) {
-    deductions += Math.min(vagueDescriptions * 0.25, 0.5);
+    deductions += Math.min(vagueDescriptions * 0.15, 0.3); // Reduced penalty - having generic is better than nothing
     if (vagueDescriptions > 0) suggestions.push("Replace vague or generic descriptions with specific, achievement-focused statements");
   }
   
-  // Excessive length with little substance - VERY harsh penalties
-  if (estimatedLength > 3.5) {
-    deductions += 3.5; // Very harsh penalty for extremely long resume (> 3.5 pages)
+  // Excessive length - reduced penalties (only penalize truly excessive length)
+  if (estimatedLength > 4.0) {
+    deductions += 1.5; // Penalty for extremely long resume (> 4 pages)
     suggestions.push("Your resume is far too long - focus on quality over quantity, aim for 1-2 pages");
-  } else if (estimatedLength > 3.0) {
-    deductions += 2.5; // Very harsh penalty for very long resume (> 3 pages)
+  } else if (estimatedLength > 3.5) {
+    deductions += 1.0; // Penalty for very long resume (> 3.5 pages)
     suggestions.push("Your resume is too long - focus on quality over quantity, aim for 1-2 pages");
-  } else if (estimatedLength > 2.5) {
-    deductions += 1.8; // Harsh penalty for long resume (2.5-3 pages)
+  } else if (estimatedLength > 3.0) {
+    deductions += 0.5; // Small penalty for long resume (> 3 pages)
     suggestions.push("Your resume is long but lacks substance - focus on quality over quantity");
-  } else if (estimatedLength > 2.2) {
-    deductions += 1.2; // Significant penalty for moderately long resume (2.2-2.5 pages)
-    if (yearsOfExperience < 5) {
-      suggestions.push("Resume is longer than recommended for your experience level - be more concise");
-    } else {
-      suggestions.push("Your resume could be more concise - aim for quality over quantity");
-    }
-  } else if (estimatedLength > 2.0) {
-    deductions += 0.8; // Penalty for slightly long resume (2-2.2 pages)
-    if (yearsOfExperience < 5) {
-      suggestions.push("Resume is longer than recommended for your experience level - be more concise");
-    }
   }
+  // Don't penalize resumes between 2-3 pages - that's acceptable
   
-  // Missing contact information
-  const hasContactInfo = data.personalInfo.email && 
-                        (data.personalInfo.phone || data.personalInfo.linkedin);
-  if (!hasContactInfo) {
+  // Missing contact information - only penalize if email is missing (required field)
+  // Phone and LinkedIn are optional, so missing them shouldn't be penalized
+  const hasEmail = data.personalInfo.email && data.personalInfo.email.length > 0;
+  if (!hasEmail) {
     deductions += 0.5;
-    suggestions.push("Ensure you have complete contact information (email, phone, or LinkedIn)");
+    suggestions.push("Ensure you have complete contact information (email is required)");
   }
   
   // Unexplained gaps (check for large gaps in employment)
@@ -534,12 +519,11 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   // BONUS POINTS (Max +1)
   // ============================================
   
-  // Professional links/portfolio (website, LinkedIn, portfolio)
+  // Professional links/portfolio (website, LinkedIn, portfolio) - bonus only, no penalty
   if (data.personalInfo.website || data.personalInfo.linkedin) {
     bonuses += 0.3;
-  } else {
-    suggestions.push("Add a professional website or LinkedIn profile to strengthen your online presence");
   }
+  // Don't suggest adding these - they're optional
   
   // Additional credentials (projects, publications, volunteer work)
   const userProjects = data.projects || [];
