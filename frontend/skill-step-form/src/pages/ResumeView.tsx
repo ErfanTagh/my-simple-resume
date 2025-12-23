@@ -6,6 +6,13 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ArrowLeft, AlertCircle, Printer, Download } from 'lucide-react';
 import { downloadResumePDFFromElement } from '@/lib/resumePdfUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { ModernTemplate } from '@/components/cv-form/templates/ModernTemplate';
+import { ClassicTemplate } from '@/components/cv-form/templates/ClassicTemplate';
+import { MinimalTemplate } from '@/components/cv-form/templates/MinimalTemplate';
+import { CreativeTemplate } from '@/components/cv-form/templates/CreativeTemplate';
+import { LatexTemplate } from '@/components/cv-form/templates/LatexTemplate';
+import { StarRoverTemplate } from '@/components/cv-form/templates/StarRoverTemplate';
+import { CVFormData } from '@/components/cv-form/types';
 
 export default function ResumeView() {
   const { id } = useParams<{ id: string }>();
@@ -123,7 +130,42 @@ export default function ResumeView() {
     );
   }
 
-  const personalInfo = resume.personalInfo;
+  // Convert Resume to CVFormData format for template rendering
+  const convertResumeToFormData = (resume: Resume): CVFormData => {
+    return {
+      template: resume.template || 'modern',
+      personalInfo: resume.personalInfo,
+      workExperience: resume.workExperience || [],
+      education: resume.education || [],
+      projects: resume.projects || [],
+      certificates: resume.certificates || [],
+      skills: resume.skills || [],
+      languages: resume.languages || [],
+      sectionOrder: resume.sectionOrder || []
+    };
+  };
+
+  // Render the appropriate template component
+  const renderTemplate = () => {
+    const formData = convertResumeToFormData(resume);
+    const template = resume.template || 'modern';
+
+    switch (template) {
+      case 'classic':
+        return <ClassicTemplate data={formData} />;
+      case 'minimal':
+        return <MinimalTemplate data={formData} />;
+      case 'creative':
+        return <CreativeTemplate data={formData} />;
+      case 'latex':
+        return <LatexTemplate data={formData} />;
+      case 'starRover':
+        return <StarRoverTemplate data={formData} />;
+      case 'modern':
+      default:
+        return <ModernTemplate data={formData} />;
+    }
+  };
 
   return (
     <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
@@ -146,266 +188,8 @@ export default function ResumeView() {
       </div>
 
       {/* Resume Content */}
-      <div className="resume-container" ref={resumeContentRef}>
-        {/* Header Section */}
-        <header className="resume-header">
-          <div className="header-content">
-            <div className="profile-info">
-              <h1 className="name"><strong>{personalInfo.firstName} {personalInfo.lastName}</strong></h1>
-              {personalInfo.professionalTitle && (
-                <h2 className="title">{personalInfo.professionalTitle}</h2>
-              )}
-            </div>
-            {personalInfo.profileImage && (
-              <img src={personalInfo.profileImage} alt={`${personalInfo.firstName} ${personalInfo.lastName}`} className="profile-image" />
-            )}
-          </div>
-        </header>
-
-        {/* Main Content - Single Column */}
-        <main className="resume-main">
-          
-          {/* Professional Summary Section */}
-          {personalInfo.summary && personalInfo.summary.trim() && (
-            <section className="resume-section">
-              <h3 className="section-title">{t('resume.sections.professionalSummary')}</h3>
-              <p style={{ fontSize: '0.9em', lineHeight: '1.5', color: '#495057' }}>
-                {personalInfo.summary}
-              </p>
-            </section>
-          )}
-
-          {/* Contact Section */}
-          <section className="resume-section">
-            <h3 className="section-title">{t('resume.sections.contact')}</h3>
-            <div className="contact-info">
-              {personalInfo.phone && (
-                <div className="contact-item">
-                  <span>{t('resume.fields.phone')}: {personalInfo.phone}</span>
-                </div>
-              )}
-              <div className="contact-item">
-                <span>{t('resume.fields.email')}: {personalInfo.email}</span>
-              </div>
-              {personalInfo.location && (
-                <div className="contact-item">
-                  <span>{t('resume.fields.location')}: {personalInfo.location}</span>
-                </div>
-              )}
-              {personalInfo.github && (
-                <div className="contact-item">
-                  <span>{t('resume.fields.github')}: <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="contact-link">{personalInfo.github}</a></span>
-                </div>
-              )}
-              {personalInfo.linkedin && (
-                <div className="contact-item">
-                  <span>{t('resume.fields.linkedin')}: <a href={personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="contact-link">{personalInfo.linkedin}</a></span>
-                </div>
-              )}
-              {personalInfo.website && (
-                <div className="contact-item">
-                  <span>{t('resume.fields.website')}: <a href={personalInfo.website} target="_blank" rel="noopener noreferrer" className="contact-link">{personalInfo.website}</a></span>
-                </div>
-              )}
-            </div>
-          </section>
-
-          {/* Education Section */}
-          {resume.education && resume.education.length > 0 && 
-           resume.education.some((edu) => edu.degree || edu.institution) && (
-            <section className="resume-section">
-              <h3 className="section-title">{t('resume.sections.education')}</h3>
-              {resume.education.filter((edu) => edu.degree || edu.institution).map((edu, index) => (
-                <div key={index} className="education-item">
-                  <h4><strong>{edu.degree}</strong></h4>
-                  <div className="education-header">
-                    <p className="institution"><strong>{edu.institution}</strong></p>
-                    {(edu.startDate || edu.endDate) && (
-                      <p className="period">
-                        {edu.startDate} - {edu.endDate || t('resume.fields.present')}
-                      </p>
-                    )}
-                  </div>
-                  {edu.location && (
-                    <p className="location">{edu.location}</p>
-                  )}
-                  {edu.keyCourses && edu.keyCourses.length > 0 && 
-                   edu.keyCourses.some((course) => course.course && course.course.trim()) && (
-                    <div className="key-courses">
-                      {edu.keyCourses
-                        .filter((course) => course.course && course.course.trim())
-                        .map((course, courseIndex) => (
-                          <span key={courseIndex} className="course-tag">{course.course}</span>
-                        ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </section>
-          )}
-
-          {/* Work Experience Section */}
-          {resume.workExperience && resume.workExperience.length > 0 && 
-           resume.workExperience.some((exp) => exp.position || exp.company) && (
-            <section className="resume-section">
-              <h3 className="section-title">{t('resume.sections.workExperience')}</h3>
-              {resume.workExperience.filter((exp) => exp.position || exp.company).map((exp, index) => (
-                <div key={index} className="experience-item">
-                  <div className="experience-header">
-                    <h4><strong>{exp.position}</strong></h4>
-                  </div>
-                  <div className="experience-place">
-                    <span className="company"><strong>{exp.company}</strong></span>
-                    {(exp.startDate || exp.endDate) && (
-                      <span className="period">
-                        {exp.startDate} - {exp.endDate || t('resume.fields.present')}
-                      </span>
-                    )}
-                  </div>
-                  {exp.location && (
-                    <div className="experience-location">
-                      <span>{exp.location}</span>
-                    </div>
-                  )}
-                  {exp.description && (
-                    <ul className="experience-details">
-                      {exp.description.split('\n').filter(line => line.trim()).map((line, lineIndex) => (
-                        <li key={lineIndex}>{line.trim()}</li>
-                      ))}
-                    </ul>
-                  )}
-                  {exp.technologies && exp.technologies.length > 0 && 
-                   exp.technologies.some((tech) => tech.technology && tech.technology.trim()) && (
-                    <div className="job-tech">
-                      {exp.technologies
-                        .filter((tech) => tech.technology && tech.technology.trim())
-                        .map((tech, techIndex) => (
-                          <span key={techIndex} className="tech-tag">{tech.technology}</span>
-                        ))}
-                    </div>
-                  )}
-                  {exp.competencies && exp.competencies.length > 0 && 
-                   exp.competencies.some((comp) => comp.competency && comp.competency.trim()) && (
-                    <div className="job-competencies">
-                      {exp.competencies
-                        .filter((comp) => comp.competency && comp.competency.trim())
-                        .map((comp, compIndex) => (
-                          <span key={compIndex} className="competency-bubble">{comp.competency}</span>
-                        ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </section>
-          )}
-
-          {/* Projects Section */}
-          {resume.projects && resume.projects.length > 0 && 
-           resume.projects.some((project) => project.name && project.name.trim()) && (
-            <section className="resume-section">
-              <h3 className="section-title">{t('resume.sections.projects')}</h3>
-              {resume.projects.filter((project) => project.name && project.name.trim()).map((project, index) => (
-                <div key={index} className="project-item">
-                  <div className="project-header">
-                    <h4><strong>{project.name}</strong></h4>
-                    {project.link && (
-                      <a href={project.link} target="_blank" rel="noopener noreferrer" className="project-link">
-                        {t('resume.labels.viewProject')}
-                      </a>
-                    )}
-                  </div>
-                  {project.description && (
-                    <p className="project-description">{project.description}</p>
-                  )}
-                  {project.technologies && project.technologies.length > 0 && 
-                   project.technologies.some((tech) => tech.technology && tech.technology.trim()) && (
-                    <div className="project-tech">
-                      {project.technologies
-                        .filter((tech) => tech.technology && tech.technology.trim())
-                        .map((tech, techIndex) => (
-                          <span key={techIndex} className="tech-tag">{tech.technology}</span>
-                        ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </section>
-          )}
-
-          {/* Certifications Section */}
-          {resume.certificates && resume.certificates.length > 0 && 
-           resume.certificates.some((cert) => cert.name && cert.name.trim()) && (
-            <section className="resume-section">
-              <h3 className="section-title">{t('resume.sections.certifications')}</h3>
-              {resume.certificates.filter((cert) => cert.name && cert.name.trim()).map((cert, index) => (
-                <div key={index} className="certification-item">
-                  <div className="certification-header">
-                    <h4><strong>{cert.name}</strong></h4>
-                    {cert.organization && (
-                      <span className="certification-issuer">{cert.organization}</span>
-                    )}
-                  </div>
-                  {cert.issueDate && (
-                    <p className="certification-date">{cert.issueDate}</p>
-                  )}
-                  {cert.url && (
-                    <a href={cert.url} target="_blank" rel="noopener noreferrer" className="certification-link">
-                      {t('resume.labels.viewCertificate')}
-                    </a>
-                  )}
-                </div>
-              ))}
-            </section>
-          )}
-
-          {/* Skills Section */}
-          {resume.skills && resume.skills.length > 0 && (
-            <section className="resume-section">
-              <h3 className="section-title">{t('resume.sections.skills')}</h3>
-              <div className="skill-tags">
-                {resume.skills
-                  .filter((skillObj) => skillObj.skill && skillObj.skill.trim())
-                  .map((skillObj, index) => (
-                    <span key={index} className="skill-tag">{skillObj.skill}</span>
-                  ))}
-              </div>
-            </section>
-          )}
-
-          {/* Languages Section */}
-          {resume.languages && resume.languages.length > 0 && 
-           resume.languages.some((lang) => lang.language && lang.language.trim()) && (
-            <section className="resume-section">
-              <h3 className="section-title">{t('resume.sections.languages')}</h3>
-              <div className="languages-list">
-                {resume.languages
-                  .filter((lang) => lang.language && lang.language.trim())
-                  .map((lang, index) => (
-                    <div key={index} className="language-item">
-                      <span className="language-name">{lang.language}</span>
-                      <span className="language-level">{lang.proficiency}</span>
-                    </div>
-                  ))}
-              </div>
-            </section>
-          )}
-
-          {/* Interests Section */}
-          {personalInfo.interests && personalInfo.interests.length > 0 && 
-           personalInfo.interests.some((interest) => interest.interest && interest.interest.trim()) && (
-            <section className="resume-section">
-              <h3 className="section-title">{t('resume.sections.interests')}</h3>
-              <div className="interests-list">
-                {personalInfo.interests
-                  .filter((interest) => interest.interest && interest.interest.trim())
-                  .map((interest, index) => (
-                    <span key={index} className="interest-tag">{interest.interest}</span>
-                  ))}
-              </div>
-            </section>
-          )}
-
-        </main>
+      <div className="resume-container" ref={resumeContentRef} style={{ maxWidth: '210mm', margin: '0 auto', backgroundColor: 'white', padding: '40px' }}>
+        {renderTemplate()}
       </div>
 
       <style>{`

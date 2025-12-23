@@ -19,6 +19,66 @@ const CSS_FILES = [
 ];
 
 /**
+ * Get all stylesheets from the current page (including Tailwind CSS)
+ * This extracts CSS from all stylesheets available in the document
+ */
+function getAllStylesheets(): string {
+  const stylesheets: string[] = [];
+  
+  // Get all stylesheet links from the head
+  const styleLinks = Array.from(document.querySelectorAll('head > link[rel="stylesheet"]'));
+  styleLinks.forEach((link) => {
+    const href = (link as HTMLLinkElement).href;
+    if (href && !href.includes('font')) {
+      stylesheets.push(`<link rel="stylesheet" href="${href}">`);
+    }
+  });
+  
+  // Get all inline styles from style tags
+  const styleTags = Array.from(document.querySelectorAll('head > style'));
+  styleTags.forEach((style) => {
+    const cssText = style.textContent || style.innerHTML;
+    if (cssText) {
+      stylesheets.push(`<style>${cssText}</style>`);
+    }
+  });
+  
+  // Also try to extract CSS rules from document.styleSheets (for dynamically loaded styles)
+  try {
+    Array.from(document.styleSheets).forEach((stylesheet) => {
+      try {
+        // Skip stylesheets that are already included as link tags
+        if (stylesheet.href && styleLinks.some(link => (link as HTMLLinkElement).href === stylesheet.href)) {
+          return;
+        }
+        
+        // Try to get the CSS rules
+        if (stylesheet.cssRules) {
+          let cssText = '';
+          for (let i = 0; i < stylesheet.cssRules.length; i++) {
+            cssText += stylesheet.cssRules[i].cssText + '\n';
+          }
+          if (cssText && cssText.length > 100) { // Only include substantial stylesheets
+            stylesheets.push(`<style>${cssText}</style>`);
+          }
+        }
+      } catch (e) {
+        // Cross-origin stylesheets will throw an error, skip them
+        // Or try to use href instead
+        if (stylesheet.href && !stylesheet.href.includes('font')) {
+          stylesheets.push(`<link rel="stylesheet" href="${stylesheet.href}">`);
+        }
+      }
+    });
+  } catch (e) {
+    // If there's an error accessing styleSheets, continue with what we have
+    console.warn('Could not access all stylesheets:', e);
+  }
+  
+  return stylesheets.join('\n');
+}
+
+/**
  * Fetch and inline all CSS files
  */
 async function fetchCSSFiles(): Promise<string[]> {
@@ -293,8 +353,18 @@ async function downloadPDFFromHTML(
   resumeHTML: string,
   filename?: string
 ): Promise<void> {
+  // Get all stylesheets from the current page (includes Tailwind CSS)
+  const pageStylesheets = getAllStylesheets();
+  
+  // Get font links
+  const fontLinks = Array.from(document.querySelectorAll('head > link[rel*="font"], head > link[href*="font"], head > link[href*="fonts.googleapis"]'))
+    .map(link => `<link rel="stylesheet" href="${(link as HTMLLinkElement).href}">`)
+    .join('\n');
+  
+  // Also fetch old CSS files for backward compatibility
   const cssContents = await fetchCSSFiles();
   
+  // Get computed styles for the resume container to ensure proper styling
   const fullHTML = `
 <!DOCTYPE html>
 <html lang="en">
@@ -302,7 +372,26 @@ async function downloadPDFFromHTML(
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Resume</title>
+  ${fontLinks}
+  ${pageStylesheets}
   ${cssContents.join('\n')}
+  <style>
+    /* Ensure proper rendering */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      background: white;
+    }
+    /* Ensure images load correctly */
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
 </head>
 <body>
   ${resumeHTML}

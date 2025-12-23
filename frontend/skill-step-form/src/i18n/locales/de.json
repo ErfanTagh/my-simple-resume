@@ -285,6 +285,9 @@
       "settings": "Einstellungen",
       "score": "Bewertung"
     },
+    "preview": {
+      "notice": "Vorschau - Der finale Export hat eine sauberere Formatierung"
+    },
     "settings": {
       "sectionOrderTitle": "Abschnittsreihenfolge anpassen",
       "sectionOrderDesc": "Ziehen Sie Abschnitte, um sie neu anzuordnen, oder verwenden Sie die Pfeiltasten"

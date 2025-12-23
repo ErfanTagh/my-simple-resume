@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { CVFormData, CVTemplate } from "./types";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { ModernTemplate } from "./templates/ModernTemplate";
 import { ClassicTemplate } from "./templates/ClassicTemplate";
 import { MinimalTemplate } from "./templates/MinimalTemplate";
@@ -10,7 +12,7 @@ import { StarRoverTemplate } from "./templates/StarRoverTemplate";
 import { CVRating } from "./CVRating";
 import { TemplateSelector } from "./TemplateSelector";
 import { SectionOrderManager } from "./SectionOrderManager";
-import { FileText, TrendingUp, FileStack, Settings, Eye } from "lucide-react";
+import { FileText, TrendingUp, FileStack, Settings, Info } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface CVPreviewProps {
@@ -21,6 +23,7 @@ interface CVPreviewProps {
 
 export const CVPreview = ({ data, onTemplateChange, onSectionOrderChange }: CVPreviewProps) => {
   const { t } = useLanguage();
+  const [activeTab, setActiveTab] = useState("design");
   const template = data.template || "modern";
   const defaultSectionOrder = ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"];
   const sectionOrder = data.sectionOrder || defaultSectionOrder;
@@ -29,6 +32,8 @@ export const CVPreview = ({ data, onTemplateChange, onSectionOrderChange }: CVPr
     if (onTemplateChange) {
       onTemplateChange(selectedTemplate);
     }
+    // Switch to Design tab when template is selected
+    setActiveTab("design");
   };
   
   const handleSectionOrderChange = (newOrder: string[]) => {
@@ -57,7 +62,7 @@ export const CVPreview = ({ data, onTemplateChange, onSectionOrderChange }: CVPr
   
   return (
     <div className="space-y-4 sticky top-4 w-full min-w-[400px]">
-      <Tabs defaultValue="design" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="design" className="flex items-center gap-2 text-xs">
             <FileText className="h-4 w-4" />
@@ -78,9 +83,17 @@ export const CVPreview = ({ data, onTemplateChange, onSectionOrderChange }: CVPr
         </TabsList>
         
         <TabsContent value="design" className="mt-4">
-          <Card className="overflow-hidden h-fit">
-            {renderTemplate()}
-          </Card>
+          <div className="space-y-2">
+            <Card className="overflow-hidden h-fit">
+              {renderTemplate()}
+            </Card>
+            <div className="flex items-center gap-2 px-1">
+              <Info className="h-3.5 w-3.5 text-muted-foreground" />
+              <Badge variant="outline" className="text-xs font-normal text-muted-foreground border-muted-foreground/30 bg-muted/30">
+                {t('resume.preview.notice') || 'Preview - Final export will have cleaner formatting'}
+              </Badge>
+            </div>
+          </div>
         </TabsContent>
         
         <TabsContent value="templates" className="mt-4">

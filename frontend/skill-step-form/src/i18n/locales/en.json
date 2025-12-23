@@ -285,6 +285,9 @@
       "settings": "Settings",
       "score": "Score"
     },
+    "preview": {
+      "notice": "Preview - Final export will have cleaner formatting"
+    },
     "settings": {
       "sectionOrderTitle": "Customize Section Order",
       "sectionOrderDesc": "Drag sections to reorder or use the arrow buttons"

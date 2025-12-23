@@ -50,10 +50,34 @@ export const CVRating = ({ data, onAnalyze, isAnalyzing, rating: externalRating 
   };
 
   const getOverallStatus = (score: number) => {
-    if (score >= 80) return { label: "Excellent", color: "bg-green-500" };
-    if (score >= 60) return { label: "Good", color: "bg-yellow-500" };
-    if (score >= 40) return { label: "Fair", color: "bg-orange-500" };
-    return { label: "Needs Improvement", color: "bg-red-500" };
+    if (score >= 80) return { 
+      label: "Excellent", 
+      color: "bg-green-500",
+      borderColor: "border-green-500",
+      bgColor: "bg-green-50 dark:bg-green-950/20",
+      textColor: "text-green-700 dark:text-green-400"
+    };
+    if (score >= 60) return { 
+      label: "Good", 
+      color: "bg-yellow-500",
+      borderColor: "border-yellow-500",
+      bgColor: "bg-yellow-50 dark:bg-yellow-950/20",
+      textColor: "text-yellow-700 dark:text-yellow-400"
+    };
+    if (score >= 40) return { 
+      label: "Fair", 
+      color: "bg-orange-500",
+      borderColor: "border-orange-500",
+      bgColor: "bg-orange-50 dark:bg-orange-950/20",
+      textColor: "text-orange-700 dark:text-orange-400"
+    };
+    return { 
+      label: "Needs Improvement", 
+      color: "bg-red-500",
+      borderColor: "border-red-500",
+      bgColor: "bg-red-50 dark:bg-red-950/20",
+      textColor: "text-red-700 dark:text-red-400"
+    };
   };
 
 if (!rating) {
@@ -97,6 +121,30 @@ if (!rating) {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Status Indicator Box */}
+        <div className={`rounded-lg border-2 ${status.borderColor} ${status.bgColor} p-4 transition-colors duration-300`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className={`h-12 w-12 rounded-full ${status.color} flex items-center justify-center shadow-lg`}>
+                <span className="text-white font-bold text-lg">{rating.overallScore}</span>
+              </div>
+              <div>
+                <p className={`font-semibold text-lg ${status.textColor}`}>
+                  {status.label}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Resume Status
+                </p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className={`text-2xl font-bold ${status.textColor}`}>
+                {rating.overallScore}/100
+              </p>
+              <p className="text-xs text-muted-foreground">Overall Score</p>
+            </div>
+          </div>
+        </div>
         {/* Overall Score */}
         <div className="space-y-3 text-center">
           <div className={`text-5xl font-bold ${getOverallScoreColor(rating.overallScore)}`}>

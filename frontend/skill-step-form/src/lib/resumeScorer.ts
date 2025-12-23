@@ -8,173 +8,629 @@ interface ScoreCategory {
 }
 
 interface ResumeScore {
-  overallScore: number;
+  overallScore: number; // 0-100 for display
   categories: ScoreCategory[];
   suggestions: string[];
 }
 
+/**
+ * Strong action verbs that indicate impact (English)
+ */
+const STRONG_ACTION_VERBS_EN = [
+  'led', 'managed', 'developed', 'implemented', 'optimized', 'designed',
+  'created', 'built', 'launched', 'achieved', 'improved', 'increased',
+  'reduced', 'established', 'delivered', 'transformed', 'streamlined',
+  'executed', 'initiated', 'spearheaded', 'accelerated', 'enhanced',
+  'pioneered', 'orchestrated', 'maximized', 'minimized', 'solved',
+  'architected', 'scaled', 'modernized', 'revolutionized'
+];
+
+/**
+ * Strong action verbs (German)
+ */
+const STRONG_ACTION_VERBS_DE = [
+  'geleitet', 'gemanagt', 'entwickelt', 'implementiert', 'optimiert', 'designt',
+  'erstellt', 'gebaut', 'gestartet', 'erreicht', 'verbessert', 'erhöht',
+  'reduziert', 'etabliert', 'geliefert', 'transformiert', 'optimiert',
+  'durchgeführt', 'initiiert', 'angeführt', 'beschleunigt', 'verbessert',
+  'vorangetrieben', 'koordiniert', 'maximiert', 'minimiert', 'gelöst',
+  'architekturiert', 'skaliert', 'modernisiert', 'revolutioniert',
+  'umgesetzt', 'realisiert', 'gesteuert', 'überwacht', 'organisiert',
+  'verwaltet', 'betreut', 'beraten', 'erfolgreich', 'verantwortlich'
+];
+
+/**
+ * Weak verbs that should be avoided
+ */
+const WEAK_VERBS = [
+  'responsible for', 'worked on', 'assisted with', 'helped with',
+  'was involved in', 'participated in', 'took part in'
+];
+
+/**
+ * Professional email patterns (to detect unprofessional emails)
+ */
+const UNPROFESSIONAL_EMAIL_PATTERNS = [
+  /party/i, /drunk/i, /lazy/i, /cool/i, /sexy/i, /hot/i,
+  /gamer/i, /ninja/i, /rockstar/i, /hacker/i, /\d{4,}/, // 4+ consecutive numbers
+  /(.)\1{3,}/ // repeated characters like aaa@gmail.com
+];
+
+/**
+ * Calculate comprehensive resume score (0-10 scale, converted to 0-100 for display)
+ */
 export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   const categories: ScoreCategory[] = [];
   const suggestions: string[] = [];
+  let totalScore = 0;
+  let deductions = 0;
+  let bonuses = 0;
 
-  // Personal Information Score (25 points)
-  let personalScore = 0;
-  const personalMax = 25;
-  if (data.personalInfo.firstName && data.personalInfo.lastName) personalScore += 5;
-  if (data.personalInfo.email) personalScore += 5;
-  if (data.personalInfo.phone) personalScore += 3;
-  if (data.personalInfo.location) personalScore += 3;
-  if (data.personalInfo.professionalTitle) personalScore += 4;
-  if (data.personalInfo.summary) personalScore += 5;
+  // Language-agnostic metrics patterns (defined once, used throughout)
+  const metricsPattern = /\b(\d+[%]|\$\d+[KM]?|€\d+[KM]?|\d+\s*[%]|\d+\s*(years?|months?|people|users|customers|clients|team members?|Jahre?|Monate?|Personen?|Mitarbeiter?|Kunden?|Menschen?))\b/i;
+  const universalMetricsPattern = /\b\d+\s*(%|€|\$|Mio|Mio\.|Million|Millionen|Tausend|K|M|BN|Billion|Milliarden|Jahre|Monate|Personen|Mitarbeiter|Kunden|Menschen|users|people|years|months|customers|clients|team)\b/i;
+
+  // ============================================
+  // 1. CONTENT QUALITY (3 points)
+  // ============================================
+  let contentScore = 0;
   
-  if (personalScore < 20) {
-    suggestions.push("Complete your personal information with professional title and summary");
-  }
+  // Strong action verbs (0.5 pts) - language-agnostic detection
+  const allText = getAllTextContent(data);
+  const hasStrongVerbsEN = STRONG_ACTION_VERBS_EN.some(verb => 
+    new RegExp(`\\b${verb}\\w*\\b`, 'i').test(allText)
+  );
+  const hasStrongVerbsDE = STRONG_ACTION_VERBS_DE.some(verb => 
+    new RegExp(`\\b${verb}\\w*\\b`, 'i').test(allText)
+  );
+  const hasStrongVerbs = hasStrongVerbsEN || hasStrongVerbsDE;
+  if (hasStrongVerbs) contentScore += 0.5;
+  else suggestions.push("Use strong action verbs like 'Led', 'Developed', 'Implemented' instead of 'Responsible for' or 'Worked on'");
+  
+  // Quantifiable achievements (1 pt) - language-agnostic (numbers/percentages work in all languages)
+  const hasMetrics = metricsPattern.test(allText) || universalMetricsPattern.test(allText) || /\d+[%]/.test(allText);
+  if (hasMetrics) contentScore += 1;
+  else suggestions.push("Add quantifiable achievements with numbers, percentages, or metrics (e.g., 'Increased revenue by 40%', 'Managed team of 5')");
+  
+  // Relevance (0.5 pts) - check if skills match experience
+  const skills = (data.skills || []).map(s => s.skill?.toLowerCase() || '').filter(Boolean);
+  const workExpTextForRelevance = (data.workExperience || []).map(exp => 
+    `${exp.position || ''} ${exp.description || ''}`.toLowerCase()
+  ).join(' ');
+  // Check if skills are mentioned in work experience or if there are enough skills
+  const hasRelevance = skills.length > 0 && (
+    skills.some(skill => workExpTextForRelevance.includes(skill)) || 
+    skills.length >= 3
+  );
+  if (hasRelevance) contentScore += 0.5;
+  else suggestions.push("Ensure your skills are relevant and match your work experience");
+  
+  // Impact-focused (1 pt) - descriptions focus on outcomes (language-agnostic)
+  const workExp = data.workExperience || [];
+  const impactFocusedCount = workExp.filter(exp => {
+    const desc = exp.description || '';
+    // Check for outcome indicators in both languages
+    const outcomeEN = /\b(improved|increased|reduced|achieved|delivered|optimized|enhanced)\b/i.test(desc);
+    const outcomeDE = /\b(verbessert|erhöht|reduziert|erreicht|geliefert|optimiert|gesteigert|verstärkt)\b/i.test(desc);
+    const hasOutcome = outcomeEN || outcomeDE;
+    const hasResult = metricsPattern.test(desc) || universalMetricsPattern.test(desc) || /\d+[%]/.test(desc);
+    const hasActionEN = STRONG_ACTION_VERBS_EN.some(verb => new RegExp(`\\b${verb}\\w*\\b`, 'i').test(desc));
+    const hasActionDE = STRONG_ACTION_VERBS_DE.some(verb => new RegExp(`\\b${verb}\\w*\\b`, 'i').test(desc));
+    const hasAction = hasActionEN || hasActionDE;
+    return (hasOutcome || hasResult) && hasAction;
+  }).length;
+  
+  if (impactFocusedCount >= Math.min(workExp.length, 2)) contentScore += 1;
+  else if (workExp.length > 0) suggestions.push("Focus on outcomes and impact in your experience descriptions, not just responsibilities");
   
   categories.push({
-    name: "Personal Information",
-    score: personalScore,
-    maxScore: personalMax,
-    feedback: personalScore >= 20 ? "Complete" : "Add more personal details",
+    name: "Content Quality",
+    score: Math.round(contentScore * 10) / 10,
+    maxScore: 3,
+    feedback: contentScore >= 2.5 ? "Excellent use of action verbs and metrics" : 
+              contentScore >= 2 ? "Good content, add more quantifiable achievements" :
+              "Needs stronger action verbs and measurable results"
   });
+  totalScore += contentScore;
 
-  // Work Experience Score (30 points)
-  let workScore = 0;
-  const workMax = 30;
-  const workExp = data.workExperience || [];
+  // ============================================
+  // 2. STRUCTURE & FORMAT (2 points)
+  // ============================================
+  let structureScore = 0;
   
-  if (workExp.length > 0) workScore += 10;
-  if (workExp.length >= 2) workScore += 5;
+  // Clear hierarchy (0.5 pts) - template selected and sections organized
+  if (data.template && data.sectionOrder && data.sectionOrder.length >= 4) {
+    structureScore += 0.5;
+  } else {
+    suggestions.push("Organize your resume sections in a clear, logical order");
+  }
   
-  const completeWorkEntries = workExp.filter(
-    exp => exp.position && exp.company && exp.description && (exp.startDate || exp.endDate)
+  // Concise (0.5 pts) - check if descriptions are reasonable length
+  const workDescriptions = workExp.map(exp => exp.description || '').filter(Boolean);
+  const avgLength = workDescriptions.length > 0 
+    ? workDescriptions.reduce((sum, d) => sum + d.length, 0) / workDescriptions.length
+    : 0;
+  const isConcise = avgLength > 0 && avgLength < 800; // Average less than 800 chars per description
+  if (isConcise || workDescriptions.length === 0) structureScore += 0.5;
+  else suggestions.push("Keep bullet points concise - aim for 1-2 lines maximum");
+  
+  // Appropriate length (0.5 pts) - estimate pages based on content
+  const estimatedLength = estimateResumeLength(data);
+  const yearsOfExperience = calculateYearsOfExperience(data);
+  const isAppropriateLength = (yearsOfExperience < 5 && estimatedLength <= 1.2) || 
+                              (yearsOfExperience >= 5 && estimatedLength <= 2.5);
+  if (isAppropriateLength) structureScore += 0.5;
+  else if (estimatedLength > 2.5) suggestions.push("Resume may be too long - aim for 1 page (under 5 years experience) or 2 pages (senior roles)");
+  
+  // Easy to scan (0.5 pts) - good use of bullet points and structure
+  const hasBulletPoints = workDescriptions.some(desc => desc.includes('\n') || desc.includes('•'));
+  const hasStructure = workExp.every(exp => exp.position && exp.company);
+  if ((hasBulletPoints || workDescriptions.length === 0) && hasStructure) structureScore += 0.5;
+  else suggestions.push("Use bullet points and clear structure to make your resume easy to scan");
+  
+  categories.push({
+    name: "Structure & Format",
+    score: Math.round(structureScore * 10) / 10,
+    maxScore: 2,
+    feedback: structureScore >= 1.8 ? "Well-structured and easy to scan" :
+              structureScore >= 1.5 ? "Good structure, could improve formatting" :
+              "Needs better organization and formatting"
+  });
+  totalScore += structureScore;
+
+  // ============================================
+  // 3. PROFESSIONAL SUMMARY (1 point)
+  // ============================================
+  let summaryScore = 0;
+  const summary = data.personalInfo.summary || '';
+  
+  // Compelling (0.5 pts) - not generic, has value proposition
+  const genericPhrases = ['hard worker', 'team player', 'detail oriented', 'good communicator'];
+  const isGeneric = genericPhrases.some(phrase => summary.toLowerCase().includes(phrase));
+  const hasValueProp = summary.length >= 50 && !isGeneric && 
+                      (summary.includes(data.personalInfo.professionalTitle || '') || 
+                       summary.split(' ').length >= 15);
+  if (hasValueProp) summaryScore += 0.5;
+  else if (summary.length > 0) suggestions.push("Make your professional summary more specific and compelling - avoid generic phrases");
+  else suggestions.push("Add a professional summary that highlights your value proposition");
+  
+  // Specific (0.5 pts) - mentions experience, skills, achievements
+  const mentionsExperience = /\d+\s*(years?|months?)\s*(of\s*)?(experience|expertise)/i.test(summary);
+  const mentionsSkills = skills.some(skill => summary.toLowerCase().includes(skill.toLowerCase()));
+  const mentionsAchievement = metricsPattern.test(summary);
+  const isSpecific = (mentionsExperience || mentionsSkills || mentionsAchievement) && summary.length >= 50;
+  
+  if (isSpecific) summaryScore += 0.5;
+  else if (summary.length > 0) suggestions.push("Make your summary more specific - mention years of experience, key technologies, or achievements");
+  
+  categories.push({
+    name: "Professional Summary",
+    score: Math.round(summaryScore * 10) / 10,
+    maxScore: 1,
+    feedback: summaryScore >= 0.9 ? "Compelling and specific summary" :
+              summaryScore >= 0.5 ? "Good summary, add more specifics" :
+              "Add or improve your professional summary"
+  });
+  totalScore += summaryScore;
+
+  // ============================================
+  // 4. EXPERIENCE SECTION (2 points)
+  // ============================================
+  let experienceScore = 0;
+  
+  // Recent and relevant (0.5 pts) - most recent roles are detailed
+  const recentWork = workExp.slice(0, 2);
+  const recentWorkDetailed = recentWork.filter(exp => 
+    exp.position && exp.company && exp.description && exp.description.length >= 50
   ).length;
   
-  workScore += Math.min(completeWorkEntries * 5, 15);
+  if (recentWorkDetailed >= Math.min(recentWork.length, 1)) experienceScore += 0.5;
+  else if (workExp.length > 0) suggestions.push("Provide detailed descriptions for your most recent roles");
   
-  if (workScore < 20) {
-    suggestions.push("Add more work experience with detailed descriptions");
-  }
+  // Achievement-oriented (1 pt) - focuses on accomplishments (language-agnostic)
+  const achievementOrientedCount = workExp.filter(exp => {
+    const desc = exp.description || '';
+    const hasMetrics = metricsPattern.test(desc) || universalMetricsPattern.test(desc) || /\d+[%]/.test(desc);
+    const hasActionEN = STRONG_ACTION_VERBS_EN.some(verb => 
+      new RegExp(`\\b${verb}\\w*\\b`, 'i').test(desc)
+    );
+    const hasActionDE = STRONG_ACTION_VERBS_DE.some(verb => 
+      new RegExp(`\\b${verb}\\w*\\b`, 'i').test(desc)
+    );
+    const hasAchievement = hasMetrics || hasActionEN || hasActionDE;
+    return hasAchievement && desc.length >= 50;
+  }).length;
+  
+  if (achievementOrientedCount >= Math.min(workExp.length, 2)) experienceScore += 1;
+  else if (workExp.length > 0) suggestions.push("Focus on achievements and outcomes in your work experience, not just responsibilities");
+  else suggestions.push("Add detailed work experience with focus on achievements");
+  
+  // Context provided (0.5 pts) - company info, industry/role context mentioned
+  const hasContext = workExp.some(exp => {
+    const desc = (exp.description || '').toLowerCase();
+    const hasCompanyInfo = exp.company && exp.company.length > 2;
+    const hasLocation = exp.location && exp.location.length > 2;
+    const hasDetailedDescription = desc.length >= 100;
+    const mentionsIndustry = /\b(industry|sector|field|domain|area)\b/i.test(desc);
+    return hasCompanyInfo && (hasLocation || mentionsIndustry || hasDetailedDescription);
+  });
+  
+  if (hasContext) experienceScore += 0.5;
+  else if (workExp.length > 0) suggestions.push("Add context like company size, industry, or technologies used in your experience");
   
   categories.push({
-    name: "Work Experience",
-    score: workScore,
-    maxScore: workMax,
-    feedback: workScore >= 25 ? "Excellent" : workScore >= 15 ? "Good" : "Add more experience",
+    name: "Experience Section",
+    score: Math.round(experienceScore * 10) / 10,
+    maxScore: 2,
+    feedback: experienceScore >= 1.8 ? "Excellent achievement-focused experience" :
+              experienceScore >= 1.5 ? "Good experience section, highlight more achievements" :
+              "Add more detailed, achievement-oriented experience"
   });
+  totalScore += experienceScore;
 
-  // Education Score (20 points)
-  let eduScore = 0;
-  const eduMax = 20;
+  // ============================================
+  // 5. SKILLS & TECHNICAL PROFICIENCY (1 point)
+  // ============================================
+  let skillsScore = 0;
+  const validSkills = skills.length;
+  
+  // Organized (0.3 pts) - skills are present and not excessive
+  if (validSkills >= 3 && validSkills <= 20) skillsScore += 0.3;
+  else if (validSkills > 20) {
+    suggestions.push("Consider reducing your skills list - focus on the most relevant ones");
+  } else {
+    suggestions.push("Add more skills to showcase your expertise");
+  }
+  
+  // Relevant (0.4 pts) - skills match industry standards and experience
+  const workExpTextForSkills = (data.workExperience || []).map(exp => 
+    `${exp.position || ''} ${exp.description || ''}`.toLowerCase()
+  ).join(' ');
+  const skillsMatchExperience = skills.some(skill => workExpTextForSkills.includes(skill));
+  const hasRelevantSkills = validSkills >= 5 && (
+    skillsMatchExperience || 
+    validSkills >= 8
+  );
+  if (hasRelevantSkills) skillsScore += 0.4;
+  else if (validSkills > 0) suggestions.push("Add more relevant skills that match industry standards and your experience");
+  
+  // Not oversaturated (0.3 pts) - focused list
+  if (validSkills >= 5 && validSkills <= 15) skillsScore += 0.3;
+  else if (validSkills > 15) suggestions.push("Your skills list may be too long - focus on the most relevant and important skills");
+  
+  categories.push({
+    name: "Skills & Proficiency",
+    score: Math.round(skillsScore * 10) / 10,
+    maxScore: 1,
+    feedback: skillsScore >= 0.9 ? "Well-organized and relevant skills" :
+              skillsScore >= 0.6 ? "Good skills, ensure they're relevant" :
+              "Add more relevant, organized skills"
+  });
+  totalScore += skillsScore;
+
+  // ============================================
+  // 6. EDUCATION & CERTIFICATIONS (0.5 points)
+  // ============================================
+  let educationScore = 0;
   const education = data.education || [];
   
-  if (education.length > 0) eduScore += 10;
-  
-  const completeEduEntries = education.filter(
-    edu => edu.degree && edu.institution && (edu.startDate || edu.endDate)
+  // Complete (0.25 pts) - degree, institution, dates included
+  const completeEdu = education.filter(edu => 
+    edu.degree && edu.institution && (edu.startDate || edu.endDate)
   ).length;
   
-  eduScore += Math.min(completeEduEntries * 5, 10);
+  if (completeEdu >= 1) educationScore += 0.25;
+  else if (education.length > 0) suggestions.push("Complete your education entries with degree, institution, and dates");
+  else suggestions.push("Add your education details");
   
-  if (eduScore < 15) {
-    suggestions.push("Complete your education details with dates and field of study");
+  // Relevant certs (0.25 pts) - industry-recognized certifications
+  const certs = data.certificates || [];
+  const validCerts = certs.filter(cert => cert.name && cert.organization).length;
+  
+  if (validCerts >= 1) educationScore += 0.25;
+  else suggestions.push("Consider adding industry-recognized certifications to strengthen your resume");
+  
+  categories.push({
+    name: "Education & Certifications",
+    score: Math.round(educationScore * 10) / 10,
+    maxScore: 0.5,
+    feedback: educationScore >= 0.45 ? "Complete education and certifications" :
+              educationScore >= 0.25 ? "Add more education or certification details" :
+              "Add education and certification information"
+  });
+  totalScore += educationScore;
+
+  // ============================================
+  // 7. ATS OPTIMIZATION (0.5 points)
+  // ============================================
+  let atsScore = 0;
+  
+  // Keyword-rich (0.25 pts) - contains relevant industry keywords
+  const hasKeywords = validSkills >= 5 || summary.length >= 50 || workExp.length > 0;
+  if (hasKeywords) atsScore += 0.25;
+  else suggestions.push("Add more industry keywords and relevant terms to improve ATS compatibility");
+  
+  // Standard formatting (0.25 pts) - template-based (assumes templates are ATS-friendly)
+  if (data.template) atsScore += 0.25;
+  else suggestions.push("Select a template - our templates are ATS-optimized");
+  
+  categories.push({
+    name: "ATS Optimization",
+    score: Math.round(atsScore * 10) / 10,
+    maxScore: 0.5,
+    feedback: atsScore >= 0.45 ? "Well-optimized for ATS systems" :
+              "Add more keywords and ensure standard formatting"
+  });
+  totalScore += atsScore;
+
+  // ============================================
+  // RED FLAGS (Deductions)
+  // ============================================
+  
+  // Typos or grammar errors - basic check for common issues
+  const hasTypoIndicators = checkForCommonTypos(allText);
+  if (hasTypoIndicators > 0) {
+    deductions += Math.min(hasTypoIndicators * 0.5, 1.5);
+    suggestions.push("Review your resume for typos and grammar errors - consider using a spell checker");
   }
   
-  categories.push({
-    name: "Education",
-    score: eduScore,
-    maxScore: eduMax,
-    feedback: eduScore >= 15 ? "Complete" : "Add more education details",
-  });
-
-  // Skills Score (10 points)
-  let skillsScore = 0;
-  const skillsMax = 10;
-  const skills = data.skills || [];
-  
-  const validSkills = skills.filter(s => s.skill && s.skill.trim() !== "").length;
-  
-  if (validSkills >= 8) skillsScore = 10;
-  else if (validSkills >= 5) skillsScore = 8;
-  else if (validSkills >= 3) skillsScore = 6;
-  else skillsScore = validSkills * 2;
-  
-  if (validSkills < 5) {
-    suggestions.push(`Add ${5 - validSkills} more skills to showcase your expertise`);
+  // Unprofessional email
+  const email = data.personalInfo.email || '';
+  const isUnprofessionalEmail = UNPROFESSIONAL_EMAIL_PATTERNS.some(pattern => pattern.test(email));
+  if (isUnprofessionalEmail) {
+    deductions += 0.3;
+    suggestions.push("Use a professional email address (e.g., firstname.lastname@email.com)");
   }
   
-  categories.push({
-    name: "Skills",
-    score: skillsScore,
-    maxScore: skillsMax,
-    feedback: validSkills >= 5 ? "Good variety" : "Add more skills",
-  });
-
-  // Languages Score (5 points)
-  let langScore = 0;
-  const langMax = 5;
-  const languages = data.languages || [];
+  // Vague or generic descriptions
+  const vagueDescriptions = workDescriptions.filter(desc => {
+    const isShort = desc.length < 30;
+    const hasGeneric = genericPhrases.some(phrase => desc.toLowerCase().includes(phrase));
+    return isShort || hasGeneric;
+  }).length;
   
-  const validLangs = languages.filter(l => l.language && l.proficiency).length;
-  langScore = Math.min(validLangs * 2.5, 5);
-  
-  if (validLangs < 2) {
-    suggestions.push("Add language proficiencies to increase appeal");
+  if (vagueDescriptions > 0 && workDescriptions.length > 0) {
+    deductions += Math.min(vagueDescriptions * 0.25, 0.5);
+    if (vagueDescriptions > 0) suggestions.push("Replace vague or generic descriptions with specific, achievement-focused statements");
   }
   
-  categories.push({
-    name: "Languages",
-    score: langScore,
-    maxScore: langMax,
-    feedback: validLangs >= 2 ? "Good" : "Add more languages",
-  });
-
-  // Projects Score (5 points) - Bonus
-  let projectScore = 0;
-  const projectMax = 5;
-  const projects = data.projects || [];
+  // Excessive length with little substance
+  if (estimatedLength > 2.5 && totalScore < 5) {
+    deductions += 0.5;
+    suggestions.push("Your resume is long but lacks substance - focus on quality over quantity");
+  }
   
-  const validProjects = projects.filter(p => p.name && p.description).length;
-  projectScore = Math.min(validProjects * 2.5, 5);
+  // Missing contact information
+  const hasContactInfo = data.personalInfo.email && 
+                        (data.personalInfo.phone || data.personalInfo.linkedin);
+  if (!hasContactInfo) {
+    deductions += 0.5;
+    suggestions.push("Ensure you have complete contact information (email, phone, or LinkedIn)");
+  }
   
-  categories.push({
-    name: "Projects",
-    score: projectScore,
-    maxScore: projectMax,
-    feedback: validProjects >= 2 ? "Great!" : validProjects >= 1 ? "Add more" : "Optional but recommended",
-  });
-
-  // Certificates Score (5 points) - Bonus
-  let certScore = 0;
-  const certMax = 5;
-  const certificates = data.certificates || [];
+  // Unexplained gaps (check for large gaps in employment)
+  const hasGaps = checkForEmploymentGaps(workExp);
+  if (hasGaps) {
+    deductions += 0.3;
+    suggestions.push("Consider addressing employment gaps or ensure dates are accurate");
+  }
   
-  const validCerts = certificates.filter(c => c.name && c.organization).length;
-  certScore = Math.min(validCerts * 2.5, 5);
+  // Irrelevant information - excessive interests or personal info
+  const interests = data.personalInfo.interests || [];
+  if (interests.length > 5) {
+    deductions += 0.3;
+    suggestions.push("Limit interests to 3-5 most relevant ones");
+  }
+
+  // ============================================
+  // BONUS POINTS (Max +1)
+  // ============================================
   
-  categories.push({
-    name: "Certificates",
-    score: certScore,
-    maxScore: certMax,
-    feedback: validCerts >= 2 ? "Excellent" : validCerts >= 1 ? "Good" : "Optional",
-  });
+  // Professional links/portfolio (website, LinkedIn, portfolio)
+  if (data.personalInfo.website || data.personalInfo.linkedin) {
+    bonuses += 0.3;
+  } else {
+    suggestions.push("Add a professional website or LinkedIn profile to strengthen your online presence");
+  }
+  
+  // Additional credentials (projects, publications, volunteer work)
+  const userProjects = data.projects || [];
+  const hasProjects = userProjects.filter(p => p.name && p.description).length > 0;
+  const mentionsProjects = /\b(project|portfolio|publication|published|article|blog|volunteer)\b/i.test(allText);
+  if (hasProjects || mentionsProjects) bonuses += 0.3;
+  
+  // Professional achievements (awards, certifications, speaking engagements)
+  const userCertificates = data.certificates || [];
+  const hasCertificates = userCertificates.length > 0;
+  const mentionsAchievements = /\b(award|certification|certified|speaking|conference|presentation|recognition)\b/i.test(allText);
+  if (hasCertificates || mentionsAchievements) bonuses += 0.2;
+  
+  // Leadership/Mentoring/Management experience (universal for all professions)
+  const mentionsLeadership = /\b(led|lead|managed|mentor|mentoring|team|supervised|directed|coordinated|organized)\b/i.test(allText);
+  if (mentionsLeadership && workExp.length > 0) bonuses += 0.2;
 
-  // Calculate overall score
-  const totalScore = categories.reduce((sum, cat) => sum + cat.score, 0);
-  const totalMax = categories.reduce((sum, cat) => sum + cat.maxScore, 0);
-  const overallScore = Math.round((totalScore / totalMax) * 100);
-
-  // Add general suggestions
+  // ============================================
+  // FINAL CALCULATION
+  // ============================================
+  
+  // Apply deductions and bonuses
+  totalScore = Math.max(0, Math.min(10, totalScore - deductions + bonuses));
+  
+  // Convert to 0-100 scale for display
+  const overallScore = Math.round(totalScore * 10);
+  
+  // Add overall suggestions based on score
   if (overallScore < 60) {
-    suggestions.unshift("Your CV needs more content. Focus on work experience and education first.");
+    suggestions.unshift("Your resume needs significant improvement. Focus on adding quantifiable achievements and strong action verbs.");
   } else if (overallScore < 80) {
-    suggestions.unshift("Good progress! Add more details to make your CV stand out.");
+    suggestions.unshift("Your resume is good but can be improved. Focus on adding more metrics and impact-focused descriptions.");
+  } else if (overallScore >= 90) {
+    suggestions.unshift("Excellent resume! You're well-positioned for job applications.");
   }
 
   return {
     overallScore,
     categories,
-    suggestions,
+    suggestions: [...new Set(suggestions)].slice(0, 10) // Remove duplicates and limit to 10
   };
 };
 
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+/**
+ * Get all text content from resume for analysis
+ */
+function getAllTextContent(data: CVFormData): string {
+  const parts: string[] = [];
+  
+  // Personal info
+  parts.push(data.personalInfo.summary || '');
+  parts.push(data.personalInfo.professionalTitle || '');
+  
+  // Work experience
+  (data.workExperience || []).forEach(exp => {
+    parts.push(exp.description || '');
+    (exp.responsibilities || []).forEach(r => parts.push(r.responsibility || ''));
+  });
+  
+  // Projects
+  (data.projects || []).forEach(proj => {
+    parts.push(proj.description || '');
+    (proj.highlights || []).forEach(h => parts.push(h.highlight || ''));
+  });
+  
+  return parts.join(' ').toLowerCase();
+}
+
+/**
+ * Estimate resume length in pages (rough approximation)
+ */
+function estimateResumeLength(data: CVFormData): number {
+  let wordCount = 0;
+  
+  // Personal info
+  wordCount += (data.personalInfo.summary || '').split(/\s+/).length;
+  wordCount += (data.personalInfo.professionalTitle || '').split(/\s+/).length;
+  
+  // Work experience (largest section)
+  (data.workExperience || []).forEach(exp => {
+    wordCount += (exp.description || '').split(/\s+/).length;
+    wordCount += (exp.position || '').split(/\s+/).length;
+    wordCount += (exp.company || '').split(/\s+/).length;
+  });
+  
+  // Education
+  (data.education || []).forEach(edu => {
+    wordCount += (edu.degree || '').split(/\s+/).length;
+    wordCount += (edu.field || '').split(/\s+/).length;
+  });
+  
+  // Projects
+  (data.projects || []).forEach(proj => {
+    wordCount += (proj.description || '').split(/\s+/).length;
+  });
+  
+  // Skills and other sections add minimal space
+  wordCount += (data.skills || []).length * 0.5;
+  
+  // Rough estimate: ~250 words per page for resume format
+  return wordCount / 250;
+}
+
+/**
+ * Calculate years of experience from work history
+ */
+function calculateYearsOfExperience(data: CVFormData): number {
+  const workExp = data.workExperience || [];
+  if (workExp.length === 0) return 0;
+  
+  // Try to extract dates and calculate total
+  let totalMonths = 0;
+  workExp.forEach(exp => {
+    if (exp.startDate) {
+      const start = parseDate(exp.startDate);
+      const end = exp.endDate ? parseDate(exp.endDate) : new Date(); // Current if no end date
+      if (start && end) {
+        const months = (end.getFullYear() - start.getFullYear()) * 12 + 
+                      (end.getMonth() - start.getMonth());
+        totalMonths += Math.max(0, months);
+      }
+    }
+  });
+  
+  return Math.round(totalMonths / 12);
+}
+
+/**
+ * Parse date string (YYYY-MM format)
+ */
+function parseDate(dateStr: string): Date | null {
+  try {
+    const parts = dateStr.split('-');
+    if (parts.length >= 2) {
+      const year = parseInt(parts[0]);
+      const month = parseInt(parts[1]) - 1; // Month is 0-indexed
+      if (!isNaN(year) && !isNaN(month)) {
+        return new Date(year, month, 1);
+      }
+    }
+  } catch (e) {
+    // Ignore parsing errors
+  }
+  return null;
+}
+
+/**
+ * Check for common typo indicators
+ */
+function checkForCommonTypos(text: string): number {
+  let typoCount = 0;
+  
+  // Check for common misspellings
+  const commonTypos = [
+    /\bteh\b/i, // "the"
+    /\badn\b/i, // "and"
+    /\byoru\b/i, // "your"
+    /\byrou\b/i, // "your"
+    /\baccross\b/i, // "across"
+    /\bseperate\b/i, // "separate"
+  ];
+  
+  typoCount += commonTypos.filter(pattern => pattern.test(text)).length;
+  
+  // Check for repeated words (common typo)
+  const repeatedWordPattern = /\b(\w+)\s+\1\b/gi;
+  const repeatedMatches = text.match(repeatedWordPattern);
+  if (repeatedMatches) typoCount += repeatedMatches.length;
+  
+  return Math.min(typoCount, 3); // Cap at 3 for scoring
+}
+
+/**
+ * Check for employment gaps
+ */
+function checkForEmploymentGaps(workExp: Array<{ startDate?: string; endDate?: string }>): boolean {
+  if (workExp.length < 2) return false;
+  
+  // Sort by start date (most recent first, assuming they're already ordered)
+  const sorted = [...workExp].filter(exp => exp.startDate && exp.endDate);
+  if (sorted.length < 2) return false;
+  
+  // Check for gaps larger than 6 months
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const currentEnd = parseDate(sorted[i].endDate!);
+    const nextStart = parseDate(sorted[i + 1].startDate!);
+    
+    if (currentEnd && nextStart) {
+      const months = (currentEnd.getFullYear() - nextStart.getFullYear()) * 12 + 
+                    (currentEnd.getMonth() - nextStart.getMonth());
+      if (months > 6) {
+        return true; // Gap larger than 6 months
+      }
+    }
+  }
+  
+  return false;
+}

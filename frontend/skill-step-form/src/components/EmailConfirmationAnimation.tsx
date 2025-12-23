@@ -19,7 +19,7 @@ export const EmailConfirmationAnimation = () => {
       ></div>
       
       {/* Center circle with icon */}
-      <div className="relative z-10 w-16 h-16 rounded-full bg-primary flex items-center justify-center animate-pulse-dot">
+      <div className="relative z-10 w-16 h-16 rounded-full bg-primary flex items-center justify-center">
         <Mail className="w-8 h-8 text-primary-foreground" />
       </div>
     </div>
