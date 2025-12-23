@@ -288,6 +288,107 @@
     "preview": {
       "notice": "Vorschau - Der finale Export hat eine sauberere Formatierung"
     },
+    "score": {
+      "label": "Lebenslauf-Bewertung",
+      "title": "CV-Bewertung & Analyse",
+      "subtitle": "Echtzeit-Vollständigkeitsanalyse",
+      "description": {
+        "withData": "Klicken Sie auf Analysieren, um Ihre neueste Lebenslauf-Bewertung zu generieren",
+        "withoutData": "Erhalten Sie KI-gestütztes Feedback zu Ihrem Lebenslauf und Verbesserungsvorschläge"
+      },
+      "analyzing": "Analysiere...",
+      "analyzeButton": "Meinen Lebenslauf analysieren",
+      "breakdown": "Bewertungsaufschlüsselung",
+      "suggestions": "Verbesserungsvorschläge",
+      "reanalyze": "Lebenslauf erneut analysieren",
+      "status": {
+        "excellent": "Ausgezeichnet",
+        "good": "Gut",
+        "fair": "Befriedigend",
+        "needsImprovement": "Verbesserungsbedarf"
+      },
+      "categories": {
+        "contentQuality": "Inhaltsqualität",
+        "structureFormat": "Struktur & Format",
+        "professionalSummary": "Professionelle Zusammenfassung",
+        "experience": "Berufserfahrung",
+        "skills": "Fähigkeiten & Kompetenzen",
+        "education": "Bildung & Zertifikate",
+        "ats": "ATS-Optimierung"
+      },
+      "feedback": {
+        "needsImprovement": "Ihr Lebenslauf benötigt erhebliche Verbesserungen. Konzentrieren Sie sich darauf, quantifizierbare Erfolge und starke Aktionsverben hinzuzufügen.",
+        "canImprove": "Ihr Lebenslauf ist gut, kann aber verbessert werden. Konzentrieren Sie sich darauf, mehr Metriken und wirkungsorientierte Beschreibungen hinzuzufügen.",
+        "excellent": "Ausgezeichneter Lebenslauf! Sie sind gut positioniert für Stellenbewerbungen.",
+        "actionVerbs": "Verwenden Sie starke Aktionsverben wie 'Leitete', 'Entwickelte', 'Implementierte' anstelle von 'Verantwortlich für' oder 'Arbeitete an'",
+        "quantifiable": "Fügen Sie quantifizierbare Erfolge mit Zahlen, Prozentsätzen oder Metriken hinzu (z.B. 'Umsatz um 40% gesteigert', 'Team von 5 Personen geleitet')",
+        "skillsRelevant": "Stellen Sie sicher, dass Ihre Fähigkeiten relevant sind und zu Ihrer Berufserfahrung passen",
+        "outcomes": "Konzentrieren Sie sich auf Ergebnisse und Auswirkungen in Ihren Erfahrungsbeschreibungen, nicht nur auf Verantwortlichkeiten",
+        "sectionOrder": "Organisieren Sie Ihre Lebenslauf-Abschnitte in einer klaren, logischen Reihenfolge",
+        "concise": "Halten Sie Aufzählungspunkte prägnant - streben Sie 1-2 Zeilen maximal an",
+        "tooLong": "Der Lebenslauf könnte zu lang sein - streben Sie 1 Seite (unter 5 Jahren Erfahrung) oder 2 Seiten (für Senior-Rollen) an",
+        "bulletPoints": "Verwenden Sie Aufzählungspunkte und eine klare Struktur, um Ihren Lebenslauf übersichtlich zu gestalten",
+        "summaryGeneric": "Machen Sie Ihre professionelle Zusammenfassung spezifischer und überzeugender - vermeiden Sie generische Phrasen",
+        "summaryMissing": "Fügen Sie eine professionelle Zusammenfassung hinzu, die Ihren Mehrwert hervorhebt",
+        "summarySpecific": "Machen Sie Ihre Zusammenfassung spezifischer - erwähnen Sie Jahre der Erfahrung, wichtige Technologien oder Erfolge",
+        "detailedDescriptions": "Bieten Sie detaillierte Beschreibungen für Ihre neuesten Rollen",
+        "achievements": "Konzentrieren Sie sich auf Erfolge und Ergebnisse in Ihrer Berufserfahrung, nicht nur auf Verantwortlichkeiten",
+        "addExperience": "Fügen Sie detaillierte Berufserfahrung mit Fokus auf Erfolge hinzu",
+        "context": "Fügen Sie Kontext hinzu wie Unternehmensgröße, Branche oder verwendete Technologien in Ihrer Erfahrung",
+        "tooManySkills": "Erwägen Sie, Ihre Fähigkeitsliste zu reduzieren - konzentrieren Sie sich auf die relevantesten",
+        "addSkills": "Fügen Sie mehr Fähigkeiten hinzu, um Ihre Expertise zu zeigen",
+        "relevantSkills": "Fügen Sie mehr relevante Fähigkeiten hinzu, die Branchenstandards und Ihrer Erfahrung entsprechen",
+        "skillsTooLong": "Ihre Fähigkeitsliste könnte zu lang sein - konzentrieren Sie sich auf die relevantesten und wichtigsten Fähigkeiten",
+        "educationComplete": "Vervollständigen Sie Ihre Bildungseinträge mit Abschluss, Institution und Daten",
+        "educationMissing": "Fügen Sie Ihre Bildungsdetails hinzu",
+        "certifications": "Erwägen Sie, branchenanerkannte Zertifikate hinzuzufügen, um Ihren Lebenslauf zu stärken",
+        "keywords": "Fügen Sie mehr Branchen-Keywords und relevante Begriffe hinzu, um die ATS-Kompatibilität zu verbessern",
+        "template": "Wählen Sie eine Vorlage - unsere Vorlagen sind ATS-optimiert",
+        "typos": "Überprüfen Sie Ihren Lebenslauf auf Tipp- und Grammatikfehler - erwägen Sie die Verwendung einer Rechtschreibprüfung",
+        "email": "Verwenden Sie eine professionelle E-Mail-Adresse (z.B. vorname.nachname@email.com)",
+        "vague": "Ersetzen Sie vage oder generische Beschreibungen durch spezifische, erfolgsorientierte Aussagen",
+        "substance": "Ihr Lebenslauf ist lang, aber es fehlt an Substanz - konzentrieren Sie sich auf Qualität statt Quantität",
+        "contact": "Stellen Sie sicher, dass Sie vollständige Kontaktinformationen haben (E-Mail, Telefon oder LinkedIn)",
+        "gaps": "Erwägen Sie, Beschäftigungslücken anzusprechen oder stellen Sie sicher, dass die Daten korrekt sind",
+        "interests": "Begrenzen Sie Interessen auf die 3-5 relevantesten",
+        "onlinePresence": "Fügen Sie eine professionelle Website oder ein LinkedIn-Profil hinzu, um Ihre Online-Präsenz zu stärken"
+      },
+      "categoryFeedback": {
+        "contentQuality": {
+          "excellent": "Ausgezeichnete Verwendung von Aktionsverben und Metriken",
+          "good": "Gute Inhalte, fügen Sie mehr quantifizierbare Erfolge hinzu",
+          "needsImprovement": "Benötigt stärkere Aktionsverben und messbare Ergebnisse"
+        },
+        "structure": {
+          "excellent": "Gut strukturiert und leicht zu scannen",
+          "good": "Gute Struktur, könnte die Formatierung verbessern",
+          "needsImprovement": "Benötigt bessere Organisation und Formatierung"
+        },
+        "summary": {
+          "excellent": "Überzeugende und spezifische Zusammenfassung",
+          "good": "Gute Zusammenfassung, fügen Sie mehr Details hinzu",
+          "needsImprovement": "Benötigt eine überzeugendere Zusammenfassung"
+        },
+        "experience": {
+          "excellent": "Ausgezeichnete erfolgsorientierte Erfahrung",
+          "good": "Guter Erfahrungsabschnitt, heben Sie mehr Erfolge hervor",
+          "needsImprovement": "Benötigt mehr erfolgsorientierte Beschreibungen"
+        },
+        "skills": {
+          "excellent": "Gut organisierte und relevante Fähigkeiten",
+          "good": "Gute Fähigkeiten, stellen Sie sicher, dass sie relevant sind",
+          "needsImprovement": "Benötigt mehr relevante und organisierte Fähigkeiten"
+        },
+        "education": {
+          "excellent": "Vollständige Bildung und Zertifikate",
+          "needsImprovement": "Fügen Sie mehr Bildungs- oder Zertifikatsdetails hinzu"
+        },
+        "ats": {
+          "excellent": "Gut optimiert für ATS-Systeme",
+          "needsImprovement": "Fügen Sie mehr Keywords hinzu und stellen Sie sicher, dass die Formatierung standardisiert ist"
+        }
+      }
+    },
     "settings": {
       "sectionOrderTitle": "Abschnittsreihenfolge anpassen",
       "sectionOrderDesc": "Ziehen Sie Abschnitte, um sie neu anzuordnen, oder verwenden Sie die Pfeiltasten"

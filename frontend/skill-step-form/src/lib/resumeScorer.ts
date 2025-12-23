@@ -150,7 +150,10 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   const avgLength = workDescriptions.length > 0 
     ? workDescriptions.reduce((sum, d) => sum + d.length, 0) / workDescriptions.length
     : 0;
-  const isConcise = avgLength > 0 && avgLength < 800; // Average less than 800 chars per description
+  const maxLength = workDescriptions.length > 0
+    ? Math.max(...workDescriptions.map(d => d.length))
+    : 0;
+  const isConcise = avgLength > 0 && avgLength < 800 && maxLength < 1200; // Average less than 800 chars, max less than 1200 chars per description
   if (isConcise || workDescriptions.length === 0) structureScore += 0.5;
   else suggestions.push("Keep bullet points concise - aim for 1-2 lines maximum");
   
@@ -161,6 +164,93 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
                               (yearsOfExperience >= 5 && estimatedLength <= 2.5);
   if (isAppropriateLength) structureScore += 0.5;
   else if (estimatedLength > 2.5) suggestions.push("Resume may be too long - aim for 1 page (under 5 years experience) or 2 pages (senior roles)");
+  
+  // VERY harsh penalties for excessive text in each section
+  let lengthDeductions = 0;
+  
+  // Work experience descriptions - VERY harsh penalties
+  if (avgLength > 2000) {
+    lengthDeductions += 2.5; // Very harsh penalty for extremely long descriptions (avg > 2000 chars)
+  } else if (avgLength > 1500) {
+    lengthDeductions += 1.8; // Harsh penalty for very long descriptions (avg > 1500 chars)
+  } else if (avgLength > 1200) {
+    lengthDeductions += 1.2; // Significant penalty for long descriptions (avg > 1200 chars)
+  } else if (avgLength > 1000) {
+    lengthDeductions += 0.7; // Penalty for moderately long descriptions (avg > 1000 chars)
+  } else if (avgLength > 900) {
+    lengthDeductions += 0.4; // Small penalty for slightly long descriptions (avg > 900 chars)
+  }
+  
+  // Check for individual overly long descriptions - cumulative penalty (more aggressive)
+  const veryLongDescriptions = workDescriptions.filter(d => d.length > 2000).length;
+  const longDescriptions = workDescriptions.filter(d => d.length > 1500 && d.length <= 2000).length;
+  const moderatelyLongDescriptions = workDescriptions.filter(d => d.length > 1200 && d.length <= 1500).length;
+  if (veryLongDescriptions > 0) {
+    lengthDeductions += Math.min(veryLongDescriptions * 0.6, 1.5); // Up to 1.5 deduction for multiple extremely long entries
+  }
+  if (longDescriptions > 0) {
+    lengthDeductions += Math.min(longDescriptions * 0.3, 0.9); // Additional penalty for long entries
+  }
+  if (moderatelyLongDescriptions > 2) {
+    lengthDeductions += Math.min((moderatelyLongDescriptions - 2) * 0.15, 0.4); // Penalty for multiple moderately long entries
+  }
+  
+  // Check summary length - VERY harsher penalties
+  const summaryLength = (data.personalInfo.summary || '').length;
+  if (summaryLength > 600) {
+    lengthDeductions += 1.0; // Very harsh penalty for very long summary (> 600 chars)
+  } else if (summaryLength > 500) {
+    lengthDeductions += 0.7; // Harsh penalty for overly long summary (> 500 chars)
+  } else if (summaryLength > 400) {
+    lengthDeductions += 0.4; // Penalty for long summary (400-500 chars)
+  } else if (summaryLength > 350) {
+    lengthDeductions += 0.2; // Small penalty for slightly long summary (350-400 chars)
+  }
+  
+  // Check project descriptions - VERY harsher penalties
+  const projects = data.projects || [];
+  const projectDescriptions = projects.map(p => (p.description || '').length);
+  const avgProjectLength = projectDescriptions.length > 0
+    ? projectDescriptions.reduce((sum, len) => sum + len, 0) / projectDescriptions.length
+    : 0;
+  const maxProjectLength = projectDescriptions.length > 0 ? Math.max(...projectDescriptions) : 0;
+  if (avgProjectLength > 600) {
+    lengthDeductions += 0.8; // Very harsh penalty for very long project descriptions
+  } else if (avgProjectLength > 400) {
+    lengthDeductions += 0.5; // Harsh penalty for long project descriptions
+  } else if (avgProjectLength > 300) {
+    lengthDeductions += 0.3; // Penalty for moderately long project descriptions
+  }
+  // Penalty for individual very long project descriptions
+  if (maxProjectLength > 800) {
+    lengthDeductions += 0.5;
+  } else if (maxProjectLength > 600) {
+    lengthDeductions += 0.3;
+  }
+  
+  // Check education field length if they exist
+  const educationEntries = data.education || [];
+  const educationFieldLengths = educationEntries.map(e => ((e.field || '') + (e.degree || '') + (e.institution || '')).length);
+  const avgEducationLength = educationFieldLengths.length > 0
+    ? educationFieldLengths.reduce((sum, len) => sum + len, 0) / educationFieldLengths.length
+    : 0;
+  if (avgEducationLength > 200) {
+    lengthDeductions += 0.3; // Penalty for long education fields
+  }
+  
+  // Compound penalty: if multiple sections are too long, add extra penalty
+  let longSectionsCount = 0;
+  if (avgLength > 1200) longSectionsCount++;
+  if (summaryLength > 400) longSectionsCount++;
+  if (avgProjectLength > 400) longSectionsCount++;
+  if (longSectionsCount >= 3) {
+    lengthDeductions += 1.0; // Extra harsh penalty if 3+ sections are too long
+  } else if (longSectionsCount >= 2) {
+    lengthDeductions += 0.5; // Extra penalty if 2 sections are too long
+  }
+  
+  // Deduct from structure score (can't go below 0)
+  structureScore = Math.max(0, structureScore - lengthDeductions);
   
   // Easy to scan (0.5 pts) - good use of bullet points and structure
   const hasBulletPoints = workDescriptions.some(desc => desc.includes('\n') || desc.includes('•'));
@@ -394,10 +484,28 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
     if (vagueDescriptions > 0) suggestions.push("Replace vague or generic descriptions with specific, achievement-focused statements");
   }
   
-  // Excessive length with little substance
-  if (estimatedLength > 2.5 && totalScore < 5) {
-    deductions += 0.5;
+  // Excessive length with little substance - VERY harsh penalties
+  if (estimatedLength > 3.5) {
+    deductions += 3.5; // Very harsh penalty for extremely long resume (> 3.5 pages)
+    suggestions.push("Your resume is far too long - focus on quality over quantity, aim for 1-2 pages");
+  } else if (estimatedLength > 3.0) {
+    deductions += 2.5; // Very harsh penalty for very long resume (> 3 pages)
+    suggestions.push("Your resume is too long - focus on quality over quantity, aim for 1-2 pages");
+  } else if (estimatedLength > 2.5) {
+    deductions += 1.8; // Harsh penalty for long resume (2.5-3 pages)
     suggestions.push("Your resume is long but lacks substance - focus on quality over quantity");
+  } else if (estimatedLength > 2.2) {
+    deductions += 1.2; // Significant penalty for moderately long resume (2.2-2.5 pages)
+    if (yearsOfExperience < 5) {
+      suggestions.push("Resume is longer than recommended for your experience level - be more concise");
+    } else {
+      suggestions.push("Your resume could be more concise - aim for quality over quantity");
+    }
+  } else if (estimatedLength > 2.0) {
+    deductions += 0.8; // Penalty for slightly long resume (2-2.2 pages)
+    if (yearsOfExperience < 5) {
+      suggestions.push("Resume is longer than recommended for your experience level - be more concise");
+    }
   }
   
   // Missing contact information

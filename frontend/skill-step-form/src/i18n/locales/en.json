@@ -288,6 +288,107 @@
     "preview": {
       "notice": "Preview - Final export will have cleaner formatting"
     },
+    "score": {
+      "label": "Resume Score",
+      "title": "CV Rating & Analysis",
+      "subtitle": "Real-time completeness analysis",
+      "description": {
+        "withData": "Click analyze to generate your latest resume score",
+        "withoutData": "Get AI-powered feedback on your CV and suggestions for improvement"
+      },
+      "analyzing": "Analyzing...",
+      "analyzeButton": "Analyze My CV",
+      "breakdown": "Score Breakdown",
+      "suggestions": "Suggestions for Improvement",
+      "reanalyze": "Re-analyze CV",
+      "status": {
+        "excellent": "Excellent",
+        "good": "Good",
+        "fair": "Fair",
+        "needsImprovement": "Needs Improvement"
+      },
+      "categories": {
+        "contentQuality": "Content Quality",
+        "structureFormat": "Structure & Format",
+        "professionalSummary": "Professional Summary",
+        "experience": "Experience Section",
+        "skills": "Skills & Proficiency",
+        "education": "Education & Certifications",
+        "ats": "ATS Optimization"
+      },
+      "feedback": {
+        "needsImprovement": "Your resume needs significant improvement. Focus on adding quantifiable achievements and strong action verbs.",
+        "canImprove": "Your resume is good but can be improved. Focus on adding more metrics and impact-focused descriptions.",
+        "excellent": "Excellent resume! You're well-positioned for job applications.",
+        "actionVerbs": "Use strong action verbs like 'Led', 'Developed', 'Implemented' instead of 'Responsible for' or 'Worked on'",
+        "quantifiable": "Add quantifiable achievements with numbers, percentages, or metrics (e.g., 'Increased revenue by 40%', 'Managed team of 5')",
+        "skillsRelevant": "Ensure your skills are relevant and match your work experience",
+        "outcomes": "Focus on outcomes and impact in your experience descriptions, not just responsibilities",
+        "sectionOrder": "Organize your resume sections in a clear, logical order",
+        "concise": "Keep bullet points concise - aim for 1-2 lines maximum",
+        "tooLong": "Resume may be too long - aim for 1 page (under 5 years experience) or 2 pages (senior roles)",
+        "bulletPoints": "Use bullet points and clear structure to make your resume easy to scan",
+        "summaryGeneric": "Make your professional summary more specific and compelling - avoid generic phrases",
+        "summaryMissing": "Add a professional summary that highlights your value proposition",
+        "summarySpecific": "Make your summary more specific - mention years of experience, key technologies, or achievements",
+        "detailedDescriptions": "Provide detailed descriptions for your most recent roles",
+        "achievements": "Focus on achievements and outcomes in your work experience, not just responsibilities",
+        "addExperience": "Add detailed work experience with focus on achievements",
+        "context": "Add context like company size, industry, or technologies used in your experience",
+        "tooManySkills": "Consider reducing your skills list - focus on the most relevant ones",
+        "addSkills": "Add more skills to showcase your expertise",
+        "relevantSkills": "Add more relevant skills that match industry standards and your experience",
+        "skillsTooLong": "Your skills list may be too long - focus on the most relevant and important skills",
+        "educationComplete": "Complete your education entries with degree, institution, and dates",
+        "educationMissing": "Add your education details",
+        "certifications": "Consider adding industry-recognized certifications to strengthen your resume",
+        "keywords": "Add more industry keywords and relevant terms to improve ATS compatibility",
+        "template": "Select a template - our templates are ATS-optimized",
+        "typos": "Review your resume for typos and grammar errors - consider using a spell checker",
+        "email": "Use a professional email address (e.g., firstname.lastname@email.com)",
+        "vague": "Replace vague or generic descriptions with specific, achievement-focused statements",
+        "substance": "Your resume is long but lacks substance - focus on quality over quantity",
+        "contact": "Ensure you have complete contact information (email, phone, or LinkedIn)",
+        "gaps": "Consider addressing employment gaps or ensure dates are accurate",
+        "interests": "Limit interests to 3-5 most relevant ones",
+        "onlinePresence": "Add a professional website or LinkedIn profile to strengthen your online presence"
+      },
+      "categoryFeedback": {
+        "contentQuality": {
+          "excellent": "Excellent use of action verbs and metrics",
+          "good": "Good content, add more quantifiable achievements",
+          "needsImprovement": "Needs stronger action verbs and measurable results"
+        },
+        "structure": {
+          "excellent": "Well-structured and easy to scan",
+          "good": "Good structure, could improve formatting",
+          "needsImprovement": "Needs better organization and formatting"
+        },
+        "summary": {
+          "excellent": "Compelling and specific summary",
+          "good": "Good summary, add more specifics",
+          "needsImprovement": "Needs a more compelling summary"
+        },
+        "experience": {
+          "excellent": "Excellent achievement-focused experience",
+          "good": "Good experience section, highlight more achievements",
+          "needsImprovement": "Needs more achievement-focused descriptions"
+        },
+        "skills": {
+          "excellent": "Well-organized and relevant skills",
+          "good": "Good skills, ensure they're relevant",
+          "needsImprovement": "Needs more relevant and organized skills"
+        },
+        "education": {
+          "excellent": "Complete education and certifications",
+          "needsImprovement": "Add more education or certification details"
+        },
+        "ats": {
+          "excellent": "Well-optimized for ATS systems",
+          "needsImprovement": "Add more keywords and ensure standard formatting"
+        }
+      }
+    },
     "settings": {
       "sectionOrderTitle": "Customize Section Order",
       "sectionOrderDesc": "Drag sections to reorder or use the arrow buttons"

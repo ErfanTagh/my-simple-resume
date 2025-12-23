@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { CVFormData, CVTemplate } from "./types";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -14,6 +14,7 @@ import { TemplateSelector } from "./TemplateSelector";
 import { SectionOrderManager } from "./SectionOrderManager";
 import { FileText, TrendingUp, FileStack, Settings, Info } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { calculateResumeScore } from "@/lib/resumeScorer";
 
 interface CVPreviewProps {
   data: CVFormData;
@@ -27,6 +28,15 @@ export const CVPreview = ({ data, onTemplateChange, onSectionOrderChange }: CVPr
   const template = data.template || "modern";
   const defaultSectionOrder = ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"];
   const sectionOrder = data.sectionOrder || defaultSectionOrder;
+
+  // Calculate resume score
+  const resumeScore = useMemo(() => {
+    try {
+      return calculateResumeScore(data);
+    } catch {
+      return { overallScore: 0 };
+    }
+  }, [data]);
   
   const handleTemplateSelect = (selectedTemplate: CVTemplate) => {
     if (onTemplateChange) {
@@ -84,6 +94,27 @@ export const CVPreview = ({ data, onTemplateChange, onSectionOrderChange }: CVPr
         
         <TabsContent value="design" className="mt-4">
           <div className="space-y-2">
+            {/* Score indicator */}
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium text-muted-foreground">{t('resume.score.label') || 'Resume Score'}</span>
+              </div>
+              <span 
+                className={`text-sm font-bold transition-colors duration-300 ${
+                  resumeScore.overallScore >= 80 
+                    ? 'text-green-600 dark:text-green-400'
+                    : resumeScore.overallScore >= 60 
+                    ? 'text-yellow-600 dark:text-yellow-400'
+                    : resumeScore.overallScore >= 40
+                    ? 'text-orange-600 dark:text-orange-400'
+                    : 'text-red-600 dark:text-red-400'
+                }`}
+              >
+                {resumeScore.overallScore}/100
+              </span>
+            </div>
+            
             <Card className="overflow-hidden h-fit">
               {renderTemplate()}
             </Card>
