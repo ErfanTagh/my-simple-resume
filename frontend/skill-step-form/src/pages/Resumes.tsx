@@ -30,8 +30,10 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Resumes() {
+  const { t } = useLanguage();
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -47,7 +49,7 @@ export default function Resumes() {
       const data = await resumeAPI.getAll();
       setResumes(data);
     } catch (err: any) {
-      setError(err.message || 'Failed to load resumes');
+      setError(err.message || t('pages.resumes.errors.loadFailed') || 'Failed to load resumes');
     } finally {
       setIsLoading(false);
     }
@@ -81,13 +83,13 @@ export default function Resumes() {
       await resumeAPI.delete(id);
       setResumes(resumes.filter((r) => r.id !== id));
       toast({
-        title: 'Resume Deleted',
-        description: 'Your resume has been successfully deleted.',
+        title: t('pages.resumes.toast.deleted.title') || 'Resume Deleted',
+        description: t('pages.resumes.toast.deleted.description') || 'Your resume has been successfully deleted.',
       });
     } catch (err: any) {
       toast({
-        title: 'Error',
-        description: err.message || 'Failed to delete resume',
+        title: t('pages.resumes.toast.error.title') || 'Error',
+        description: err.message || t('pages.resumes.toast.error.deleteFailed') || 'Failed to delete resume',
         variant: 'destructive',
       });
     } finally {
@@ -97,7 +99,7 @@ export default function Resumes() {
 
   const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) {
-      return 'No date';
+      return t('pages.resumes.date.noDate') || 'No date';
     }
     
     try {
@@ -105,7 +107,7 @@ export default function Resumes() {
       
       // Check if date is valid
       if (isNaN(date.getTime())) {
-        return 'Invalid date';
+        return t('pages.resumes.date.invalid') || 'Invalid date';
       }
       
       // Format as DD/MM/YY (e.g., 10/12/26)
@@ -114,7 +116,7 @@ export default function Resumes() {
       const year = String(date.getFullYear()).slice(-2);
       return `${day}/${month}/${year}`;
     } catch (error) {
-      return 'Invalid date';
+      return t('pages.resumes.date.invalid') || 'Invalid date';
     }
   };
 
@@ -125,9 +127,9 @@ export default function Resumes() {
   };
 
   const getRatingBadge = (rating: number) => {
-    if (rating >= 9) return "Excellent";
-    if (rating >= 7) return "Good";
-    return "Needs Work";
+    if (rating >= 9) return t('pages.resumes.rating.excellent') || "Excellent";
+    if (rating >= 7) return t('pages.resumes.rating.good') || "Good";
+    return t('pages.resumes.rating.needsWork') || "Needs Work";
   };
 
   const handleDownloadPDF = async (resume: Resume) => {
@@ -136,13 +138,13 @@ export default function Resumes() {
       const fullResume = await resumeAPI.getById(resume.id);
       await downloadResumePDF(fullResume);
       toast({
-        title: 'PDF Downloaded',
-        description: 'Your resume has been downloaded successfully.',
+        title: t('pages.resumes.toast.downloaded.title') || 'PDF Downloaded',
+        description: t('pages.resumes.toast.downloaded.description') || 'Your resume has been downloaded successfully.',
       });
     } catch (err: any) {
       toast({
-        title: 'Error',
-        description: err.message || 'Failed to generate PDF',
+        title: t('pages.resumes.toast.error.title') || 'Error',
+        description: err.message || t('pages.resumes.toast.error.pdfFailed') || 'Failed to generate PDF',
         variant: 'destructive',
       });
     }
@@ -153,12 +155,12 @@ export default function Resumes() {
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-foreground mb-2">My Resumes</h1>
-            <p className="text-muted-foreground">View and manage your created CVs</p>
+            <h1 className="text-4xl font-bold text-foreground mb-2">{t('pages.resumes.title') || 'My Resumes'}</h1>
+            <p className="text-muted-foreground">{t('pages.resumes.subtitle') || 'View and manage your created CVs'}</p>
           </div>
           <Button onClick={() => navigate('/create')} size="lg">
             <Plus className="mr-2 h-4 w-4" />
-            Create New CV
+            {t('pages.resumes.createNew') || 'Create New CV'}
           </Button>
         </div>
 
@@ -173,20 +175,20 @@ export default function Resumes() {
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
               <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent mb-4"></div>
-              <p className="text-muted-foreground">Loading resumes...</p>
+              <p className="text-muted-foreground">{t('pages.resumes.loading') || 'Loading resumes...'}</p>
             </div>
           </div>
         ) : resumes.length === 0 ? (
           <Card className="text-center py-12">
             <CardContent>
               <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No resumes yet</h3>
+              <h3 className="text-xl font-semibold mb-2">{t('pages.resumes.empty.title') || 'No resumes yet'}</h3>
               <p className="text-muted-foreground mb-4">
-                Create your first CV to get started
+                {t('pages.resumes.empty.description') || 'Create your first CV to get started'}
               </p>
               <Button onClick={() => navigate('/create')}>
                 <Plus className="mr-2 h-4 w-4" />
-                Create Your First CV
+                {t('pages.resumes.empty.createButton') || 'Create Your First CV'}
               </Button>
             </CardContent>
           </Card>
@@ -217,8 +219,8 @@ export default function Resumes() {
                       setDeleteId(resume.id);
                     }}
                     className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-red-50 text-red-600 opacity-0 group-hover:opacity-100 hover:bg-red-100 hover:text-red-700 transition-all"
-                    title="Delete resume"
-                    aria-label="Delete resume"
+                    title={t('pages.resumes.delete') || 'Delete resume'}
+                    aria-label={t('pages.resumes.delete') || 'Delete resume'}
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -252,19 +254,19 @@ export default function Resumes() {
 
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Completeness</span>
+                        <span className="text-muted-foreground">{t('pages.resumes.scores.completeness') || 'Completeness'}</span>
                         <span className="font-medium">{completenessScore}/10</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Clarity</span>
+                        <span className="text-muted-foreground">{t('pages.resumes.scores.clarity') || 'Clarity'}</span>
                         <span className="font-medium">{clarityScore}/10</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Formatting</span>
+                        <span className="text-muted-foreground">{t('pages.resumes.scores.formatting') || 'Formatting'}</span>
                         <span className="font-medium">{formattingScore}/10</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Impact</span>
+                        <span className="text-muted-foreground">{t('pages.resumes.scores.impact') || 'Impact'}</span>
                         <span className="font-medium">{impactScore}/10</span>
                       </div>
                     </div>
@@ -277,27 +279,27 @@ export default function Resumes() {
                         onClick={() => navigate(`/resume/${resume.id}`)}
                       >
                         <Eye className="h-3 w-3 mr-1" />
-                        View
+                        {t('pages.resumes.actions.view') || 'View'}
                       </Button>
                       <Button 
                         variant="outline" 
                         className="flex-1" 
                         size="sm"
                         onClick={() => handleDownloadPDF(resume)}
-                        title="Download PDF"
+                        title={t('pages.resumes.actions.downloadPDF') || 'Download PDF'}
                       >
                         <Download className="h-3 w-3 mr-1" />
-                        PDF
+                        {t('pages.resumes.actions.pdf') || 'PDF'}
                       </Button>
                       <Button 
                         variant="outline" 
                         className="flex-1" 
                         size="sm"
                         onClick={() => navigate(`/create?edit=${resume.id}`)}
-                        title="Edit resume"
+                        title={t('pages.resumes.actions.edit') || 'Edit resume'}
                       >
                         <Edit className="h-3 w-3 mr-1" />
-                        Edit
+                        {t('pages.resumes.actions.edit') || 'Edit'}
                       </Button>
                     </div>
                   </CardContent>
@@ -310,19 +312,18 @@ export default function Resumes() {
         <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Delete Resume?</AlertDialogTitle>
+              <AlertDialogTitle>{t('pages.resumes.deleteDialog.title') || 'Delete Resume?'}</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete your
-                resume.
+                {t('pages.resumes.deleteDialog.description') || 'This action cannot be undone. This will permanently delete your resume.'}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel>{t('pages.resumes.deleteDialog.cancel') || 'Cancel'}</AlertDialogCancel>
               <AlertDialogAction
                 onClick={() => deleteId && handleDelete(deleteId)}
                 className="bg-destructive hover:bg-destructive/90"
               >
-                Delete
+                {t('pages.resumes.deleteDialog.delete') || 'Delete'}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

@@ -466,6 +466,63 @@
       "myResumesDesc": "Anzeigen und Verwalten Ihrer gespeicherten Lebensläufe",
       "viewAll": "Alle anzeigen"
     },
+    "resumes": {
+      "title": "Meine Lebensläufe",
+      "subtitle": "Anzeigen und Verwalten Ihrer erstellten Lebensläufe",
+      "createNew": "Neuen Lebenslauf erstellen",
+      "loading": "Lebensläufe werden geladen...",
+      "errors": {
+        "loadFailed": "Lebensläufe konnten nicht geladen werden"
+      },
+      "empty": {
+        "title": "Noch keine Lebensläufe",
+        "description": "Erstellen Sie Ihren ersten Lebenslauf, um zu beginnen",
+        "createButton": "Ihren ersten Lebenslauf erstellen"
+      },
+      "date": {
+        "noDate": "Kein Datum",
+        "invalid": "Ungültiges Datum"
+      },
+      "rating": {
+        "excellent": "Ausgezeichnet",
+        "good": "Gut",
+        "needsWork": "Verbesserungsbedarf"
+      },
+      "scores": {
+        "completeness": "Vollständigkeit",
+        "clarity": "Klarheit",
+        "formatting": "Formatierung",
+        "impact": "Wirkung"
+      },
+      "actions": {
+        "view": "Anzeigen",
+        "edit": "Bearbeiten",
+        "pdf": "PDF",
+        "downloadPDF": "PDF herunterladen"
+      },
+      "delete": "Lebenslauf löschen",
+      "deleteDialog": {
+        "title": "Lebenslauf löschen?",
+        "description": "Diese Aktion kann nicht rückgängig gemacht werden. Dies wird Ihren Lebenslauf dauerhaft löschen.",
+        "cancel": "Abbrechen",
+        "delete": "Löschen"
+      },
+      "toast": {
+        "deleted": {
+          "title": "Lebenslauf gelöscht",
+          "description": "Ihr Lebenslauf wurde erfolgreich gelöscht."
+        },
+        "downloaded": {
+          "title": "PDF heruntergeladen",
+          "description": "Ihr Lebenslauf wurde erfolgreich heruntergeladen."
+        },
+        "error": {
+          "title": "Fehler",
+          "deleteFailed": "Lebenslauf konnte nicht gelöscht werden",
+          "pdfFailed": "PDF konnte nicht generiert werden"
+        }
+      }
+    },
     "about": {
       "title": "Über 123Resume",
       "subtitle": "Jobsuchende dabei unterstützen, professionelle Lebensläufe zu erstellen, die auffallen",

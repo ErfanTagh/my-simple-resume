@@ -466,6 +466,63 @@
       "myResumesDesc": "View and manage your saved resumes",
       "viewAll": "View All"
     },
+    "resumes": {
+      "title": "My Resumes",
+      "subtitle": "View and manage your created CVs",
+      "createNew": "Create New CV",
+      "loading": "Loading resumes...",
+      "errors": {
+        "loadFailed": "Failed to load resumes"
+      },
+      "empty": {
+        "title": "No resumes yet",
+        "description": "Create your first CV to get started",
+        "createButton": "Create Your First CV"
+      },
+      "date": {
+        "noDate": "No date",
+        "invalid": "Invalid date"
+      },
+      "rating": {
+        "excellent": "Excellent",
+        "good": "Good",
+        "needsWork": "Needs Work"
+      },
+      "scores": {
+        "completeness": "Completeness",
+        "clarity": "Clarity",
+        "formatting": "Formatting",
+        "impact": "Impact"
+      },
+      "actions": {
+        "view": "View",
+        "edit": "Edit",
+        "pdf": "PDF",
+        "downloadPDF": "Download PDF"
+      },
+      "delete": "Delete resume",
+      "deleteDialog": {
+        "title": "Delete Resume?",
+        "description": "This action cannot be undone. This will permanently delete your resume.",
+        "cancel": "Cancel",
+        "delete": "Delete"
+      },
+      "toast": {
+        "deleted": {
+          "title": "Resume Deleted",
+          "description": "Your resume has been successfully deleted."
+        },
+        "downloaded": {
+          "title": "PDF Downloaded",
+          "description": "Your resume has been downloaded successfully."
+        },
+        "error": {
+          "title": "Error",
+          "deleteFailed": "Failed to delete resume",
+          "pdfFailed": "Failed to generate PDF"
+        }
+      }
+    },
     "about": {
       "title": "About 123Resume",
       "subtitle": "Empowering job seekers to create professional resumes that get noticed",
