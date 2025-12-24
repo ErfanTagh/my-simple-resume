@@ -111,7 +111,7 @@ export const CVPreview = ({ data, onTemplateChange, onSectionOrderChange }: CVPr
                     : 'text-red-600 dark:text-red-400'
                 }`}
               >
-                {resumeScore.overallScore}/100
+                {Math.round((resumeScore.overallScore / 10) * 10) / 10}/10
               </span>
             </div>
             

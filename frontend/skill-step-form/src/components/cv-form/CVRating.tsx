@@ -46,27 +46,29 @@ export const CVRating = ({ data, onAnalyze, isAnalyzing, rating: externalRating 
   };
 
   const getOverallScoreColor = (score: number) => {
-    if (score >= 80) return "text-green-600 dark:text-green-400";
-    if (score >= 60) return "text-yellow-600 dark:text-yellow-400";
+    const scoreOutOf10 = score / 10;
+    if (scoreOutOf10 >= 8) return "text-green-600 dark:text-green-400";
+    if (scoreOutOf10 >= 6) return "text-yellow-600 dark:text-yellow-400";
     return "text-red-600 dark:text-red-400";
   };
 
   const getOverallStatus = (score: number) => {
-    if (score >= 80) return { 
+    const scoreOutOf10 = score / 10;
+    if (scoreOutOf10 >= 8) return { 
       label: t('resume.score.status.excellent') || "Excellent", 
       color: "bg-green-500",
       borderColor: "border-green-500",
       bgColor: "bg-green-50 dark:bg-green-950/20",
       textColor: "text-green-700 dark:text-green-400"
     };
-    if (score >= 60) return { 
+    if (scoreOutOf10 >= 6) return { 
       label: t('resume.score.status.good') || "Good", 
       color: "bg-yellow-500",
       borderColor: "border-yellow-500",
       bgColor: "bg-yellow-50 dark:bg-yellow-950/20",
       textColor: "text-yellow-700 dark:text-yellow-400"
     };
-    if (score >= 40) return { 
+    if (scoreOutOf10 >= 4) return { 
       label: t('resume.score.status.fair') || "Fair", 
       color: "bg-orange-500",
       borderColor: "border-orange-500",
@@ -126,8 +128,8 @@ if (!rating) {
         {/* Overall Score */}
         <div className="space-y-3 text-center">
           <div className={`text-5xl font-bold ${getOverallScoreColor(rating.overallScore)}`}>
-            {rating.overallScore}
-            <span className="text-2xl text-muted-foreground">/100</span>
+            {Math.round((rating.overallScore / 10) * 10) / 10}
+            <span className="text-2xl text-muted-foreground">/10</span>
           </div>
           <Badge className={status.color}>{status.label}</Badge>
           <Progress value={rating.overallScore} className="h-3" />
