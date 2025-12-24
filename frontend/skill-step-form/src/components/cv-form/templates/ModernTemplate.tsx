@@ -167,11 +167,11 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
       <div className="bg-primary/5 -mx-8 -mt-8 px-8 py-6 mb-6 border-l-4 border-primary">
         <div className="flex items-start gap-6">
           <div className="flex-1">
-            <h1 className="text-3xl font-bold text-foreground mb-2">
-              {personalInfo.firstName} {personalInfo.lastName}
-            </h1>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-muted-foreground mt-3">
+        <h1 className="text-3xl font-bold text-foreground mb-2">
+          {personalInfo.firstName} {personalInfo.lastName}
+        </h1>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-muted-foreground mt-3">
           {personalInfo.email && (
             <div className="flex items-center gap-2 min-w-0">
               <Mail className="h-4 w-4 text-primary flex-shrink-0" />

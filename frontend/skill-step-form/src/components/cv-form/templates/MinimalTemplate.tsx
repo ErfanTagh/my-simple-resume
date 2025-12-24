@@ -185,11 +185,11 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
       <div className="mb-10">
         <div className="flex items-start gap-6 mb-4">
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-foreground mb-1 tracking-tight">
-              {personalInfo.firstName} {personalInfo.lastName}
-            </h1>
-            
-            <div className="flex flex-wrap gap-3 text-xs text-muted-foreground mt-3">
+        <h1 className="text-xl font-bold text-foreground mb-1 tracking-tight">
+          {personalInfo.firstName} {personalInfo.lastName}
+        </h1>
+        
+        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground mt-3">
           {personalInfo.email && <span>{personalInfo.email}</span>}
           {personalInfo.phone && <span>{personalInfo.phone}</span>}
           {personalInfo.location && <span>{personalInfo.location}</span>}

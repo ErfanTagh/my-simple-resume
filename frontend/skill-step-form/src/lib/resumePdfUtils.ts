@@ -1,4 +1,14 @@
 import { resumeAPI, Resume } from './api';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { CVFormData } from '@/components/cv-form/types';
+import { ModernTemplate } from '@/components/cv-form/templates/ModernTemplate';
+import { ClassicTemplate } from '@/components/cv-form/templates/ClassicTemplate';
+import { MinimalTemplate } from '@/components/cv-form/templates/MinimalTemplate';
+import { CreativeTemplate } from '@/components/cv-form/templates/CreativeTemplate';
+import { LatexTemplate } from '@/components/cv-form/templates/LatexTemplate';
+import { StarRoverTemplate } from '@/components/cv-form/templates/StarRoverTemplate';
+import { LanguageProvider } from '@/contexts/LanguageContext';
 
 /**
  * CSS files needed for resume rendering
@@ -411,14 +421,166 @@ async function downloadPDFFromHTML(
 }
 
 /**
+ * Convert Resume to CVFormData format for template rendering
+ */
+function convertResumeToFormData(resume: Resume): CVFormData {
+  return {
+    template: resume.template || 'modern',
+    personalInfo: resume.personalInfo,
+    workExperience: resume.workExperience || [],
+    education: resume.education || [],
+    projects: resume.projects || [],
+    certificates: resume.certificates || [],
+    skills: resume.skills || [],
+    languages: resume.languages || [],
+    sectionOrder: resume.sectionOrder || []
+  };
+}
+
+/**
+ * Render React template component to HTML string
+ */
+function renderTemplateToHTML(resume: Resume): Promise<string> {
+  return new Promise((resolve, reject) => {
+    try {
+      const formData = convertResumeToFormData(resume);
+      const template = resume.template || 'modern';
+      
+      // Create a temporary container with proper styling context
+      const container = document.createElement('div');
+      container.className = 'resume-container';
+      container.style.position = 'fixed';
+      container.style.left = '-9999px';
+      container.style.top = '0';
+      container.style.width = '210mm';
+      container.style.padding = '40px';
+      container.style.backgroundColor = 'white';
+      container.style.visibility = 'hidden';
+      container.style.opacity = '0';
+      // Ensure container has proper styling context by adding it to body
+      document.body.appendChild(container);
+      
+      // Create a root for React rendering
+      const root = ReactDOM.createRoot(container);
+      
+      // Render the appropriate template wrapped with LanguageProvider
+      let templateComponent: React.ReactElement;
+      switch (template) {
+        case 'classic':
+          templateComponent = React.createElement(ClassicTemplate, { data: formData });
+          break;
+        case 'minimal':
+          templateComponent = React.createElement(MinimalTemplate, { data: formData });
+          break;
+        case 'creative':
+          templateComponent = React.createElement(CreativeTemplate, { data: formData });
+          break;
+        case 'latex':
+          templateComponent = React.createElement(LatexTemplate, { data: formData });
+          break;
+        case 'starRover':
+          templateComponent = React.createElement(StarRoverTemplate, { data: formData });
+          break;
+        case 'modern':
+        default:
+          templateComponent = React.createElement(ModernTemplate, { data: formData });
+          break;
+      }
+      
+      // Wrap template with LanguageProvider to provide context
+      const wrappedComponent = React.createElement(
+        LanguageProvider,
+        { children: templateComponent }
+      );
+      
+      root.render(wrappedComponent);
+      
+      // Wait for React to render using both requestAnimationFrame and timeout
+      // This ensures we wait long enough for React to fully render
+      let frameCount = 0;
+      const maxFrames = 30; // Increased to 30 frames (~500ms at 60fps)
+      const maxWaitTime = 2000; // Maximum 2 seconds wait time
+      const startTime = Date.now();
+      let resolved = false;
+      
+      const checkRender = () => {
+        if (resolved) return;
+        
+        frameCount++;
+        const elapsed = Date.now() - startTime;
+        const html = container.innerHTML;
+        
+        // Check if we have substantial content (more than just container/div tags)
+        // Look for actual content like text nodes, not just empty divs
+        const hasSubstantialContent = html.trim().length > 500 && 
+          (html.includes('<h1') || html.includes('<h2') || html.includes('<h3') || 
+           html.includes('class="name') || html.includes('class="title') ||
+           html.includes('resume-header') || html.includes('resume-main'));
+        
+        const shouldResolve = hasSubstantialContent || frameCount >= maxFrames || elapsed >= maxWaitTime;
+        
+        if (shouldResolve) {
+          try {
+            const finalHtml = container.innerHTML;
+            // More lenient check - just ensure we have some HTML content
+            if (finalHtml.trim().length > 100) {
+              resolved = true;
+              // Cleanup
+              root.unmount();
+              document.body.removeChild(container);
+              resolve(finalHtml);
+            } else if (elapsed >= maxWaitTime) {
+              // If we've waited the max time and still no content, reject
+              resolved = true;
+              root.unmount();
+              document.body.removeChild(container);
+              reject(new Error('Template rendering failed - no content generated after waiting'));
+            } else {
+              // Continue waiting
+              requestAnimationFrame(checkRender);
+            }
+          } catch (error) {
+            // Cleanup on error
+            resolved = true;
+            try {
+              root.unmount();
+              document.body.removeChild(container);
+            } catch {}
+            reject(error);
+          }
+        } else {
+          requestAnimationFrame(checkRender);
+        }
+      };
+      
+      // Start checking after a short delay to allow React to start rendering
+      setTimeout(() => {
+        requestAnimationFrame(checkRender);
+      }, 50);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+/**
  * Download PDF from resume data
+ * Now uses React template rendering to match ResumeView page
+ * Falls back to simple HTML generation if React rendering fails
  */
 export async function downloadResumePDF(
   resume: Resume,
   filename?: string
 ): Promise<void> {
-  const resumeHTML = generateResumeHTML(resume);
-  await downloadPDFFromHTML(resume.id, resumeHTML, filename || `${resume.personalInfo.firstName || 'resume'}_${resume.personalInfo.lastName || 'download'}.pdf`);
+  try {
+    // Try to render the template component to HTML first
+    const resumeHTML = await renderTemplateToHTML(resume);
+    await downloadPDFFromHTML(resume.id, resumeHTML, filename || `${resume.personalInfo.firstName || 'resume'}_${resume.personalInfo.lastName || 'download'}.pdf`);
+  } catch (error) {
+    // Fallback to simple HTML generation if React rendering fails
+    const resumeHTML = generateResumeHTML(resume);
+    await downloadPDFFromHTML(resume.id, resumeHTML, filename || `${resume.personalInfo.firstName || 'resume'}_${resume.personalInfo.lastName || 'download'}.pdf`);
+  }
 }
 
 /**

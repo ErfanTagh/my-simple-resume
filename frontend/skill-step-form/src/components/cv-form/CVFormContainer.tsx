@@ -34,8 +34,11 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
   const { t } = useLanguage();
 
   // Ensure overlay is ALWAYS hidden when navigating between steps - only show when explicitly clicking "Complete CV"
+  // Also scroll to top when step changes
   useEffect(() => {
     setShowSignupOverlay(false);
+    // Scroll to top of the form container when step changes
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentStep]);
 
   // Ensure workExperience and education always have at least one entry

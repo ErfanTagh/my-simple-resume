@@ -21,6 +21,7 @@ import CreateResume from "./pages/CreateResume";
 import ResumeView from "./pages/ResumeView";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import BlogEditor from "./pages/BlogEditor";
 import About from "./pages/About";
 import Careers from "./pages/Careers";
 import Contact from "./pages/Contact";
@@ -87,6 +88,14 @@ const AppRoutes = () => {
         />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:id" element={<BlogPost />} />
+        <Route
+          path="/blog-editor/:id?"
+          element={
+            <ProtectedRoute>
+              <BlogEditor />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/about" element={<About />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/contact" element={<Contact />} />
@@ -109,14 +118,14 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <LanguageProvider>
-        <AuthProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
+      <AuthProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
             <ScrollToTop />
-            <AppRoutes />
-          </BrowserRouter>
-        </AuthProvider>
+          <AppRoutes />
+        </BrowserRouter>
+      </AuthProvider>
       </LanguageProvider>
     </TooltipProvider>
   </QueryClientProvider>
