@@ -386,15 +386,56 @@ async function downloadPDFFromHTML(
   ${pageStylesheets}
   ${cssContents.join('\n')}
   <style>
+    /* Remove page margins for PDF - no white space around the document */
+    @page {
+      margin: 0 !important;
+      padding: 0 !important;
+      size: A4;
+    }
     /* Ensure proper rendering */
     * {
       box-sizing: border-box;
     }
     body {
-      margin: 0;
-      padding: 0;
+      margin: 0 !important;
+      padding: 8mm !important;
       font-family: Inter, ui-sans-serif, system-ui, sans-serif;
       background: white;
+      width: 100%;
+    }
+    /* Aggressively remove all margins and constraints from template root */
+    /* Templates use mx-auto and max-w-* which create side margins - force remove for PDF */
+    body > div:first-child {
+      margin: 0 !important;
+      padding: 0 !important;
+      max-width: none !important;
+      width: 100% !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+    }
+    /* Remove padding from resume-container class only if it's the root element */
+    /* This prevents the container's 40px padding from affecting the PDF */
+    /* Template's internal padding (p-8, p-12, etc.) should be preserved */
+    body > .resume-container {
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+    /* Override ALL possible Tailwind classes that could add margins/width constraints */
+    body > div[class*="mx-auto"],
+    body > div[class*="mx-"],
+    body > div[class*="max-w"],
+    body > div[class*="w-"],
+    body > div.bg-background,
+    body > div.bg-gradient {
+      margin: 0 !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+      max-width: none !important;
+      width: 100% !important;
     }
     /* Ensure images load correctly */
     img {
@@ -521,13 +562,16 @@ function renderTemplateToHTML(resume: Resume): Promise<string> {
         
         if (shouldResolve) {
           try {
-            const finalHtml = container.innerHTML;
+            const templateHtml = container.innerHTML;
             // More lenient check - just ensure we have some HTML content
-            if (finalHtml.trim().length > 100) {
+            if (templateHtml.trim().length > 100) {
               resolved = true;
               // Cleanup
               root.unmount();
               document.body.removeChild(container);
+              // Wrap the template HTML in a container div matching ResumeView structure
+              // This ensures the same padding and styling as the individual resume page
+              const finalHtml = `<div class="resume-container" style="max-width: 210mm; margin: 0 auto; background-color: white; padding: 40px; box-sizing: border-box;">${templateHtml}</div>`;
               resolve(finalHtml);
             } else if (elapsed >= maxWaitTime) {
               // If we've waited the max time and still no content, reject
@@ -565,21 +609,138 @@ function renderTemplateToHTML(resume: Resume): Promise<string> {
 
 /**
  * Download PDF from resume data
- * Now uses React template rendering to match ResumeView page
- * Falls back to simple HTML generation if React rendering fails
+ * Uses the same approach as downloadResumePDFFromElement by temporarily rendering
+ * the resume on the page to get identical HTML structure
  */
 export async function downloadResumePDF(
   resume: Resume,
   filename?: string
 ): Promise<void> {
+  // Create structure that matches ResumeView exactly:
+  // Outer container (hidden, no padding) -> Inner wrapper (where template renders)
+  // This matches: <div class="resume-container" style="padding: 40px"><template/></div>
+  // But we extract innerHTML from the inner wrapper, not the outer container
+  const outerContainer = document.createElement('div');
+  outerContainer.style.position = 'fixed';
+  outerContainer.style.left = '-9999px';
+  outerContainer.style.top = '0';
+  outerContainer.style.width = '210mm';
+  outerContainer.style.margin = '0';
+  outerContainer.style.padding = '0';
+  outerContainer.style.backgroundColor = 'transparent';
+  outerContainer.style.visibility = 'hidden';
+  outerContainer.style.opacity = '0';
+  outerContainer.style.zIndex = '-9999';
+  document.body.appendChild(outerContainer);
+
+  // Create inner wrapper div where template will render (matches ResumeView structure)
+  const innerWrapper = document.createElement('div');
+  innerWrapper.style.width = '100%';
+  innerWrapper.style.height = '100%';
+  innerWrapper.style.padding = '0';
+  innerWrapper.style.margin = '0';
+  outerContainer.appendChild(innerWrapper);
+
+  // Create a root for React rendering on the inner wrapper (declare outside try for cleanup)
+  const root = ReactDOM.createRoot(innerWrapper);
+
   try {
-    // Try to render the template component to HTML first
-    const resumeHTML = await renderTemplateToHTML(resume);
-    await downloadPDFFromHTML(resume.id, resumeHTML, filename || `${resume.personalInfo.firstName || 'resume'}_${resume.personalInfo.lastName || 'download'}.pdf`);
-  } catch (error) {
-    // Fallback to simple HTML generation if React rendering fails
-    const resumeHTML = generateResumeHTML(resume);
-    await downloadPDFFromHTML(resume.id, resumeHTML, filename || `${resume.personalInfo.firstName || 'resume'}_${resume.personalInfo.lastName || 'download'}.pdf`);
+    const formData = convertResumeToFormData(resume);
+    const template = resume.template || 'modern';
+    
+    // Render the appropriate template wrapped with LanguageProvider
+    let templateComponent: React.ReactElement;
+    switch (template) {
+      case 'classic':
+        templateComponent = React.createElement(ClassicTemplate, { data: formData });
+        break;
+      case 'minimal':
+        templateComponent = React.createElement(MinimalTemplate, { data: formData });
+        break;
+      case 'creative':
+        templateComponent = React.createElement(CreativeTemplate, { data: formData });
+        break;
+      case 'latex':
+        templateComponent = React.createElement(LatexTemplate, { data: formData });
+        break;
+      case 'starRover':
+        templateComponent = React.createElement(StarRoverTemplate, { data: formData });
+        break;
+      case 'modern':
+      default:
+        templateComponent = React.createElement(ModernTemplate, { data: formData });
+        break;
+    }
+    
+    // Wrap template with LanguageProvider to provide context
+    const wrappedComponent = React.createElement(
+      LanguageProvider,
+      { children: templateComponent }
+    );
+    
+    root.render(wrappedComponent);
+    
+    // Wait for React to render - use a more reliable approach
+    await new Promise<void>((resolve) => {
+      let frameCount = 0;
+      const maxFrames = 30;
+      const maxWaitTime = 2000;
+      const startTime = Date.now();
+      
+      const checkRender = () => {
+        frameCount++;
+        const elapsed = Date.now() - startTime;
+        const html = innerWrapper.innerHTML;
+        
+        // Check if we have substantial content
+        const hasSubstantialContent = html.trim().length > 500 && 
+          (html.includes('<h1') || html.includes('<h2') || html.includes('<h3') || 
+           html.includes('class="name') || html.includes('class="title') ||
+           html.includes('resume-header') || html.includes('resume-main'));
+        
+        if (hasSubstantialContent || frameCount >= maxFrames || elapsed >= maxWaitTime) {
+          resolve();
+        } else {
+          requestAnimationFrame(checkRender);
+        }
+      };
+      
+      setTimeout(() => {
+        requestAnimationFrame(checkRender);
+      }, 50);
+    });
+    
+    // Get the innerHTML exactly like downloadResumePDFFromElement does
+    // This is the working method - just get innerHTML and pass to downloadPDFFromHTML
+    let resumeHTML = innerWrapper.innerHTML;
+    
+    // Strip margin classes that create side margins (mx-auto, max-w-*, etc.)
+    // Replace them to remove the margin/width constraints
+    resumeHTML = resumeHTML.replace(/\s*mx-auto\s*/g, ' ');
+    resumeHTML = resumeHTML.replace(/\s*max-w-[^\s"]+\s*/g, ' ');
+    resumeHTML = resumeHTML.replace(/\s*mx-\d+\s*/g, ' ');
+    resumeHTML = resumeHTML.replace(/\s*ml-auto\s*/g, ' ');
+    resumeHTML = resumeHTML.replace(/\s*mr-auto\s*/g, ' ');
+    
+    // Generate filename
+    const finalFilename = filename || `${resume.personalInfo.firstName || 'resume'}_${resume.personalInfo.lastName || 'download'}.pdf`;
+    
+    // Call downloadPDFFromHTML directly - same as downloadResumePDFFromElement does
+    await downloadPDFFromHTML(resume.id, resumeHTML, finalFilename);
+  } finally {
+    // Cleanup - ensure everything is always removed
+    try {
+      root.unmount();
+    } catch (e) {
+      // Ignore unmount errors
+    }
+    try {
+      if (outerContainer.parentNode) {
+        document.body.removeChild(outerContainer);
+      }
+    } catch (e) {
+      // Ignore removal errors
+    }
   }
 }
 
@@ -593,7 +754,20 @@ export async function downloadResumePDFFromElement(
   resumeOrFilename?: Resume | string,
   filename?: string
 ): Promise<void> {
-  const resumeHTML = htmlElement.innerHTML;
+  // Get the innerHTML (template content)
+  // The templates already have their own padding built in (p-8, p-12, etc.)
+  // We use the template HTML as-is without adding container padding
+  // This gives clean PDFs without extra padding on the sides
+  // Extract innerHTML to get just the template content, excluding the container's padding
+  let resumeHTML = htmlElement.innerHTML;
+  
+  // Strip any margin classes that could create side margins (mx-auto, max-w-*, etc.)
+  // This ensures the PDF doesn't have unwanted margins like the container padding
+  resumeHTML = resumeHTML.replace(/\s*mx-auto\s*/g, ' ');
+  resumeHTML = resumeHTML.replace(/\s*max-w-[^\s"]+\s*/g, ' ');
+  resumeHTML = resumeHTML.replace(/\s*mx-\d+\s*/g, ' ');
+  resumeHTML = resumeHTML.replace(/\s*ml-auto\s*/g, ' ');
+  resumeHTML = resumeHTML.replace(/\s*mr-auto\s*/g, ' ');
   
   // Determine if third param is Resume or filename
   let finalFilename = filename;
