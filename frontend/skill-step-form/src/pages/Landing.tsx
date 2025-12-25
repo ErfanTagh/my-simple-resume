@@ -9,7 +9,8 @@ import {
   CheckCircle2,
   Zap,
   Clock,
-  BookOpen
+  BookOpen,
+  FileText
 } from "lucide-react";
 import { LandingTemplatePreview } from "./LandingTemplatePreview";
 import { getBlogPosts } from "@/lib/blogPosts";
@@ -243,6 +244,11 @@ const Landing = () => {
                           // Image failed to load, fallback to gradient design
                         }}
                       />
+                      {/* Watermark */}
+                      <div className="absolute bottom-2 right-2 flex items-center gap-1.5 bg-background/80 backdrop-blur-sm px-2 py-1 rounded-md shadow-sm">
+                        <FileText className="w-3 h-3 text-primary" />
+                        <span className="text-xs font-semibold text-foreground">123Resume</span>
+                      </div>
                     </div>
                   ) : (
                     <div className={`aspect-[16/9] bg-gradient-to-br ${post.gradient} relative overflow-hidden`}>

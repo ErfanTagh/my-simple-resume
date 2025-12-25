@@ -227,12 +227,17 @@ const BlogPost = () => {
       <div className="px-4 sm:px-6 mb-12">
         <div className="container mx-auto max-w-4xl">
           {post.image ? (
-            <div className="aspect-[21/9] rounded-2xl overflow-hidden border border-border shadow-lg">
+            <div className="aspect-[21/9] rounded-2xl overflow-hidden border border-border shadow-lg relative">
               <img 
                 src={post.image} 
                 alt={post.title}
                 className="w-full h-full object-cover"
               />
+              {/* Watermark */}
+              <div className="absolute bottom-3 right-3 flex items-center gap-2 bg-background/90 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-md">
+                <FileText className="w-4 h-4 text-primary" />
+                <span className="text-sm font-semibold text-foreground">123Resume</span>
+              </div>
             </div>
           ) : (
             <div className={`aspect-[21/9] bg-gradient-to-br ${post.gradient} rounded-2xl relative overflow-hidden`}>
