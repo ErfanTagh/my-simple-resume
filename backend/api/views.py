@@ -76,15 +76,7 @@ def resume_list(request):
     List all resumes for the authenticated user
     """
     import logging
-    import sys
     logger = logging.getLogger(__name__)
-    
-    # Log all requests for debugging
-    print("=" * 50, file=sys.stderr)
-    print(f"REQUEST RECEIVED: {request.method} /api/resumes/", file=sys.stderr)
-    print(f"User: {request.user} (authenticated: {request.user.is_authenticated})", file=sys.stderr)
-    print(f"Headers: {dict(request.headers)}", file=sys.stderr)
-    print("=" * 50, file=sys.stderr)
     
     if request.method == 'GET':
         try:

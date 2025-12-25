@@ -63,7 +63,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
   const renderSection = (sectionKey: string) => {
     switch (sectionKey) {
       case "summary":
-        return personalInfo.summary ? (
+        return personalInfo.summary && personalInfo.summary.trim() ? (
           <div key="summary" className="mb-6">
             <div className="mb-3">
               <div className="flex items-center gap-2">
@@ -74,7 +74,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                 <div className="flex-1" style={{ borderTop: `1px solid ${ACCENT_COLOR}` }}></div>
               </div>
             </div>
-            <p className="text-sm text-foreground leading-relaxed break-words">{personalInfo.summary}</p>
+            <p className="text-sm text-foreground leading-relaxed break-words whitespace-pre-wrap">{personalInfo.summary.trim()}</p>
           </div>
         ) : null;
 

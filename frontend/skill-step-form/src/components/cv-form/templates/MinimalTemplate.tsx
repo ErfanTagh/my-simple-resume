@@ -16,9 +16,9 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
   const renderSection = (sectionKey: string) => {
     switch (sectionKey) {
       case "summary":
-        return personalInfo.summary ? (
+        return personalInfo.summary && personalInfo.summary.trim() ? (
           <div key="summary" className="mb-8">
-            <p className="text-sm text-foreground leading-relaxed">{personalInfo.summary}</p>
+            <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{personalInfo.summary.trim()}</p>
           </div>
         ) : null;
 

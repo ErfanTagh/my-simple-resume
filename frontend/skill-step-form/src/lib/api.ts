@@ -443,109 +443,21 @@ export const resumeAPI = {
 };
 
 // ============================================
-// Blog Post API
+// Blog Post API - Using @123resume/react-blog-system
 // ============================================
 
-export interface BlogPost {
-  id: string;
-  title: string;
-  excerpt: string;
-  category: string;
-  readTime: string;
-  date: string;
-  gradient: string;
-  iconColor: string;
-  image?: string;
-  content: string;
-  language?: string;
-  published?: boolean;
-  scheduledPublishAt?: string; // ISO datetime string
-}
+import { createBlogClient, BlogPost } from '@123resume/react-blog-system';
 
-export const blogPostAPI = {
-  /**
-   * Get all published blog posts for a language
-   */
-  getAll: async (language: string = 'en', includeDrafts: boolean = false): Promise<BlogPost[]> => {
-    const url = `${API_BASE_URL}/blog-posts/?language=${language}${includeDrafts ? '&include_drafts=true' : ''}`;
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: createHeaders(includeDrafts), // Auth required for drafts
-    });
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.error || 'Failed to fetch blog posts');
-    }
-    const data = await response.json();
-    return snakeToCamelObject(data);
-  },
+// Re-export BlogPost type for backwards compatibility
+export type { BlogPost };
 
-  /**
-   * Get a specific blog post by ID
-   */
-  getById: async (id: string, language: string = 'en'): Promise<BlogPost> => {
-    const response = await fetch(`${API_BASE_URL}/blog-posts/${id}/?language=${language}`, {
-      method: 'GET',
-      headers: createHeaders(false), // Public endpoint
-    });
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.error || 'Failed to fetch blog post');
-    }
-    const data = await response.json();
-    return snakeToCamelObject(data);
-  },
-
-  /**
-   * Create a new blog post
-   */
-  create: async (post: BlogPost): Promise<BlogPost> => {
-    const snakeCaseData = camelToSnakeObject(post);
-    const response = await fetch(`${API_BASE_URL}/blog-posts/`, {
-      method: 'POST',
-      headers: createHeaders(true),
-      body: JSON.stringify(snakeCaseData),
-    });
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.error || error.message || 'Failed to create blog post');
-    }
-    const data = await response.json();
-    return snakeToCamelObject(data);
-  },
-
-  /**
-   * Update an existing blog post
-   */
-  update: async (id: string, post: Partial<BlogPost>, language: string = 'en'): Promise<BlogPost> => {
-    const snakeCaseData = camelToSnakeObject(post);
-    const response = await fetch(`${API_BASE_URL}/blog-posts/${id}/?language=${language}`, {
-      method: 'PUT',
-      headers: createHeaders(true),
-      body: JSON.stringify(snakeCaseData),
-    });
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.error || error.message || 'Failed to update blog post');
-    }
-    const data = await response.json();
-    return snakeToCamelObject(data);
-  },
-
-  /**
-   * Delete a blog post
-   */
-  delete: async (id: string, language: string = 'en'): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/blog-posts/${id}/?language=${language}`, {
-      method: 'DELETE',
-      headers: createHeaders(true),
-    });
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.error || 'Failed to delete blog post');
-    }
-  },
-};
+// Create blog client instance
+export const blogPostAPI = createBlogClient({
+  apiBaseUrl: API_BASE_URL,
+  getAuthToken: () => getAccessToken(),
+  defaultLanguage: 'en',
+  supportedLanguages: ['en', 'de'],
+});
 
 // ============================================
 // Health Check

@@ -196,19 +196,18 @@ export default function Resumes() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {resumes.map((resume) => {
               // Get quality scores from API (already converted to camelCase by API)
-              const resumeData = resume as any;
-              // Backend returns scores in 0-100 format, convert to 0-10 for display
-              const completenessScore = Math.round((resumeData.completenessScore || 0) / 10);
-              const clarityScore = Math.round((resumeData.clarityScore || 0) / 10);
-              const formattingScore = Math.round((resumeData.formattingScore || 0) / 10);
-              const impactScore = Math.round((resumeData.impactScore || 0) / 10);
-              const overallScore = resumeData.overallScore || 0;
+              // Backend returns scores in 0-10 format
+              const completenessScore = Math.round((resume.completenessScore || 0) * 10) / 10;
+              const clarityScore = Math.round((resume.clarityScore || 0) * 10) / 10;
+              const formattingScore = Math.round((resume.formattingScore || 0) * 10) / 10;
+              const impactScore = Math.round((resume.impactScore || 0) * 10) / 10;
+              const overallScore = resume.overallScore || 0;
               
-              // Use overall_score from backend if available, otherwise calculate
-              // Backend returns scores in 0-100 format, convert to 0-10 for display
+              // Use overall_score from backend if available, otherwise calculate average
+              // Backend returns scores in 0-10 format
               const displayScore = overallScore > 0 
-                ? Math.round(overallScore / 10)
-                : Math.round((completenessScore + clarityScore + formattingScore + impactScore) / 4);
+                ? Math.round(overallScore * 10) / 10
+                : Math.round(((completenessScore + clarityScore + formattingScore + impactScore) / 4) * 10) / 10;
               
               const template = resumeData.template || 'modern';
               

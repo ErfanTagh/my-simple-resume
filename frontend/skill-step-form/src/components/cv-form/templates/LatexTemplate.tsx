@@ -359,7 +359,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
       {(personalInfo.summary || (skills && skills.length > 0 && skills.some(s => s.skill))) && (
         <div className="mb-2">
           {/* Summary - full width if both exist, otherwise keep as is */}
-          {personalInfo.summary && (
+          {personalInfo.summary && personalInfo.summary.trim() && (
             <div className="mb-2">
               <div className="flex items-center gap-2 mb-1">
                 <h2 className="text-[11px] font-bold text-foreground uppercase tracking-wide flex-shrink-0">
@@ -367,8 +367,8 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                 </h2>
                 <div className="flex-1 border-t border-foreground"></div>
               </div>
-              <p className="text-[10px] text-foreground leading-relaxed break-words" style={{ lineHeight: '1.4' }}>
-                {personalInfo.summary}
+              <p className="text-[10px] text-foreground leading-relaxed break-words whitespace-pre-wrap" style={{ lineHeight: '1.4' }}>
+                {personalInfo.summary.trim()}
               </p>
             </div>
           )}

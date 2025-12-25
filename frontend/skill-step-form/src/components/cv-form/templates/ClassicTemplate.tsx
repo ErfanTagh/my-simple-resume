@@ -17,10 +17,10 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
   const renderSection = (sectionKey: string) => {
     switch (sectionKey) {
       case "summary":
-        return personalInfo.summary ? (
+        return personalInfo.summary && personalInfo.summary.trim() ? (
           <div key="summary" className="mb-5">
             <h2 className="text-base font-bold mb-2 text-foreground uppercase tracking-wide">{t('resume.sections.summary').toUpperCase()}</h2>
-            <p className="text-sm text-foreground leading-relaxed">{personalInfo.summary}</p>
+            <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{personalInfo.summary.trim()}</p>
           </div>
         ) : null;
 

@@ -16,10 +16,10 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
   const renderSection = (sectionKey: string) => {
     switch (sectionKey) {
       case "summary":
-        return personalInfo.summary ? (
+        return personalInfo.summary && personalInfo.summary.trim() ? (
           <div key="summary" className="mb-6">
             <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">{t('resume.sections.professionalSummary').toUpperCase()}</h2>
-            <p className="text-sm text-foreground leading-relaxed">{personalInfo.summary}</p>
+            <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{personalInfo.summary.trim()}</p>
           </div>
         ) : null;
 

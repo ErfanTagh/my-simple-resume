@@ -1,3 +1,4 @@
+import React, { Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,8 +22,14 @@ import CreateResume from "./pages/CreateResume";
 import ResumeView from "./pages/ResumeView";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
-import BlogEditor from "./pages/BlogEditor";
-import BlogManagement from "./pages/BlogManagement";
+// Blog editing components - only loaded in development mode
+// In production builds, these will be tree-shaken out
+const BlogEditor = import.meta.env.DEV 
+  ? React.lazy(() => import("./pages/BlogEditor"))
+  : null;
+const BlogManagement = import.meta.env.DEV
+  ? React.lazy(() => import("./pages/BlogManagement"))
+  : null;
 import About from "./pages/About";
 import Careers from "./pages/Careers";
 import Contact from "./pages/Contact";
@@ -89,22 +96,31 @@ const AppRoutes = () => {
         />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:id" element={<BlogPost />} />
-        <Route
-          path="/blog-editor/:id?"
-          element={
-            <ProtectedRoute>
-              <BlogEditor />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/blog-management"
-          element={
-            <ProtectedRoute>
-              <BlogManagement />
-            </ProtectedRoute>
-          }
-        />
+        {/* Blog editing routes - only available in development */}
+        {import.meta.env.DEV && BlogEditor && (
+          <Route
+            path="/blog-editor/:id?"
+            element={
+              <ProtectedRoute>
+                <Suspense fallback={<div>Loading...</div>}>
+                  <BlogEditor />
+                </Suspense>
+              </ProtectedRoute>
+            }
+          />
+        )}
+        {import.meta.env.DEV && BlogManagement && (
+          <Route
+            path="/blog-management"
+            element={
+              <ProtectedRoute>
+                <Suspense fallback={<div>Loading...</div>}>
+                  <BlogManagement />
+                </Suspense>
+              </ProtectedRoute>
+            }
+          />
+        )}
         <Route path="/about" element={<About />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/contact" element={<Contact />} />

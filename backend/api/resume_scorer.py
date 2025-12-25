@@ -34,6 +34,7 @@ def calculate_completeness(data):
     """
     score = 0.0
     max_score = 10.0
+    deductions = 0.0
     
     personal_info = data.get('personal_info', {}) or data.get('personalInfo', {})
     
@@ -70,10 +71,13 @@ def calculate_completeness(data):
     if has_detailed_work:
         score += 1
     
-    # Education (2 points)
+    # Education (2 points) - CRITICAL: Missing education gets significant deduction
     education = data.get('education', []) or []
     if len(education) >= 1:
         score += 1
+    else:
+        # Significant deduction for missing education
+        deductions += 2.0
     
     has_detailed_edu = any(
         e.get('degree') and e.get('institution') and 
@@ -95,15 +99,54 @@ def calculate_completeness(data):
     if len(valid_langs) >= 1:
         score += 0.5
     
-    # Projects/Certificates (1.5 points bonus)
+    # Bonus points for additional sections (certifications, published papers, etc.)
     projects = data.get('projects', []) or []
     certificates = data.get('certificates', []) or []
-    if len(projects) >= 1:
-        score += 0.75
+    
+    # Check for published papers in projects (projects with academic/research keywords)
+    published_papers = [
+        p for p in projects 
+        if p.get('name') and (
+            'paper' in p.get('name', '').lower() or 
+            'publication' in p.get('name', '').lower() or
+            'journal' in p.get('name', '').lower() or
+            'conference' in p.get('name', '').lower() or
+            'research' in p.get('name', '').lower()
+        )
+    ]
+    
+    # Bonus for certifications (0.75 points)
     if len(certificates) >= 1:
         score += 0.75
+    if len(certificates) >= 2:
+        score += 0.25  # Additional bonus for multiple certifications
+    
+    # Bonus for published papers (0.75 points)
+    if len(published_papers) >= 1:
+        score += 0.75
+    if len(published_papers) >= 2:
+        score += 0.25  # Additional bonus for multiple papers
+    
+    # Bonus for regular projects (0.5 points, separate from papers)
+    regular_projects = [p for p in projects if p not in published_papers]
+    if len(regular_projects) >= 1:
+        score += 0.5
+    
+    # Apply deductions
+    score = max(0.0, score - deductions)
     
     return min(round(score, 1), max_score)
+
+
+def count_lines(text):
+    """Count the number of lines in text (approximately 80 chars per line)"""
+    if not text:
+        return 0
+    # Approximate: count newlines + estimate based on length
+    newline_count = text.count('\n')
+    # Estimate additional lines based on length (assuming ~80 chars per line)
+    estimated_lines = max(0, (len(text) - newline_count * 80) // 80)
+    return newline_count + estimated_lines + (1 if text else 0)
 
 
 def calculate_clarity(data):
@@ -111,9 +154,11 @@ def calculate_clarity(data):
     CLARITY: Measures how clear and readable the content is
     - Is the information well-organized?
     - Are descriptions concise and clear?
+    - Deducts points for sections with 4+ lines of text
     """
     score = 0.0
     max_score = 10.0
+    deductions = 0.0
     
     personal_info = data.get('personal_info', {}) or data.get('personalInfo', {})
     
@@ -126,9 +171,15 @@ def calculate_clarity(data):
     if 50 <= len(summary) <= 300:
         score += 1
     
+    # Check summary length (deduct for 4+ lines)
+    summary_lines = count_lines(summary)
+    if summary_lines >= 4:
+        deductions += 0.5
+    
     # Work experience clarity (3 points)
     work_exp = data.get('work_experience', []) or data.get('workExperience', []) or []
     clear_work_entries = 0
+    long_work_descriptions = 0
     
     for w in work_exp:
         has_title = w.get('position') and len(w.get('position', '')) >= 3
@@ -137,8 +188,17 @@ def calculate_clarity(data):
         has_description = 30 <= len(desc) <= 500
         has_dates = w.get('start_date') or w.get('startDate')
         
+        # Check for 4+ lines in work description
+        desc_lines = count_lines(desc)
+        if desc_lines >= 4:
+            long_work_descriptions += 1
+        
         if has_title and has_company and has_description and has_dates:
             clear_work_entries += 1
+    
+    # Deduct for each work experience with 4+ lines
+    if long_work_descriptions > 0:
+        deductions += min(long_work_descriptions * 0.3, 1.5)  # Max 1.5 deduction
     
     if clear_work_entries >= 1:
         score += 1.5
@@ -156,6 +216,14 @@ def calculate_clarity(data):
     if clear_edu_entries >= 1:
         score += 2
     
+    # Check education descriptions for length
+    for e in education:
+        # Check field of study or any description field
+        edu_text = (e.get('field_of_study') or e.get('fieldOfStudy') or e.get('field') or '')
+        edu_lines = count_lines(edu_text)
+        if edu_lines >= 4:
+            deductions += 0.3
+    
     # Skills organization (1.5 points)
     skills = data.get('skills', []) or []
     valid_skills = [
@@ -168,10 +236,29 @@ def calculate_clarity(data):
     if len(valid_skills) >= 6:
         score += 0.75
     
+    # Check project descriptions for length
+    projects = data.get('projects', []) or []
+    for p in projects:
+        proj_desc = p.get('description', '')
+        proj_lines = count_lines(proj_desc)
+        if proj_lines >= 4:
+            deductions += 0.3
+    
+    # Check certificate descriptions for length
+    certificates = data.get('certificates', []) or []
+    for c in certificates:
+        cert_text = (c.get('name', '') + ' ' + (c.get('organization', '') or '')).strip()
+        cert_lines = count_lines(cert_text)
+        if cert_lines >= 4:
+            deductions += 0.2
+    
     # Section order defined (1.5 points)
     section_order = data.get('section_order') or data.get('sectionOrder')
     if section_order and len(section_order) > 0:
         score += 1.5
+    
+    # Apply deductions
+    score = max(0.0, score - deductions)
     
     return min(round(score, 1), max_score)
 

@@ -17,11 +17,11 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
   const renderSection = (sectionKey: string) => {
     switch (sectionKey) {
       case "summary":
-        return personalInfo.summary ? (
+        return personalInfo.summary && personalInfo.summary.trim() ? (
           <div key="summary" className="mb-6">
             <div className="relative pl-6 border-l-4 border-primary">
               <h2 className="text-2xl font-black mb-3 text-primary italic">{t('resume.sections.aboutMe')}</h2>
-              <p className="text-sm text-foreground leading-relaxed">{personalInfo.summary}</p>
+              <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{personalInfo.summary.trim()}</p>
             </div>
           </div>
         ) : null;
