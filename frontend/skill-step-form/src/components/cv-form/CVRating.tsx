@@ -128,7 +128,7 @@ if (!rating) {
         {/* Overall Score */}
         <div className="space-y-3 text-center">
           <div className={`text-5xl font-bold ${getOverallScoreColor(rating.overallScore)}`}>
-            {Math.round((rating.overallScore / 10) * 10) / 10}
+            {Math.round(rating.overallScore / 10)}
             <span className="text-2xl text-muted-foreground">/10</span>
           </div>
           <Badge className={status.color}>{status.label}</Badge>

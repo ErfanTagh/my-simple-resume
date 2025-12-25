@@ -234,3 +234,35 @@ class PasswordReset(models.Model):
     def __str__(self):
         return f"Password reset for {self.user.username} - Used: {self.is_used}"
 
+
+class BlogPost(models.Model):
+    """Blog post model for storing blog articles"""
+    _id = models.ObjectIdField(primary_key=True)
+    id = models.CharField(max_length=200, db_index=True)  # URL slug
+    title = models.CharField(max_length=500)
+    excerpt = models.TextField()
+    category = models.CharField(max_length=100)
+    read_time = models.CharField(max_length=50)
+    date = models.CharField(max_length=50)
+    gradient = models.CharField(max_length=200)
+    icon_color = models.CharField(max_length=100)
+    image = models.CharField(max_length=500, blank=True, null=True)
+    content = models.TextField()
+    language = models.CharField(max_length=10, default='en')  # 'en' or 'de'
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blog_posts')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    published = models.BooleanField(default=False)  # Default to draft
+    scheduled_publish_at = models.DateTimeField(blank=True, null=True)  # For scheduled publishing
+
+    class Meta:
+        db_table = 'blog_posts'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['id', 'language']),
+            models.Index(fields=['published', 'language']),
+        ]
+
+    def __str__(self):
+        return f"{self.title} ({self.language})"
+

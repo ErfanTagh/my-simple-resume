@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { 
   BookOpen, 
@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getBlogPosts } from "@/lib/blogPosts";
+import { blogPostAPI, BlogPost } from "@/lib/api";
 
 // Legacy export for backwards compatibility (will be removed)
 export const blogPosts = [
@@ -395,7 +396,33 @@ Both documents serve different purposes. The resume provides facts and figures; 
 
 const Blog = () => {
   const { language, t } = useLanguage();
-  const blogPosts = useMemo(() => getBlogPosts(language), [language]);
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Fallback to static posts
+  const staticPosts = useMemo(() => getBlogPosts(language), [language]);
+  
+  // Fetch blog posts from API
+  useEffect(() => {
+    const fetchPosts = async () => {
+      setIsLoading(true);
+      try {
+        const apiPosts = await blogPostAPI.getAll(language);
+        // Merge API posts with static posts, prioritizing API posts
+        const apiPostIds = new Set(apiPosts.map(p => p.id));
+        const mergedPosts = [...apiPosts, ...staticPosts.filter(p => !apiPostIds.has(p.id))];
+        setBlogPosts(mergedPosts);
+      } catch (error) {
+        // If API fails, use static posts as fallback
+        console.warn('Failed to fetch blog posts from API, using static posts:', error);
+        setBlogPosts(staticPosts);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchPosts();
+  }, [language, staticPosts]);
   
   // Scroll to top when component mounts
   useEffect(() => {
@@ -432,67 +459,77 @@ const Blog = () => {
       {/* Blog Grid */}
       <section className="py-12 sm:py-16 px-4 sm:px-6">
         <div className="container mx-auto max-w-6xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {blogPosts.map((post) => {
-              const hasImage = post.image && typeof post.image === 'string';
-              return (
-              <Link to={`/blog/${post.id}`} key={post.id}>
-                <article className="group relative bg-card rounded-2xl border border-border overflow-hidden hover:shadow-[0_20px_40px_-15px_hsl(var(--primary)/0.25)] hover:border-primary/40 transition-all duration-500 cursor-pointer hover:-translate-y-2 h-full">
-                  {/* Hero Image or Decorative background pattern */}
-                  {hasImage ? (
-                    <div className="aspect-[16/9] relative overflow-hidden">
-                      <img 
-                        src={post.image} 
-                        alt={post.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        onError={(e) => {
-                          // Image failed to load, fallback to gradient design
-                        }}
-                      />
-                    </div>
-                  ) : (
-                    <div className={`aspect-[16/9] bg-gradient-to-br ${post.gradient} relative overflow-hidden`}>
-                      <div className="absolute inset-0 opacity-30">
-                        <div className="absolute top-4 right-4 w-20 h-20 border border-current rounded-full opacity-20" />
-                        <div className="absolute bottom-4 left-4 w-12 h-12 border border-current rounded-lg rotate-12 opacity-20" />
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border border-current rounded-full opacity-10" />
-                      </div>
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-background/80 backdrop-blur-sm flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500">
-                          <BookOpen className={`w-8 h-8 sm:w-10 sm:h-10 ${post.iconColor} group-hover:scale-110 transition-transform duration-300`} />
+          {isLoading ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">Loading blog posts...</p>
+            </div>
+          ) : blogPosts.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No blog posts available.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              {blogPosts.map((post) => {
+                const hasImage = post.image && typeof post.image === 'string';
+                return (
+                  <Link to={`/blog/${post.id}`} key={post.id}>
+                    <article className="group relative bg-card rounded-2xl border border-border overflow-hidden hover:shadow-[0_20px_40px_-15px_hsl(var(--primary)/0.25)] hover:border-primary/40 transition-all duration-500 cursor-pointer hover:-translate-y-2 h-full">
+                      {/* Hero Image or Decorative background pattern */}
+                      {hasImage ? (
+                        <div className="aspect-[16/9] relative overflow-hidden">
+                          <img 
+                            src={post.image} 
+                            alt={post.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            onError={(e) => {
+                              // Image failed to load, fallback to gradient design
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <div className={`aspect-[16/9] bg-gradient-to-br ${post.gradient} relative overflow-hidden`}>
+                          <div className="absolute inset-0 opacity-30">
+                            <div className="absolute top-4 right-4 w-20 h-20 border border-current rounded-full opacity-20" />
+                            <div className="absolute bottom-4 left-4 w-12 h-12 border border-current rounded-lg rotate-12 opacity-20" />
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border border-current rounded-full opacity-10" />
+                          </div>
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-background/80 backdrop-blur-sm flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500">
+                              <BookOpen className={`w-8 h-8 sm:w-10 sm:h-10 ${post.iconColor} group-hover:scale-110 transition-transform duration-300`} />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      <div className="p-5 sm:p-6">
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-xs font-semibold uppercase tracking-wider text-primary bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20 hover:bg-primary/15 transition-colors">
+                            {post.category}
+                          </span>
+                        </div>
+                        <h3 className="text-lg sm:text-xl font-bold text-card-foreground mb-3 group-hover:text-primary transition-colors duration-300 line-clamp-2 leading-tight">
+                          {post.title}
+                        </h3>
+                        <p className="text-sm text-muted-foreground mb-4 line-clamp-2 leading-relaxed">
+                          {post.excerpt}
+                        </p>
+                        <div className="flex items-center justify-between text-xs text-muted-foreground pt-4 border-t border-border/50">
+                          <div className="flex items-center gap-1.5 font-medium">
+                            <Clock className="w-3.5 h-3.5" />
+                            {post.readTime}
+                          </div>
+                          <span className="font-medium">{post.date}</span>
                         </div>
                       </div>
-                    </div>
-                  )}
-                  <div className="p-5 sm:p-6">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-xs font-semibold uppercase tracking-wider text-primary bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20 hover:bg-primary/15 transition-colors">
-                        {post.category}
-                      </span>
-                    </div>
-                    <h3 className="text-lg sm:text-xl font-bold text-card-foreground mb-3 group-hover:text-primary transition-colors duration-300 line-clamp-2 leading-tight">
-                      {post.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2 leading-relaxed">
-                      {post.excerpt}
-                    </p>
-                    <div className="flex items-center justify-between text-xs text-muted-foreground pt-4 border-t border-border/50">
-                      <div className="flex items-center gap-1.5 font-medium">
-                        <Clock className="w-3.5 h-3.5" />
-                        {post.readTime}
+                      {/* Hover arrow indicator */}
+                      <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-background/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
+                        <ArrowRight className="w-4 h-4 text-primary" />
                       </div>
-                      <span className="font-medium">{post.date}</span>
-                    </div>
-                  </div>
-                  {/* Hover arrow indicator */}
-                  <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-background/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
-                    <ArrowRight className="w-4 h-4 text-primary" />
-                  </div>
-                </article>
-              </Link>
-              );
-            })}
-          </div>
+                    </article>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 

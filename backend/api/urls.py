@@ -27,5 +27,9 @@ urlpatterns = [
     path('resumes/parse/', views.parse_resume, name='resume-parse'),  # Must come before <str:pk> pattern
     path('resumes/<str:resume_id>/pdf/', views.generate_resume_pdf, name='resume-pdf'),
     path('resumes/<str:pk>/', views.resume_detail, name='resume-detail'),
+    
+    # Blog post endpoints
+    path('blog-posts/', views.blog_post_list, name='blog-post-list'),
+    path('blog-posts/<str:post_id>/', views.blog_post_detail, name='blog-post-detail'),
 ]
 

@@ -8,10 +8,11 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 5173,
     proxy: {
+      // DEV SERVER ONLY - This proxy config is NOT used in production builds
+      // Production uses VITE_API_URL env var set at build time (see docker-compose.prod.yml)
       // Proxy API requests to backend in development
-      // Use 'backend' service name from docker-compose network (works in Docker)
-      // For local dev outside Docker, use 'http://localhost:8000'
       '/api': {
+        // In Docker, use 'backend' service name; can override with VITE_BACKEND_URL env var
         target: process.env.VITE_BACKEND_URL || 'http://backend:8000',
         changeOrigin: true,
         secure: false,

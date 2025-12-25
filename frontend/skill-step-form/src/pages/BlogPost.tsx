@@ -1,5 +1,5 @@
 import { Link, useParams, Navigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { 
   FileText, 
@@ -13,22 +13,71 @@ import {
 } from "lucide-react";
 import { getBlogPost, getBlogPosts } from "@/lib/blogPosts";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { blogPostAPI, BlogPost } from "@/lib/api";
 
 const BlogPost = () => {
   const { id } = useParams<{ id: string }>();
   const { language, t } = useLanguage();
-  const post = getBlogPost(id || '', language);
+  const [post, setPost] = useState<BlogPost | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Scroll to top when component mounts or id changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [id]);
   
+  // Fetch blog post from API with fallback to static
+  useEffect(() => {
+    const fetchPost = async () => {
+      if (!id) return;
+      
+      setIsLoading(true);
+      try {
+        const apiPost = await blogPostAPI.getById(id, language);
+        setPost(apiPost);
+      } catch (error) {
+        // Fallback to static posts
+        const staticPost = getBlogPost(id, language);
+        setPost(staticPost);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchPost();
+  }, [id, language]);
+  
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">Loading blog post...</p>
+        </div>
+      </div>
+    );
+  }
+  
   if (!post) {
     return <Navigate to="/blog" replace />;
   }
 
-  const allPosts = getBlogPosts(language);
+  // Get all posts for navigation (try API first, fallback to static)
+  const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
+  useEffect(() => {
+    const fetchAllPosts = async () => {
+      try {
+        const apiPosts = await blogPostAPI.getAll(language);
+        const staticPosts = getBlogPosts(language);
+        const apiPostIds = new Set(apiPosts.map(p => p.id));
+        const merged = [...apiPosts, ...staticPosts.filter(p => !apiPostIds.has(p.id))];
+        setAllPosts(merged);
+      } catch {
+        setAllPosts(getBlogPosts(language));
+      }
+    };
+    fetchAllPosts();
+  }, [language]);
+  
   const currentIndex = allPosts.findIndex(p => p.id === id);
   const prevPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
   const nextPost = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null;
@@ -205,7 +254,7 @@ const BlogPost = () => {
       {/* Article Content */}
       <article className="px-4 sm:px-6 pb-16">
         <div className="container mx-auto max-w-3xl">
-          <div className="prose prose-lg max-w-none">
+          <div className="prose prose-lg max-w-none font-sans" style={{ fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }}>
             {renderContent(post.content)}
           </div>
         </div>

@@ -7,10 +7,12 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
 from .models import Resume
-from .serializers import ResumeSerializer
+from .serializers import ResumeSerializer, BlogPostSerializer
 from .resume_scorer import calculate_resume_quality
 from bson import ObjectId
 from datetime import datetime
+import os
+from pymongo import MongoClient
 
 
 def format_mongo_date(date_value):
@@ -596,6 +598,266 @@ def parse_resume(request):
             {"error": f"Failed to parse resume: {str(e)}"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([AllowAny])  # GET is public, POST requires auth check inside
+def blog_post_list(request):
+    """
+    List all published blog posts or create a new one
+    GET: Public - returns all published posts for a language
+    POST: Requires authentication - creates a new blog post
+    """
+    # Get MongoDB connection
+    connection_string = os.getenv('MONGODB_CONNECTION_STRING')
+    if not connection_string:
+        connection_string = f"mongodb://{os.getenv('MONGODB_HOST', 'localhost')}:{os.getenv('MONGODB_PORT', '27017')}"
+    
+    try:
+        client = MongoClient(connection_string)
+        db = client[os.getenv('MONGODB_NAME', 'resume_db')]
+        collection = db['blog_posts']
+    except Exception as e:
+        return Response({'error': f'Database connection failed: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    if request.method == 'GET':
+        # Public endpoint - get all published posts (including scheduled that are due)
+        language = request.query_params.get('language', 'en')
+        include_drafts = request.query_params.get('include_drafts', 'false').lower() == 'true'
+        
+        try:
+            now = datetime.utcnow()
+            
+            # Build query - published posts or scheduled posts that are due
+            query = {
+                'language': language,
+                '$or': [
+                    {'published': True},
+                    {
+                        'published': False,
+                        'scheduled_publish_at': {'$lte': now}  # Scheduled posts that are due
+                    }
+                ]
+            }
+            
+            # If authenticated and requesting drafts, include them
+            if include_drafts and request.user.is_authenticated:
+                query = {'language': language}  # Show all posts for authenticated users
+                # Filter by current user's posts
+                query['author_id'] = str(request.user.id)
+            
+            posts = list(collection.find(query).sort('created_at', -1))
+            
+            # Auto-publish scheduled posts that are due
+            for post in posts:
+                scheduled_at = post.get('scheduled_publish_at')
+                if scheduled_at and not post.get('published', False):
+                    if isinstance(scheduled_at, datetime):
+                        if scheduled_at <= now:
+                            # Auto-publish
+                            collection.update_one(
+                                {'_id': post.get('_id')},
+                                {'$set': {'published': True}}
+                            )
+                            post['published'] = True
+            
+            # Convert ObjectId to string and clean up
+            for post in posts:
+                if '_id' in post:
+                    post['id'] = str(post.get('_id', post.get('id', '')))
+                    del post['_id']
+                # Ensure id field exists
+                if 'id' not in post:
+                    post['id'] = str(post.get('_id', ''))
+                # Format scheduled_publish_at if present
+                if 'scheduled_publish_at' in post and post['scheduled_publish_at']:
+                    if isinstance(post['scheduled_publish_at'], datetime):
+                        post['scheduled_publish_at'] = post['scheduled_publish_at'].isoformat()
+            
+            # Filter out drafts for public requests
+            if not include_drafts or not request.user.is_authenticated:
+                posts = [p for p in posts if p.get('published', False) or (p.get('scheduled_publish_at') and datetime.fromisoformat(p['scheduled_publish_at'].replace('Z', '+00:00')) <= now)]
+            
+            return Response(posts)
+        except Exception as e:
+            return Response({'error': f'Failed to fetch blog posts: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    elif request.method == 'POST':
+        # Protected endpoint - create new post
+        if not request.user.is_authenticated:
+            return Response({'error': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        serializer = BlogPostSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                post_data = serializer.validated_data.copy()
+                post_data['author_id'] = str(request.user.id)
+                post_data['created_at'] = datetime.utcnow()
+                post_data['updated_at'] = datetime.utcnow()
+                
+                # Handle scheduled publishing
+                scheduled_at = post_data.get('scheduled_publish_at')
+                if scheduled_at:
+                    # Convert string to datetime if needed
+                    if isinstance(scheduled_at, str):
+                        try:
+                            scheduled_at = datetime.fromisoformat(scheduled_at.replace('Z', '+00:00'))
+                        except:
+                            scheduled_at = datetime.fromisoformat(scheduled_at)
+                    post_data['scheduled_publish_at'] = scheduled_at
+                    # If scheduled time is in the past, publish immediately
+                    if scheduled_at <= datetime.utcnow():
+                        post_data['published'] = True
+                    else:
+                        # Keep as draft until scheduled time
+                        post_data['published'] = post_data.get('published', False)
+                else:
+                    # No scheduled time - use published status as provided
+                    if 'published' not in post_data:
+                        post_data['published'] = False  # Default to draft
+                
+                # Check if post with this ID and language already exists
+                existing = collection.find_one({
+                    'id': post_data['id'],
+                    'language': post_data.get('language', 'en')
+                })
+                
+                if existing:
+                    # Update existing
+                    collection.update_one(
+                        {'id': post_data['id'], 'language': post_data.get('language', 'en')},
+                        {'$set': post_data}
+                    )
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                else:
+                    # Create new
+                    collection.insert_one(post_data)
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response({'error': f'Failed to save blog post: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([AllowAny])  # GET is public, PUT/DELETE require auth check inside
+def blog_post_detail(request, post_id):
+    """
+    Get, update, or delete a specific blog post
+    GET: Public - returns the post if published
+    PUT/DELETE: Requires authentication
+    """
+    # Get MongoDB connection
+    connection_string = os.getenv('MONGODB_CONNECTION_STRING')
+    if not connection_string:
+        connection_string = f"mongodb://{os.getenv('MONGODB_HOST', 'localhost')}:{os.getenv('MONGODB_PORT', '27017')}"
+    
+    try:
+        client = MongoClient(connection_string)
+        db = client[os.getenv('MONGODB_NAME', 'resume_db')]
+        collection = db['blog_posts']
+    except Exception as e:
+        return Response({'error': f'Database connection failed: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    language = request.query_params.get('language', 'en')
+    
+    try:
+        post = collection.find_one({'id': post_id, 'language': language})
+    except Exception as e:
+        return Response({'error': f'Failed to fetch blog post: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    if not post:
+        return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'GET':
+        # Public endpoint - return if published or scheduled and due
+        now = datetime.utcnow()
+        scheduled_at = post.get('scheduled_publish_at')
+        is_published = post.get('published', False)
+        is_scheduled_due = scheduled_at and not is_published
+        
+        # Check if scheduled post is due
+        if is_scheduled_due:
+            if isinstance(scheduled_at, datetime):
+                if scheduled_at <= now:
+                    # Auto-publish and return
+                    collection.update_one(
+                        {'_id': post.get('_id')},
+                        {'$set': {'published': True}}
+                    )
+                    post['published'] = True
+                else:
+                    # Not due yet - only show to author
+                    if not request.user.is_authenticated or str(post.get('author_id')) != str(request.user.id):
+                        return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
+            elif isinstance(scheduled_at, str):
+                try:
+                    scheduled_dt = datetime.fromisoformat(scheduled_at.replace('Z', '+00:00'))
+                    if scheduled_dt <= now:
+                        collection.update_one(
+                            {'_id': post.get('_id')},
+                            {'$set': {'published': True}}
+                        )
+                        post['published'] = True
+                    else:
+                        if not request.user.is_authenticated or str(post.get('author_id')) != str(request.user.id):
+                            return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
+                except:
+                    pass
+        
+        # If not published and not scheduled due, only show to author
+        if not is_published and not is_scheduled_due:
+            if not request.user.is_authenticated or str(post.get('author_id')) != str(request.user.id):
+                return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Clean up ObjectId
+        if '_id' in post:
+            post['id'] = str(post.get('_id', post.get('id', '')))
+            del post['_id']
+        if 'id' not in post:
+            post['id'] = post_id
+        
+        return Response(post)
+    
+    elif request.method in ['PUT', 'DELETE']:
+        if not request.user.is_authenticated:
+            return Response({'error': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        if request.method == 'PUT':
+            serializer = BlogPostSerializer(data=request.data)
+            if serializer.is_valid():
+                try:
+                    post_data = serializer.validated_data.copy()
+                    post_data['updated_at'] = datetime.utcnow()
+                    
+                    # Handle scheduled publishing
+                    scheduled_at = post_data.get('scheduled_publish_at')
+                    if scheduled_at:
+                        # Convert string to datetime if needed
+                        if isinstance(scheduled_at, str):
+                            try:
+                                scheduled_at = datetime.fromisoformat(scheduled_at.replace('Z', '+00:00'))
+                            except:
+                                scheduled_at = datetime.fromisoformat(scheduled_at)
+                        post_data['scheduled_publish_at'] = scheduled_at
+                        # If scheduled time is in the past, publish immediately
+                        if scheduled_at <= datetime.utcnow():
+                            post_data['published'] = True
+                    
+                    collection.update_one(
+                        {'id': post_id, 'language': language},
+                        {'$set': post_data}
+                    )
+                    return Response(serializer.data)
+                except Exception as e:
+                    return Response({'error': f'Failed to update blog post: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        elif request.method == 'DELETE':
+            try:
+                collection.delete_one({'id': post_id, 'language': language})
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            except Exception as e:
+                return Response({'error': f'Failed to delete blog post: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])

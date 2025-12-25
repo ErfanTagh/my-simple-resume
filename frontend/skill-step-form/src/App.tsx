@@ -22,6 +22,7 @@ import ResumeView from "./pages/ResumeView";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import BlogEditor from "./pages/BlogEditor";
+import BlogManagement from "./pages/BlogManagement";
 import About from "./pages/About";
 import Careers from "./pages/Careers";
 import Contact from "./pages/Contact";
@@ -93,6 +94,14 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute>
               <BlogEditor />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/blog-management"
+          element={
+            <ProtectedRoute>
+              <BlogManagement />
             </ProtectedRoute>
           }
         />

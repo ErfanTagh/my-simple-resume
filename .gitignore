@@ -78,3 +78,11 @@ frontend/skill-step-form-ui/
 # Temporary scripts
 backend/runserver_quiet.sh
 backend/test_ner_model.py
+
+# Excluded files
+frontend/skill-step-form/src/pages/BlogEditor.tsx
+
+# Blog administration files
+backend/api/views/blog_views.py
+frontend/skill-step-form/src/pages/BlogManagement.tsx
+backend/api/management/

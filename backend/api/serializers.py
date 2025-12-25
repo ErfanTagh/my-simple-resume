@@ -196,3 +196,19 @@ class ResumeSerializer(serializers.Serializer):
     created_at = serializers.DateTimeField(read_only=True)
     updated_at = serializers.DateTimeField(read_only=True)
 
+
+class BlogPostSerializer(serializers.Serializer):
+    id = serializers.CharField(max_length=200)
+    title = serializers.CharField(max_length=500)
+    excerpt = serializers.CharField()
+    category = serializers.CharField(max_length=100)
+    read_time = serializers.CharField(max_length=50)
+    date = serializers.CharField(max_length=50)
+    gradient = serializers.CharField(max_length=200)
+    icon_color = serializers.CharField(max_length=100)
+    image = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    content = serializers.CharField()
+    language = serializers.CharField(max_length=10, default='en')
+    published = serializers.BooleanField(default=False, required=False)
+    scheduled_publish_at = serializers.DateTimeField(required=False, allow_null=True)
+

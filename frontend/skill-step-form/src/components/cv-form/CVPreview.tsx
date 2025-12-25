@@ -102,16 +102,16 @@ export const CVPreview = ({ data, onTemplateChange, onSectionOrderChange }: CVPr
               </div>
               <span 
                 className={`text-sm font-bold transition-colors duration-300 ${
-                  resumeScore.overallScore >= 80 
+                  resumeScore.overallScore / 10 >= 8 
                     ? 'text-green-600 dark:text-green-400'
-                    : resumeScore.overallScore >= 60 
+                    : resumeScore.overallScore / 10 >= 6 
                     ? 'text-yellow-600 dark:text-yellow-400'
-                    : resumeScore.overallScore >= 40
+                    : resumeScore.overallScore / 10 >= 4
                     ? 'text-orange-600 dark:text-orange-400'
                     : 'text-red-600 dark:text-red-400'
                 }`}
               >
-                {Math.round((resumeScore.overallScore / 10) * 10) / 10}/10
+                {Math.round(resumeScore.overallScore / 10)}/10
               </span>
             </div>
             

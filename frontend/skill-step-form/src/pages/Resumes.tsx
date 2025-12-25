@@ -197,16 +197,18 @@ export default function Resumes() {
             {resumes.map((resume) => {
               // Get quality scores from API (already converted to camelCase by API)
               const resumeData = resume as any;
-              const completenessScore = resumeData.completenessScore || 0;
-              const clarityScore = resumeData.clarityScore || 0;
-              const formattingScore = resumeData.formattingScore || 0;
-              const impactScore = resumeData.impactScore || 0;
+              // Backend returns scores in 0-100 format, convert to 0-10 for display
+              const completenessScore = Math.round((resumeData.completenessScore || 0) / 10);
+              const clarityScore = Math.round((resumeData.clarityScore || 0) / 10);
+              const formattingScore = Math.round((resumeData.formattingScore || 0) / 10);
+              const impactScore = Math.round((resumeData.impactScore || 0) / 10);
               const overallScore = resumeData.overallScore || 0;
               
               // Use overall_score from backend if available, otherwise calculate
+              // Backend returns scores in 0-100 format, convert to 0-10 for display
               const displayScore = overallScore > 0 
-                ? Math.round(overallScore * 10) / 10
-                : Math.round(((completenessScore + clarityScore + formattingScore + impactScore) / 4) * 10) / 10;
+                ? Math.round(overallScore / 10)
+                : Math.round((completenessScore + clarityScore + formattingScore + impactScore) / 4);
               
               const template = resumeData.template || 'modern';
               
