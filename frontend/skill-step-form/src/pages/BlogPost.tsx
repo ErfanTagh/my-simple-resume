@@ -14,6 +14,7 @@ import {
 import { getBlogPost, getBlogPosts } from "@/lib/blogPosts";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { blogPostAPI, BlogPost } from "@/lib/api";
+import { SEO } from "@/components/SEO";
 
 const BlogPost = () => {
   const { id } = useParams<{ id: string }>();
@@ -151,8 +152,51 @@ const BlogPost = () => {
     return elements;
   };
 
+  const postUrl = `https://123resume.de/blog/${post.id}`;
+  const postImage = post.coverImage || post.image || 'https://123resume.de/resume-icon.svg';
+  const postDescription = post.excerpt || post.content?.substring(0, 160) || 'Read our latest resume tips and career advice';
+  
+  // Structured data for article
+  const articleStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: post.title,
+    description: postDescription,
+    image: postImage,
+    datePublished: post.publishedAt || post.createdAt || new Date().toISOString(),
+    dateModified: post.updatedAt || post.publishedAt || post.createdAt || new Date().toISOString(),
+    author: {
+      '@type': 'Organization',
+      name: '123Resume',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: '123Resume',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://123resume.de/resume-icon.svg',
+      },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': postUrl,
+    },
+  };
+
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <SEO
+        title={`${post.title} | 123Resume Blog`}
+        description={postDescription}
+        keywords={`${post.category || 'resume tips'}, career advice, job search, ${post.title}`}
+        image={postImage}
+        url={postUrl}
+        type="article"
+        structuredData={articleStructuredData}
+        publishedTime={post.publishedAt || post.createdAt}
+        modifiedTime={post.updatedAt || post.publishedAt || post.createdAt}
+      />
+      <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
@@ -336,6 +380,7 @@ const BlogPost = () => {
         </div>
       </footer>
     </div>
+    </>
   );
 };
 

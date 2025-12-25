@@ -205,8 +205,9 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
               <div className="w-20 h-20">
                 <img 
                   src={personalInfo.profileImage} 
-                  alt={`${personalInfo.firstName} ${personalInfo.lastName} profile`}
+                  alt={`${personalInfo.firstName} ${personalInfo.lastName} profile picture`}
                   className="w-full h-full object-cover rounded-sm"
+                  loading="lazy"
                 />
               </div>
             </div>

@@ -98,28 +98,28 @@ const AppRoutes = () => {
         <Route path="/blog/:id" element={<BlogPost />} />
         {/* Blog editing routes - only available in development */}
         {import.meta.env.DEV && BlogEditor && (
-          <Route
-            path="/blog-editor/:id?"
-            element={
-              <ProtectedRoute>
+        <Route
+          path="/blog-editor/:id?"
+          element={
+            <ProtectedRoute>
                 <Suspense fallback={<div>Loading...</div>}>
-                  <BlogEditor />
+              <BlogEditor />
                 </Suspense>
-              </ProtectedRoute>
-            }
-          />
+            </ProtectedRoute>
+          }
+        />
         )}
         {import.meta.env.DEV && BlogManagement && (
-          <Route
-            path="/blog-management"
-            element={
-              <ProtectedRoute>
+        <Route
+          path="/blog-management"
+          element={
+            <ProtectedRoute>
                 <Suspense fallback={<div>Loading...</div>}>
-                  <BlogManagement />
+              <BlogManagement />
                 </Suspense>
-              </ProtectedRoute>
-            }
-          />
+            </ProtectedRoute>
+          }
+        />
         )}
         <Route path="/about" element={<About />} />
         <Route path="/careers" element={<Careers />} />

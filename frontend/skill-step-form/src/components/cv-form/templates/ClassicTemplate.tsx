@@ -191,8 +191,9 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
             <div className="w-28 h-28">
               <img 
                 src={personalInfo.profileImage} 
-                alt={`${personalInfo.firstName} ${personalInfo.lastName} profile`}
+                alt={`${personalInfo.firstName} ${personalInfo.lastName} profile picture`}
                 className="w-full h-full object-cover rounded-full border-2 border-foreground"
+                loading="lazy"
               />
             </div>
           </div>

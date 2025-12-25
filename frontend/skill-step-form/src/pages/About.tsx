@@ -3,11 +3,19 @@ import { FileText, Sparkles, Target, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { SEO } from "@/components/SEO";
 
 const About = () => {
   const { t } = useLanguage();
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <SEO
+        title="About Us - Professional CV Builder | 123Resume"
+        description="Learn about 123Resume - our mission to help job seekers create professional, ATS-friendly resumes. Free CV builder with multiple templates."
+        keywords="about 123resume, CV builder about, resume builder company, professional CV tools"
+        url="https://123resume.de/about"
+      />
+      <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 sm:px-6 py-16 sm:py-24 max-w-4xl">
         <div className="text-center mb-12">
           <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">{t('pages.about.title')}</h1>
@@ -91,6 +99,7 @@ const About = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

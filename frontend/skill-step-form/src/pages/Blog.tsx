@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getBlogPosts } from "@/lib/blogPosts";
 import { blogPostAPI, BlogPost } from "@/lib/api";
+import { SEO } from "@/components/SEO";
 
 // Legacy export for backwards compatibility (will be removed)
 export const blogPosts = [
@@ -431,7 +432,14 @@ const Blog = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <SEO
+        title="Resume Tips & Career Advice Blog | 123Resume"
+        description="Expert resume tips, career advice, and job search strategies. Learn how to create ATS-friendly resumes and land your dream job."
+        keywords="resume tips, career advice, job search, ATS resume, resume writing, career development, job interview tips"
+        url="https://123resume.de/blog"
+      />
+      <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <section className="pt-16 sm:pt-24 pb-12 sm:pb-16 px-4 sm:px-6 bg-muted/30">
         <div className="container mx-auto max-w-4xl text-center">
@@ -557,6 +565,7 @@ const Blog = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 

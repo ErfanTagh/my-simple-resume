@@ -263,8 +263,9 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
               <div className="w-28 h-28">
                 <img 
                   src={personalInfo.profileImage} 
-                  alt={`${personalInfo.firstName} ${personalInfo.lastName} profile`}
+                  alt={`${personalInfo.firstName} ${personalInfo.lastName} profile picture`}
                   className="w-full h-full object-cover rounded-lg border-4 border-primary shadow-lg"
+                  loading="lazy"
                 />
               </div>
             </div>

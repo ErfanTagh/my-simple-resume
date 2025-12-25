@@ -1,11 +1,19 @@
 import { Mail, MessageSquare, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { SEO } from "@/components/SEO";
 
 const Contact = () => {
   const { t } = useLanguage();
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <SEO
+        title="Contact Us - 123Resume Support"
+        description="Get in touch with 123Resume. Have questions about our CV builder? Contact our support team for assistance."
+        keywords="contact 123resume, CV builder support, resume builder help, customer service"
+        url="https://123resume.de/contact"
+      />
+      <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 sm:px-6 py-16 sm:py-24 max-w-4xl">
         <div className="text-center mb-12">
           <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">{t('pages.contact.title')}</h1>
@@ -78,6 +86,7 @@ const Contact = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

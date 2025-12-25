@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { LandingTemplatePreview } from "./LandingTemplatePreview";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { SEO } from "@/components/SEO";
 
 const Templates = () => {
   const { t } = useLanguage();
@@ -15,8 +16,15 @@ const Templates = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 sm:px-6 py-16 sm:py-24 max-w-6xl">
+    <>
+      <SEO
+        title="Professional CV Templates | 123Resume"
+        description="Choose from 6 professional CV templates: Modern, Classic, Creative, Minimal, LaTeX, and StarRover. All templates are ATS-friendly and customizable."
+        keywords="CV templates, resume templates, professional templates, ATS templates, modern CV, classic resume"
+        url="https://123resume.de/templates"
+      />
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 sm:px-6 py-16 sm:py-24 max-w-6xl">
         <div className="text-center mb-12">
           <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">{t('pages.templates.title')}</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -70,6 +78,7 @@ const Templates = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

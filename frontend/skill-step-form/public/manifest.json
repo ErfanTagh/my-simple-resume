@@ -1,0 +1,22 @@
+{
+  "name": "123Resume - Professional CV Builder",
+  "short_name": "123Resume",
+  "description": "Build your professional CV with our easy-to-use multi-step form. Create ATS-friendly resumes with multiple templates.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/resume-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "business", "education"],
+  "lang": "en",
+  "dir": "ltr"
+}
+

@@ -3,11 +3,19 @@ import { Check, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { SEO } from "@/components/SEO";
 
 const Pricing = () => {
   const { t } = useLanguage();
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <SEO
+        title="Pricing - Free CV Builder | 123Resume"
+        description="Create professional resumes for free with 123Resume. No credit card required. Export to PDF, save multiple versions, and access all templates."
+        keywords="free CV builder, resume builder pricing, free resume maker, CV builder cost"
+        url="https://123resume.de/pricing"
+      />
+      <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 sm:px-6 py-16 sm:py-24 max-w-5xl">
         <div className="text-center mb-12">
           <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">{t('pages.pricing.title')}</h1>
@@ -115,6 +123,7 @@ const Pricing = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

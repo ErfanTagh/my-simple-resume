@@ -16,6 +16,7 @@ import { LandingTemplatePreview } from "./LandingTemplatePreview";
 import { getBlogPosts } from "@/lib/blogPosts";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useMemo } from "react";
+import { SEO } from "@/components/SEO";
 
 const Landing = () => {
   const { language, t } = useLanguage();
@@ -30,7 +31,13 @@ const Landing = () => {
     { nameKey: 'templateStarRover', descKey: 'templateStarRoverDesc', key: 'starRover' as const }
   ];
   return (
-    <div className="min-h-screen bg-background overflow-hidden">
+    <>
+      <SEO
+        title="123Resume - Professional CV Builder | Create Your Resume Online"
+        description="Build your professional CV with our easy-to-use multi-step form. Create ATS-friendly resumes with multiple templates. Free CV builder with PDF export."
+        keywords="CV builder, resume builder, create CV, professional resume, ATS resume, CV templates, resume templates, online CV maker"
+      />
+      <div className="min-h-screen bg-background overflow-hidden">
       {/* Hero Section */}
       <section className="relative pt-28 sm:pt-40 pb-16 sm:pb-24 px-4 sm:px-6">
         {/* Background Effects */}
@@ -305,6 +312,7 @@ const Landing = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 

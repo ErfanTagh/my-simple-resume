@@ -320,8 +320,9 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
               <div className="w-16 h-16 overflow-hidden rounded-sm border border-foreground">
                 <img 
                   src={personalInfo.profileImage} 
-                  alt={`${fullName} profile`}
+                  alt={`${fullName} profile picture`}
                   className="w-full h-full object-cover"
+                  loading="lazy"
                 />
               </div>
             </div>

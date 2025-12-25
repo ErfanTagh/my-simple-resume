@@ -209,7 +209,7 @@ export default function Resumes() {
                 ? Math.round(overallScore * 10) / 10
                 : Math.round(((completenessScore + clarityScore + formattingScore + impactScore) / 4) * 10) / 10;
               
-              const template = resumeData.template || 'modern';
+              const template = resume.template || 'modern';
               
               return (
                 <Card key={resume.id} className="hover:shadow-lg transition-shadow relative group">
