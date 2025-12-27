@@ -15,6 +15,7 @@ interface SEOProps {
   publishedTime?: string;
   modifiedTime?: string;
   breadcrumbs?: Array<{ name: string; url: string }>;
+  faqs?: Array<{ question: string; answer: string }>;
 }
 
 export const SEO = ({
@@ -30,6 +31,7 @@ export const SEO = ({
   publishedTime,
   modifiedTime,
   breadcrumbs,
+  faqs,
 }: SEOProps) => {
   const location = useLocation();
   const { language } = useLanguage();
@@ -189,6 +191,20 @@ export const SEO = ({
       })),
     } : null;
 
+    // FAQPage structured data
+    const faqPageData = faqs && faqs.length > 0 ? {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqs.map((faq) => ({
+        '@type': 'Question',
+        name: faq.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: faq.answer,
+        },
+      })),
+    } : null;
+
     // Structured Data (JSON-LD)
     let structuredDataScript = document.querySelector('script[type="application/ld+json"]');
     if (structuredData) {
@@ -199,7 +215,7 @@ export const SEO = ({
       }
       structuredDataScript.textContent = JSON.stringify(structuredData);
       
-      // Add breadcrumbs separately if custom structuredData is provided
+      // Add breadcrumbs and FAQs separately if custom structuredData is provided
       if (breadcrumbListData) {
         let breadcrumbScript = document.querySelector('script[type="application/ld+json"][data-breadcrumb]');
         if (!breadcrumbScript) {
@@ -209,6 +225,17 @@ export const SEO = ({
           document.head.appendChild(breadcrumbScript);
         }
         breadcrumbScript.textContent = JSON.stringify(breadcrumbListData);
+      }
+      
+      if (faqPageData) {
+        let faqScript = document.querySelector('script[type="application/ld+json"][data-faq]');
+        if (!faqScript) {
+          faqScript = document.createElement('script');
+          faqScript.setAttribute('type', 'application/ld+json');
+          faqScript.setAttribute('data-faq', 'true');
+          document.head.appendChild(faqScript);
+        }
+        faqScript.textContent = JSON.stringify(faqPageData);
       }
     } else {
       // Default Organization, Website, SoftwareApplication, and Service structured data
@@ -308,18 +335,19 @@ export const SEO = ({
         document.head.appendChild(structuredDataScript);
       }
       
-      // Combine default structured data with breadcrumbs if available
+      // Combine default structured data with breadcrumbs and FAQs if available
       const combinedData = {
         ...defaultStructuredData,
         '@graph': [
           ...defaultStructuredData['@graph'],
           ...(breadcrumbListData ? [breadcrumbListData] : []),
+          ...(faqPageData ? [faqPageData] : []),
         ],
       };
       
       structuredDataScript.textContent = JSON.stringify(combinedData);
     }
-  }, [title, description, keywords, image, currentUrl, type, noindex, location.pathname, structuredData, author, publishedTime, modifiedTime, language, finalBreadcrumbs]);
+  }, [title, description, keywords, image, currentUrl, type, noindex, location.pathname, structuredData, author, publishedTime, modifiedTime, language, finalBreadcrumbs, faqs]);
 
   return null;
 };

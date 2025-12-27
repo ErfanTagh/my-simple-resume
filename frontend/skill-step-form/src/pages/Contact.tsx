@@ -5,6 +5,27 @@ import { SEO } from "@/components/SEO";
 
 const Contact = () => {
   const { t } = useLanguage();
+  
+  // FAQ data for structured data
+  const faqs = [
+    {
+      question: t('pages.contact.howToCreate'),
+      answer: t('pages.contact.howToCreateAnswer'),
+    },
+    {
+      question: t('pages.contact.isFree'),
+      answer: t('pages.contact.isFreeAnswer'),
+    },
+    {
+      question: t('pages.contact.multipleResumes'),
+      answer: t('pages.contact.multipleResumesAnswer'),
+    },
+    {
+      question: t('pages.contact.howToDownload'),
+      answer: t('pages.contact.howToDownloadAnswer'),
+    },
+  ];
+  
   return (
     <>
       <SEO
@@ -12,6 +33,7 @@ const Contact = () => {
         description="Get in touch with 123Resume. Have questions about our CV builder? Contact our support team for assistance."
         keywords="contact 123resume, CV builder support, resume builder help, customer service"
         url="https://123resume.de/contact"
+        faqs={faqs}
       />
       <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 sm:px-6 py-16 sm:py-24 max-w-4xl">
