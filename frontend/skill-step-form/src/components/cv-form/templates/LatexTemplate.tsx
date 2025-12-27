@@ -307,7 +307,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
   };
 
   const fullName = `${personalInfo.firstName || ''} ${personalInfo.lastName || ''}`.trim();
-  const professionalTitle = personalInfo.professionalTitle || '';
+  const professionalTitle = (personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0) ? personalInfo.professionalTitle.trim() : '';
 
   return (
     <div className="bg-background text-foreground p-4 max-w-[1280px] mx-auto" style={{ fontFamily: 'sans-serif' }}>

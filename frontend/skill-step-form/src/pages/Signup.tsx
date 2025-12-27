@@ -61,8 +61,21 @@ export default function Signup() {
       return;
     }
 
+    // Password strength validation
     if (formData.password.length < 8) {
       setError('Password must be at least 8 characters long');
+      return;
+    }
+
+    // Check for at least one letter
+    if (!/[a-zA-Z]/.test(formData.password)) {
+      setError('Password must contain at least one letter');
+      return;
+    }
+
+    // Check for at least one number
+    if (!/[0-9]/.test(formData.password)) {
+      setError('Password must contain at least one number');
       return;
     }
 

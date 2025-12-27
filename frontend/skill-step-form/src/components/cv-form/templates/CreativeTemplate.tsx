@@ -213,9 +213,12 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
             <h1 className="text-5xl font-black text-foreground mb-2 italic tracking-tight">
               {personalInfo.firstName}
             </h1>
-            <h1 className="text-5xl font-black text-primary mb-4 italic tracking-tight">
+            <h1 className="text-5xl font-black text-primary mb-2 italic tracking-tight">
               {personalInfo.lastName}
             </h1>
+            {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (
+              <p className="text-xl text-primary font-bold mb-4 italic">{personalInfo.professionalTitle.trim()}</p>
+            )}
             
             <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mt-4">
           {personalInfo.email && (

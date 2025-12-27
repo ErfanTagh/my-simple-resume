@@ -51,9 +51,9 @@ class PersonalInfoSerializer(serializers.Serializer):
         required=False, 
         allow_blank=True
     )
-    linkedin = serializers.URLField(required=False, allow_blank=True)
-    github = serializers.URLField(required=False, allow_blank=True)
-    website = serializers.URLField(required=False, allow_blank=True)
+    linkedin = serializers.CharField(required=False, allow_blank=True, max_length=500)
+    github = serializers.CharField(required=False, allow_blank=True, max_length=500)
+    website = serializers.CharField(required=False, allow_blank=True, max_length=500)
     summary = serializers.CharField(required=False, allow_blank=True)
     interests = InterestSerializer(many=True, required=False)
 
@@ -186,12 +186,12 @@ class ResumeSerializer(serializers.Serializer):
         required=False,
         allow_empty=True
     )
-    # Quality scores
-    completeness_score = serializers.FloatField(read_only=True, required=False)
-    clarity_score = serializers.FloatField(read_only=True, required=False)
-    formatting_score = serializers.FloatField(read_only=True, required=False)
-    impact_score = serializers.FloatField(read_only=True, required=False)
-    overall_score = serializers.FloatField(read_only=True, required=False)
+    # Quality scores (calculated on frontend, accepted from request)
+    completeness_score = serializers.FloatField(required=False, allow_null=True, min_value=0.0, max_value=10.0)
+    clarity_score = serializers.FloatField(required=False, allow_null=True, min_value=0.0, max_value=10.0)
+    formatting_score = serializers.FloatField(required=False, allow_null=True, min_value=0.0, max_value=10.0)
+    impact_score = serializers.FloatField(required=False, allow_null=True, min_value=0.0, max_value=10.0)
+    overall_score = serializers.FloatField(required=False, allow_null=True, min_value=0.0, max_value=10.0)
     
     created_at = serializers.DateTimeField(read_only=True)
     updated_at = serializers.DateTimeField(read_only=True)

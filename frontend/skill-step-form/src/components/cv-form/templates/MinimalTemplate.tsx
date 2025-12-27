@@ -188,6 +188,9 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
         <h1 className="text-xl font-bold text-foreground mb-1 tracking-tight">
           {personalInfo.firstName} {personalInfo.lastName}
         </h1>
+        {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (
+          <p className="text-xs text-muted-foreground font-normal mb-2">{personalInfo.professionalTitle.trim()}</p>
+        )}
         
         <div className="flex flex-wrap gap-3 text-xs text-muted-foreground mt-3">
           {personalInfo.email && <span>{personalInfo.email}</span>}

@@ -66,6 +66,13 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   let deductions = 0;
   let bonuses = 0;
 
+  // Extract data sections early for use throughout
+  const workExp = data.workExperience || [];
+  const education = data.education || [];
+  const summary = data.personalInfo.summary || '';
+  const skills = (data.skills || []).map(s => s.skill?.toLowerCase() || '').filter(Boolean);
+  const validSkills = (data.skills || []).filter(s => s.skill && s.skill.trim()).length;
+
   // Language-agnostic metrics patterns (defined once, used throughout)
   const metricsPattern = /\b(\d+[%]|\$\d+[KM]?|€\d+[KM]?|\d+\s*[%]|\d+\s*(years?|months?|people|users|customers|clients|team members?|Jahre?|Monate?|Personen?|Mitarbeiter?|Kunden?|Menschen?))\b/i;
   const universalMetricsPattern = /\b\d+\s*(%|€|\$|Mio|Mio\.|Million|Millionen|Tausend|K|M|BN|Billion|Milliarden|Jahre|Monate|Personen|Mitarbeiter|Kunden|Menschen|users|people|years|months|customers|clients|team)\b/i;
@@ -90,11 +97,10 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   // Quantifiable achievements (1 pt) - language-agnostic (numbers/percentages work in all languages)
   const hasMetrics = metricsPattern.test(allText) || universalMetricsPattern.test(allText) || /\d+[%]/.test(allText);
   if (hasMetrics) contentScore += 1;
-  else suggestions.push("Add quantifiable achievements with numbers, percentages, or metrics (e.g., 'Increased revenue by 40%', 'Managed team of 5')");
+  else suggestions.push("Add specific numbers to showcase impact: revenue increased (%), team size managed, cost savings ($), users reached, etc.");
   
   // Relevance (0.5 pts) - check if skills match experience
-  const skills = (data.skills || []).map(s => s.skill?.toLowerCase() || '').filter(Boolean);
-  const workExpTextForRelevance = (data.workExperience || []).map(exp => 
+  const workExpTextForRelevance = workExp.map(exp => 
     `${exp.position || ''} ${exp.description || ''}`.toLowerCase()
   ).join(' ');
   // Check if skills are mentioned in work experience or if there are enough skills
@@ -106,7 +112,6 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   else suggestions.push("Ensure your skills are relevant and match your work experience");
   
   // Impact-focused (1 pt) - descriptions focus on outcomes (language-agnostic)
-  const workExp = data.workExperience || [];
   const impactFocusedCount = workExp.filter(exp => {
     const desc = exp.description || '';
     // Check for outcome indicators in both languages
@@ -139,9 +144,13 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   let structureScore = 0;
   
   // Clear hierarchy (0.5 pts) - template selected and sections organized
-  if (data.template && data.sectionOrder && data.sectionOrder.length >= 4) {
+  // Only give points if there's actual content, not just empty structure
+  const hasBasicContent = (data.personalInfo.firstName && data.personalInfo.lastName) || 
+                          (workExp.length > 0 && workExp.some(exp => exp.position || exp.company)) ||
+                          (education.length > 0 && education.some(edu => edu.degree || edu.institution));
+  if (data.template && data.sectionOrder && data.sectionOrder.length >= 4 && hasBasicContent) {
     structureScore += 0.5;
-  } else {
+  } else if (data.template || data.sectionOrder) {
     suggestions.push("Organize your resume sections in a clear, logical order");
   }
   
@@ -166,42 +175,42 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   if (isAppropriateLength) structureScore += 0.5;
   else if (estimatedLength > 2.5) suggestions.push("Resume may be too long - aim for 1 page (under 5 years experience) or 2 pages (senior roles)");
   
-  // Reduced penalties for excessive text - only penalize truly excessive lengths
+  // Penalize excessive text - recruiters spend 6-7 seconds scanning resumes
+  // Brevity is power: keep descriptions concise for optimal readability
   let lengthDeductions = 0;
   
-  // Work experience descriptions - only penalize extreme cases
-  if (avgLength > 2000) {
-    lengthDeductions += 1.0; // Penalty for extremely long descriptions (avg > 2000 chars)
-  } else if (avgLength > 1500) {
-    lengthDeductions += 0.5; // Small penalty for very long descriptions (avg > 1500 chars)
-  }
-  // Don't penalize descriptions under 1500 chars average
-  
-  // Check for individual extremely long descriptions
-  const veryLongDescriptions = workDescriptions.filter(d => d.length > 2000).length;
-  if (veryLongDescriptions > 2) {
-    lengthDeductions += Math.min((veryLongDescriptions - 2) * 0.2, 0.5); // Only penalize if 3+ extremely long entries
+  // Work experience descriptions - penalize verbose descriptions
+  if (avgLength > 1000) {
+    lengthDeductions += 1.5; // Severe penalty for very long (avg > 1000 chars)
+  } else if (avgLength > 700) {
+    lengthDeductions += 1.0; // Large penalty for long (avg > 700 chars)
+  } else if (avgLength > 500) {
+    lengthDeductions += 0.5; // Moderate penalty (avg > 500 chars = ~3-4 lines)
+    suggestions.push("Your descriptions are too long - keep each bullet point to 1-2 lines maximum for better readability");
   }
   
-  // Check summary length - only penalize extreme cases
+  // Check for individual extremely long descriptions (> 800 chars each)
+  const extremelyLongDescriptions = workDescriptions.filter(d => d.length > 800).length;
+  if (extremelyLongDescriptions > 1) {
+    lengthDeductions += extremelyLongDescriptions * 0.3; // Penalize each
+  }
+  
+  // Summary should be brief (elevator pitch)
   const summaryLength = (data.personalInfo.summary || '').length;
-  if (summaryLength > 700) {
-    lengthDeductions += 0.5; // Penalty for very long summary (> 700 chars)
+  if (summaryLength > 400) {
+    lengthDeductions += 0.8; // Penalty for verbose summary
+  } else if (summaryLength > 300) {
+    lengthDeductions += 0.4;
   }
-  // Don't penalize summaries under 700 chars
   
-  // Check project descriptions - only penalize extreme cases
+  // Project descriptions should be punchy
   const projects = data.projects || [];
   const projectDescriptions = projects.map(p => (p.description || '').length);
   const avgProjectLength = projectDescriptions.length > 0
     ? projectDescriptions.reduce((sum, len) => sum + len, 0) / projectDescriptions.length
     : 0;
-  const maxProjectLength = projectDescriptions.length > 0 ? Math.max(...projectDescriptions) : 0;
-  if (avgProjectLength > 800) {
-    lengthDeductions += 0.3; // Penalty for very long project descriptions
-  }
-  if (maxProjectLength > 1000) {
-    lengthDeductions += 0.2; // Penalty for individual extremely long project descriptions
+  if (avgProjectLength > 500) {
+    lengthDeductions += 0.5;
   }
   
   // Don't penalize education field length - it's usually short
@@ -230,7 +239,6 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   // 3. PROFESSIONAL SUMMARY (1 point)
   // ============================================
   let summaryScore = 0;
-  const summary = data.personalInfo.summary || '';
   
   // Compelling (0.5 pts) - not generic, has value proposition
   const genericPhrases = ['hard worker', 'team player', 'detail oriented', 'good communicator'];
@@ -339,7 +347,6 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   // 5. SKILLS & TECHNICAL PROFICIENCY (1 point)
   // ============================================
   let skillsScore = 0;
-  const validSkills = skills.length;
   
   // Organized (0.3 pts) - skills are present and not excessive
   if (validSkills >= 3 && validSkills <= 20) {
@@ -391,7 +398,6 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   // 6. EDUCATION & CERTIFICATIONS (0.5 points)
   // ============================================
   let educationScore = 0;
-  const education = data.education || [];
   
   // Complete (0.25 pts) - degree, institution, dates included
   const completeEdu = education.filter(edu => 
@@ -430,13 +436,21 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   let atsScore = 0;
   
   // Keyword-rich (0.25 pts) - contains relevant industry keywords
-  const hasKeywords = validSkills >= 5 || summary.length >= 50 || workExp.length > 0;
+  // Only give points if there's actual content, not just empty fields
+  const hasKeywords = validSkills >= 5 || (summary.length >= 50 && summary.trim().length > 0) || (workExp.length > 0 && workExp.some(exp => exp.position && exp.company));
   if (hasKeywords) atsScore += 0.25;
-  else suggestions.push("Add more industry keywords and relevant terms to improve ATS compatibility");
+  else if (validSkills > 0 || summary.length > 0 || workExp.length > 0) {
+    suggestions.push("Add more industry keywords and relevant terms to improve ATS compatibility");
+  }
   
   // Standard formatting (0.25 pts) - template-based (assumes templates are ATS-friendly)
-  if (data.template) atsScore += 0.25;
-  else suggestions.push("Select a template - our templates are ATS-optimized");
+  // Only give points if there's actual resume content, not just contact info
+  const hasActualContent = (workExp.length > 0 && workExp.some(exp => exp.position || exp.company)) ||
+                            (education.length > 0 && education.some(edu => edu.degree || edu.institution)) ||
+                            validSkills > 0 ||
+                            (summary && summary.trim().length > 0);
+  if (data.template && hasActualContent) atsScore += 0.25;
+  else if (!data.template) suggestions.push("Select a template - our templates are ATS-optimized");
   
   categories.push({
     name: "ATS Optimization",
@@ -525,6 +539,17 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   }
   // Don't suggest adding these - they're optional
   
+  // Metrics-rich resume bonus - reward quantified achievements
+  // Count all metric occurrences in the text using comprehensive pattern matching
+  const comprehensiveMetricsPattern = /\b\d+\s*(%|€|\$|Mio|Mio\.|Million|Millionen|Tausend|K|M|BN|Billion|Milliarden|Jahre|Monate|Personen|Mitarbeiter|Kunden|Menschen|users|people|years|months|customers|clients|team|members?)\b|\$\d+[KM]?|€\d+[KM]?|\d+[%]/gi;
+  const allMetricsMatches = allText.match(comprehensiveMetricsPattern) || [];
+  const metricsCount = allMetricsMatches.length;
+  if (metricsCount >= 10) {
+    bonuses += 0.5; // Additional bonus for highly quantified resume (10+ metrics)
+  } else if (metricsCount >= 5) {
+    bonuses += 0.3; // Bonus for metrics-rich resume (5+ quantified results)
+  }
+  
   // Additional credentials (projects, publications, volunteer work)
   const userProjects = data.projects || [];
   const hasProjects = userProjects.filter(p => p.name && p.description).length > 0;
@@ -545,8 +570,25 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   // FINAL CALCULATION
   // ============================================
   
-  // Apply deductions and bonuses
-  totalScore = Math.max(0, Math.min(10, totalScore - deductions + bonuses));
+  // Check if resume is essentially empty - only contact info, no actual resume content
+  // Resume is empty if it only has personal contact info but no work experience, education, skills, projects, certificates, languages, or summary
+  const hasActualResumeContent = (
+    (workExp.length > 0 && workExp.some(exp => (exp.position && exp.position.trim()) || (exp.company && exp.company.trim()))) ||
+    (education.length > 0 && education.some(edu => (edu.degree && edu.degree.trim()) || (edu.institution && edu.institution.trim()))) ||
+    validSkills > 0 ||
+    (data.projects && data.projects.length > 0 && data.projects.some(p => p.name && p.name.trim())) ||
+    (data.certificates && data.certificates.length > 0 && data.certificates.some(c => c.name && c.name.trim())) ||
+    (data.languages && data.languages.length > 0 && data.languages.some(l => l.language && l.language.trim())) ||
+    (summary && summary.trim().length > 0)
+  );
+  
+  // If resume has no actual content (only contact info), score should be 0
+  if (!hasActualResumeContent) {
+    totalScore = 0;
+  } else {
+    // Apply deductions and bonuses
+    totalScore = Math.max(0, Math.min(10, totalScore - deductions + bonuses));
+  }
   
   // Convert to 0-100 scale for display
   const overallScore = Math.round(totalScore * 10);

@@ -104,9 +104,24 @@ def register(request):
             )
         
         # Validate password strength
+        import re
         if len(password) < 8:
             return Response(
                 {'error': 'Password must be at least 8 characters long'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Check for at least one letter
+        if not re.search(r'[a-zA-Z]', password):
+            return Response(
+                {'error': 'Password must contain at least one letter'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Check for at least one number
+        if not re.search(r'[0-9]', password):
+            return Response(
+                {'error': 'Password must contain at least one number'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -554,10 +569,25 @@ def reset_password(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    # Validate password length
+    # Validate password strength
+    import re
     if len(new_password) < 8:
         return Response(
             {'error': 'Password must be at least 8 characters long'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # Check for at least one letter
+    if not re.search(r'[a-zA-Z]', new_password):
+        return Response(
+            {'error': 'Password must contain at least one letter'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # Check for at least one number
+    if not re.search(r'[0-9]', new_password):
+        return Response(
+            {'error': 'Password must contain at least one number'},
             status=status.HTTP_400_BAD_REQUEST
         )
     

@@ -23,14 +23,14 @@ def generate_pdf_from_html(html_content: str) -> bytes:
         # Set content and wait for it to load
         page.set_content(html_content, wait_until='networkidle')
         
-        # Generate PDF with A4 format and margins matching print CSS
+        # Generate PDF with A4 format and zero margins (padding is handled in CSS)
         pdf_bytes = page.pdf(
             format='A4',
             margin={
-                'top': '18mm',
-                'right': '18mm',
-                'bottom': '18mm',
-                'left': '18mm'
+                'top': '0mm',
+                'right': '0mm',
+                'bottom': '0mm',
+                'left': '0mm'
             },
             print_background=True,
         )

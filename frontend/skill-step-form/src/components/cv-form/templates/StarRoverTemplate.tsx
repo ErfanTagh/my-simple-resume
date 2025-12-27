@@ -354,9 +354,14 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
     <div className="bg-background text-foreground p-8 max-w-4xl mx-auto text-sm" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       {/* Header: Large name in navy with optional photo */}
       <div className="text-center mb-4">
-        <h1 className="text-4xl font-black mb-3" style={{ color: ACCENT_COLOR, letterSpacing: '0.02em' }}>
+        <h1 className="text-4xl font-black mb-2" style={{ color: ACCENT_COLOR, letterSpacing: '0.02em' }}>
           {fullName || 'YOUR NAME'}
         </h1>
+        {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (
+          <p className="text-lg font-semibold mb-3" style={{ color: ACCENT_COLOR }}>
+            {personalInfo.professionalTitle.trim().toUpperCase()}
+          </p>
+        )}
         
         {/* Profile photo centered beneath the name if provided */}
         {personalInfo.profileImage && (

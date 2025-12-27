@@ -9,9 +9,9 @@ export const cvFormSchema = z.object({
     email: z.string().email("Invalid email address"),
     phone: z.string().optional(),
     location: z.string().optional(),
-    linkedin: z.string().url("Please enter a valid URL (e.g., https://linkedin.com/in/yourprofile)").optional().or(z.literal("")),
-    github: z.string().url("Please enter a valid URL (e.g., https://github.com/yourusername)").optional().or(z.literal("")),
-    website: z.string().url("Please enter a valid URL (e.g., https://yourwebsite.com)").optional().or(z.literal("")),
+    linkedin: z.string().optional().or(z.literal("")),
+    github: z.string().optional().or(z.literal("")),
+    website: z.string().optional().or(z.literal("")),
     summary: z.string().optional(),
     interests: z.array(
       z.object({

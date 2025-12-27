@@ -398,29 +398,38 @@ async function downloadPDFFromHTML(
     }
     body {
       margin: 0 !important;
-      padding: 8mm !important;
+      padding: 0 !important;
       font-family: Inter, ui-sans-serif, system-ui, sans-serif;
       background: white;
       width: 100%;
+      min-height: 100vh;
     }
-    /* Aggressively remove all margins and constraints from template root */
+    /* Resume container fills the page with internal padding */
+    /* The container's background will fill the entire page */
+    .resume-container,
+    body > div:first-child {
+      width: 100% !important;
+      min-height: 100vh !important;
+      margin: 0 !important;
+      padding: 15mm !important;
+      box-sizing: border-box;
+    }
+    /* Remove margins but keep internal padding for resume container */
     /* Templates use mx-auto and max-w-* which create side margins - force remove for PDF */
     body > div:first-child {
       margin: 0 !important;
-      padding: 0 !important;
+      padding: 15mm !important;
       max-width: none !important;
       width: 100% !important;
-      margin-left: 0 !important;
-      margin-right: 0 !important;
-      margin-top: 0 !important;
-      margin-bottom: 0 !important;
+      min-height: 100vh !important;
+      box-sizing: border-box;
     }
-    /* Remove padding from resume-container class only if it's the root element */
-    /* This prevents the container's 40px padding from affecting the PDF */
-    /* Template's internal padding (p-8, p-12, etc.) should be preserved */
+    /* Resume container gets internal padding, background fills page */
     body > .resume-container {
-      padding: 0 !important;
+      padding: 15mm !important;
       margin: 0 !important;
+      min-height: 100vh !important;
+      box-sizing: border-box;
     }
     /* Override ALL possible Tailwind classes that could add margins/width constraints */
     body > div[class*="mx-auto"],

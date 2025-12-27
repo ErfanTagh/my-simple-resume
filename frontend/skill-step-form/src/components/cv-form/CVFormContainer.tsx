@@ -19,6 +19,7 @@ import { toast } from "@/hooks/use-toast";
 import { getTestProfile, getTestProfileNames } from "@/lib/testData";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { calculateResumeScore } from "@/lib/resumeScorer";
 
 interface CVFormContainerProps {
   initialData?: CVFormData;
@@ -195,10 +196,87 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
     setShowSignupOverlay(false);
     
     try {
+      // Calculate resume score using frontend scorer
+      const scoreResult = calculateResumeScore(data);
+      
+      // Map frontend score format to backend format
+      // Frontend: categories with names, overallScore 0-100
+      // Backend: completeness_score, clarity_score, formatting_score, impact_score, overall_score (all 0-10)
+      const getCategoryScore = (name: string): number => {
+        const category = scoreResult.categories.find(c => c.name === name);
+        if (!category) return 0;
+        return category.score; // Already in 0-maxScore format
+      };
+      
+      const getCategoryMaxScore = (name: string): number => {
+        const category = scoreResult.categories.find(c => c.name === name);
+        if (!category) return 1; // Avoid division by zero
+        return category.maxScore;
+      };
+      
+      // Map categories to backend format (normalize each to 0-10 scale):
+      // Completeness: Content Quality (3 max) + Education & Certifications (0.5 max) + Skills & Proficiency (1 max) = 4.5 max
+      const contentQuality = getCategoryScore("Content Quality");
+      const contentQualityMax = getCategoryMaxScore("Content Quality");
+      const education = getCategoryScore("Education & Certifications");
+      const educationMax = getCategoryMaxScore("Education & Certifications");
+      const skills = getCategoryScore("Skills & Proficiency");
+      const skillsMax = getCategoryMaxScore("Skills & Proficiency");
+      
+      // Normalize each to 0-10, then average (weighted by max scores)
+      const totalCompletenessMax = contentQualityMax + educationMax + skillsMax;
+      const completenessScore = totalCompletenessMax > 0
+        ? Math.min(10, Math.round(((contentQuality + education + skills) / totalCompletenessMax) * 10 * 10) / 10)
+        : 0;
+      
+      // Clarity: Structure & Format (2 max) + Professional Summary (1 max) = 3 max
+      const structure = getCategoryScore("Structure & Format");
+      const structureMax = getCategoryMaxScore("Structure & Format");
+      const summary = getCategoryScore("Professional Summary");
+      const summaryMax = getCategoryMaxScore("Professional Summary");
+      
+      const totalClarityMax = structureMax + summaryMax;
+      const clarityScore = totalClarityMax > 0
+        ? Math.min(10, Math.round(((structure + summary) / totalClarityMax) * 10 * 10) / 10)
+        : 0;
+      
+      // Formatting: ATS Optimization (0.5 max) -> normalize to 0-10
+      const ats = getCategoryScore("ATS Optimization");
+      const atsMax = getCategoryMaxScore("ATS Optimization");
+      const formattingScore = atsMax > 0
+        ? Math.min(10, Math.round((ats / atsMax) * 10 * 10) / 10)
+        : 0;
+      
+      // Impact: Experience Section (2 max) -> normalize to 0-10
+      const experience = getCategoryScore("Experience Section");
+      const experienceMax = getCategoryMaxScore("Experience Section");
+      const impactScore = experienceMax > 0
+        ? Math.min(10, Math.round((experience / experienceMax) * 10 * 10) / 10)
+        : 0;
+      
+      // Overall: Convert from 0-100 to 0-10
+      const overallScore = Math.round((scoreResult.overallScore / 10) * 10) / 10;
+      
+      // Add scores to resume data
+      const resumeDataWithScores: CVFormData & {
+        completenessScore: number;
+        clarityScore: number;
+        formattingScore: number;
+        impactScore: number;
+        overallScore: number;
+      } = {
+        ...data,
+        completenessScore,
+        clarityScore,
+        formattingScore,
+        impactScore,
+        overallScore,
+      };
+      
       // Check if user is authenticated
       if (!user) {
         // User is not authenticated - save to localStorage and show signup overlay
-        localStorage.setItem('pendingResume', JSON.stringify(data));
+        localStorage.setItem('pendingResume', JSON.stringify(resumeDataWithScores));
         setIsSaving(false);
         // Show full-page signup overlay with blurred resume ONLY when Complete CV is clicked
         setShowSignupOverlay(true);
@@ -208,7 +286,7 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
       const { resumeAPI } = await import('@/lib/api');
       
       if (editId) {
-        const updatedResume = await resumeAPI.update(editId, data as any);
+        const updatedResume = await resumeAPI.update(editId, resumeDataWithScores as any);
 
         toast({
           title: "CV Updated Successfully!",
@@ -220,7 +298,7 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
           navigate('/resumes');
         }, 800);
       } else {
-        const savedResume = await resumeAPI.create(data as any);
+        const savedResume = await resumeAPI.create(resumeDataWithScores as any);
         
         toast({
           title: "CV Saved Successfully!",

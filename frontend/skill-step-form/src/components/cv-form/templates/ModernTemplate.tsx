@@ -170,6 +170,9 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
         <h1 className="text-3xl font-bold text-foreground mb-2">
           {personalInfo.firstName} {personalInfo.lastName}
         </h1>
+        {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (
+          <p className="text-base text-primary font-semibold mb-2">{personalInfo.professionalTitle.trim()}</p>
+        )}
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-muted-foreground mt-3">
           {personalInfo.email && (

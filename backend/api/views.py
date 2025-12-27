@@ -8,7 +8,7 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
 from .models import Resume
 from .serializers import ResumeSerializer, BlogPostSerializer
-from .resume_scorer import calculate_resume_quality
+# Backend scorer removed - scores are now calculated on frontend
 from bson import ObjectId
 from datetime import datetime
 import os
@@ -231,8 +231,15 @@ def resume_list(request):
                 # Save data from validated_data
                 data = serializer.validated_data
                 
-                # Calculate quality scores
-                quality_scores = calculate_resume_quality(request.data)
+                # Get quality scores from request (calculated on frontend)
+                # Default to 0.0 if not provided (should always be provided by frontend)
+                quality_scores = {
+                    'completeness_score': data.get('completeness_score', 0.0),
+                    'clarity_score': data.get('clarity_score', 0.0),
+                    'formatting_score': data.get('formatting_score', 0.0),
+                    'impact_score': data.get('impact_score', 0.0),
+                    'overall_score': data.get('overall_score', 0.0),
+                }
                 
                 # Prepare document for MongoDB
                 resume_doc = {
@@ -431,8 +438,16 @@ def resume_detail(request, pk):
         serializer = ResumeSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                # Calculate quality scores
-                quality_scores = calculate_resume_quality(request.data)
+                # Get quality scores from request (calculated on frontend)
+                # Default to 0.0 if not provided (should always be provided by frontend)
+                data = serializer.validated_data
+                quality_scores = {
+                    'completeness_score': data.get('completeness_score', 0.0),
+                    'clarity_score': data.get('clarity_score', 0.0),
+                    'formatting_score': data.get('formatting_score', 0.0),
+                    'impact_score': data.get('impact_score', 0.0),
+                    'overall_score': data.get('overall_score', 0.0),
+                }
                 
                 # Update the resume in MongoDB
                 update_data = serializer.validated_data

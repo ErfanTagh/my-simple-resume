@@ -290,6 +290,12 @@ export interface ResumeData {
   }>;
   sectionOrder?: string[];
   template?: "modern" | "classic" | "minimal" | "creative" | "latex" | "starRover";
+  // Score fields (calculated on frontend, stored on backend)
+  completenessScore?: number;
+  clarityScore?: number;
+  formattingScore?: number;
+  impactScore?: number;
+  overallScore?: number;
 }
 
 export interface Resume extends ResumeData {

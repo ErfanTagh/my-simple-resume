@@ -51,8 +51,21 @@ export default function ResetPassword() {
       return;
     }
 
+    // Password strength validation
     if (password.length < 8) {
       setError('Password must be at least 8 characters long');
+      return;
+    }
+
+    // Check for at least one letter
+    if (!/[a-zA-Z]/.test(password)) {
+      setError('Password must contain at least one letter');
+      return;
+    }
+
+    // Check for at least one number
+    if (!/[0-9]/.test(password)) {
+      setError('Password must contain at least one number');
       return;
     }
 

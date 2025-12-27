@@ -199,9 +199,12 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
           </div>
         )}
         
-        <h1 className="text-2xl font-bold text-foreground mb-3 uppercase tracking-wide">
+        <h1 className="text-2xl font-bold text-foreground mb-2 uppercase tracking-wide">
           {personalInfo.firstName} {personalInfo.lastName}
         </h1>
+        {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (
+          <p className="text-base text-muted-foreground font-normal mb-3 italic">{personalInfo.professionalTitle.trim()}</p>
+        )}
         
         <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
           {personalInfo.email && (

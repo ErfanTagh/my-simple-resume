@@ -116,6 +116,8 @@ export const SEO = ({
             logo: {
               '@type': 'ImageObject',
               url: 'https://123resume.de/resume-icon.svg',
+              width: 512,
+              height: 512,
             },
             sameAs: [],
           },
