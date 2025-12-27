@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { LogIn, AlertCircle, Mail } from 'lucide-react';
+import { SEO } from '@/components/SEO';
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -117,8 +118,14 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background flex items-center justify-center py-12 px-4">
-      <Card className="w-full max-w-md p-8 shadow-elevated">
+    <>
+      <SEO
+        title="Login - 123Resume"
+        description="Login to your 123Resume account to create and manage your professional resumes."
+        noindex={true}
+      />
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background flex items-center justify-center py-12 px-4">
+        <Card className="w-full max-w-md p-8 shadow-elevated">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
             <LogIn className="w-8 h-8 text-primary" />
@@ -217,7 +224,8 @@ export default function Login() {
           </p>
         </div>
       </Card>
-    </div>
+      </div>
+    </>
   );
 }
 

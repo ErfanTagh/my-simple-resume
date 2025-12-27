@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { UserPlus, AlertCircle, Mail, CheckCircle2 } from 'lucide-react';
 import { EmailConfirmationAnimation } from '@/components/EmailConfirmationAnimation';
+import { SEO } from '@/components/SEO';
 
 export default function Signup() {
   const [searchParams] = useSearchParams();
@@ -109,7 +110,13 @@ export default function Signup() {
   // If registration successful, show email verification message
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background flex items-center justify-center py-12 px-4">
+      <>
+        <SEO
+          title="Sign Up - 123Resume"
+          description="Create your free 123Resume account to start building professional resumes."
+          noindex={true}
+        />
+        <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background flex items-center justify-center py-12 px-4">
         <Card className="w-full max-w-md p-8 shadow-elevated">
           <div className="text-center">
             <div className="flex justify-center mb-4">
@@ -146,11 +153,18 @@ export default function Signup() {
           </div>
         </Card>
       </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background flex items-center justify-center py-12 px-4">
+    <>
+      <SEO
+        title="Sign Up - 123Resume"
+        description="Create your free 123Resume account to start building professional resumes."
+        noindex={true}
+      />
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background flex items-center justify-center py-12 px-4">
       <Card className="w-full max-w-md p-8 shadow-elevated">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
@@ -276,7 +290,8 @@ export default function Signup() {
           </p>
         </div>
       </Card>
-    </div>
+      </div>
+    </>
   );
 }
 

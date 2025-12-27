@@ -4,6 +4,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { FileText, Plus, List } from 'lucide-react';
+import { SEO } from '@/components/SEO';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -11,7 +12,13 @@ const Index = () => {
   const { t } = useLanguage();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background py-12 px-4">
+    <>
+      <SEO
+        title="Dashboard - 123Resume"
+        description="Manage your resumes and create new professional CVs."
+        noindex={true}
+      />
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background py-12 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold mb-4">
@@ -57,7 +64,8 @@ const Index = () => {
           </Card>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

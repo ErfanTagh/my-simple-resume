@@ -13,6 +13,7 @@ import { CreativeTemplate } from '@/components/cv-form/templates/CreativeTemplat
 import { LatexTemplate } from '@/components/cv-form/templates/LatexTemplate';
 import { StarRoverTemplate } from '@/components/cv-form/templates/StarRoverTemplate';
 import { CVFormData } from '@/components/cv-form/types';
+import { SEO } from '@/components/SEO';
 
 export default function ResumeView() {
   const { id } = useParams<{ id: string }>();
@@ -104,18 +105,31 @@ export default function ResumeView() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <>
+        <SEO
+          title="Resume View - 123Resume"
+          description="View and download your professional resume."
+          noindex={true}
+        />
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent mb-4"></div>
           <p className="text-muted-foreground">Loading resume...</p>
         </div>
       </div>
+      </>
     );
   }
 
   if (error || !resume) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12 px-4">
+      <>
+        <SEO
+          title="Resume View - 123Resume"
+          description="View and download your professional resume."
+          noindex={true}
+        />
+        <div className="min-h-screen bg-gray-50 py-12 px-4">
         <div className="max-w-4xl mx-auto">
           <Alert variant="destructive" className="mb-6">
             <AlertCircle className="h-4 w-4" />
@@ -127,6 +141,7 @@ export default function ResumeView() {
           </Button>
         </div>
       </div>
+      </>
     );
   }
 
@@ -168,55 +183,60 @@ export default function ResumeView() {
   };
 
   return (
-    <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
-      {/* Action Buttons - Hide on print */}
-      <div className="no-print" style={{ padding: '20px', textAlign: 'center', backgroundColor: 'white', borderBottom: '1px solid #e9ecef' }}>
-        <div style={{ maxWidth: '210mm', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Button variant="outline" onClick={() => navigate('/resumes')}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            {t('common.back')}
-          </Button>
-          <Button onClick={handlePrint} variant="outline">
-            <Printer className="mr-2 h-4 w-4" />
-            {t('common.print')}
-          </Button>
-          <Button onClick={handleDownloadPDF}>
-            <Download className="mr-2 h-4 w-4" />
-            {t('common.downloadPDF')}
-          </Button>
+    <>
+      <SEO
+        title="Resume View - 123Resume"
+        description="View and download your professional resume."
+        noindex={true}
+      />
+      <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+        {/* Action Buttons - Hide on print */}
+        <div className="no-print" style={{ padding: '20px', textAlign: 'center', backgroundColor: 'white', borderBottom: '1px solid #e9ecef' }}>
+          <div style={{ maxWidth: '210mm', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Button variant="outline" onClick={() => navigate('/resumes')}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              {t('common.back')}
+            </Button>
+            <Button onClick={handlePrint} variant="outline">
+              <Printer className="mr-2 h-4 w-4" />
+              {t('common.print')}
+            </Button>
+            <Button onClick={handleDownloadPDF}>
+              <Download className="mr-2 h-4 w-4" />
+              {t('common.downloadPDF')}
+            </Button>
+          </div>
         </div>
-      </div>
 
-      {/* Resume Content */}
-      <div className="resume-container" ref={resumeContentRef} style={{ maxWidth: '210mm', margin: '0 auto', backgroundColor: 'white', padding: '40px' }}>
-        {renderTemplate()}
-      </div>
+        {/* Resume Content */}
+        <div className="resume-container" ref={resumeContentRef} style={{ maxWidth: '210mm', margin: '0 auto', backgroundColor: 'white', padding: '40px' }}>
+          {renderTemplate()}
+        </div>
 
-      <style>{`
-        @media print {
-          .no-print {
-            display: none !important;
-          }
-          body {
-            background: white !important;
-          }
-          /* Hide page title and URL in print */
-          @page {
-            margin: 0;
-          }
-        }
-        /* Global print styles - hide header and footer site-wide when printing */
-        @media print {
-          header:not(.resume-header),
-          footer,
-          .no-print,
-          header.no-print {
-            display: none !important;
-            visibility: hidden !important;
-          }
-        }
-      `}</style>
-    </div>
+        <style>{`
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+  }
+  @page {
+    margin: 0;
+  }
+}
+@media print {
+  header:not(.resume-header),
+  footer,
+  .no-print,
+  header.no-print {
+    display: none !important;
+    visibility: hidden !important;
+  }
+}
+`}</style>
+      </div>
+    </>
   );
 }
 

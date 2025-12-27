@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { CVFormContainer } from "@/components/cv-form/CVFormContainer";
 import type { CVFormData } from "@/components/cv-form/types";
 import { resumeAPI, type Resume } from "@/lib/api";
+import { SEO } from "@/components/SEO";
 
 const DEFAULT_SECTION_ORDER = [
   "summary",
@@ -180,7 +181,16 @@ const CreateResume = () => {
     );
   }
 
-  return <CVFormContainer initialData={initialData} editId={editId} />;
+  return (
+    <>
+      <SEO
+        title="Create Resume - 123Resume"
+        description="Build your professional resume with our easy-to-use form. Multiple templates available."
+        noindex={true}
+      />
+      <CVFormContainer initialData={initialData} editId={editId} />
+    </>
+  );
 };
 
 export default CreateResume;
