@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface SEOProps {
   title?: string;
@@ -29,6 +30,7 @@ export const SEO = ({
   modifiedTime,
 }: SEOProps) => {
   const location = useLocation();
+  const { language } = useLanguage();
   const currentUrl = url || (typeof window !== 'undefined' ? window.location.href : '');
 
   useEffect(() => {
@@ -59,7 +61,10 @@ export const SEO = ({
     updateMetaTag('og:image', image, true);
     updateMetaTag('og:url', currentUrl, true);
     updateMetaTag('og:site_name', '123Resume', true);
-    updateMetaTag('og:locale', 'en_US', true);
+    // Update og:locale based on current language
+    updateMetaTag('og:locale', language === 'de' ? 'de_DE' : 'en_US', true);
+    // Add alternate locales for both languages
+    updateMetaTag('og:locale:alternate', language === 'de' ? 'en_US' : 'de_DE', true);
 
     // Twitter Card tags
     updateMetaTag('twitter:card', 'summary_large_image');
@@ -76,6 +81,24 @@ export const SEO = ({
     }
     canonical.setAttribute('href', currentUrl);
 
+    // Hreflang tags for multi-language support (German/English)
+    // Since we use client-side language switching, same URL serves both languages
+    const updateHreflangTag = (lang: string, href: string) => {
+      let hreflang = document.querySelector(`link[rel="alternate"][hreflang="${lang}"]`) as HTMLLinkElement;
+      if (!hreflang) {
+        hreflang = document.createElement('link');
+        hreflang.setAttribute('rel', 'alternate');
+        hreflang.setAttribute('hreflang', lang);
+        document.head.appendChild(hreflang);
+      }
+      hreflang.setAttribute('href', href);
+    };
+
+    // Add hreflang tags for English, German, and x-default (fallback)
+    updateHreflangTag('en', currentUrl);
+    updateHreflangTag('de', currentUrl);
+    updateHreflangTag('x-default', currentUrl); // Default/fallback language
+
     // Robots meta tag
     if (noindex) {
       updateMetaTag('robots', 'noindex, nofollow');
@@ -83,9 +106,9 @@ export const SEO = ({
       updateMetaTag('robots', 'index, follow');
     }
 
-    // Language attribute
+    // Language attribute - update based on current language
     const html = document.documentElement;
-    html.setAttribute('lang', 'en');
+    html.setAttribute('lang', language);
 
     // Article-specific meta tags
     if (type === 'article') {
@@ -141,7 +164,7 @@ export const SEO = ({
       }
       structuredDataScript.textContent = JSON.stringify(defaultStructuredData);
     }
-  }, [title, description, keywords, image, currentUrl, type, noindex, location.pathname, structuredData, author, publishedTime, modifiedTime]);
+  }, [title, description, keywords, image, currentUrl, type, noindex, location.pathname, structuredData, author, publishedTime, modifiedTime, language]);
 
   return null;
 };
