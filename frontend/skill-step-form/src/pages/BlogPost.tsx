@@ -195,6 +195,11 @@ const BlogPost = () => {
         structuredData={articleStructuredData}
         publishedTime={post.publishedAt || post.createdAt}
         modifiedTime={post.updatedAt || post.publishedAt || post.createdAt}
+        breadcrumbs={[
+          { name: 'Home', url: 'https://123resume.de/' },
+          { name: 'Blog', url: 'https://123resume.de/blog' },
+          { name: post.title, url: postUrl },
+        ]}
       />
       <div className="min-h-screen bg-background">
       {/* Navigation */}

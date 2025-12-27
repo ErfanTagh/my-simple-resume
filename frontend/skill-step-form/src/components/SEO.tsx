@@ -14,6 +14,7 @@ interface SEOProps {
   author?: string;
   publishedTime?: string;
   modifiedTime?: string;
+  breadcrumbs?: Array<{ name: string; url: string }>;
 }
 
 export const SEO = ({
@@ -28,10 +29,69 @@ export const SEO = ({
   author,
   publishedTime,
   modifiedTime,
+  breadcrumbs,
 }: SEOProps) => {
   const location = useLocation();
   const { language } = useLanguage();
   const currentUrl = url || (typeof window !== 'undefined' ? window.location.href : '');
+  
+  // Generate breadcrumbs from pathname if not provided
+  const generateBreadcrumbsFromPath = (pathname: string): Array<{ name: string; url: string }> => {
+    const baseUrl = 'https://123resume.de';
+    const crumbs: Array<{ name: string; url: string }> = [
+      { name: 'Home', url: `${baseUrl}/` },
+    ];
+
+    // Skip breadcrumbs for private pages (they have noindex anyway)
+    if (noindex) {
+      return crumbs;
+    }
+
+    const pathParts = pathname.split('/').filter(Boolean);
+    
+    if (pathParts.length === 0) {
+      return crumbs;
+    }
+
+    // Map path segments to friendly names
+    const pathMap: Record<string, string> = {
+      'blog': 'Blog',
+      'templates': 'Templates',
+      'pricing': 'Pricing',
+      'about': 'About',
+      'contact': 'Contact',
+      'careers': 'Careers',
+      'privacy': 'Privacy Policy',
+      'terms': 'Terms of Service',
+      'data-protection': 'Data Protection',
+      'cookies': 'Cookie Policy',
+      'resumes': 'My Resumes',
+      'create': 'Create Resume',
+      'resume': 'Resume',
+    };
+
+    let currentPath = '';
+    pathParts.forEach((part, index) => {
+      currentPath += `/${part}`;
+      // For dynamic routes like /blog/:id or /resume/:id, use the last part as the name
+      if (index === pathParts.length - 1 && (part.match(/^[a-f0-9-]{24,}$/i) || part.length > 20)) {
+        // It's likely an ID, use a generic name
+        const parentPath = pathParts[index - 1];
+        if (parentPath === 'blog') {
+          crumbs.push({ name: 'Blog Post', url: `${baseUrl}${currentPath}` });
+        } else if (parentPath === 'resume' || pathParts[0] === 'resume') {
+          crumbs.push({ name: 'Resume', url: `${baseUrl}${currentPath}` });
+        }
+      } else {
+        const friendlyName = pathMap[part] || part.charAt(0).toUpperCase() + part.slice(1);
+        crumbs.push({ name: friendlyName, url: `${baseUrl}${currentPath}` });
+      }
+    });
+
+    return crumbs;
+  };
+
+  const finalBreadcrumbs = breadcrumbs || generateBreadcrumbsFromPath(location.pathname);
 
   useEffect(() => {
     // Update document title
@@ -117,6 +177,18 @@ export const SEO = ({
       if (modifiedTime) updateMetaTag('article:modified_time', modifiedTime, true);
     }
 
+    // BreadcrumbList structured data
+    const breadcrumbListData = finalBreadcrumbs.length > 1 ? {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: finalBreadcrumbs.map((crumb, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: crumb.name,
+        item: crumb.url,
+      })),
+    } : null;
+
     // Structured Data (JSON-LD)
     let structuredDataScript = document.querySelector('script[type="application/ld+json"]');
     if (structuredData) {
@@ -126,8 +198,20 @@ export const SEO = ({
         document.head.appendChild(structuredDataScript);
       }
       structuredDataScript.textContent = JSON.stringify(structuredData);
+      
+      // Add breadcrumbs separately if custom structuredData is provided
+      if (breadcrumbListData) {
+        let breadcrumbScript = document.querySelector('script[type="application/ld+json"][data-breadcrumb]');
+        if (!breadcrumbScript) {
+          breadcrumbScript = document.createElement('script');
+          breadcrumbScript.setAttribute('type', 'application/ld+json');
+          breadcrumbScript.setAttribute('data-breadcrumb', 'true');
+          document.head.appendChild(breadcrumbScript);
+        }
+        breadcrumbScript.textContent = JSON.stringify(breadcrumbListData);
+      }
     } else {
-      // Default Organization and Website structured data
+      // Default Organization, Website, SoftwareApplication, and Service structured data
       const defaultStructuredData = {
         '@context': 'https://schema.org',
         '@graph': [
@@ -154,6 +238,67 @@ export const SEO = ({
               '@id': 'https://123resume.de/#organization',
             },
           },
+          {
+            '@type': 'SoftwareApplication',
+            '@id': 'https://123resume.de/#software',
+            name: '123Resume',
+            applicationCategory: 'WebApplication',
+            operatingSystem: 'Web',
+            browserRequirements: 'Requires JavaScript. Requires HTML5.',
+            softwareVersion: '1.0',
+            description: 'Professional CV and resume builder with multiple ATS-friendly templates. Create, edit, and export your resume as PDF.',
+            url: 'https://123resume.de',
+            offers: {
+              '@type': 'Offer',
+              price: '0',
+              priceCurrency: 'USD',
+              availability: 'https://schema.org/InStock',
+            },
+            featureList: [
+              'Multiple resume templates',
+              'ATS-friendly format',
+              'PDF export',
+              'Multi-step form',
+              'Real-time preview',
+              'Free to use',
+            ],
+            screenshot: 'https://123resume.de/resume-icon.svg',
+            applicationSubCategory: 'Productivity Software',
+            creator: {
+              '@id': 'https://123resume.de/#organization',
+            },
+          },
+          {
+            '@type': 'Service',
+            '@id': 'https://123resume.de/#service',
+            serviceType: 'Resume Builder',
+            name: 'Professional Resume Building Service',
+            description: 'Create professional, ATS-friendly resumes and CVs with our easy-to-use online builder. Multiple templates available with PDF export.',
+            provider: {
+              '@id': 'https://123resume.de/#organization',
+            },
+            areaServed: {
+              '@type': 'Place',
+              name: 'Worldwide',
+            },
+            serviceOutput: {
+              '@type': 'CreativeWork',
+              name: 'Professional Resume',
+              fileFormat: 'application/pdf',
+            },
+            offers: {
+              '@type': 'Offer',
+              price: '0',
+              priceCurrency: 'USD',
+              availability: 'https://schema.org/InStock',
+              description: 'Free resume builder with unlimited templates and PDF export',
+            },
+            category: 'Career Services',
+            audience: {
+              '@type': 'Audience',
+              audienceType: 'Job Seekers',
+            },
+          },
         ],
       };
 
@@ -162,9 +307,19 @@ export const SEO = ({
         structuredDataScript.setAttribute('type', 'application/ld+json');
         document.head.appendChild(structuredDataScript);
       }
-      structuredDataScript.textContent = JSON.stringify(defaultStructuredData);
+      
+      // Combine default structured data with breadcrumbs if available
+      const combinedData = {
+        ...defaultStructuredData,
+        '@graph': [
+          ...defaultStructuredData['@graph'],
+          ...(breadcrumbListData ? [breadcrumbListData] : []),
+        ],
+      };
+      
+      structuredDataScript.textContent = JSON.stringify(combinedData);
     }
-  }, [title, description, keywords, image, currentUrl, type, noindex, location.pathname, structuredData, author, publishedTime, modifiedTime, language]);
+  }, [title, description, keywords, image, currentUrl, type, noindex, location.pathname, structuredData, author, publishedTime, modifiedTime, language, finalBreadcrumbs]);
 
   return null;
 };
