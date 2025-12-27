@@ -6,6 +6,7 @@ from .parse_views import parse_resume
 from .health_views import health_check
 from .pdf_views import generate_resume_pdf
 from .blog_views import blog_post_list, blog_post_detail
+from .sitemap_views import generate_sitemap
 
 __all__ = [
     'resume_list',
@@ -15,5 +16,6 @@ __all__ = [
     'generate_resume_pdf',
     'blog_post_list',
     'blog_post_detail',
+    'generate_sitemap',
 ]
 

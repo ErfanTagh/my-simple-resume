@@ -31,5 +31,8 @@ urlpatterns = [
     # Blog post endpoints
     path('blog-posts/', views.blog_post_list, name='blog-post-list'),
     path('blog-posts/<str:post_id>/', views.blog_post_detail, name='blog-post-detail'),
+    
+    # Sitemap endpoint
+    path('sitemap.xml', views.generate_sitemap, name='sitemap'),
 ]
 
