@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { resumeAPI, Resume } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { ArrowLeft, AlertCircle, Printer, Download } from 'lucide-react';
+import { ArrowLeft, AlertCircle, Download } from 'lucide-react';
 import { downloadResumePDFFromElement } from '@/lib/resumePdfUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ModernTemplate } from '@/components/cv-form/templates/ModernTemplate';
@@ -86,11 +86,6 @@ export default function ResumeView() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handlePrint = () => {
-    // Open browser print dialog - users can choose to print or save as PDF
-    window.print();
   };
 
   const handleDownloadPDF = async () => {
@@ -196,10 +191,6 @@ export default function ResumeView() {
             <Button variant="outline" onClick={() => navigate('/resumes')}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               {t('common.back')}
-            </Button>
-            <Button onClick={handlePrint} variant="outline">
-              <Printer className="mr-2 h-4 w-4" />
-              {t('common.print')}
             </Button>
             <Button onClick={handleDownloadPDF}>
               <Download className="mr-2 h-4 w-4" />
