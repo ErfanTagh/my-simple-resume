@@ -29,7 +29,7 @@ export const Header = () => {
         <div className="flex items-center justify-between gap-2 sm:gap-4 min-w-0">
           <Link to="/" className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-shrink-0">
             <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-xl bg-primary flex items-center justify-center flex-shrink-0">
-              <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-primary-foreground" />
+              <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-white" />
             </div>
             <span className="text-base sm:text-lg md:text-xl font-bold text-foreground whitespace-nowrap truncate">123Resume</span>
           </Link>

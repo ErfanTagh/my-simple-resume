@@ -405,7 +405,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
             <div className="w-24 h-24 md:w-28 md:h-28">
               <img 
                 src={personalInfo.profileImage} 
-                alt={`${fullName} profile picture`}
+                alt={`Professional profile photo of ${personalInfo.firstName} ${personalInfo.lastName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
                 className="w-full h-full object-cover rounded-md border-2"
                 style={{ borderColor: ACCENT_COLOR }}
                 loading="lazy"

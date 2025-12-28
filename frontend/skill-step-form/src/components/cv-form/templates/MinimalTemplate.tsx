@@ -279,7 +279,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
               <div className="w-20 h-20">
                 <img 
                   src={personalInfo.profileImage} 
-                  alt={`${personalInfo.firstName} ${personalInfo.lastName} profile picture`}
+                  alt={`Professional profile photo of ${personalInfo.firstName} ${personalInfo.lastName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
                   className="w-full h-full object-cover rounded-sm"
                   loading="lazy"
                 />

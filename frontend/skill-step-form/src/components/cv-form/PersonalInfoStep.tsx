@@ -155,7 +155,7 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
             <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-border">
               <img
                 src={imagePreview}
-                alt="Profile preview"
+                alt={`Profile photo preview for ${form.getValues("personalInfo.firstName") || ""} ${form.getValues("personalInfo.lastName") || ""}${form.getValues("personalInfo.professionalTitle") ? ` - ${form.getValues("personalInfo.professionalTitle")}` : ""}`}
                 className="w-full h-full object-cover"
               />
               <Button

@@ -322,7 +322,7 @@ function generateResumeHTML(resume: Resume): string {
             <h1 class="name"><strong>${escapeHtml(personalInfo.firstName || '')} ${escapeHtml(personalInfo.lastName || '')}</strong></h1>
             ${personalInfo.professionalTitle ? `<h2 class="title">${escapeHtml(personalInfo.professionalTitle)}</h2>` : ''}
           </div>
-          ${personalInfo.profileImage ? `<img src="${escapeHtml(personalInfo.profileImage)}" alt="${escapeHtml(personalInfo.firstName)} ${escapeHtml(personalInfo.lastName)}" class="profile-image" />` : ''}
+          ${personalInfo.profileImage ? `<img src="${escapeHtml(personalInfo.profileImage)}" alt="Professional profile photo of ${escapeHtml(personalInfo.firstName)} ${escapeHtml(personalInfo.lastName)}${personalInfo.professionalTitle ? `, ${escapeHtml(personalInfo.professionalTitle)}` : ''}${personalInfo.location ? ` from ${escapeHtml(personalInfo.location)}` : ''}" class="profile-image" />` : ''}
         </div>
       </header>
       <main class="resume-main" style="width: 100%; max-width: 100%; box-sizing: border-box; overflow: visible;">

@@ -9,6 +9,7 @@ export interface BlogPost {
   iconColor: string;
   image?: string;
   content: string;
+  tags?: string[]; // Array of tag strings for better content organization and SEO
 }
 
 type BlogPostsByLanguage = {
@@ -28,6 +29,7 @@ export const blogPostsByLanguage: BlogPostsByLanguage = {
       gradient: "from-rose-500/20 via-orange-500/10 to-amber-500/5",
       iconColor: "text-rose-500",
       image: "/blog-resume-mistakes.png",
+      tags: ["Resume Tips", "Job Search", "ATS", "Common Mistakes"],
       content: `
 ## Introduction
 
@@ -88,6 +90,7 @@ Avoiding these common mistakes will significantly improve your chances of landin
       gradient: "from-blue-500/20 via-cyan-500/10 to-teal-500/5",
       iconColor: "text-blue-500",
       image: "/ats.png",
+      tags: ["ATS", "Resume Optimization", "Keywords", "Formatting"],
       content: `
 ## What is an ATS?
 
@@ -146,6 +149,7 @@ Remember that your resume ultimately needs to impress humans too. Find the balan
       gradient: "from-emerald-500/20 via-green-500/10 to-lime-500/5",
       iconColor: "text-emerald-500",
       image: "/quatifying.png",
+      tags: ["Career Growth", "Resume Writing", "Achievements", "Metrics"],
       content: `
 ## Why Numbers Matter
 
@@ -272,6 +276,7 @@ Don't suggest that you want remote work for convenience or to avoid commuting. F
       gradient: "from-amber-500/20 via-yellow-500/10 to-orange-500/5",
       iconColor: "text-amber-500",
       image: "/career-change.png",
+      tags: ["Career Change", "Resume Tips", "Transition", "Skills"],
       content: `
 ## Making a Successful Career Pivot
 
@@ -343,6 +348,7 @@ Career changers should always include a cover letter. It's your opportunity to t
       gradient: "from-pink-500/20 via-rose-500/10 to-red-500/5",
       iconColor: "text-pink-500",
       image: "/cover-letter.png",
+      tags: ["Cover Letter", "Job Search", "Application", "Resume Tips"],
       content: `
 ## The Great Debate
 

@@ -247,12 +247,12 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
         {personalInfo.profileImage && (
           <div className="flex justify-center mb-4">
             <div className="w-28 h-28">
-              <img 
-                src={personalInfo.profileImage} 
-                alt={`${personalInfo.firstName} ${personalInfo.lastName} profile picture`}
-                className="w-full h-full object-cover rounded-full border-2 border-foreground"
-                loading="lazy"
-              />
+                <img 
+                  src={personalInfo.profileImage} 
+                  alt={`Professional profile photo of ${personalInfo.firstName} ${personalInfo.lastName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
+                  className="w-full h-full object-cover rounded-full border-2 border-foreground"
+                  loading="lazy"
+                />
             </div>
           </div>
         )}

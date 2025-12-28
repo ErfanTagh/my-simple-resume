@@ -357,7 +357,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
               <div className="w-16 h-16 overflow-hidden rounded-sm border border-foreground">
                 <img 
                   src={personalInfo.profileImage} 
-                  alt={`${fullName} profile picture`}
+                  alt={`Professional profile photo of ${fullName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
                   className="w-full h-full object-cover"
                   loading="lazy"
                 />

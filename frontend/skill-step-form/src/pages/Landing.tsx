@@ -245,16 +245,18 @@ const Landing = () => {
                     <div className="aspect-[16/9] relative overflow-hidden">
                       <img 
                         src={post.image} 
-                        alt={post.title}
+                        alt={`Featured image for blog post: ${post.title}${post.category ? ` about ${post.category}` : ''} on 123Resume`}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         onError={(e) => {
                           // Image failed to load, fallback to gradient design
                         }}
                       />
                       {/* Watermark */}
-                      <div className="absolute bottom-2 right-2 flex items-center gap-1.5 bg-background/80 backdrop-blur-sm px-2 py-1 rounded-md shadow-sm">
-                        <FileText className="w-3 h-3 text-primary" />
-                        <span className="text-xs font-semibold text-foreground">123Resume</span>
+                      <div className="absolute bottom-2 right-2 flex items-center gap-1.5 bg-white px-1.5 py-1 rounded-md shadow-sm">
+                        <div className="w-6 h-6 rounded-md bg-primary flex items-center justify-center">
+                          <FileText className="w-3 h-3 text-white" />
+                        </div>
+                        <span className="text-xs font-bold text-foreground">123Resume</span>
                       </div>
                     </div>
                   ) : (

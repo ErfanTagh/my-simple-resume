@@ -21,6 +21,7 @@ const BlogPost = () => {
   const { language, t } = useLanguage();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
   
   // Scroll to top when component mounts or id changes
   useEffect(() => {
@@ -48,22 +49,7 @@ const BlogPost = () => {
     fetchPost();
   }, [id, language]);
   
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-muted-foreground">Loading blog post...</p>
-        </div>
-      </div>
-    );
-  }
-  
-  if (!post) {
-    return <Navigate to="/blog" replace />;
-  }
-
   // Get all posts for navigation (try API first, fallback to static)
-  const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
   useEffect(() => {
     const fetchAllPosts = async () => {
       try {
@@ -79,9 +65,28 @@ const BlogPost = () => {
     fetchAllPosts();
   }, [language]);
   
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">Loading blog post...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  if (!post) {
+    return <Navigate to="/blog" replace />;
+  }
+  
   const currentIndex = allPosts.findIndex(p => p.id === id);
   const prevPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
   const nextPost = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null;
+  
+  // Get related articles from the same category (excluding current post)
+  const relatedArticles = allPosts
+    .filter(p => p.id !== id && p.category === post.category)
+    .slice(0, 3);
 
   // Simple markdown-like rendering
   const renderContent = (content: string) => {
@@ -207,7 +212,7 @@ const BlogPost = () => {
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary flex items-center justify-center">
-              <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
+              <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
             <span className="text-lg sm:text-xl font-bold text-foreground">{t('common.appName')}</span>
           </Link>
@@ -236,13 +241,7 @@ const BlogPost = () => {
             {t('common.back')}
           </Link>
           
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-xs font-semibold uppercase tracking-wider text-primary bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20 hover:bg-primary/15 transition-colors">
-              {post.category}
-            </span>
-          </div>
-          
-          <h1 className="text-3xl sm:text-5xl font-bold text-foreground mb-6 leading-tight">
+          <h1 className="text-3xl sm:text-5xl font-bold text-primary mb-6 leading-tight">
             {post.title}
           </h1>
           
@@ -279,13 +278,15 @@ const BlogPost = () => {
             <div className="aspect-[21/9] rounded-2xl overflow-hidden border border-border shadow-lg relative">
               <img 
                 src={post.image} 
-                alt={post.title}
+                alt={`Featured image for blog post: ${post.title}${post.category ? ` about ${post.category}` : ''} on 123Resume`}
                 className="w-full h-full object-cover"
               />
               {/* Watermark */}
-              <div className="absolute bottom-3 right-3 flex items-center gap-2 bg-background/90 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-md">
-                <FileText className="w-4 h-4 text-primary" />
-                <span className="text-sm font-semibold text-foreground">123Resume</span>
+              <div className="absolute bottom-3 right-3 flex items-center gap-2 bg-white px-2 py-1.5 rounded-lg shadow-md">
+                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+                  <FileText className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-sm font-bold text-foreground">123Resume</span>
               </div>
             </div>
           ) : (
@@ -311,6 +312,20 @@ const BlogPost = () => {
           <div className="prose prose-lg max-w-none font-sans" style={{ fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }}>
             {renderContent(post.content)}
           </div>
+          
+          {/* Tags at the end of article */}
+          {post.tags && post.tags.length > 0 && (
+            <div className="mt-12 pt-8 border-t border-border">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-sm font-semibold text-foreground mr-2">Tags:</span>
+                {post.tags.map((tag, index) => (
+                  <span key={index} className="text-sm text-muted-foreground bg-muted px-3 py-1.5 rounded-md border border-border hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-colors cursor-pointer">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </article>
 
@@ -333,6 +348,65 @@ const BlogPost = () => {
           </div>
         </div>
       </section>
+
+      {/* Related Articles Section */}
+      {relatedArticles.length > 0 && (
+        <section className="px-4 sm:px-6 pb-12">
+          <div className="container mx-auto max-w-6xl">
+            <div className="mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
+                Related Articles
+              </h2>
+              <p className="text-muted-foreground">
+                More articles about {post.category}
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {relatedArticles.map((relatedPost) => {
+                const hasImage = relatedPost.image && typeof relatedPost.image === 'string';
+                return (
+                  <Link to={`/blog/${relatedPost.id}`} key={relatedPost.id} className="group">
+                    <article className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg hover:border-primary/30 transition-all duration-300 h-full">
+                      {hasImage && (
+                        <div className="aspect-[16/9] relative overflow-hidden">
+                          <img 
+                            src={relatedPost.image} 
+                            alt={`Featured image for blog post: ${relatedPost.title}${relatedPost.category ? ` about ${relatedPost.category}` : ''} on 123Resume`}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                      )}
+                      <div className="p-4 sm:p-5">
+                        <div className="flex items-center gap-2 mb-2 flex-wrap">
+                          <span className="text-xs font-semibold uppercase tracking-wider text-primary bg-primary/10 px-2 py-1 rounded border border-primary/20">
+                            {relatedPost.category}
+                          </span>
+                          {relatedPost.tags && relatedPost.tags.length > 0 && (
+                            <div className="flex items-center gap-1 flex-wrap">
+                              {relatedPost.tags.slice(0, 2).map((tag, index) => (
+                                <span key={index} className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          <span className="text-xs text-muted-foreground ml-auto">{relatedPost.readTime}</span>
+                        </div>
+                        <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2">
+                          {relatedPost.title}
+                        </h3>
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {relatedPost.excerpt}
+                        </p>
+                      </div>
+                    </article>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Navigation Between Posts */}
       <section className="px-4 sm:px-6 pb-16">
@@ -374,7 +448,7 @@ const BlogPost = () => {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <Link to="/" className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <FileText className="w-4 h-4 text-primary-foreground" />
+                <FileText className="w-4 h-4 text-white" />
               </div>
               <span className="font-semibold text-foreground">123Resume</span>
             </Link>
