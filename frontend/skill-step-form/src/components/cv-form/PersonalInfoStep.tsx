@@ -9,6 +9,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { ResumeUpload } from "./ResumeUpload";
 import { Separator } from "@/components/ui/separator";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { CityAutocomplete } from "@/components/ui/city-autocomplete";
 
 interface PersonalInfoStepProps {
   form: UseFormReturn<CVFormData>;

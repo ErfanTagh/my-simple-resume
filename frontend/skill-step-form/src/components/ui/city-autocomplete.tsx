@@ -10,12 +10,12 @@ interface CityAutocompleteProps {
   id?: string;
 }
 
-export function CityAutocomplete({
+export const CityAutocomplete: React.FC<CityAutocompleteProps> = ({
   value = "",
   onChange,
   placeholder = "Type a city name...",
   id,
-}: CityAutocompleteProps) {
+}) => {
   const [open, setOpen] = React.useState(false);
   const [inputValue, setInputValue] = React.useState(value);
   const [suggestions, setSuggestions] = React.useState<City[]>([]);
@@ -121,5 +121,5 @@ export function CityAutocomplete({
       )}
     </div>
   );
-}
+};
 
