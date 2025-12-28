@@ -1,4 +1,4 @@
-import { UseFormReturn, useFieldArray } from "react-hook-form";
+import { UseFormReturn, useFieldArray, Controller } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -220,10 +220,17 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
         
         <div className="space-y-2">
           <Label htmlFor="location">{t('resume.fields.location')}</Label>
-          <Input
-            id="location"
-            {...form.register("personalInfo.location")}
-            placeholder={t('resume.placeholders.location')}
+          <Controller
+            control={form.control}
+            name="personalInfo.location"
+            render={({ field }) => (
+              <CityAutocomplete
+                id="location"
+                value={field.value || ""}
+                onChange={field.onChange}
+                placeholder={t('resume.placeholders.location')}
+              />
+            )}
           />
         </div>
       </div>

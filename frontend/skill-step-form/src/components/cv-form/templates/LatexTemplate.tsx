@@ -109,6 +109,18 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                           {proj.description}
                         </p>
                       )}
+                      {proj.highlights && proj.highlights.length > 0 && (
+                        <ul className="text-foreground space-y-0.5 mt-0.5 mb-0.5 list-none pl-0">
+                          {proj.highlights.map((highlight, i) => (
+                            highlight.highlight && (
+                              <li key={i} className="flex gap-1">
+                                <span className="text-foreground flex-shrink-0 text-[10px]">•</span>
+                                <span className="flex-1 break-words text-[10px] leading-snug">{highlight.highlight}</span>
+                              </li>
+                            )
+                          ))}
+                        </ul>
+                      )}
                       {technologies && (
                         <p className="text-muted-foreground text-[8px] font-mono">
                           {technologies}
@@ -145,12 +157,22 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start gap-2 mb-0.5">
                         <h3 className="font-bold text-foreground text-[10px]">{edu.degree || ''}</h3>
-                        <span className="text-[10px] font-bold text-foreground flex-shrink-0">
-                          {edu.institution || ''}
-                        </span>
+                        <div className="text-right">
+                          <span className="text-[10px] font-bold text-foreground flex-shrink-0">
+                            {edu.institution || ''}
+                          </span>
+                          {edu.location && (
+                            <span className="text-[8px] text-muted-foreground block">{edu.location}</span>
+                          )}
+                        </div>
                       </div>
                       {edu.field && (
                         <p className="text-foreground leading-snug break-words text-[10px]">{edu.field}</p>
+                      )}
+                      {edu.keyCourses && edu.keyCourses.length > 0 && (
+                        <p className="text-muted-foreground text-[8px] mt-0.5">
+                          Key Courses: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(', ')}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -194,9 +216,14 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start gap-2 mb-0.5">
                         <h3 className="font-bold text-foreground text-[10px]">{exp.position || ''}</h3>
-                        <span className="text-[10px] font-bold text-foreground flex-shrink-0">
-                          {exp.company || ''}
-                        </span>
+                        <div className="text-right">
+                          <span className="text-[10px] font-bold text-foreground flex-shrink-0">
+                            {exp.company || ''}
+                          </span>
+                          {exp.location && (
+                            <span className="text-[8px] text-muted-foreground block">{exp.location}</span>
+                          )}
+                        </div>
                       </div>
                       {responsibilities.length > 0 && (
                         <ul className="text-foreground space-y-0.5 mt-0.5 mb-0.5 list-none pl-0">
@@ -216,6 +243,11 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                             </span>
                           ))}
                         </div>
+                      )}
+                      {exp.competencies && exp.competencies.length > 0 && (
+                        <p className="text-muted-foreground text-[8px] mt-0.5">
+                          Competencies: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(', ')}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -254,6 +286,11 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                       </div>
                       {cert.credentialId && (
                         <p className="text-muted-foreground text-[8px]">ID: {cert.credentialId}</p>
+                      )}
+                      {cert.url && (
+                        <a href={cert.url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:underline text-[8px] block truncate max-w-[200px]">
+                          {cert.url.replace(/^https?:\/\/(www\.)?/, '')}
+                        </a>
                       )}
                     </div>
                   </div>

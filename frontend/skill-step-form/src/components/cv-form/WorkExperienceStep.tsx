@@ -8,6 +8,7 @@ import { MonthPicker } from "@/components/ui/month-picker";
 import { Plus, Trash2 } from "lucide-react";
 import { CVFormData } from "./types";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { CityAutocomplete } from "@/components/ui/city-autocomplete";
 
 interface WorkExperienceStepProps {
   form: UseFormReturn<CVFormData>;
@@ -50,9 +51,17 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
 
       <div className="space-y-2">
         <Label htmlFor={`workExperience.${index}.location`}>{t('resume.fields.location')}</Label>
-        <Input
-          {...form.register(`workExperience.${index}.location`)}
-          placeholder={t('resume.placeholders.jobLocation')}
+        <Controller
+          control={form.control}
+          name={`workExperience.${index}.location`}
+          render={({ field }) => (
+            <CityAutocomplete
+              id={`workExperience.${index}.location`}
+              value={field.value || ""}
+              onChange={field.onChange}
+              placeholder={t('resume.placeholders.jobLocation')}
+            />
+          )}
         />
       </div>
 

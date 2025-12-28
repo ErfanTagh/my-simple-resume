@@ -37,7 +37,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                     <div key={index} className="relative">
                       <div className="absolute -left-[26px] w-3 h-3 rounded-full bg-primary"></div>
                       <h3 className="text-lg font-bold text-foreground">{exp.position}</h3>
-                      <p className="text-base font-semibold text-primary">{exp.company}</p>
+                      <p className="text-base font-semibold text-primary">{exp.company}{exp.location && ` • ${exp.location}`}</p>
                       {(exp.startDate || exp.endDate) && (
                         <p className="text-xs text-muted-foreground mt-1">
                           {formatDateRange(exp.startDate, exp.endDate)}
@@ -63,6 +63,22 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                           }
                         </ul>
                       )}
+                      {exp.technologies && exp.technologies.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {exp.technologies.map((tech, i) => (
+                            tech.technology && (
+                              <span key={i} className="px-2 py-0.5 bg-primary/20 text-primary text-xs rounded">
+                                {typeof tech === 'string' ? tech : tech.technology}
+                              </span>
+                            )
+                          ))}
+                        </div>
+                      )}
+                      {exp.competencies && exp.competencies.length > 0 && (
+                        <p className="text-xs text-muted-foreground mt-2">
+                          Competencies: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(", ")}
+                        </p>
+                      )}
                     </div>
                   )
                 ))}
@@ -82,8 +98,13 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                     <div key={index} className="relative">
                       <div className="absolute -left-[26px] w-3 h-3 rounded-full bg-primary"></div>
                       <h3 className="text-lg font-bold text-foreground">{edu.degree}</h3>
-                      <p className="text-sm text-muted-foreground">{edu.institution}</p>
+                      <p className="text-sm text-muted-foreground">{edu.institution}{edu.location && ` • ${edu.location}`}</p>
                       {edu.field && <p className="text-sm text-muted-foreground italic">{edu.field}</p>}
+                      {edu.keyCourses && edu.keyCourses.length > 0 && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Key Courses: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(", ")}
+                        </p>
+                      )}
                     </div>
                   )
                 ))}
@@ -102,7 +123,14 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                   proj.name && (
                     <div key={index} className="relative">
                       <div className="absolute -left-[26px] w-3 h-3 rounded-full bg-primary"></div>
-                      <h3 className="text-lg font-bold text-foreground">{proj.name}</h3>
+                      <div className="flex justify-between items-start">
+                        <h3 className="text-lg font-bold text-foreground">{proj.name}</h3>
+                        {(proj.startDate || proj.endDate) && (
+                          <span className="text-xs text-muted-foreground">
+                            {formatDateRange(proj.startDate, proj.endDate)}
+                          </span>
+                        )}
+                      </div>
                       {proj.description && (
                         <ul className="text-sm text-muted-foreground space-y-1 mt-1">
                           {proj.description.split('\n').filter(line => line.trim()).map((line, i) => (
@@ -110,6 +138,18 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                               <span className="text-primary font-bold">•</span>
                               <span className="flex-1">{line.trim()}</span>
                             </li>
+                          ))}
+                        </ul>
+                      )}
+                      {proj.highlights && proj.highlights.length > 0 && (
+                        <ul className="text-sm text-muted-foreground space-y-1 mt-1">
+                          {proj.highlights.map((highlight, i) => (
+                            highlight.highlight && (
+                              <li key={i} className="flex gap-2">
+                                <span className="text-primary font-bold">•</span>
+                                <span className="flex-1">{highlight.highlight}</span>
+                              </li>
+                            )
                           ))}
                         </ul>
                       )}
@@ -123,6 +163,11 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                             )
                           ))}
                         </div>
+                      )}
+                      {proj.link && (
+                        <a href={proj.link} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline mt-2 block">
+                          {proj.link.replace(/^https?:\/\/(www\.)?/, '')}
+                        </a>
                       )}
                     </div>
                   )
@@ -144,6 +189,19 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                       <div className="absolute -left-[26px] w-3 h-3 rounded-full bg-primary"></div>
                       <h3 className="font-bold text-foreground">{cert.name}</h3>
                       <p className="text-sm text-muted-foreground">{cert.organization}</p>
+                      {(cert.issueDate || cert.expirationDate) && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {cert.issueDate} {cert.expirationDate && `- ${cert.expirationDate}`}
+                        </p>
+                      )}
+                      {cert.credentialId && (
+                        <p className="text-xs text-muted-foreground">ID: {cert.credentialId}</p>
+                      )}
+                      {cert.url && (
+                        <a href={cert.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline mt-1 block">
+                          {cert.url.replace(/^https?:\/\/(www\.)?/, '')}
+                        </a>
+                      )}
                     </div>
                   )
                 ))}

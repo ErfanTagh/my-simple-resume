@@ -34,7 +34,10 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
                   <div key={index}>
                     <h3 className="font-semibold text-foreground">{exp.position}</h3>
                     <div className="flex justify-between items-center text-sm">
-                      <span className="italic text-muted-foreground">{exp.company}</span>
+                      <div>
+                        <span className="italic text-muted-foreground">{exp.company}</span>
+                        {exp.location && <span className="text-xs text-muted-foreground ml-2">• {exp.location}</span>}
+                      </div>
                       {(exp.startDate || exp.endDate) && (
                         <span className="text-xs text-muted-foreground">
                           {formatDateRange(exp.startDate, exp.endDate)}
@@ -61,6 +64,16 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
                         }
                       </ul>
                     )}
+                    {exp.technologies && exp.technologies.length > 0 && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Technologies: {exp.technologies.map(t => typeof t === 'string' ? t : t.technology).filter(Boolean).join(", ")}
+                      </p>
+                    )}
+                    {exp.competencies && exp.competencies.length > 0 && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Competencies: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(", ")}
+                      </p>
+                    )}
                   </div>
                 )
               ))}
@@ -78,7 +91,10 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
                   <div key={index}>
                     <h3 className="font-semibold text-foreground">{edu.degree}</h3>
                     <div className="flex justify-between items-center text-sm">
-                      <span className="italic text-muted-foreground">{edu.institution}</span>
+                      <div>
+                        <span className="italic text-muted-foreground">{edu.institution}</span>
+                        {edu.location && <span className="text-xs text-muted-foreground ml-2">• {edu.location}</span>}
+                      </div>
                       {(edu.startDate || edu.endDate) && (
                         <span className="text-xs text-muted-foreground">
                           {formatDateRange(edu.startDate, edu.endDate)}
@@ -86,6 +102,11 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
                       )}
                     </div>
                     {edu.field && <p className="text-sm text-muted-foreground">{edu.field}</p>}
+                    {edu.keyCourses && edu.keyCourses.length > 0 && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Key Courses: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(", ")}
+                      </p>
+                    )}
                   </div>
                 )
               ))}
@@ -101,7 +122,14 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
               {projects.map((proj, index) => (
                 proj.name && (
                   <div key={index}>
-                    <h3 className="font-semibold text-foreground">{proj.name}</h3>
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-semibold text-foreground">{proj.name}</h3>
+                      {(proj.startDate || proj.endDate) && (
+                        <span className="text-xs text-muted-foreground">
+                          {formatDateRange(proj.startDate, proj.endDate)}
+                        </span>
+                      )}
+                    </div>
                     {proj.description && (
                       <ul className="text-sm text-foreground space-y-1 mt-1">
                         {proj.description.split('\n').filter(line => line.trim()).map((line, i) => (
@@ -112,10 +140,27 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
                         ))}
                       </ul>
                     )}
+                    {proj.highlights && proj.highlights.length > 0 && (
+                      <ul className="text-sm text-foreground space-y-1 mt-1">
+                        {proj.highlights.map((highlight, i) => (
+                          highlight.highlight && (
+                            <li key={i} className="flex gap-2">
+                              <span className="text-primary">•</span>
+                              <span className="flex-1">{highlight.highlight}</span>
+                            </li>
+                          )
+                        ))}
+                      </ul>
+                    )}
                     {proj.technologies && proj.technologies.length > 0 && (
                       <p className="text-xs text-muted-foreground mt-1">
                         {t('resume.sections.technologies')}: {proj.technologies.map(techItem => techItem.technology).filter(Boolean).join(", ")}
                       </p>
+                    )}
+                    {proj.link && (
+                      <a href={proj.link} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline mt-1 block">
+                        {proj.link.replace(/^https?:\/\/(www\.)?/, '')}
+                      </a>
                     )}
                   </div>
                 )
@@ -134,6 +179,19 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
                   <div key={index}>
                     <h3 className="font-semibold text-foreground">{cert.name}</h3>
                     <p className="text-sm text-muted-foreground">{cert.organization}</p>
+                    {(cert.issueDate || cert.expirationDate) && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {cert.issueDate} {cert.expirationDate && `- ${cert.expirationDate}`}
+                      </p>
+                    )}
+                    {cert.credentialId && (
+                      <p className="text-xs text-muted-foreground">ID: {cert.credentialId}</p>
+                    )}
+                    {cert.url && (
+                      <a href={cert.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline mt-1 block">
+                        {cert.url.replace(/^https?:\/\/(www\.)?/, '')}
+                      </a>
+                    )}
                   </div>
                 )
               ))}

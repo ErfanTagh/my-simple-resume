@@ -1,5 +1,5 @@
 import { CVFormData } from "../types";
-import { Mail, Phone, MapPin, Linkedin, Github, Globe, Calendar } from "lucide-react";
+import { Mail, Phone, MapPin, Linkedin, Github, Globe, Calendar, ExternalLink } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ModernTemplateProps {
@@ -35,6 +35,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                       <div>
                         <h3 className="font-bold text-foreground">{exp.position}</h3>
                         <p className="text-sm font-semibold text-primary">{exp.company}</p>
+                        {exp.location && <p className="text-xs text-muted-foreground">{exp.location}</p>}
                       </div>
                       {(exp.startDate || exp.endDate) && (
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -43,7 +44,29 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                         </div>
                       )}
                     </div>
-                    {exp.description && <p className="text-sm text-muted-foreground">{exp.description}</p>}
+                    {exp.description && <p className="text-sm text-muted-foreground mb-2">{exp.description}</p>}
+                    {exp.responsibilities && exp.responsibilities.length > 0 && (
+                      <ul className="text-sm text-foreground space-y-1 mb-2">
+                        {exp.responsibilities.map((resp, i) => (
+                          resp.responsibility && (
+                            <li key={i} className="flex gap-2">
+                              <span className="text-primary">•</span>
+                              <span className="flex-1">{resp.responsibility}</span>
+                            </li>
+                          )
+                        ))}
+                      </ul>
+                    )}
+                    {exp.technologies && exp.technologies.length > 0 && (
+                      <p className="text-xs text-primary mt-2">
+                        Tech: {exp.technologies.map(t => typeof t === 'string' ? t : t.technology).filter(Boolean).join(", ")}
+                      </p>
+                    )}
+                    {exp.competencies && exp.competencies.length > 0 && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Competencies: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(", ")}
+                      </p>
+                    )}
                   </div>
                 )
               ))}
@@ -63,7 +86,13 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                       <div>
                         <h3 className="font-bold text-foreground">{edu.degree}</h3>
                         <p className="text-sm text-muted-foreground">{edu.institution}</p>
+                        {edu.location && <p className="text-xs text-muted-foreground">{edu.location}</p>}
                         {edu.field && <p className="text-sm text-muted-foreground italic">{edu.field}</p>}
+                        {edu.keyCourses && edu.keyCourses.length > 0 && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Key Courses: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(", ")}
+                          </p>
+                        )}
                       </div>
                       {(edu.startDate || edu.endDate) && (
                         <span className="text-xs text-muted-foreground">{edu.startDate} - {edu.endDate || t('resume.fields.present')}</span>
@@ -84,12 +113,34 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
               {projects.map((proj, index) => (
                 proj.name && (
                   <div key={index}>
-                    <h3 className="font-bold text-foreground">{proj.name}</h3>
-                    {proj.description && <p className="text-sm text-muted-foreground">{proj.description}</p>}
+                    <div className="flex justify-between items-start mb-1">
+                      <h3 className="font-bold text-foreground">{proj.name}</h3>
+                      {(proj.startDate || proj.endDate) && (
+                        <span className="text-xs text-muted-foreground">{proj.startDate} - {proj.endDate || t('resume.fields.present')}</span>
+                      )}
+                    </div>
+                    {proj.description && <p className="text-sm text-muted-foreground mb-2">{proj.description}</p>}
+                    {proj.highlights && proj.highlights.length > 0 && (
+                      <ul className="text-sm text-foreground space-y-1 mb-2">
+                        {proj.highlights.map((highlight, i) => (
+                          highlight.highlight && (
+                            <li key={i} className="flex gap-2">
+                              <span className="text-primary">•</span>
+                              <span className="flex-1">{highlight.highlight}</span>
+                            </li>
+                          )
+                        ))}
+                      </ul>
+                    )}
                     {proj.technologies && proj.technologies.length > 0 && (
                       <p className="text-xs text-primary mt-1">
                         Tech: {proj.technologies.map(t => typeof t === 'string' ? t : t.technology).filter(Boolean).join(", ")}
                       </p>
+                    )}
+                    {proj.link && (
+                      <a href={proj.link} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline mt-1 block">
+                        {proj.link.replace(/^https?:\/\/(www\.)?/, '')}
+                      </a>
                     )}
                   </div>
                 )
@@ -106,8 +157,25 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
               {certificates.map((cert, index) => (
                 cert.name && (
                   <div key={index}>
-                    <h3 className="font-semibold text-foreground">{cert.name}</h3>
-                    <p className="text-sm text-muted-foreground">{cert.organization}</p>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-semibold text-foreground">{cert.name}</h3>
+                        <p className="text-sm text-muted-foreground">{cert.organization}</p>
+                        {(cert.issueDate || cert.expirationDate) && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {cert.issueDate} {cert.expirationDate && `- ${cert.expirationDate}`}
+                          </p>
+                        )}
+                        {cert.credentialId && (
+                          <p className="text-xs text-muted-foreground">ID: {cert.credentialId}</p>
+                        )}
+                        {cert.url && (
+                          <a href={cert.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline mt-1 block">
+                            {cert.url.replace(/^https?:\/\/(www\.)?/, '')}
+                          </a>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 )
               ))}

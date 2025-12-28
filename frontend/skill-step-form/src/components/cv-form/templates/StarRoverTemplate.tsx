@@ -114,10 +114,20 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                         </span>
                       )}
                     </div>
+                    {edu.location && (
+                      <span className="text-xs font-normal" style={{ color: ACCENT_COLOR }}>
+                        {edu.location}
+                      </span>
+                    )}
                     {edu.field && (
                       <ul className="text-sm text-foreground space-y-0.5 mt-1 list-none pl-0">
                         <li className="break-words">{edu.field}</li>
                       </ul>
+                    )}
+                    {edu.keyCourses && edu.keyCourses.length > 0 && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Key Courses: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(', ')}
+                      </p>
                     )}
                   </div>
                 );
@@ -175,6 +185,11 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                           <li key={i} className="break-words">• {resp}</li>
                         ))}
                       </ul>
+                    )}
+                    {exp.competencies && exp.competencies.length > 0 && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Competencies: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(', ')}
+                      </p>
                     )}
                   </div>
                 );
@@ -236,6 +251,15 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                         <li className="break-words">{proj.description}</li>
                       </ul>
                     )}
+                    {proj.highlights && proj.highlights.length > 0 && (
+                      <ul className="text-sm text-foreground space-y-0.5 mt-1 list-none pl-0">
+                        {proj.highlights.map((highlight, i) => (
+                          highlight.highlight && (
+                            <li key={i} className="break-words">• {highlight.highlight}</li>
+                          )
+                        ))}
+                      </ul>
+                    )}
                     {technologies && (
                       <p className="text-xs text-muted-foreground mt-1 break-words">{technologies}</p>
                     )}
@@ -265,13 +289,25 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                 const dateRange = formatDateRangeStar(cert.issueDate, cert.expirationDate);
                 
                 return (
-                  <div key={index} className="flex justify-between items-start gap-2">
-                    <span className="text-sm text-foreground break-words">{cert.name}, {cert.organization || ''}</span>
-                    {dateRange && (
-                      <span className="text-xs font-normal flex-shrink-0" style={{ color: ACCENT_COLOR }}>
-                        {dateRange || cert.issueDate || ''}
-                      </span>
-                    )}
+                  <div key={index}>
+                    <div className="flex justify-between items-start gap-2">
+                      <div>
+                        <span className="text-sm text-foreground break-words">{cert.name}, {cert.organization || ''}</span>
+                        {cert.credentialId && (
+                          <span className="text-xs text-muted-foreground ml-2">ID: {cert.credentialId}</span>
+                        )}
+                        {cert.url && (
+                          <a href={cert.url} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:underline ml-2 block">
+                            {cert.url.replace(/^https?:\/\/(www\.)?/, '')}
+                          </a>
+                        )}
+                      </div>
+                      {dateRange && (
+                        <span className="text-xs font-normal flex-shrink-0" style={{ color: ACCENT_COLOR }}>
+                          {dateRange || cert.issueDate || ''}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 );
               })}

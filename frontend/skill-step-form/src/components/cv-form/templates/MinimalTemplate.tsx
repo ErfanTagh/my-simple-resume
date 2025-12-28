@@ -6,6 +6,17 @@ interface MinimalTemplateProps {
   data: CVFormData;
 }
 
+// Helper component for section headings with decorative lines
+const SectionHeading = ({ title }: { title: string }) => (
+  <div className="flex items-center gap-4 mb-6 mt-12">
+    <div className="flex-1 border-t border-foreground"></div>
+    <h2 className="text-xs font-bold text-foreground uppercase tracking-widest whitespace-nowrap">
+      {title}
+    </h2>
+    <div className="flex-1 border-t border-foreground"></div>
+  </div>
+);
+
 export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
   const { t } = useLanguage();
   const { personalInfo, workExperience, education, projects, certificates, languages, skills, sectionOrder } = data;
@@ -17,15 +28,16 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
     switch (sectionKey) {
       case "summary":
         return personalInfo.summary && personalInfo.summary.trim() ? (
-          <div key="summary" className="mb-8">
+          <div key="summary">
+            <SectionHeading title={t('resume.sections.professionalSummary') || 'Summary'} />
             <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{personalInfo.summary.trim()}</p>
           </div>
         ) : null;
 
       case "workExperience":
         return workExperience.some(exp => exp.position || exp.company) ? (
-          <div key="workExperience" className="mb-8">
-            <h2 className="text-xs font-bold mb-4 text-foreground uppercase tracking-widest">{t('resume.sections.experience').toUpperCase()}</h2>
+          <div key="workExperience">
+            <SectionHeading title={t('resume.sections.experience') || 'Experience'} />
             <div className="space-y-5">
               {workExperience.map((exp, index) => (
                 (exp.position || exp.company) && (
@@ -38,7 +50,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground">{exp.company}</p>
+                    <p className="text-xs text-muted-foreground">{exp.company}{exp.location && ` • ${exp.location}`}</p>
                     {((exp.responsibilities && exp.responsibilities.length > 0) || exp.description) && (
                       <ul className="text-xs text-foreground space-y-1 mt-2">
                         {exp.responsibilities && exp.responsibilities.length > 0 
@@ -59,6 +71,16 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                         }
                       </ul>
                     )}
+                    {exp.technologies && exp.technologies.length > 0 && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Technologies: {exp.technologies.map(t => typeof t === 'string' ? t : t.technology).filter(Boolean).join(", ")}
+                      </p>
+                    )}
+                    {exp.competencies && exp.competencies.length > 0 && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Competencies: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(", ")}
+                      </p>
+                    )}
                   </div>
                 )
               ))}
@@ -68,8 +90,8 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
 
       case "education":
         return education.some(edu => edu.degree || edu.institution) ? (
-          <div key="education" className="mb-8">
-            <h2 className="text-xs font-bold mb-4 text-foreground uppercase tracking-widest">{t('resume.sections.education').toUpperCase()}</h2>
+          <div key="education">
+            <SectionHeading title={t('resume.sections.education') || 'Education'} />
             <div className="space-y-4">
               {education.map((edu, index) => (
                 (edu.degree || edu.institution) && (
@@ -82,8 +104,13 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground">{edu.institution}</p>
+                    <p className="text-xs text-muted-foreground">{edu.institution}{edu.location && ` • ${edu.location}`}</p>
                     {edu.field && <p className="text-xs text-muted-foreground">{edu.field}</p>}
+                    {edu.keyCourses && edu.keyCourses.length > 0 && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Key Courses: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(", ")}
+                      </p>
+                    )}
                   </div>
                 )
               ))}
@@ -93,13 +120,20 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
 
       case "projects":
         return projects.some(proj => proj.name) ? (
-          <div key="projects" className="mb-8">
-            <h2 className="text-xs font-bold mb-4 text-foreground uppercase tracking-widest">{t('resume.sections.projects').toUpperCase()}</h2>
+          <div key="projects">
+            <SectionHeading title={t('resume.sections.projects') || 'Projects'} />
             <div className="space-y-4">
               {projects.map((proj, index) => (
                 proj.name && (
                   <div key={index} className="space-y-1">
-                    <h3 className="text-sm font-semibold text-foreground">{proj.name}</h3>
+                    <div className="flex justify-between items-baseline">
+                      <h3 className="text-sm font-semibold text-foreground">{proj.name}</h3>
+                      {(proj.startDate || proj.endDate) && (
+                        <span className="text-xs text-muted-foreground">
+                          {formatDateRange(proj.startDate, proj.endDate)}
+                        </span>
+                      )}
+                    </div>
                     {proj.description && (
                       <ul className="text-xs text-foreground space-y-1 mt-1">
                         {proj.description.split('\n').filter(line => line.trim()).map((line, i) => (
@@ -110,10 +144,27 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                         ))}
                       </ul>
                     )}
+                    {proj.highlights && proj.highlights.length > 0 && (
+                      <ul className="text-xs text-foreground space-y-1 mt-1">
+                        {proj.highlights.map((highlight, i) => (
+                          highlight.highlight && (
+                            <li key={i} className="flex gap-2">
+                              <span className="text-muted-foreground">•</span>
+                              <span className="flex-1">{highlight.highlight}</span>
+                            </li>
+                          )
+                        ))}
+                      </ul>
+                    )}
                     {proj.technologies && proj.technologies.length > 0 && (
                       <p className="text-xs text-muted-foreground mt-1">
                         {t('resume.sections.technologies')}: {proj.technologies.map(techItem => techItem.technology).filter(Boolean).join(", ")}
                       </p>
+                    )}
+                    {proj.link && (
+                      <a href={proj.link} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:underline mt-1 block">
+                        {proj.link.replace(/^https?:\/\/(www\.)?/, '')}
+                      </a>
                     )}
                   </div>
                 )
@@ -124,14 +175,27 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
 
       case "certificates":
         return certificates.some(cert => cert.name) ? (
-          <div key="certificates" className="mb-8">
-            <h2 className="text-xs font-bold mb-4 text-foreground uppercase tracking-widest">{t('resume.sections.certifications').toUpperCase()}</h2>
+          <div key="certificates">
+            <SectionHeading title={t('resume.sections.certifications') || 'Certifications'} />
             <div className="space-y-3">
               {certificates.map((cert, index) => (
                 cert.name && (
                   <div key={index}>
                     <h3 className="text-sm font-semibold text-foreground">{cert.name}</h3>
                     <p className="text-xs text-muted-foreground">{cert.organization}</p>
+                    {(cert.issueDate || cert.expirationDate) && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {cert.issueDate} {cert.expirationDate && `- ${cert.expirationDate}`}
+                      </p>
+                    )}
+                    {cert.credentialId && (
+                      <p className="text-xs text-muted-foreground">ID: {cert.credentialId}</p>
+                    )}
+                    {cert.url && (
+                      <a href={cert.url} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:underline mt-1 block">
+                        {cert.url.replace(/^https?:\/\/(www\.)?/, '')}
+                      </a>
+                    )}
                   </div>
                 )
               ))}
@@ -141,8 +205,8 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
 
       case "skills":
         return skills.some(s => s.skill) ? (
-          <div key="skills" className="mb-8">
-            <h2 className="text-xs font-bold mb-4 text-foreground uppercase tracking-widest">{t('resume.sections.skills').toUpperCase()}</h2>
+          <div key="skills">
+            <SectionHeading title={t('resume.sections.skills') || 'Skills'} />
             <p className="text-xs text-foreground leading-relaxed">
               {skills.filter(s => s.skill).map(s => s.skill).join(", ")}
             </p>
@@ -151,8 +215,8 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
 
       case "languages":
         return languages.some(lang => lang.language) ? (
-          <div key="languages" className="mb-8">
-            <h2 className="text-xs font-bold mb-4 text-foreground uppercase tracking-widest">{t('resume.sections.languages').toUpperCase()}</h2>
+          <div key="languages">
+            <SectionHeading title={t('resume.sections.languages') || 'Languages'} />
             <div className="space-y-1">
               {languages.map((lang, index) => (
                 lang.language && (
@@ -168,8 +232,8 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
 
       case "interests":
         return personalInfo.interests && personalInfo.interests.length > 0 && personalInfo.interests.some(i => i.interest) ? (
-          <div key="interests" className="mb-8">
-            <h2 className="text-xs font-bold mb-4 text-foreground uppercase tracking-widest">{t('resume.sections.interests').toUpperCase()}</h2>
+          <div key="interests">
+            <SectionHeading title={t('resume.sections.interests') || 'Interests'} />
             <p className="text-xs text-foreground leading-relaxed">{personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}</p>
           </div>
         ) : null;
@@ -179,27 +243,34 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
     }
   };
 
+  // Build contact info array
+  const contactItems: string[] = [];
+  if (personalInfo.email) contactItems.push(personalInfo.email);
+  if (personalInfo.phone) contactItems.push(personalInfo.phone);
+  if (personalInfo.location) contactItems.push(personalInfo.location);
+  if (personalInfo.linkedin) contactItems.push(personalInfo.linkedin.replace(/^https?:\/\/(www\.)?/, ''));
+  if (personalInfo.github) contactItems.push(personalInfo.github.replace(/^https?:\/\/(www\.)?/, ''));
+  if (personalInfo.website) contactItems.push(personalInfo.website.replace(/^https?:\/\/(www\.)?/, ''));
+
   return (
     <div className="bg-background text-foreground p-12 max-w-3xl mx-auto font-minimal">
-      {/* Ultra-minimal header */}
-      <div className="mb-10">
-        <div className="flex items-start gap-6 mb-4">
+      {/* Header with large, widely-spaced name */}
+      <div className="mb-12">
+        <div className="flex items-start gap-6 mb-6">
           <div className="flex-1">
-        <h1 className="text-xl font-bold text-foreground mb-1 tracking-tight">
-          {personalInfo.firstName} {personalInfo.lastName}
-        </h1>
-        {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (
-          <p className="text-xs text-muted-foreground font-normal mb-2">{personalInfo.professionalTitle.trim()}</p>
-        )}
-        
-        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground mt-3">
-          {personalInfo.email && <span>{personalInfo.email}</span>}
-          {personalInfo.phone && <span>{personalInfo.phone}</span>}
-          {personalInfo.location && <span>{personalInfo.location}</span>}
-          {personalInfo.linkedin && <span className="truncate max-w-[200px]">{personalInfo.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span>}
-          {personalInfo.github && <span className="truncate max-w-[200px]">{personalInfo.github.replace(/^https?:\/\/(www\.)?/, '')}</span>}
-          {personalInfo.website && <span className="truncate max-w-[200px]">{personalInfo.website.replace(/^https?:\/\/(www\.)?/, '')}</span>}
-            </div>
+            <h1 className="text-3xl font-bold text-foreground mb-4" style={{ letterSpacing: '0.3em' }}>
+              {personalInfo.firstName.toUpperCase()} {personalInfo.lastName.toUpperCase()}
+            </h1>
+            {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (
+              <p className="text-xs text-muted-foreground font-normal mb-4">{personalInfo.professionalTitle.trim()}</p>
+            )}
+            
+            {/* Contact info in single line with separators */}
+            {contactItems.length > 0 && (
+              <p className="text-xs text-muted-foreground">
+                {contactItems.join(' | ')}
+              </p>
+            )}
           </div>
           
           {/* Profile image */}
@@ -218,7 +289,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
         </div>
       </div>
 
-      {/* Sections with maximum whitespace */}
+      {/* Sections with decorative headings and generous spacing */}
       <div>
         {orderedSections.map(section => renderSection(section))}
       </div>
