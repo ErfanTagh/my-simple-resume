@@ -356,6 +356,15 @@ function generateResumeHTML(resume: Resume): string {
 }
 
 /**
+ * Detect if the current device is mobile
+ */
+function isMobileDevice(): boolean {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  ) || window.innerWidth < 768;
+}
+
+/**
  * Download PDF from resume HTML (from DOM element)
  */
 async function downloadPDFFromHTML(
@@ -459,15 +468,69 @@ async function downloadPDFFromHTML(
 </html>`;
 
   const pdfBlob = await resumeAPI.generatePDF(resumeId, fullHTML);
+  const blob = new Blob([pdfBlob], { type: 'application/pdf' });
+  const finalFilename = filename || `resume_${resumeId}.pdf`;
+  const isMobile = isMobileDevice();
   
-  const url = window.URL.createObjectURL(pdfBlob);
+  // Try File System Access API first (Chrome/Edge, including mobile Chrome on Android)
+  // This provides the most reliable download experience
+  // @ts-ignore - File System Access API types may not be available
+  if ('showSaveFilePicker' in window) {
+    try {
+      // @ts-ignore
+      const fileHandle = await window.showSaveFilePicker({
+        suggestedName: finalFilename,
+        types: [{
+          description: 'PDF files',
+          accept: { 'application/pdf': ['.pdf'] }
+        }]
+      });
+      const writable = await fileHandle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+      return; // Successfully saved via File System Access API
+    } catch (error: any) {
+      // User cancelled or error occurred, fall through to blob URL method
+      if (error.name !== 'AbortError') {
+        // Only log if it's not a user cancellation
+      }
+    }
+  }
+  
+  // Standard blob URL download method (works on all browsers, but mobile may open in viewer)
+  const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = filename || `resume_${resumeId}.pdf`;
+  a.download = finalFilename;
+  a.style.display = 'none';
+  a.setAttribute('download', finalFilename);
+  
   document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  window.URL.revokeObjectURL(url);
+  
+  // On mobile, use requestAnimationFrame for better reliability
+  if (isMobile) {
+    requestAnimationFrame(() => {
+      a.click();
+      // Cleanup after a longer delay on mobile to ensure download starts
+      setTimeout(() => {
+        if (a.parentNode) {
+          document.body.removeChild(a);
+        }
+        // Don't revoke URL immediately on mobile - give browser time to process download
+        setTimeout(() => {
+          window.URL.revokeObjectURL(url);
+        }, 2000);
+      }, 300);
+    });
+  } else {
+    a.click();
+    setTimeout(() => {
+      if (a.parentNode) {
+        document.body.removeChild(a);
+      }
+      window.URL.revokeObjectURL(url);
+    }, 100);
+  }
 }
 
 /**

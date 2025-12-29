@@ -5,6 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ArrowLeft, AlertCircle, Download } from 'lucide-react';
 import { downloadResumePDFFromElement } from '@/lib/resumePdfUtils';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ModernTemplate } from '@/components/cv-form/templates/ModernTemplate';
 import { ClassicTemplate } from '@/components/cv-form/templates/ClassicTemplate';
@@ -22,6 +29,7 @@ export default function ResumeView() {
   const [resume, setResume] = useState<Resume | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isDownloading, setIsDownloading] = useState(false);
   const resumeContentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -91,10 +99,13 @@ export default function ResumeView() {
   const handleDownloadPDF = async () => {
     if (!resumeContentRef.current || !id || !resume) return;
 
+    setIsDownloading(true);
     try {
       await downloadResumePDFFromElement(id, resumeContentRef.current, resume);
     } catch (error: any) {
       setError(error.message || 'Failed to generate PDF');
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -226,6 +237,20 @@ export default function ResumeView() {
   }
 }
 `}</style>
+
+        <Dialog open={isDownloading} onOpenChange={() => {}}>
+          <DialogContent className="sm:max-w-md [&>button]:hidden">
+            <DialogHeader>
+              <DialogTitle className="text-center">{t('common.downloading.title') || 'Generating PDF'}</DialogTitle>
+              <DialogDescription className="text-center">
+                {t('common.downloading.description') || 'Please wait while we generate your resume PDF...'}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex items-center justify-center py-6">
+              <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </>
   );

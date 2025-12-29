@@ -28,6 +28,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -38,6 +45,7 @@ export default function Resumes() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -133,6 +141,7 @@ export default function Resumes() {
   };
 
   const handleDownloadPDF = async (resume: Resume) => {
+    setIsDownloading(true);
     try {
       // Fetch the full resume data
       const fullResume = await resumeAPI.getById(resume.id);
@@ -147,18 +156,20 @@ export default function Resumes() {
         description: err.message || t('pages.resumes.toast.error.pdfFailed') || 'Failed to generate PDF',
         variant: 'destructive',
       });
+    } finally {
+      setIsDownloading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="flex items-center justify-between mb-8">
+      <div className="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-foreground mb-2">{t('pages.resumes.title') || 'My Resumes'}</h1>
-            <p className="text-muted-foreground">{t('pages.resumes.subtitle') || 'View and manage your created CVs'}</p>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">{t('pages.resumes.title') || 'My Resumes'}</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">{t('pages.resumes.subtitle') || 'View and manage your created CVs'}</p>
           </div>
-          <Button onClick={() => navigate('/create')} size="lg">
+          <Button onClick={() => navigate('/create')} size="lg" className="w-full sm:w-auto">
             <Plus className="mr-2 h-4 w-4" />
             {t('pages.resumes.createNew') || 'Create New CV'}
           </Button>
@@ -175,25 +186,25 @@ export default function Resumes() {
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
               <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent mb-4"></div>
-              <p className="text-muted-foreground">{t('pages.resumes.loading') || 'Loading resumes...'}</p>
+              <p className="text-muted-foreground text-sm sm:text-base">{t('pages.resumes.loading') || 'Loading resumes...'}</p>
             </div>
           </div>
         ) : resumes.length === 0 ? (
-          <Card className="text-center py-12">
+          <Card className="text-center py-8 sm:py-12">
             <CardContent>
-              <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-xl font-semibold mb-2">{t('pages.resumes.empty.title') || 'No resumes yet'}</h3>
-              <p className="text-muted-foreground mb-4">
+              <FileText className="h-12 w-12 sm:h-16 sm:w-16 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg sm:text-xl font-semibold mb-2">{t('pages.resumes.empty.title') || 'No resumes yet'}</h3>
+              <p className="text-sm sm:text-base text-muted-foreground mb-4 px-4">
                 {t('pages.resumes.empty.description') || 'Create your first CV to get started'}
               </p>
-              <Button onClick={() => navigate('/create')}>
+              <Button onClick={() => navigate('/create')} className="text-sm sm:text-base">
                 <Plus className="mr-2 h-4 w-4" />
                 {t('pages.resumes.empty.createButton') || 'Create Your First CV'}
               </Button>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {resumes.map((resume) => {
               // Get quality scores from API (already converted to camelCase by API)
               // Backend returns scores in 0-10 format
@@ -219,7 +230,7 @@ export default function Resumes() {
                       e.stopPropagation();
                       setDeleteId(resume.id);
                     }}
-                    className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-red-50 text-red-600 opacity-0 group-hover:opacity-100 hover:bg-red-100 hover:text-red-700 transition-all"
+                    className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-red-50 text-red-600 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 hover:bg-red-100 hover:text-red-700 transition-all touch-manipulation"
                     title={t('pages.resumes.delete') || 'Delete resume'}
                     aria-label={t('pages.resumes.delete') || 'Delete resume'}
                   >
@@ -228,32 +239,32 @@ export default function Resumes() {
                   
                   <CardHeader>
                     <div className="flex items-start justify-between">
-                      <FileText className="h-8 w-8 text-primary mb-2" />
-                      <Badge variant="secondary" className="capitalize">
+                      <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-primary mb-2 flex-shrink-0" />
+                      <Badge variant="secondary" className="capitalize text-xs sm:text-sm">
                         {template}
                       </Badge>
                     </div>
-                    <CardTitle className="text-xl">
+                    <CardTitle className="text-lg sm:text-xl break-words pr-6">
                       {resume.personalInfo.firstName} {resume.personalInfo.lastName}
                     </CardTitle>
-                    <CardDescription className="flex items-center gap-2">
-                      <Clock className="h-3 w-3" />
+                    <CardDescription className="flex items-center gap-2 text-xs sm:text-sm">
+                      <Clock className="h-3 w-3 flex-shrink-0" />
                       {formatDate((resume as any).updatedAt || (resume as any).updated_at)}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
                       <div className="flex items-center gap-2">
-                        <Star className={`h-5 w-5 fill-current ${getRatingColor(displayScore)}`} />
-                        <span className={`text-2xl font-bold ${getRatingColor(displayScore)}`}>
+                        <Star className={`h-4 w-4 sm:h-5 sm:w-5 fill-current ${getRatingColor(displayScore)} flex-shrink-0`} />
+                        <span className={`text-xl sm:text-2xl font-bold ${getRatingColor(displayScore)}`}>
                           {displayScore}
                         </span>
-                        <span className="text-muted-foreground">/10</span>
+                        <span className="text-sm sm:text-base text-muted-foreground">/10</span>
                       </div>
-                      <Badge variant="outline">{getRatingBadge(displayScore)}</Badge>
+                      <Badge variant="outline" className="text-xs sm:text-sm">{getRatingBadge(displayScore)}</Badge>
                     </div>
 
-                    <div className="space-y-2 text-sm">
+                    <div className="space-y-2 text-xs sm:text-sm">
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">{t('pages.resumes.scores.completeness') || 'Completeness'}</span>
                         <span className="font-medium">{completenessScore}/10</span>
@@ -272,15 +283,15 @@ export default function Resumes() {
                       </div>
                     </div>
 
-                    <div className="flex gap-2 pt-2">
+                    <div className="flex flex-col sm:flex-row gap-2 pt-2">
                       <Button 
                         variant="outline" 
                         className="flex-1" 
                         size="sm"
                         onClick={() => navigate(`/resume/${resume.id}`)}
                       >
-                        <Eye className="h-3 w-3 mr-1" />
-                        {t('pages.resumes.actions.view') || 'View'}
+                        <Eye className="h-3 w-3 mr-1 sm:mr-1.5" />
+                        <span className="text-xs sm:text-sm">{t('pages.resumes.actions.view') || 'View'}</span>
                       </Button>
                       <Button 
                         variant="outline" 
@@ -289,8 +300,8 @@ export default function Resumes() {
                         onClick={() => handleDownloadPDF(resume)}
                         title={t('pages.resumes.actions.downloadPDF') || 'Download PDF'}
                       >
-                        <Download className="h-3 w-3 mr-1" />
-                        {t('pages.resumes.actions.pdf') || 'PDF'}
+                        <Download className="h-3 w-3 mr-1 sm:mr-1.5" />
+                        <span className="text-xs sm:text-sm">{t('pages.resumes.actions.pdf') || 'PDF'}</span>
                       </Button>
                       <Button 
                         variant="outline" 
@@ -299,8 +310,8 @@ export default function Resumes() {
                         onClick={() => navigate(`/create?edit=${resume.id}`)}
                         title={t('pages.resumes.actions.edit') || 'Edit resume'}
                       >
-                        <Edit className="h-3 w-3 mr-1" />
-                        {t('pages.resumes.actions.edit') || 'Edit'}
+                        <Edit className="h-3 w-3 mr-1 sm:mr-1.5" />
+                        <span className="text-xs sm:text-sm">{t('pages.resumes.actions.edit') || 'Edit'}</span>
                       </Button>
                     </div>
                   </CardContent>
@@ -329,6 +340,20 @@ export default function Resumes() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        <Dialog open={isDownloading} onOpenChange={() => {}}>
+          <DialogContent className="sm:max-w-md [&>button]:hidden">
+            <DialogHeader>
+              <DialogTitle className="text-center">{t('pages.resumes.downloading.title') || 'Generating PDF'}</DialogTitle>
+              <DialogDescription className="text-center">
+                {t('pages.resumes.downloading.description') || 'Please wait while we generate your resume PDF...'}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex items-center justify-center py-6">
+              <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
