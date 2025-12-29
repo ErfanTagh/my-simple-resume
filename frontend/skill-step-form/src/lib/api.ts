@@ -68,10 +68,17 @@ const getAccessToken = () => {
 };
 
 // Create headers with authentication
-const createHeaders = (includeAuth = true) => {
+const createHeaders = (includeAuth = true, noCache = false) => {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
+
+  // Add cache control headers to prevent caching (especially important for mobile browsers)
+  if (noCache) {
+    headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+    headers['Pragma'] = 'no-cache';
+    headers['Expires'] = '0';
+  }
 
   if (includeAuth) {
     const token = getAccessToken();
@@ -314,11 +321,23 @@ export const resumeAPI = {
    * Get all resumes for the authenticated user
    */
   getAll: async (): Promise<Resume[]> => {
-    const makeRequest = () => fetch(`${API_BASE_URL}/resumes/`, {
-      headers: createHeaders(true),
+    // Add timestamp to prevent caching
+    const timestamp = Date.now();
+    const makeRequest = () => fetch(`${API_BASE_URL}/resumes/?_t=${timestamp}`, {
+      headers: createHeaders(true, true), // Enable no-cache headers
+      cache: 'no-store', // Explicitly disable fetch cache
     });
     const response = await makeRequest();
-    return handleResponse(response, makeRequest);
+    const data = await handleResponse(response, makeRequest);
+    // Ensure consistent sorting by updated date (newest first)
+    if (Array.isArray(data)) {
+      return data.sort((a: any, b: any) => {
+        const dateA = new Date(a.updatedAt || a.updated_at || 0).getTime();
+        const dateB = new Date(b.updatedAt || b.updated_at || 0).getTime();
+        return dateB - dateA; // Newest first
+      });
+    }
+    return data;
   },
 
   /**

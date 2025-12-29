@@ -54,14 +54,21 @@ export default function Resumes() {
     setIsLoading(true);
     setError('');
     try {
+      // Always fetch fresh data - no caching
       const data = await resumeAPI.getAll();
-      setResumes(data);
+      // Ensure we have an array and set it
+      if (Array.isArray(data)) {
+        setResumes(data);
+      } else {
+        setResumes([]);
+      }
     } catch (err: any) {
       setError(err.message || t('pages.resumes.errors.loadFailed') || 'Failed to load resumes');
+      setResumes([]); // Clear resumes on error
     } finally {
       setIsLoading(false);
     }
-  }, []); // No dependencies - function is stable
+  }, [t]); // Include t for translation
 
   useEffect(() => {
     if (!user) {
@@ -72,6 +79,7 @@ export default function Resumes() {
     }
 
     // Load resumes immediately when user is available
+    // Always fetch fresh data, especially important for mobile browsers
     loadResumes();
     
     // Listen for resume saved event (from AuthContext after login)
@@ -81,8 +89,20 @@ export default function Resumes() {
     
     window.addEventListener('resumeSaved', handleResumeSaved);
     
+    // Also listen for visibility change to refresh when user returns to tab
+    // This helps ensure mobile browsers show fresh data
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && user) {
+        // Refresh data when tab becomes visible (helps with mobile browser caching)
+        loadResumes();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
     return () => {
       window.removeEventListener('resumeSaved', handleResumeSaved);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [user, loadResumes]); // Reload when user changes (e.g., after login)
 
