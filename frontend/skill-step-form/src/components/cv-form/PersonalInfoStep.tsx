@@ -10,6 +10,7 @@ import { ResumeUpload } from "./ResumeUpload";
 import { Separator } from "@/components/ui/separator";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { CityAutocomplete } from "@/components/ui/city-autocomplete";
+import { ProfessionalTitleAutocomplete } from "@/components/ProfessionalTitleAutocomplete";
 
 interface PersonalInfoStepProps {
   form: UseFormReturn<CVFormData>;
@@ -141,10 +142,17 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
 
       <div className="space-y-2">
         <Label htmlFor="professionalTitle">{t('resume.fields.professionalTitle')}</Label>
-        <Input
-          id="professionalTitle"
-          {...form.register("personalInfo.professionalTitle")}
-          placeholder={t('resume.placeholders.professionalTitle')}
+        <Controller
+          control={form.control}
+          name="personalInfo.professionalTitle"
+          render={({ field }) => (
+            <ProfessionalTitleAutocomplete
+              id="professionalTitle"
+              value={field.value || ""}
+              onChange={field.onChange}
+              placeholder={t('resume.placeholders.professionalTitle')}
+            />
+          )}
         />
       </div>
 
