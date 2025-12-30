@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     # 'rest_framework_simplejwt.token_blacklist',  # Disabled - incompatible with djongo/MongoDB
     'corsheaders',
-    'anymail',  # Email service integration (SendGrid, Mailgun, AWS SES, etc.)
     
     # Local apps
     'api',
@@ -189,19 +188,20 @@ SIMPLE_JWT = {
 # SendGrid provides better deliverability and is recommended for production
 SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY', '').strip()
 
+# Email Configuration
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+
+# Use SendGrid SMTP if API key is provided, otherwise use configured SMTP settings
 if SENDGRID_API_KEY:
-    # Use Anymail with SendGrid for better deliverability
-    EMAIL_BACKEND = 'anymail.backends.sendgrid.EmailBackend'
-    ANYMAIL = {
-        'SENDGRID_API_KEY': SENDGRID_API_KEY,
-    }
-    # Anymail handles SMTP settings automatically, but we can set defaults
-    EMAIL_HOST = 'smtp.sendgrid.net'
-    EMAIL_PORT = 587
-    EMAIL_USE_TLS = True
+    # SendGrid SMTP configuration
+    EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.sendgrid.net')
+    EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+    EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+    EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'False') == 'True'
+    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'apikey')
+    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', SENDGRID_API_KEY)
 else:
-    # Fallback to SMTP (Gmail, etc.)
-    EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+    # Fallback to configured SMTP (Gmail, etc.)
     EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
     EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
     EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'

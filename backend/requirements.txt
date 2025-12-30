@@ -13,9 +13,10 @@ PyJWT==2.8.0
 django-cors-headers==4.3.1
 python-dotenv==1.0.0
 
-# Email service (Anymail supports SendGrid, Mailgun, AWS SES, etc.)
-# Anymail is the recommended Django package for transactional email services
-anymail[sendgrid]>=10.0
+# Email service - Using SendGrid via SMTP (direct integration)
+# Note: anymail requires Django 4.0+, but we use Django 3.2.23
+# We use SendGrid's SMTP server directly instead
+sendgrid>=6.11.0
 
 # Production server
 gunicorn==21.2.0
