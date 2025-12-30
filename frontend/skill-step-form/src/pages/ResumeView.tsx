@@ -162,7 +162,8 @@ export default function ResumeView() {
       certificates: resume.certificates || [],
       skills: resume.skills || [],
       languages: resume.languages || [],
-      sectionOrder: resume.sectionOrder || []
+      sectionOrder: resume.sectionOrder || [],
+      styling: resume.styling || {}  // Include styling field
     };
   };
 

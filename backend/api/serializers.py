@@ -186,6 +186,7 @@ class ResumeSerializer(serializers.Serializer):
         required=False,
         allow_empty=True
     )
+    styling = serializers.DictField(required=False, allow_null=True)  # Styling options (font, colors, etc.)
     # Quality scores (calculated on frontend, accepted from request)
     completeness_score = serializers.FloatField(required=False, allow_null=True, min_value=0.0, max_value=10.0)
     clarity_score = serializers.FloatField(required=False, allow_null=True, min_value=0.0, max_value=10.0)

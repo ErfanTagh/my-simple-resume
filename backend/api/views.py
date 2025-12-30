@@ -153,6 +153,7 @@ def resume_list(request):
                         'languages',
                         'interests',
                     ]),
+                    'styling': resume_doc.get('styling', {}),  # Include styling field
                     'completeness_score': resume_doc.get('completeness_score', 0.0),
                     'clarity_score': resume_doc.get('clarity_score', 0.0),
                     'formatting_score': resume_doc.get('formatting_score', 0.0),
@@ -187,6 +188,15 @@ def resume_list(request):
         print("=" * 50, file=sys.stderr)
         
         logger.error(f"Received POST data: {request.data}")
+        
+        # Debug: Log raw request data to see what's being sent
+        print(f"DEBUG: Raw request.data personal_info: {request.data.get('personal_info', {})}", file=sys.stderr)
+        if 'personal_info' in request.data:
+            raw_pi = request.data['personal_info']
+            print(f"DEBUG: Raw professional_title = {raw_pi.get('professional_title', 'NOT FOUND')}", file=sys.stderr)
+            print(f"DEBUG: Raw linkedin = {raw_pi.get('linkedin', 'NOT FOUND')}", file=sys.stderr)
+            print(f"DEBUG: Raw github = {raw_pi.get('github', 'NOT FOUND')}", file=sys.stderr)
+            print(f"DEBUG: Raw website = {raw_pi.get('website', 'NOT FOUND')}", file=sys.stderr)
         
         serializer = ResumeSerializer(data=request.data)
         if serializer.is_valid():
@@ -231,6 +241,14 @@ def resume_list(request):
                 # Save data from validated_data
                 data = serializer.validated_data
                 
+                # Debug: Log personal_info to see what's being saved
+                print(f"DEBUG: personal_info in validated_data: {data.get('personal_info', {})}", file=sys.stderr)
+                personal_info = data.get('personal_info', {})
+                print(f"DEBUG: professional_title = {personal_info.get('professional_title', 'NOT FOUND')}", file=sys.stderr)
+                print(f"DEBUG: linkedin = {personal_info.get('linkedin', 'NOT FOUND')}", file=sys.stderr)
+                print(f"DEBUG: github = {personal_info.get('github', 'NOT FOUND')}", file=sys.stderr)
+                print(f"DEBUG: website = {personal_info.get('website', 'NOT FOUND')}", file=sys.stderr)
+                
                 # Get quality scores from request (calculated on frontend)
                 # Default to 0.0 if not provided (should always be provided by frontend)
                 quality_scores = {
@@ -242,9 +260,28 @@ def resume_list(request):
                 }
                 
                 # Prepare document for MongoDB
+                # Ensure personal_info includes all fields, even if empty
+                personal_info_raw = request.data.get('personal_info', {})
+                personal_info_validated = data.get('personal_info', {})
+                # Merge to ensure all fields from request are preserved (in case serializer omits empty strings)
+                personal_info_final = {
+                    'first_name': personal_info_validated.get('first_name', personal_info_raw.get('first_name', '')),
+                    'last_name': personal_info_validated.get('last_name', personal_info_raw.get('last_name', '')),
+                    'professional_title': personal_info_validated.get('professional_title', personal_info_raw.get('professional_title', '')),
+                    'profile_image': personal_info_validated.get('profile_image', personal_info_raw.get('profile_image', '')),
+                    'email': personal_info_validated.get('email', personal_info_raw.get('email', '')),
+                    'phone': personal_info_validated.get('phone', personal_info_raw.get('phone', '')),
+                    'location': personal_info_validated.get('location', personal_info_raw.get('location', '')),
+                    'linkedin': personal_info_validated.get('linkedin', personal_info_raw.get('linkedin', '')),
+                    'github': personal_info_validated.get('github', personal_info_raw.get('github', '')),
+                    'website': personal_info_validated.get('website', personal_info_raw.get('website', '')),
+                    'summary': personal_info_validated.get('summary', personal_info_raw.get('summary', '')),
+                    'interests': personal_info_validated.get('interests', personal_info_raw.get('interests', [])),
+                }
+                
                 resume_doc = {
                     'user_id': request.user.id,
-                    'personal_info': data.get('personal_info', {}),
+                    'personal_info': personal_info_final,
                     'work_experience': data.get('work_experience', []),
                     'education': data.get('education', []),
                     'projects': data.get('projects', []),
@@ -262,6 +299,7 @@ def resume_list(request):
                         'languages',
                         'interests',
                     ]),
+                    'styling': data.get('styling', {}),  # Include styling field
                     'completeness_score': quality_scores.get('completeness_score', 0.0),
                     'clarity_score': quality_scores.get('clarity_score', 0.0),
                     'formatting_score': quality_scores.get('formatting_score', 0.0),
@@ -299,6 +337,7 @@ def resume_list(request):
                         'languages',
                         'interests',
                     ]),
+                    'styling': created_doc.get('styling', {}),  # Include styling field
                     'completeness_score': created_doc.get('completeness_score', 0.0),
                     'clarity_score': created_doc.get('clarity_score', 0.0),
                     'formatting_score': created_doc.get('formatting_score', 0.0),
@@ -323,6 +362,10 @@ def resume_list(request):
                 )
         
         logger.error(f"Serializer validation failed: {serializer.errors}")
+        print(f"DEBUG: Serializer errors: {serializer.errors}", file=sys.stderr)
+        print(f"DEBUG: Request data keys: {list(request.data.keys())}", file=sys.stderr)
+        if 'personal_info' in request.data:
+            print(f"DEBUG: personal_info keys: {list(request.data['personal_info'].keys()) if isinstance(request.data['personal_info'], dict) else 'NOT A DICT'}", file=sys.stderr)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -416,6 +459,7 @@ def resume_detail(request, pk):
                     'languages',
                     'interests',
                 ]),
+                'styling': resume_doc.get('styling', {}),  # Include styling field
                 'completeness_score': resume_doc.get('completeness_score', 0.0),
                 'clarity_score': resume_doc.get('clarity_score', 0.0),
                 'formatting_score': resume_doc.get('formatting_score', 0.0),
@@ -450,7 +494,28 @@ def resume_detail(request, pk):
                 }
                 
                 # Update the resume in MongoDB
-                update_data = serializer.validated_data
+                # Ensure personal_info includes all fields, even if empty
+                personal_info_raw = request.data.get('personal_info', {})
+                personal_info_validated = data.get('personal_info', {})
+                # Merge to ensure all fields from request are preserved (in case serializer omits empty strings)
+                personal_info_final = {
+                    'first_name': personal_info_validated.get('first_name', personal_info_raw.get('first_name', '')),
+                    'last_name': personal_info_validated.get('last_name', personal_info_raw.get('last_name', '')),
+                    'professional_title': personal_info_validated.get('professional_title', personal_info_raw.get('professional_title', '')),
+                    'profile_image': personal_info_validated.get('profile_image', personal_info_raw.get('profile_image', '')),
+                    'email': personal_info_validated.get('email', personal_info_raw.get('email', '')),
+                    'phone': personal_info_validated.get('phone', personal_info_raw.get('phone', '')),
+                    'location': personal_info_validated.get('location', personal_info_raw.get('location', '')),
+                    'linkedin': personal_info_validated.get('linkedin', personal_info_raw.get('linkedin', '')),
+                    'github': personal_info_validated.get('github', personal_info_raw.get('github', '')),
+                    'website': personal_info_validated.get('website', personal_info_raw.get('website', '')),
+                    'summary': personal_info_validated.get('summary', personal_info_raw.get('summary', '')),
+                    'interests': personal_info_validated.get('interests', personal_info_raw.get('interests', [])),
+                }
+                
+                # Update the resume in MongoDB
+                update_data = serializer.validated_data.copy()
+                update_data['personal_info'] = personal_info_final  # Use merged personal_info
                 update_data.update(quality_scores)  # Add scores to update
                 update_data['updated_at'] = datetime.utcnow()  # Set updated_at timestamp
                 
@@ -487,6 +552,7 @@ def resume_detail(request, pk):
                         'languages',
                         'interests',
                     ]),
+                    'styling': updated_doc.get('styling', {}),  # Include styling field
                     'completeness_score': updated_doc.get('completeness_score', 0.0),
                     'clarity_score': updated_doc.get('clarity_score', 0.0),
                     'formatting_score': updated_doc.get('formatting_score', 0.0),
