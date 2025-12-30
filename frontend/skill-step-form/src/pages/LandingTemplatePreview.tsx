@@ -20,7 +20,7 @@ const sampleData: CVFormData = {
     github: "github.com/alexmartinez",
     summary:
       "Experienced software engineer with 8+ years building scalable web applications. Expertise in React, Node.js, and cloud architecture. Passionate about creating efficient, maintainable code and leading high-performing development teams. Strong background in full-stack development, system design, and DevOps practices.",
-    profileImage: "",
+    profileImage: "https://ui-avatars.com/api/?name=Alex+Martinez&size=200&background=6366f1&color=fff&bold=true&font-size=0.5",
     website: "alexmartinez.dev",
     interests: [
       { interest: "Open Source Contribution" },
