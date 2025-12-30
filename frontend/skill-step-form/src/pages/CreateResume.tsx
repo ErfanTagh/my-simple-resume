@@ -114,18 +114,11 @@ const CreateResume = () => {
 
   useEffect(() => {
     if (!editId) {
-      // Creating a new resume - check for pending resume data
-      const pendingResume = localStorage.getItem('pendingResume');
-      if (pendingResume) {
-        try {
-          const resumeData = JSON.parse(pendingResume);
-          setInitialData(resumeData);
-        } catch (error) {
-          setInitialData(undefined);
-        }
-      } else {
-        setInitialData(undefined);
-      }
+      // Creating a new resume - clear any stale pending resume data to ensure fresh template selection
+      // Only restore pendingResume if explicitly needed (e.g., after signup flow)
+      // For now, always start fresh to show the new template selection UI
+      localStorage.removeItem('pendingResume');
+      setInitialData(undefined);
       setIsLoading(false);
       return;
     }

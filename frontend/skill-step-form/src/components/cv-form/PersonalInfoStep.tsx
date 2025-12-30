@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2, Upload, X } from "lucide-react";
+import { Plus, Trash2, Upload, X, User, Camera } from "lucide-react";
 import { CVFormData } from "./types";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { ResumeUpload } from "./ResumeUpload";
@@ -159,42 +159,52 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
       <div className="space-y-2">
         <Label htmlFor="profileImage">{t('resume.labels.profileImage')}</Label>
         <div className="flex flex-col gap-4">
-          {imagePreview && (
-            <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-border">
-              <img
-                src={imagePreview}
-                alt={`Profile photo preview for ${form.getValues("personalInfo.firstName") || ""} ${form.getValues("personalInfo.lastName") || ""}${form.getValues("personalInfo.professionalTitle") ? ` - ${form.getValues("personalInfo.professionalTitle")}` : ""}`}
-                className="w-full h-full object-cover"
-              />
-              <Button
-                type="button"
-                variant="destructive"
-                size="icon"
-                className="absolute top-1 right-1 h-6 w-6"
-                onClick={handleRemoveImage}
+          <Input
+            ref={fileInputRef}
+            id="profileImage"
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="hidden"
+          />
+          <div className="relative inline-block">
+            {imagePreview ? (
+              <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-border cursor-pointer group" onClick={() => fileInputRef.current?.click()}>
+                <img
+                  src={imagePreview}
+                  alt={`Profile photo preview for ${form.getValues("personalInfo.firstName") || ""} ${form.getValues("personalInfo.lastName") || ""}${form.getValues("personalInfo.professionalTitle") ? ` - ${form.getValues("personalInfo.professionalTitle")}` : ""}`}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Camera className="h-6 w-6 text-white" />
+                </div>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  className="absolute top-1 right-1 h-6 w-6"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveImage();
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <div
+                className="relative w-32 h-32 rounded-lg border-2 border-dashed border-border bg-muted/30 cursor-pointer hover:border-primary hover:bg-muted/50 transition-colors flex flex-col items-center justify-center gap-2 group"
+                onClick={() => fileInputRef.current?.click()}
               >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
-          <div className="flex gap-2">
-            <Input
-              ref={fileInputRef}
-              id="profileImage"
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => fileInputRef.current?.click()}
-              className="flex-1"
-            >
-              <Upload className="mr-2 h-4 w-4" />
-              {imagePreview ? t('resume.placeholders.changeImage') : t('resume.placeholders.uploadImage')}
-            </Button>
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                  <User className="h-6 w-6 text-primary" />
+                </div>
+                <div className="text-xs text-muted-foreground group-hover:text-primary transition-colors text-center px-2">
+                  {t('resume.placeholders.uploadImage')}
+                </div>
+                <Camera className="absolute bottom-2 right-2 h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </div>
+            )}
           </div>
           <p className="text-xs text-muted-foreground">
             {t('resume.placeholders.imageHint')}

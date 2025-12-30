@@ -282,7 +282,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
         return personalInfo.interests && personalInfo.interests.length > 0 && personalInfo.interests.some(i => i.interest) ? (
           <div key="interests" className="mb-6">
             <h2 className={getHeadingClassName()} style={getHeadingStyle()}>{t('resume.sections.interests').toUpperCase()}</h2>
-            <p className="text-sm text-muted-foreground">{personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}</p>
+            <p className="text-sm" style={{ color: textColor, fontSize: sizes.baseText }}>{personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}</p>
           </div>
         ) : null;
 

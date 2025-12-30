@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProgressIndicator } from "./ProgressIndicator";
-import { TemplateSelector } from "./TemplateSelector";
+import { LandingTemplatePreview } from "@/pages/LandingTemplatePreview";
 import { PersonalInfoStep } from "./PersonalInfoStep";
 import { ExperienceStep } from "./ExperienceStep";
 import { EducationStep } from "./EducationStep";
@@ -14,7 +14,7 @@ import { ReviewStep } from "./ReviewStep";
 import { CVPreview } from "./CVPreview";
 import { SignupOverlay } from "./SignupOverlay";
 import { cvFormSchema, CVFormData } from "./types";
-import { ChevronLeft, ChevronRight, FileCheck, Beaker } from "lucide-react";
+import { ChevronLeft, ChevronRight, FileCheck, Beaker, CheckCircle2, ArrowRight } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { getTestProfile, getTestProfileNames } from "@/lib/testData";
 import { useAuth } from "@/contexts/AuthContext";
@@ -100,6 +100,87 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
       education: initialData.education && initialData.education.length > 0
         ? initialData.education
         : defaults.education,
+    };
+  };
+
+  // Merge form data with hint data for preview (show hints when fields are empty)
+  const getPreviewDataWithHints = (formData: CVFormData): CVFormData => {
+    // Only show hints when creating a new resume (no initialData and no editId)
+    if (initialData || editId) {
+      return formData;
+    }
+
+    const hintData = getTestProfile("freshGraduate");
+    if (!hintData) {
+      return formData;
+    }
+
+    // Helper to use hint if field is empty
+    const useHintIfEmpty = <T,>(value: T, hint: T): T => {
+      if (typeof value === 'string') {
+        return (value && value.trim() !== '') ? value : hint;
+      }
+      if (Array.isArray(value)) {
+        return value.length > 0 ? value : hint;
+      }
+      return value || hint;
+    };
+
+    // Merge personal info - use hint if empty, but preserve user's name/email if already filled
+    const mergedPersonalInfo = {
+      firstName: useHintIfEmpty(formData.personalInfo?.firstName || "", hintData.personalInfo.firstName),
+      lastName: useHintIfEmpty(formData.personalInfo?.lastName || "", hintData.personalInfo.lastName),
+      professionalTitle: useHintIfEmpty(formData.personalInfo?.professionalTitle || "", hintData.personalInfo.professionalTitle || ""),
+      profileImage: formData.personalInfo?.profileImage || "https://ui-avatars.com/api/?name=Emily+Chen&size=200&background=6366f1&color=fff&bold=true&font-size=0.5",
+      email: useHintIfEmpty(formData.personalInfo?.email || "", hintData.personalInfo.email),
+      phone: useHintIfEmpty(formData.personalInfo?.phone || "", hintData.personalInfo.phone || ""),
+      location: useHintIfEmpty(formData.personalInfo?.location || "", hintData.personalInfo.location || ""),
+      linkedin: useHintIfEmpty(formData.personalInfo?.linkedin || "", hintData.personalInfo.linkedin || ""),
+      github: formData.personalInfo?.github || "", // Don't show hint for GitHub - many users don't have it
+      website: formData.personalInfo?.website || "", // Don't show hint for website - many users don't have it
+      summary: useHintIfEmpty(formData.personalInfo?.summary || "", hintData.personalInfo.summary || ""),
+      interests: useHintIfEmpty(formData.personalInfo?.interests || [], hintData.personalInfo.interests || []),
+    };
+
+    // Merge work experience - use hint if empty
+    const mergedWorkExperience = (formData.workExperience && formData.workExperience.length > 0 && 
+      formData.workExperience.some(exp => exp.position || exp.company)) 
+      ? formData.workExperience 
+      : (hintData.workExperience || []);
+
+    // Merge education - use hint if empty
+    const mergedEducation = (formData.education && formData.education.length > 0 && 
+      formData.education.some(edu => edu.degree || edu.institution))
+      ? formData.education
+      : (hintData.education || []);
+
+    // Merge projects - use hint if empty (only first project to fit on one page)
+    const mergedProjects = (formData.projects && formData.projects.length > 0 && 
+      formData.projects.some(proj => proj.name || proj.description))
+      ? formData.projects
+      : (hintData.projects ? hintData.projects.slice(0, 1) : []);
+
+    // Merge languages - use hint if empty
+    const mergedLanguages = (formData.languages && formData.languages.length > 0 && 
+      formData.languages.some(lang => lang.language))
+      ? formData.languages
+      : (hintData.languages || []);
+
+    // Merge skills - use hint if empty
+    const mergedSkills = (formData.skills && formData.skills.length > 0 && 
+      formData.skills.some(skill => skill.skill))
+      ? formData.skills
+      : (hintData.skills || []);
+
+    return {
+      ...formData,
+      personalInfo: mergedPersonalInfo,
+      workExperience: mergedWorkExperience,
+      education: mergedEducation,
+      projects: mergedProjects,
+      languages: mergedLanguages,
+      skills: mergedSkills,
+      certificates: formData.certificates || [],
     };
   };
 
@@ -344,36 +425,75 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
       <div className="max-w-7xl mx-auto">
         {!templateSelected ? (
           // Template Selection Screen (before starting the form)
-          <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
-            <div className="lg:col-span-4">
-              <div className="text-center mb-8">
-                <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                  {t('resume.templateSelection.title')}
-                </h1>
-                <p className="text-muted-foreground">
-                  {t('resume.templateSelection.subtitle')}
-                </p>
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h1 className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                {t('resume.templateSelection.title')}
+              </h1>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                {t('resume.templateSelection.subtitle')}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              {[
+                { nameKey: 'templateModern', descKey: 'templateModernDesc', key: 'modern' as const },
+                { nameKey: 'templateClassic', descKey: 'templateClassicDesc', key: 'classic' as const },
+                { nameKey: 'templateCreative', descKey: 'templateCreativeDesc', key: 'creative' as const },
+                { nameKey: 'templateMinimal', descKey: 'templateMinimalDesc', key: 'minimal' as const },
+                { nameKey: 'templateLatex', descKey: 'templateLatexDesc', key: 'latex' as const },
+                { nameKey: 'templateStarRover', descKey: 'templateStarRoverDesc', key: 'starRover' as const }
+              ].map((template) => {
+                const isSelected = form.watch("template") === template.key;
+                return (
+                  <div
+                    key={template.key}
+                    className={`bg-card rounded-2xl border-2 transition-all duration-300 cursor-pointer hover:shadow-[0_8px_25px_-5px_hsl(var(--primary)/0.35)] hover:-translate-y-1.5 ${
+                      isSelected
+                        ? "border-primary shadow-lg ring-2 ring-primary/20"
+                        : "border-border hover:border-primary/30"
+                    }`}
+                    onClick={() => {
+                      form.setValue("template", template.key);
+                    }}
+                  >
+                    <div className="aspect-[3/4] bg-white rounded-t-2xl mb-4 overflow-hidden border-b border-border shadow-inner relative max-h-[400px] sm:max-h-[450px]">
+                      <div className="absolute inset-0 w-full h-full">
+                        <LandingTemplatePreview templateName={template.key} />
+                      </div>
+                    </div>
+                    <div className="p-4 sm:p-5 space-y-2">
+                      <h3 className="font-bold text-lg sm:text-xl" style={{ color: 'hsl(215 25% 15%)' }}>
+                        {t(`landing.${template.nameKey}`)} {t('landing.templateLabel')}
+                      </h3>
+                      <p className="text-sm sm:text-base font-medium" style={{ color: 'hsl(214 95% 45%)' }}>
+                        {t(`landing.${template.descKey}`)}
+                      </p>
+                      {isSelected && (
+                        <div className="pt-2 flex items-center gap-2 text-primary text-sm font-semibold">
+                          <CheckCircle2 className="h-4 w-4" />
+                          <span>{t('common.selected') || 'Selected'}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Continue Button */}
+            {form.watch("template") && (
+              <div className="mt-10 flex justify-center">
+                <Button
+                  size="lg"
+                  onClick={() => setTemplateSelected(true)}
+                  className="bg-primary hover:bg-primary/90 text-base sm:text-lg px-8 sm:px-10 py-6 sm:py-7 rounded-2xl shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 font-semibold"
+                >
+                  {t('resume.templateSelection.continue') || 'Continue with Template'}
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
               </div>
-
-              <Card className="p-8 shadow-elevated">
-                <TemplateSelector
-                  selected={form.watch("template") || "modern"}
-                  onSelect={(template) => {
-                    form.setValue("template", template);
-                    setTemplateSelected(true);
-                  }}
-                />
-              </Card>
-            </div>
-
-            {/* Preview on template selection screen */}
-            <div className="hidden lg:block lg:col-span-3">
-              <CVPreview 
-                data={formData}
-                onTemplateChange={(template) => form.setValue("template", template)}
-                onSectionOrderChange={(sectionOrder) => form.setValue("sectionOrder", sectionOrder)}
-              />
-            </div>
+            )}
           </div>
         ) : (
           // Main Form Flow
@@ -494,7 +614,7 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
               {/* Right Sidebar - Always Visible Preview */}
               <div className="hidden lg:block lg:col-span-3">
                 <CVPreview 
-                  data={formData} 
+                  data={getPreviewDataWithHints(formData)} 
                   onTemplateChange={(template) => form.setValue("template", template)}
                   onSectionOrderChange={(sectionOrder) => form.setValue("sectionOrder", sectionOrder)}
                   onStylingChange={(styling) => form.setValue("styling", styling)}

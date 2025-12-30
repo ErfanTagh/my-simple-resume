@@ -462,7 +462,7 @@ export const testProfiles: Record<string, CVFormData> = {
       linkedin: "https://linkedin.com/in/emilychen",
       github: "https://github.com/emilychen",
       website: "https://emilychen.dev",
-      summary: "Recent Computer Science graduate passionate about web development and eager to contribute to innovative projects. Strong foundation in JavaScript, React, and Python. Quick learner with excellent problem-solving skills and a collaborative mindset.",
+      summary: "Recent Computer Science graduate with strong foundation in JavaScript, React, and Python. Quick learner with excellent problem-solving skills.",
       interests: [
         { interest: "Web Development" },
         { interest: "UI/UX Design" },
@@ -476,7 +476,7 @@ export const testProfiles: Record<string, CVFormData> = {
         location: "Seattle, WA",
         startDate: "2024-06",
         endDate: "2024-08",
-        description: "Developed features for company website using React and Node.js. Fixed bugs and improved performance. Collaborated with senior developers through code reviews and pair programming.",
+        description: "Developed features using React and Node.js. Fixed bugs and improved performance. Collaborated with senior developers.",
         technologies: [
           { technology: "React" },
           { technology: "Node.js" },

@@ -23,7 +23,8 @@
       "description": "Please wait while we generate your resume PDF..."
     },
     "viewMore": "View More",
-    "showLess": "Show Less"
+    "showLess": "Show Less",
+    "selected": "Selected"
   },
   "navigation": {
     "home": "Home",
@@ -145,23 +146,33 @@
       "present": "Present"
     },
     "placeholders": {
-      "firstName": "John",
-      "lastName": "Doe",
+      "firstName": "Emily",
+      "lastName": "Chen",
       "professionalTitle": "e.g., Web Application Developer, Software Engineer",
-      "email": "john.doe@example.com",
-      "phone": "+1 (555) 000-0000",
-      "location": "New York, USA",
-      "linkedin": "https://linkedin.com/in/yourprofile",
+      "email": "emily.chen@example.com",
+      "phone": "+1 (555) 987-6543",
+      "location": "Seattle, WA",
+      "linkedin": "https://linkedin.com/in/emilychen",
       "github": "https://github.com/yourusername",
       "website": "https://yourwebsite.com",
       "uploadImage": "Upload Image",
       "changeImage": "Change Image",
       "imageHint": "Upload a profile picture (JPG, PNG, max 2MB)",
+      "position": "Software Engineering Intern",
+      "company": "Tech Startup Inc.",
+      "jobLocation": "Seattle, WA",
+      "degree": "Bachelor of Science in Computer Science",
+      "institution": "University of Washington",
+      "fieldOfStudy": "Computer Science",
+      "course": "Data Structures & Algorithms",
+      "projectName": "Personal Portfolio Website",
+      "projectDescription": "Built responsive portfolio website showcasing projects and skills",
+      "skill": "JavaScript",
       "selectLevel": "Select level",
       "selectStartDate": "Select start date",
       "selectEndDate": "Select end date",
       "searchArticles": "Search articles...",
-      "summary": "A brief overview of your professional background and goals...",
+      "summary": "Recent Computer Science graduate with strong foundation in JavaScript, React, and Python. Quick learner with excellent problem-solving skills.",
       "interests": "e.g., Running, Cycling, Language Learning",
       "position": "Software Engineer",
       "company": "Tech Corp",
@@ -268,7 +279,8 @@
       "title": "Choose Your CV Template",
       "subtitle": "Select a template that best fits your style. You can see a live preview as you fill out your information.",
       "label": "Choose CV Template",
-      "description": "Select a template that best fits your style and industry"
+      "description": "Select a template that best fits your style and industry",
+      "continue": "Continue with Template"
     },
     "form": {
       "title": "Build Your CV",
