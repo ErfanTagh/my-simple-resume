@@ -202,20 +202,29 @@ The app supports two email backends:
    - Enter: `noreply@123resume.de` (or your preferred email)
    - Complete verification
 
-4. **Add to `.env` file:**
+4. **Disable Click Tracking (Important!):**
+
+   - Go to Settings → Tracking
+   - Under "Click Tracking", toggle it OFF
+   - This prevents SSL certificate errors when users click verification links
+   - The tracking domain (`url3144.123resume.de`) doesn't have a valid SSL certificate
+
+5. **Add to `.env` file:**
 
    ```bash
    SENDGRID_API_KEY=SG.your_api_key_here
    DEFAULT_FROM_EMAIL=noreply@123resume.de
    ```
 
-5. **Install dependencies:**
+6. **Install dependencies:**
    ```bash
    docker compose exec backend pip install -r requirements.txt
    docker compose restart backend
    ```
 
 That's it! The app will automatically use SendGrid when `SENDGRID_API_KEY` is set.
+
+**Note:** If you see SSL certificate errors when clicking email links, make sure click tracking is disabled in SendGrid Settings → Tracking.
 
 ### Option 2: SMTP (Gmail, etc.) - Fallback
 

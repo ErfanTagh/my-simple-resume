@@ -4,6 +4,7 @@ Email verification utilities
 import secrets
 import hashlib
 import uuid
+import json
 from datetime import datetime, timedelta
 from django.core.mail import EmailMessage, EmailMultiAlternatives, send_mail
 from django.conf import settings
@@ -124,9 +125,19 @@ https://123resume.de
         
         # Add proper headers to reduce spam filtering
         # Removed X-Priority, Precedence, and List-Unsubscribe as they trigger spam filters
+        # Disable SendGrid click tracking to avoid SSL certificate issues with tracking domains
+        tracking_settings = {
+            "clicktrack": {
+                "enable": False
+            },
+            "opentrack": {
+                "enable": False
+            }
+        }
         email.extra_headers = {
             'Message-ID': f'<{uuid.uuid4()}@123resume.de>',
             'X-Mailer': '123Resume Email System',
+            'X-SMTPAPI': json.dumps({"tracking_settings": tracking_settings}),  # Disable SendGrid click tracking
         }
         
         # Send email
@@ -216,9 +227,18 @@ Ready to get started? Visit https://123resume.de
         
         email.attach_alternative(html_message, "text/html")
         
+        tracking_settings = {
+            "clicktrack": {
+                "enable": False
+            },
+            "opentrack": {
+                "enable": False
+            }
+        }
         email.extra_headers = {
             'Message-ID': f'<{uuid.uuid4()}@123resume.de>',
             'X-Mailer': '123Resume Email System',
+            'X-SMTPAPI': json.dumps({"tracking_settings": tracking_settings}),  # Disable SendGrid click tracking
         }
         
         email.send(fail_silently=False)
@@ -338,9 +358,18 @@ https://123resume.de
         email.attach_alternative(html_message, "text/html")
         
         # Removed X-Priority, Precedence, and List-Unsubscribe as they trigger spam filters
+        tracking_settings = {
+            "clicktrack": {
+                "enable": False
+            },
+            "opentrack": {
+                "enable": False
+            }
+        }
         email.extra_headers = {
             'Message-ID': f'<{uuid.uuid4()}@123resume.de>',
             'X-Mailer': '123Resume Email System',
+            'X-SMTPAPI': json.dumps({"tracking_settings": tracking_settings}),  # Disable SendGrid click tracking
         }
         
         email.send(fail_silently=False)
@@ -447,9 +476,18 @@ https://123resume.de
         email.attach_alternative(html_message, "text/html")
         
         # Removed X-Priority, Precedence, and List-Unsubscribe as they trigger spam filters
+        tracking_settings = {
+            "clicktrack": {
+                "enable": False
+            },
+            "opentrack": {
+                "enable": False
+            }
+        }
         email.extra_headers = {
             'Message-ID': f'<{uuid.uuid4()}@123resume.de>',
             'X-Mailer': '123Resume Email System',
+            'X-SMTPAPI': json.dumps({"tracking_settings": tracking_settings}),  # Disable SendGrid click tracking
         }
         
         email.send(fail_silently=False)
