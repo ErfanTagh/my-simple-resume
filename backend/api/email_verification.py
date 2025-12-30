@@ -10,6 +10,14 @@ from django.core.mail import EmailMessage, EmailMultiAlternatives, send_mail
 from django.conf import settings
 from django.template.loader import render_to_string
 
+# Try to import SendGrid SDK (optional - falls back to SMTP if not available)
+try:
+    from sendgrid import SendGridAPIClient
+    from sendgrid.helpers.mail import Mail, Email, TrackingSettings, ClickTracking
+    SENDGRID_AVAILABLE = True
+except ImportError:
+    SENDGRID_AVAILABLE = False
+
 
 def generate_verification_token():
     """Generate a unique verification token"""
@@ -108,10 +116,38 @@ https://123resume.de
             print("Error: EMAIL_HOST_USER or DEFAULT_FROM_EMAIL not configured")
             return False
         
-        # Use proper From display name format
+        # Use SendGrid SDK if available and API key is set (allows disabling click tracking)
+        if SENDGRID_AVAILABLE and settings.SENDGRID_API_KEY:
+            try:
+                sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+                
+                # Create email with tracking disabled
+                message = Mail(
+                    from_email=Email(from_email, "123Resume"),
+                    to_emails=user_email,
+                    subject=subject,
+                    plain_text_content=plain_message,
+                    html_content=html_message
+                )
+                
+                # Disable click tracking to avoid SSL certificate issues
+                message.tracking_settings = TrackingSettings(
+                    click_tracking=ClickTracking(enable=False),
+                )
+                
+                # Set reply-to
+                message.reply_to = Email('contact@123resume.de')
+                
+                # Send via SendGrid API
+                response = sg.send(message)
+                return True
+            except Exception as sg_error:
+                print(f"SendGrid API error: {sg_error}, falling back to SMTP")
+                # Fall through to SMTP fallback
+        
+        # Fallback to SMTP (Django's email backend)
         from_email_display = f"123Resume <{from_email}>"
         
-        # Use EmailMultiAlternatives for better control over headers
         email = EmailMultiAlternatives(
             subject=subject,
             body=plain_message,
@@ -120,27 +156,13 @@ https://123resume.de
             reply_to=['contact@123resume.de'],
         )
         
-        # Attach HTML version
         email.attach_alternative(html_message, "text/html")
         
-        # Add proper headers to reduce spam filtering
-        # Removed X-Priority, Precedence, and List-Unsubscribe as they trigger spam filters
-        # Disable SendGrid click tracking to avoid SSL certificate issues with tracking domains
-        tracking_settings = {
-            "clicktrack": {
-                "enable": False
-            },
-            "opentrack": {
-                "enable": False
-            }
-        }
         email.extra_headers = {
             'Message-ID': f'<{uuid.uuid4()}@123resume.de>',
             'X-Mailer': '123Resume Email System',
-            'X-SMTPAPI': json.dumps({"tracking_settings": tracking_settings}),  # Disable SendGrid click tracking
         }
         
-        # Send email
         email.send(fail_silently=False)
         return True
     except Exception as e:
@@ -213,10 +235,28 @@ Ready to get started? Visit https://123resume.de
             print("Error: EMAIL_HOST_USER or DEFAULT_FROM_EMAIL not configured")
             return False
         
-        # Use proper From display name format
-        from_email_display = f"123Resume <{from_email}>"
+        # Use SendGrid SDK if available and API key is set
+        if SENDGRID_AVAILABLE and settings.SENDGRID_API_KEY:
+            try:
+                sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+                message = Mail(
+                    from_email=Email(from_email, "123Resume"),
+                    to_emails=user_email,
+                    subject=subject,
+                    plain_text_content=plain_message,
+                    html_content=html_message
+                )
+                message.tracking_settings = TrackingSettings(
+                    click_tracking=ClickTracking(enable=False),
+                )
+                message.reply_to = Email('contact@123resume.de')
+                sg.send(message)
+                return True
+            except Exception as sg_error:
+                print(f"SendGrid API error: {sg_error}, falling back to SMTP")
         
-        # Use EmailMultiAlternatives for consistency and better header control
+        # Fallback to SMTP
+        from_email_display = f"123Resume <{from_email}>"
         email = EmailMultiAlternatives(
             subject=subject,
             body=plain_message,
@@ -224,23 +264,11 @@ Ready to get started? Visit https://123resume.de
             to=[user_email],
             reply_to=['contact@123resume.de'],
         )
-        
         email.attach_alternative(html_message, "text/html")
-        
-        tracking_settings = {
-            "clicktrack": {
-                "enable": False
-            },
-            "opentrack": {
-                "enable": False
-            }
-        }
         email.extra_headers = {
             'Message-ID': f'<{uuid.uuid4()}@123resume.de>',
             'X-Mailer': '123Resume Email System',
-            'X-SMTPAPI': json.dumps({"tracking_settings": tracking_settings}),  # Disable SendGrid click tracking
         }
-        
         email.send(fail_silently=False)
         return True
     except Exception as e:
@@ -344,9 +372,28 @@ https://123resume.de
             print("Error: EMAIL_HOST_USER or DEFAULT_FROM_EMAIL not configured")
             return False
         
-        # Use proper From display name format
-        from_email_display = f"123Resume <{from_email}>"
+        # Use SendGrid SDK if available and API key is set
+        if SENDGRID_AVAILABLE and settings.SENDGRID_API_KEY:
+            try:
+                sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+                message = Mail(
+                    from_email=Email(from_email, "123Resume"),
+                    to_emails=user_email,
+                    subject=subject,
+                    plain_text_content=plain_message,
+                    html_content=html_message
+                )
+                message.tracking_settings = TrackingSettings(
+                    click_tracking=ClickTracking(enable=False),
+                )
+                message.reply_to = Email('contact@123resume.de')
+                sg.send(message)
+                return True
+            except Exception as sg_error:
+                print(f"SendGrid API error: {sg_error}, falling back to SMTP")
         
+        # Fallback to SMTP
+        from_email_display = f"123Resume <{from_email}>"
         email = EmailMultiAlternatives(
             subject=subject,
             body=plain_message,
@@ -354,24 +401,11 @@ https://123resume.de
             to=[user_email],
             reply_to=['contact@123resume.de'],
         )
-        
         email.attach_alternative(html_message, "text/html")
-        
-        # Removed X-Priority, Precedence, and List-Unsubscribe as they trigger spam filters
-        tracking_settings = {
-            "clicktrack": {
-                "enable": False
-            },
-            "opentrack": {
-                "enable": False
-            }
-        }
         email.extra_headers = {
             'Message-ID': f'<{uuid.uuid4()}@123resume.de>',
             'X-Mailer': '123Resume Email System',
-            'X-SMTPAPI': json.dumps({"tracking_settings": tracking_settings}),  # Disable SendGrid click tracking
         }
-        
         email.send(fail_silently=False)
         return True
     except Exception as e:
@@ -462,9 +496,28 @@ https://123resume.de
             print("Error: EMAIL_HOST_USER or DEFAULT_FROM_EMAIL not configured")
             return False
         
-        # Use proper From display name format
-        from_email_display = f"123Resume <{from_email}>"
+        # Use SendGrid SDK if available and API key is set
+        if SENDGRID_AVAILABLE and settings.SENDGRID_API_KEY:
+            try:
+                sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+                message = Mail(
+                    from_email=Email(from_email, "123Resume"),
+                    to_emails=user_email,
+                    subject=subject,
+                    plain_text_content=plain_message,
+                    html_content=html_message
+                )
+                message.tracking_settings = TrackingSettings(
+                    click_tracking=ClickTracking(enable=False),
+                )
+                message.reply_to = Email('contact@123resume.de')
+                sg.send(message)
+                return True
+            except Exception as sg_error:
+                print(f"SendGrid API error: {sg_error}, falling back to SMTP")
         
+        # Fallback to SMTP
+        from_email_display = f"123Resume <{from_email}>"
         email = EmailMultiAlternatives(
             subject=subject,
             body=plain_message,
@@ -472,24 +525,11 @@ https://123resume.de
             to=[user_email],
             reply_to=['contact@123resume.de'],
         )
-        
         email.attach_alternative(html_message, "text/html")
-        
-        # Removed X-Priority, Precedence, and List-Unsubscribe as they trigger spam filters
-        tracking_settings = {
-            "clicktrack": {
-                "enable": False
-            },
-            "opentrack": {
-                "enable": False
-            }
-        }
         email.extra_headers = {
             'Message-ID': f'<{uuid.uuid4()}@123resume.de>',
             'X-Mailer': '123Resume Email System',
-            'X-SMTPAPI': json.dumps({"tracking_settings": tracking_settings}),  # Disable SendGrid click tracking
         }
-        
         email.send(fail_silently=False)
         return True
     except Exception as e:
