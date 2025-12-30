@@ -5,7 +5,7 @@ import secrets
 import hashlib
 import uuid
 from datetime import datetime, timedelta
-from django.core.mail import EmailMessage, EmailMultiAlternatives
+from django.core.mail import EmailMessage, EmailMultiAlternatives, send_mail
 from django.conf import settings
 from django.template.loader import render_to_string
 
@@ -107,25 +107,26 @@ https://123resume.de
             print("Error: EMAIL_HOST_USER or DEFAULT_FROM_EMAIL not configured")
             return False
         
+        # Use proper From display name format
+        from_email_display = f"123Resume <{from_email}>"
+        
         # Use EmailMultiAlternatives for better control over headers
         email = EmailMultiAlternatives(
             subject=subject,
             body=plain_message,
-            from_email=from_email,
+            from_email=from_email_display,
             to=[user_email],
+            reply_to=['contact@123resume.de'],
         )
         
         # Attach HTML version
         email.attach_alternative(html_message, "text/html")
         
-        # Add important headers to reduce spam filtering
+        # Add proper headers to reduce spam filtering
+        # Removed X-Priority, Precedence, and List-Unsubscribe as they trigger spam filters
         email.extra_headers = {
             'Message-ID': f'<{uuid.uuid4()}@123resume.de>',
             'X-Mailer': '123Resume Email System',
-            'X-Priority': '1',
-            'Precedence': 'bulk',
-            'List-Unsubscribe': f'<https://123resume.de/unsubscribe?email={user_email}>',
-            'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
         }
         
         # Send email
@@ -201,14 +202,26 @@ Ready to get started? Visit https://123resume.de
             print("Error: EMAIL_HOST_USER or DEFAULT_FROM_EMAIL not configured")
             return False
         
-        send_mail(
+        # Use proper From display name format
+        from_email_display = f"123Resume <{from_email}>"
+        
+        # Use EmailMultiAlternatives for consistency and better header control
+        email = EmailMultiAlternatives(
             subject=subject,
-            message=plain_message,
-            from_email=from_email,
-            recipient_list=[user_email],
-            html_message=html_message,
-            fail_silently=False,
+            body=plain_message,
+            from_email=from_email_display,
+            to=[user_email],
+            reply_to=['contact@123resume.de'],
         )
+        
+        email.attach_alternative(html_message, "text/html")
+        
+        email.extra_headers = {
+            'Message-ID': f'<{uuid.uuid4()}@123resume.de>',
+            'X-Mailer': '123Resume Email System',
+        }
+        
+        email.send(fail_silently=False)
         return True
     except Exception as e:
         print(f"Error sending welcome email: {e}")
@@ -311,22 +324,23 @@ https://123resume.de
             print("Error: EMAIL_HOST_USER or DEFAULT_FROM_EMAIL not configured")
             return False
         
+        # Use proper From display name format
+        from_email_display = f"123Resume <{from_email}>"
+        
         email = EmailMultiAlternatives(
             subject=subject,
             body=plain_message,
-            from_email=from_email,
+            from_email=from_email_display,
             to=[user_email],
+            reply_to=['contact@123resume.de'],
         )
         
         email.attach_alternative(html_message, "text/html")
         
+        # Removed X-Priority, Precedence, and List-Unsubscribe as they trigger spam filters
         email.extra_headers = {
             'Message-ID': f'<{uuid.uuid4()}@123resume.de>',
             'X-Mailer': '123Resume Email System',
-            'X-Priority': '1',
-            'Precedence': 'bulk',
-            'List-Unsubscribe': f'<https://123resume.de/unsubscribe?email={user_email}>',
-            'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
         }
         
         email.send(fail_silently=False)
@@ -419,22 +433,23 @@ https://123resume.de
             print("Error: EMAIL_HOST_USER or DEFAULT_FROM_EMAIL not configured")
             return False
         
+        # Use proper From display name format
+        from_email_display = f"123Resume <{from_email}>"
+        
         email = EmailMultiAlternatives(
             subject=subject,
             body=plain_message,
-            from_email=from_email,
+            from_email=from_email_display,
             to=[user_email],
+            reply_to=['contact@123resume.de'],
         )
         
         email.attach_alternative(html_message, "text/html")
         
+        # Removed X-Priority, Precedence, and List-Unsubscribe as they trigger spam filters
         email.extra_headers = {
             'Message-ID': f'<{uuid.uuid4()}@123resume.de>',
             'X-Mailer': '123Resume Email System',
-            'X-Priority': '1',
-            'Precedence': 'bulk',
-            'List-Unsubscribe': f'<https://123resume.de/unsubscribe?email={user_email}>',
-            'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
         }
         
         email.send(fail_silently=False)

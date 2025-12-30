@@ -166,6 +166,73 @@ docker compose logs mongodb
 docker compose restart mongodb
 ```
 
+## Email Configuration
+
+The app supports two email backends:
+
+### Option 1: SendGrid (Recommended for Production)
+
+**Benefits:**
+
+- ✅ Better deliverability (SPF/DKIM/DMARC handled automatically)
+- ✅ Free tier: 100 emails/day forever
+- ✅ No daily sending limits
+- ✅ Built-in analytics and tracking
+- ✅ Professional reputation management
+
+**Setup Steps:**
+
+1. **Create SendGrid Account:**
+
+   - Go to [sendgrid.com](https://sendgrid.com) and sign up (free)
+   - Verify your email address
+
+2. **Create API Key:**
+
+   - Go to Settings → API Keys
+   - Click "Create API Key"
+   - Name it (e.g., "123Resume Production")
+   - Select "Full Access" or "Mail Send" permissions
+   - Copy the API key (you'll only see it once!)
+
+3. **Verify Sender Email:**
+
+   - Go to Settings → Sender Authentication
+   - Click "Verify a Single Sender"
+   - Enter: `noreply@123resume.de` (or your preferred email)
+   - Complete verification
+
+4. **Add to `.env` file:**
+
+   ```bash
+   SENDGRID_API_KEY=SG.your_api_key_here
+   DEFAULT_FROM_EMAIL=noreply@123resume.de
+   ```
+
+5. **Install dependencies:**
+   ```bash
+   docker compose exec backend pip install -r requirements.txt
+   docker compose restart backend
+   ```
+
+That's it! The app will automatically use SendGrid when `SENDGRID_API_KEY` is set.
+
+### Option 2: SMTP (Gmail, etc.) - Fallback
+
+If `SENDGRID_API_KEY` is not set, the app falls back to SMTP:
+
+```bash
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER=your-email@gmail.com
+EMAIL_HOST_PASSWORD=your-app-password  # Use App Password, not regular password
+DEFAULT_FROM_EMAIL=your-email@gmail.com
+```
+
+**Note:** Gmail has daily sending limits (500 emails/day) and may flag emails as spam. SendGrid is recommended for production.
+
 ## Deployment
 
 Live site: [123resume.de](https://123resume.de)

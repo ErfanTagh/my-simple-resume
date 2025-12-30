@@ -8,25 +8,87 @@ interface ModernTemplateProps {
 
 export const ModernTemplate = ({ data }: ModernTemplateProps) => {
   const { t } = useLanguage();
-  const { personalInfo, workExperience, education, projects, certificates, languages, skills, sectionOrder } = data;
+  const { personalInfo, workExperience, education, projects, certificates, languages, skills, sectionOrder, styling } = data;
   
   const defaultOrder = ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"];
   const orderedSections = sectionOrder || defaultOrder;
+  
+  // Extract styling options with defaults
+  const fontFamily = styling?.fontFamily || "Inter";
+  const fontSize = styling?.fontSize || "medium";
+  const titleColor = styling?.titleColor || "#1f2937";
+  const titleBold = styling?.titleBold ?? true;
+  const headingColor = styling?.headingColor || "#2563eb";
+  const headingBold = styling?.headingBold ?? true;
+  const textColor = styling?.textColor || "#1f2937";
+  const linkColor = styling?.linkColor || "#2563eb";
+  
+  // Font size mappings
+  const fontSizeMap = {
+    small: {
+      base: '0.75rem',      // 12px
+      sm: '0.875rem',       // 14px
+      baseText: '0.75rem',  // 12px
+      title: '1.5rem',      // 24px
+      heading: '0.875rem',  // 14px
+      xs: '0.625rem',       // 10px
+    },
+    medium: {
+      base: '0.875rem',     // 14px
+      sm: '1rem',           // 16px
+      baseText: '0.875rem', // 14px
+      title: '1.875rem',    // 30px
+      heading: '1.125rem',  // 18px
+      xs: '0.75rem',        // 12px
+    },
+    large: {
+      base: '1rem',         // 16px
+      sm: '1.125rem',       // 18px
+      baseText: '1rem',     // 16px
+      title: '2.25rem',     // 36px
+      heading: '1.25rem',   // 20px
+      xs: '0.875rem',       // 14px
+    },
+  };
+  
+  const sizes = fontSizeMap[fontSize];
+  
+  // Helper function for section headings
+  const getHeadingStyle = () => ({
+    color: headingColor,
+    fontWeight: headingBold ? 'bold' : 'normal',
+    borderColor: headingColor,
+    fontSize: sizes.heading,
+  });
+  
+  // Helper function for section headings className
+  const getHeadingClassName = () => "mb-3 border-b-2 pb-1";
 
   const renderSection = (sectionKey: string) => {
     switch (sectionKey) {
       case "summary":
         return personalInfo.summary && personalInfo.summary.trim() ? (
           <div key="summary" className="mb-6">
-            <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">{t('resume.sections.professionalSummary').toUpperCase()}</h2>
-            <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{personalInfo.summary.trim()}</p>
+            <h2 
+              className={`text-lg mb-3 border-b-2 pb-1`}
+              style={{ 
+                color: headingColor,
+                fontWeight: headingBold ? 'bold' : 'normal',
+                borderColor: headingColor
+              }}
+            >
+              {t('resume.sections.professionalSummary').toUpperCase()}
+            </h2>
+            <p className="leading-relaxed whitespace-pre-wrap" style={{ color: textColor, fontSize: sizes.baseText }}>
+              {personalInfo.summary.trim()}
+            </p>
           </div>
         ) : null;
 
       case "workExperience":
         return workExperience.some(exp => exp.position || exp.company) ? (
           <div key="workExperience" className="mb-6">
-            <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">{t('resume.sections.experience').toUpperCase()}</h2>
+            <h2 className={getHeadingClassName()} style={getHeadingStyle()}>{t('resume.sections.experience').toUpperCase()}</h2>
             <div className="space-y-4">
               {workExperience.map((exp, index) => (
                 (exp.position || exp.company) && (
@@ -44,9 +106,9 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                         </div>
                       )}
                     </div>
-                    {exp.description && <p className="text-sm text-muted-foreground mb-2">{exp.description}</p>}
+                    {exp.description && <p className="text-muted-foreground mb-2" style={{ color: textColor, fontSize: sizes.sm }}>{exp.description}</p>}
                     {exp.responsibilities && exp.responsibilities.length > 0 && (
-                      <ul className="text-sm text-foreground space-y-1 mb-2">
+                      <ul className="space-y-1 mb-2" style={{ fontSize: sizes.sm }}>
                         {exp.responsibilities.map((resp, i) => (
                           resp.responsibility && (
                             <li key={i} className="flex gap-2">
@@ -64,7 +126,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                     )}
                     {exp.competencies && exp.competencies.length > 0 && (
                       <p className="text-xs text-muted-foreground mt-1">
-                        Competencies: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(", ")}
+                        Power Skills: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(", ")}
                       </p>
                     )}
                   </div>
@@ -77,7 +139,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
       case "education":
         return education.some(edu => edu.degree || edu.institution) ? (
           <div key="education" className="mb-6">
-            <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">{t('resume.sections.education').toUpperCase()}</h2>
+            <h2 className={getHeadingClassName()} style={getHeadingStyle()}>{t('resume.sections.education').toUpperCase()}</h2>
             <div className="space-y-3">
               {education.map((edu, index) => (
                 (edu.degree || edu.institution) && (
@@ -108,7 +170,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
       case "projects":
         return projects.some(proj => proj.name) ? (
           <div key="projects" className="mb-6">
-            <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">{t('resume.sections.projects').toUpperCase()}</h2>
+            <h2 className={getHeadingClassName()} style={getHeadingStyle()}>{t('resume.sections.projects').toUpperCase()}</h2>
             <div className="space-y-3">
               {projects.map((proj, index) => (
                 proj.name && (
@@ -152,7 +214,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
       case "certificates":
         return certificates.some(cert => cert.name) ? (
           <div key="certificates" className="mb-6">
-            <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">{t('resume.sections.certifications').toUpperCase()}</h2>
+            <h2 className={getHeadingClassName()} style={getHeadingStyle()}>{t('resume.sections.certifications').toUpperCase()}</h2>
             <div className="space-y-2">
               {certificates.map((cert, index) => (
                 cert.name && (
@@ -186,7 +248,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
       case "skills":
         return skills.some(s => s.skill) ? (
           <div key="skills" className="mb-6">
-            <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">{t('resume.sections.skills').toUpperCase()}</h2>
+            <h2 className={getHeadingClassName()} style={getHeadingStyle()}>{t('resume.sections.skills').toUpperCase()}</h2>
             <div className="flex flex-wrap gap-2">
               {skills.map((s, index) => (
                 s.skill && (
@@ -202,7 +264,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
       case "languages":
         return languages.some(lang => lang.language) ? (
           <div key="languages" className="mb-6">
-            <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">{t('resume.sections.languages').toUpperCase()}</h2>
+            <h2 className={getHeadingClassName()} style={getHeadingStyle()}>{t('resume.sections.languages').toUpperCase()}</h2>
             <div className="space-y-2">
               {languages.map((lang, index) => (
                 lang.language && (
@@ -219,7 +281,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
       case "interests":
         return personalInfo.interests && personalInfo.interests.length > 0 && personalInfo.interests.some(i => i.interest) ? (
           <div key="interests" className="mb-6">
-            <h2 className="text-lg font-bold mb-3 text-primary border-b-2 border-primary pb-1">{t('resume.sections.interests').toUpperCase()}</h2>
+            <h2 className={getHeadingClassName()} style={getHeadingStyle()}>{t('resume.sections.interests').toUpperCase()}</h2>
             <p className="text-sm text-muted-foreground">{personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}</p>
           </div>
         ) : null;
@@ -230,12 +292,23 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
   };
 
   return (
-    <div className="bg-background text-foreground p-8 max-w-4xl mx-auto">
+    <div 
+      className="bg-background text-foreground p-8 max-w-4xl mx-auto"
+      style={{ fontFamily: `"${fontFamily}", ui-sans-serif, system-ui, sans-serif` }}
+    >
       {/* Header with colored background */}
       <div className="bg-primary/5 -mx-8 -mt-8 px-8 py-6 mb-6 border-l-4 border-primary">
         <div className="flex items-start gap-6">
           <div className="flex-1">
-        <h1 className="text-3xl font-bold text-foreground mb-2">
+        <h1 
+          className="mb-2"
+          style={{ 
+            color: titleColor,
+            fontWeight: titleBold ? 'bold' : 'normal',
+            fontSize: sizes.title,
+            lineHeight: '1.2',
+          }}
+        >
           {personalInfo.firstName} {personalInfo.lastName}
         </h1>
         {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (

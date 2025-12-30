@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { Plus, Trash2 } from "lucide-react";
 import { CVFormData } from "./types";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { LanguageAutocomplete } from "@/components/LanguageAutocomplete";
 
 interface SkillsStepProps {
   form: UseFormReturn<CVFormData>;
@@ -100,9 +101,11 @@ export const SkillsStep = ({ form }: SkillsStepProps) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-2">
                 <Label htmlFor={`languages.${index}.language`}>{t('resume.fields.language')} *</Label>
-                <Input
-                  {...form.register(`languages.${index}.language`)}
+                <LanguageAutocomplete
+                  value={field.language || ""}
+                  onChange={(value) => form.setValue(`languages.${index}.language`, value)}
                   placeholder={t('resume.fields.language')}
+                  id={`languages.${index}.language`}
                 />
               </div>
 

@@ -497,6 +497,7 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
                   data={formData} 
                   onTemplateChange={(template) => form.setValue("template", template)}
                   onSectionOrderChange={(sectionOrder) => form.setValue("sectionOrder", sectionOrder)}
+                  onStylingChange={(styling) => form.setValue("styling", styling)}
                 />
               </div>
             </div>

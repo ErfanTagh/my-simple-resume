@@ -71,7 +71,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
                     )}
                     {exp.competencies && exp.competencies.length > 0 && (
                       <p className="text-xs text-muted-foreground mt-1">
-                        Competencies: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(", ")}
+                        Power Skills: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(", ")}
                       </p>
                     )}
                   </div>

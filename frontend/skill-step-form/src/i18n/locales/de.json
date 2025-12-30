@@ -18,6 +18,10 @@
     "print": "Drucken",
     "download": "Herunterladen",
     "downloadPDF": "PDF Herunterladen",
+    "downloading": {
+      "title": "PDF wird erstellt",
+      "description": "Bitte warten Sie, während wir Ihr Lebenslauf-PDF erstellen..."
+    },
     "viewMore": "Mehr anzeigen",
     "showLess": "Weniger anzeigen"
   },
@@ -186,8 +190,8 @@
       "keyResponsibilities": "Schlüsselverantwortlichkeiten & Erfolge",
       "technologies": "Verwendete Technologien",
       "technologiesHint": "Fügen Sie in diesem Projekt verwendete Technologien hinzu",
-      "keyCompetencies": "Schlüsselkompetenzen",
-      "competenciesHint": "Fügen Sie wichtige Fähigkeiten hinzu, die in dieser Rolle gezeigt wurden",
+      "keyCompetencies": "Soft Skills",
+      "competenciesHint": "Fügen Sie Soft Skills hinzu, die in dieser Rolle gezeigt wurden (z.B. Teamarbeit, Führung, Kommunikation)",
       "keyCourses": "Wichtige Kurse",
       "projectLink": "Projekt-Link",
       "viewProject": "Projekt ansehen",
@@ -196,7 +200,7 @@
       "languagesDesc": "Fügen Sie Sprachen hinzu, die Sie sprechen, und Ihr Kenntnisniveau",
       "add": "Hinzufügen",
       "addTechnology": "Technologie hinzufügen",
-      "addCompetency": "Kompetenz hinzufügen",
+      "addCompetency": "Soft Skill hinzufügen",
       "addCourse": "Kurs hinzufügen",
       "addResponsibility": "Verantwortlichkeit hinzufügen",
       "educationDesc": "Erzählen Sie uns von Ihrem Bildungsweg",
@@ -286,7 +290,9 @@
       "score": "Bewertung"
     },
     "preview": {
-      "notice": "Vorschau - Der finale Export hat eine sauberere Formatierung"
+      "notice": "Vorschau - Der finale Export hat eine sauberere Formatierung",
+      "pages": "Seiten",
+      "page": "Seite"
     },
     "score": {
       "label": "Lebenslauf-Bewertung",
@@ -390,6 +396,27 @@
       }
     },
     "settings": {
+      "stylingTitle": "Gestaltung & Typografie",
+      "stylingDesc": "Schriftarten, Farben und Textstile anpassen",
+      "fontFamily": "Schriftart",
+      "selectFont": "Schriftart auswählen",
+      "fontSize": "Schriftgröße",
+      "selectFontSize": "Schriftgröße auswählen",
+      "fontSizeSmall": "Klein",
+      "fontSizeSmallDesc": "Mehr Inhalt pro Seite",
+      "fontSizeMedium": "Mittel",
+      "fontSizeMediumDesc": "Standard",
+      "fontSizeLarge": "Groß",
+      "fontSizeLargeDesc": "Leichter lesbar",
+      "fontSizeHint": "Kleinere Schriftgrößen ermöglichen mehr Inhalt auf weniger Seiten",
+      "titleColor": "Titel-Farbe",
+      "titleBold": "Fetter Titel",
+      "headingColor": "Überschriften-Farbe",
+      "headingBold": "Fette Überschriften",
+      "textColor": "Text-Farbe",
+      "linkColor": "Link-Farbe",
+      "sectionOrderTitle": "Abschnittsreihenfolge anpassen",
+      "sectionOrderDesc": "Ziehen Sie Abschnitte zum Neuordnen oder verwenden Sie die Pfeiltasten",
       "sectionOrderTitle": "Abschnittsreihenfolge anpassen",
       "sectionOrderDesc": "Ziehen Sie Abschnitte, um sie neu anzuordnen, oder verwenden Sie die Pfeiltasten"
     }
@@ -515,6 +542,10 @@
         "downloaded": {
           "title": "PDF heruntergeladen",
           "description": "Ihr Lebenslauf wurde erfolgreich heruntergeladen."
+        },
+        "downloading": {
+          "title": "PDF wird erstellt",
+          "description": "Bitte warten Sie, während wir Ihr Lebenslauf-PDF erstellen..."
         },
         "error": {
           "title": "Fehler",

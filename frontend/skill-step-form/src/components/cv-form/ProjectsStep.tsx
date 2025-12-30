@@ -7,6 +7,7 @@ import { MonthPicker } from "@/components/ui/month-picker";
 import { Plus, Trash2 } from "lucide-react";
 import { CVFormData } from "./types";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { TechnologyAutocomplete } from "@/components/TechnologyAutocomplete";
 
 interface ProjectsStepProps {
   form: UseFormReturn<CVFormData>;
@@ -47,10 +48,17 @@ const ProjectItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {techFields.map((field, techIndex) => (
             <div key={field.id} className="flex gap-1">
-              <Input
-                {...form.register(`projects.${index}.technologies.${techIndex}.technology`)}
-                placeholder={t('resume.placeholders.technology')}
-                className="text-sm"
+              <Controller
+                control={form.control}
+                name={`projects.${index}.technologies.${techIndex}.technology`}
+                render={({ field: techField }) => (
+                  <TechnologyAutocomplete
+                    value={techField.value || ""}
+                    onChange={techField.onChange}
+                    placeholder={t('resume.placeholders.technology')}
+                    className="text-sm"
+                  />
+                )}
               />
               {techFields.length > 0 && (
                 <Button

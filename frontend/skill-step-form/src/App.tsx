@@ -20,6 +20,8 @@ import ResetPassword from "./pages/ResetPassword";
 import Resumes from "./pages/Resumes";
 import CreateResume from "./pages/CreateResume";
 import ResumeView from "./pages/ResumeView";
+import JobMatching from "./pages/JobMatching";
+import Profile from "./pages/Profile";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 // Blog editing components - only loaded in development mode
@@ -87,10 +89,26 @@ const AppRoutes = () => {
           }
         />
         <Route
+          path="/job-matching"
+          element={
+            <ProtectedRoute>
+              <JobMatching />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/resume/:id"
           element={
             <ProtectedRoute>
               <ResumeView />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />

@@ -446,6 +446,26 @@ export const resumeAPI = {
   },
 
   /**
+   * Match resume to a single job description using AI semantic similarity
+   */
+  matchToJob: async (resumeId: string, jobTitle: string, jobDescription: string): Promise<{
+    resume_id: string;
+    job_title: string;
+    job_description: string;
+    similarity: number;
+    match_percentage: number;
+    resume_summary: string;
+  }> => {
+    const makeRequest = () => fetch(`${API_BASE_URL}/resumes/${resumeId}/match/`, {
+      method: 'POST',
+      headers: createHeaders(true),
+      body: JSON.stringify({ title: jobTitle, description: jobDescription }),
+    });
+    const response = await makeRequest();
+    return handleResponse(response, makeRequest);
+  },
+
+  /**
    * Parse resume text (extracted from PDF on frontend) and return structured data
    * This uses better PDF extraction (react-pdftotext) on the frontend
    */

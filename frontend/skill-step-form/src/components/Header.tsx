@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { FileText, User, LogOut, Settings } from 'lucide-react';
+import { FileText, User, LogOut, Settings, Sparkles } from 'lucide-react';
 import { LanguageSwitcher } from './LanguageSwitcher';
 
 export const Header = () => {
@@ -20,7 +20,7 @@ export const Header = () => {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/login');
+    navigate('/');
   };
 
   return (
@@ -59,6 +59,10 @@ export const Header = () => {
                     <DropdownMenuItem onClick={() => navigate('/resumes')}>
                       <FileText className="mr-2 h-4 w-4" />
                       <span>{t('navigation.myResumes')}</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/job-matching')}>
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      <span>AI Job Matching</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate('/dashboard')}>
                       <FileText className="mr-2 h-4 w-4" />

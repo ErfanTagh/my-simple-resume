@@ -101,6 +101,16 @@ export const cvFormSchema = z.object({
   ).optional(),  // 🔧 Made array optional
   sectionOrder: z.array(z.string()).optional(),
   template: z.enum(["modern", "classic", "minimal", "creative", "latex", "starRover"]).default("modern"),
+  styling: z.object({
+    fontFamily: z.string().optional(),
+    fontSize: z.enum(["small", "medium", "large"]).optional(),
+    titleColor: z.string().optional(),
+    titleBold: z.boolean().optional(),
+    headingColor: z.string().optional(),
+    headingBold: z.boolean().optional(),
+    textColor: z.string().optional(),
+    linkColor: z.string().optional(),
+  }).optional(),
 });
 export type CVFormData = z.infer<typeof cvFormSchema>;
 

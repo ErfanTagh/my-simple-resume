@@ -9,6 +9,8 @@ import { Plus, Trash2 } from "lucide-react";
 import { CVFormData } from "./types";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { CityAutocomplete } from "@/components/ui/city-autocomplete";
+import { TechnologyAutocomplete } from "@/components/TechnologyAutocomplete";
+import { PowerSkillsAutocomplete } from "@/components/PowerSkillsAutocomplete";
 
 interface WorkExperienceStepProps {
   form: UseFormReturn<CVFormData>;
@@ -141,10 +143,17 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {techFields.map((field, techIndex) => (
             <div key={field.id} className="flex gap-1">
-              <Input
-                {...form.register(`workExperience.${index}.technologies.${techIndex}.technology`)}
-                placeholder="e.g., React"
-                className="text-sm"
+              <Controller
+                control={form.control}
+                name={`workExperience.${index}.technologies.${techIndex}.technology`}
+                render={({ field: techField }) => (
+                  <TechnologyAutocomplete
+                    value={techField.value || ""}
+                    onChange={techField.onChange}
+                    placeholder={t('resume.placeholders.technology')}
+                    className="text-sm"
+                  />
+                )}
               />
               {techFields.length > 0 && (
                 <Button
@@ -179,10 +188,17 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {compFields.map((field, compIndex) => (
             <div key={field.id} className="flex gap-1">
-              <Input
-                {...form.register(`workExperience.${index}.competencies.${compIndex}.competency`)}
-                placeholder={t('resume.placeholders.competency')}
-                className="text-sm"
+              <Controller
+                control={form.control}
+                name={`workExperience.${index}.competencies.${compIndex}.competency`}
+                render={({ field: compField }) => (
+                  <PowerSkillsAutocomplete
+                    value={compField.value || ""}
+                    onChange={compField.onChange}
+                    placeholder={t('resume.placeholders.competency')}
+                    className="text-sm"
+                  />
+                )}
               />
               {compFields.length > 0 && (
                 <Button

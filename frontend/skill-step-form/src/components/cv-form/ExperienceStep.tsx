@@ -7,12 +7,17 @@ import { Separator } from "@/components/ui/separator";
 import { MonthPicker } from "@/components/ui/month-picker";
 import { Plus, Trash2 } from "lucide-react";
 import { CVFormData } from "./types";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { TechnologyAutocomplete } from "@/components/TechnologyAutocomplete";
+import { CityAutocomplete } from "@/components/ui/city-autocomplete";
+import { PowerSkillsAutocomplete } from "@/components/PowerSkillsAutocomplete";
 
 interface ExperienceStepProps {
   form: UseFormReturn<CVFormData>;
 }
 
 const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: number }) => {
+  const { t } = useLanguage();
   const { fields: respFields, append: appendResp, remove: removeResp } = useFieldArray({
     control: form.control,
     name: `workExperience.${index}.responsibilities`,
@@ -47,10 +52,18 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor={`workExperience.${index}.location`}>Location</Label>
-        <Input
-          {...form.register(`workExperience.${index}.location`)}
-          placeholder="San Francisco, USA"
+        <Label htmlFor={`workExperience.${index}.location`}>{t('resume.fields.location')}</Label>
+        <Controller
+          control={form.control}
+          name={`workExperience.${index}.location`}
+          render={({ field }) => (
+            <CityAutocomplete
+              id={`workExperience.${index}.location`}
+              value={field.value || ""}
+              onChange={field.onChange}
+              placeholder={t('resume.placeholders.jobLocation')}
+            />
+          )}
         />
       </div>
 
@@ -130,10 +143,17 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
           {techFields.map((field, techIndex) => (
             <div key={field.id} className="flex gap-1">
-              <Input
-                {...form.register(`workExperience.${index}.technologies.${techIndex}.technology`)}
-                placeholder="e.g., React"
-                className="text-sm"
+              <Controller
+                control={form.control}
+                name={`workExperience.${index}.technologies.${techIndex}.technology`}
+                render={({ field: techField }) => (
+                  <TechnologyAutocomplete
+                    value={techField.value || ""}
+                    onChange={techField.onChange}
+                    placeholder="e.g., React"
+                    className="text-sm"
+                  />
+                )}
               />
               {techFields.length > 0 && (
                 <Button
@@ -162,16 +182,23 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
 
       <div className="space-y-3">
         <div>
-          <Label>Key Competencies</Label>
-          <p className="text-xs text-muted-foreground mt-1">Add key skills demonstrated in this role</p>
+          <Label>{t('resume.labels.keyCompetencies')}</Label>
+          <p className="text-xs text-muted-foreground mt-1">{t('resume.labels.competenciesHint')}</p>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
           {compFields.map((field, compIndex) => (
             <div key={field.id} className="flex gap-1">
-              <Input
-                {...form.register(`workExperience.${index}.competencies.${compIndex}.competency`)}
-                placeholder="e.g., Teamwork"
-                className="text-sm"
+              <Controller
+                control={form.control}
+                name={`workExperience.${index}.competencies.${compIndex}.competency`}
+                render={({ field: compField }) => (
+                  <PowerSkillsAutocomplete
+                    value={compField.value || ""}
+                    onChange={compField.onChange}
+                    placeholder={t('resume.placeholders.competency')}
+                    className="text-sm"
+                  />
+                )}
               />
               {compFields.length > 0 && (
                 <Button
@@ -194,7 +221,7 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
           onClick={() => appendComp({ competency: "" })}
         >
           <Plus className="mr-1 h-3 w-3" />
-          Add Competency
+          {t('resume.labels.addCompetency')}
         </Button>
       </div>
     </>
@@ -235,10 +262,17 @@ const ProjectItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
           {techFields.map((field, techIndex) => (
             <div key={field.id} className="flex gap-1">
-              <Input
-                {...form.register(`projects.${index}.technologies.${techIndex}.technology`)}
-                placeholder="e.g., React"
-                className="text-sm"
+              <Controller
+                control={form.control}
+                name={`projects.${index}.technologies.${techIndex}.technology`}
+                render={({ field: techField }) => (
+                  <TechnologyAutocomplete
+                    value={techField.value || ""}
+                    onChange={techField.onChange}
+                    placeholder="e.g., React"
+                    className="text-sm"
+                  />
+                )}
               />
               {techFields.length > 0 && (
                 <Button

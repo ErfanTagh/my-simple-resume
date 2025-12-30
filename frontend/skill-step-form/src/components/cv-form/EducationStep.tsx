@@ -9,6 +9,8 @@ import { Plus, Trash2 } from "lucide-react";
 import { CVFormData } from "./types";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { CityAutocomplete } from "@/components/ui/city-autocomplete";
+import { DegreeAutocomplete } from "@/components/DegreeAutocomplete";
+import { FieldOfStudyAutocomplete } from "@/components/FieldOfStudyAutocomplete";
 
 interface EducationStepProps {
   form: UseFormReturn<CVFormData>;
@@ -25,9 +27,17 @@ const EducationItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index
     <>
       <div className="space-y-2">
         <Label htmlFor={`education.${index}.degree`}>{t('resume.fields.degree')} *</Label>
-        <Input
-          {...form.register(`education.${index}.degree`)}
-          placeholder={t('resume.placeholders.degree')}
+        <Controller
+          control={form.control}
+          name={`education.${index}.degree`}
+          render={({ field }) => (
+            <DegreeAutocomplete
+              value={field.value || ""}
+              onChange={field.onChange}
+              placeholder={t('resume.placeholders.degree')}
+              id={`education.${index}.degree`}
+            />
+          )}
         />
       </div>
 
@@ -89,9 +99,17 @@ const EducationItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index
 
       <div className="space-y-2">
         <Label htmlFor={`education.${index}.field`}>{t('resume.fields.field')}</Label>
-        <Input
-          {...form.register(`education.${index}.field`)}
-          placeholder={t('resume.placeholders.fieldOfStudy')}
+        <Controller
+          control={form.control}
+          name={`education.${index}.field`}
+          render={({ field }) => (
+            <FieldOfStudyAutocomplete
+              value={field.value || ""}
+              onChange={field.onChange}
+              placeholder={t('resume.placeholders.fieldOfStudy')}
+              id={`education.${index}.field`}
+            />
+          )}
         />
       </div>
 

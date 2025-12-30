@@ -13,6 +13,10 @@ PyJWT==2.8.0
 django-cors-headers==4.3.1
 python-dotenv==1.0.0
 
+# Email service (Anymail supports SendGrid, Mailgun, AWS SES, etc.)
+# Anymail is the recommended Django package for transactional email services
+anymail[sendgrid]>=10.0
+
 # Production server
 gunicorn==21.2.0
 
@@ -22,4 +26,8 @@ PyPDF2>=3.0.0
 
 # PDF generation with headless browser
 playwright>=1.40.0
+
+# ML/AI for resume-job matching
+sentence-transformers>=2.2.0
+numpy>=1.24.0
 

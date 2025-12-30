@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     # 'rest_framework_simplejwt.token_blacklist',  # Disabled - incompatible with djongo/MongoDB
     'corsheaders',
+    'anymail',  # Email service integration (SendGrid, Mailgun, AWS SES, etc.)
     
     # Local apps
     'api',
@@ -184,19 +185,33 @@ SIMPLE_JWT = {
 }
 
 # Email Configuration
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
-EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
-EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
-EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'False') == 'True'
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '').strip()
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '').strip()
+# Priority: SendGrid (if API key is set) > SMTP (fallback)
+# SendGrid provides better deliverability and is recommended for production
+SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY', '').strip()
+
+if SENDGRID_API_KEY:
+    # Use Anymail with SendGrid for better deliverability
+    EMAIL_BACKEND = 'anymail.backends.sendgrid.EmailBackend'
+    ANYMAIL = {
+        'SENDGRID_API_KEY': SENDGRID_API_KEY,
+    }
+    # Anymail handles SMTP settings automatically, but we can set defaults
+    EMAIL_HOST = 'smtp.sendgrid.net'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+else:
+    # Fallback to SMTP (Gmail, etc.)
+    EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+    EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+    EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+    EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+    EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'False') == 'True'
+    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '').strip()
+    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '').strip()
 
 # Email FROM address configuration
-# For custom domain emails (e.g., registration@123resume.de), the FROM email 
-# should match the authenticated email (EMAIL_HOST_USER) to avoid blocking
-# If DEFAULT_FROM_EMAIL is set, use it; otherwise use EMAIL_HOST_USER
-# Remove any display name and use just the email address
+# For SendGrid: Use a verified sender email (e.g., noreply@123resume.de)
+# For SMTP: Should match authenticated email to avoid blocking
 default_from = os.getenv('DEFAULT_FROM_EMAIL', '').strip()
 if default_from:
     # Extract email from "Display Name <email@domain.com>" format if present
@@ -207,8 +222,11 @@ if default_from:
     else:
         DEFAULT_FROM_EMAIL = default_from
 else:
-    # Fallback to authenticated email or default registration email
-    DEFAULT_FROM_EMAIL = EMAIL_HOST_USER or 'registration@123resume.de'
+    # Fallback: Use verified sender for SendGrid, or authenticated email for SMTP
+    if SENDGRID_API_KEY:
+        DEFAULT_FROM_EMAIL = 'noreply@123resume.de'  # Should be verified in SendGrid
+    else:
+        DEFAULT_FROM_EMAIL = EMAIL_HOST_USER or 'registration@123resume.de'
 
 # Set SERVER_EMAIL to match for error reporting
 SERVER_EMAIL = DEFAULT_FROM_EMAIL

@@ -18,6 +18,10 @@
     "print": "Print",
     "download": "Download",
     "downloadPDF": "Download PDF",
+    "downloading": {
+      "title": "Generating PDF",
+      "description": "Please wait while we generate your resume PDF..."
+    },
     "viewMore": "View More",
     "showLess": "Show Less"
   },
@@ -186,8 +190,8 @@
       "keyResponsibilities": "Key Responsibilities & Achievements",
       "technologies": "Technologies Used",
       "technologiesHint": "Add technologies used in this project",
-      "keyCompetencies": "Key Competencies",
-      "competenciesHint": "Add key skills demonstrated in this role",
+      "keyCompetencies": "Power Skills",
+      "competenciesHint": "Add power skills demonstrated in this role (e.g., Teamwork, Leadership, Communication)",
       "keyCourses": "Key Courses",
       "projectLink": "Project Link",
       "viewProject": "View Project",
@@ -196,7 +200,7 @@
       "languagesDesc": "Add languages you speak and your proficiency level",
       "add": "Add",
       "addTechnology": "Add Technology",
-      "addCompetency": "Add Competency",
+      "addCompetency": "Add Power Skill",
       "addCourse": "Add Course",
       "addResponsibility": "Add Responsibility",
       "educationDesc": "Tell us about your educational background",
@@ -286,7 +290,9 @@
       "score": "Score"
     },
     "preview": {
-      "notice": "Preview - Final export will have cleaner formatting"
+      "notice": "Preview - Final export will have cleaner formatting",
+      "pages": "pages",
+      "page": "Page"
     },
     "score": {
       "label": "Resume Score",
@@ -390,6 +396,27 @@
       }
     },
     "settings": {
+      "stylingTitle": "Styling & Typography",
+      "stylingDesc": "Customize fonts, colors, and text styles",
+      "fontFamily": "Font Family",
+      "selectFont": "Select font",
+      "fontSize": "Font Size",
+      "selectFontSize": "Select font size",
+      "fontSizeSmall": "Small",
+      "fontSizeSmallDesc": "More content per page",
+      "fontSizeMedium": "Medium",
+      "fontSizeMediumDesc": "Standard",
+      "fontSizeLarge": "Large",
+      "fontSizeLargeDesc": "Easier to read",
+      "fontSizeHint": "Smaller font sizes allow more content to fit on fewer pages",
+      "titleColor": "Title Color",
+      "titleBold": "Bold Title",
+      "headingColor": "Section Heading Color",
+      "headingBold": "Bold Headings",
+      "textColor": "Text Color",
+      "linkColor": "Link Color",
+      "sectionOrderTitle": "Customize Section Order",
+      "sectionOrderDesc": "Drag sections to reorder or use the arrow buttons",
       "sectionOrderTitle": "Customize Section Order",
       "sectionOrderDesc": "Drag sections to reorder or use the arrow buttons"
     }
@@ -515,6 +542,10 @@
         "downloaded": {
           "title": "PDF Downloaded",
           "description": "Your resume has been downloaded successfully."
+        },
+        "downloading": {
+          "title": "Generating PDF",
+          "description": "Please wait while we generate your resume PDF..."
         },
         "error": {
           "title": "Error",
