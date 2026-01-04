@@ -42,6 +42,33 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentStep]);
 
+
+  // Push history state when entering the form (templateSelected becomes true)
+  useEffect(() => {
+    if (templateSelected && !editId && !initialData) {
+      // Push a state when entering the form so we can intercept back button
+      window.history.pushState({ formStep: currentStep, templateSelected: true }, '', window.location.pathname);
+    }
+  }, [templateSelected, editId, initialData, currentStep]);
+
+  // Handle browser back button - intercept and go back to template selection
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      // If we're in the form (templateSelected is true) and on step 0, go back to template selection
+      if (templateSelected && currentStep === 0 && !editId && !initialData) {
+        // We can't prevent popstate, but we can update state and push a new state
+        setTemplateSelected(false);
+        // Push a new state to keep us on the same page and prevent further navigation
+        setTimeout(() => {
+          window.history.pushState({ templateSelected: false }, '', window.location.pathname);
+        }, 0);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [currentStep, templateSelected, editId, initialData]);
+
   // Ensure workExperience and education always have at least one entry
   const getDefaultValues = (): CVFormData => {
     const defaults = {
@@ -448,7 +475,7 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
                 return (
                   <div
                     key={template.key}
-                    className={`bg-card rounded-2xl border-2 transition-all duration-300 cursor-pointer hover:shadow-[0_8px_25px_-5px_hsl(var(--primary)/0.35)] hover:-translate-y-1.5 ${
+                    className={`bg-card rounded-2xl border-2 transition-all duration-300 cursor-pointer hover:shadow-[0_8px_25px_-5px_hsl(var(--primary)/0.35)] hover:-translate-y-1.5 flex flex-col h-full ${
                       isSelected
                         ? "border-primary shadow-lg ring-2 ring-primary/20"
                         : "border-border hover:border-primary/30"
@@ -456,21 +483,25 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
                     onClick={() => {
                       form.setValue("template", template.key);
                     }}
+                    onDoubleClick={() => {
+                      form.setValue("template", template.key);
+                      setTemplateSelected(true);
+                    }}
                   >
-                    <div className="aspect-[3/4] bg-white rounded-t-2xl mb-4 overflow-hidden border-b border-border shadow-inner relative max-h-[400px] sm:max-h-[450px]">
+                    <div className="aspect-[3/4] bg-white rounded-t-2xl overflow-hidden border-b border-border shadow-inner relative max-h-[400px] sm:max-h-[450px] flex-shrink-0">
                       <div className="absolute inset-0 w-full h-full">
                         <LandingTemplatePreview templateName={template.key} />
                       </div>
                     </div>
-                    <div className="p-4 sm:p-5 space-y-2">
-                      <h3 className="font-bold text-lg sm:text-xl" style={{ color: 'hsl(215 25% 15%)' }}>
+                    <div className="p-4 sm:p-5 flex flex-col" style={{ height: '140px' }}>
+                      <h3 className="font-bold text-lg sm:text-xl mb-2 flex-shrink-0" style={{ color: 'hsl(215 25% 15%)' }}>
                         {t(`landing.${template.nameKey}`)} {t('landing.templateLabel')}
                       </h3>
-                      <p className="text-sm sm:text-base font-medium" style={{ color: 'hsl(214 95% 45%)' }}>
+                      <p className="text-sm sm:text-base font-medium mb-2 flex-shrink-0" style={{ color: 'hsl(214 95% 45%)' }}>
                         {t(`landing.${template.descKey}`)}
                       </p>
                       {isSelected && (
-                        <div className="pt-2 flex items-center gap-2 text-primary text-sm font-semibold">
+                        <div className="flex items-center gap-2 text-primary text-sm font-semibold mt-auto flex-shrink-0">
                           <CheckCircle2 className="h-4 w-4" />
                           <span>{t('common.selected') || 'Selected'}</span>
                         </div>
@@ -567,15 +598,17 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
                   )}
 
                   <div className="flex justify-between mt-8 pt-6 border-t">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handlePrevious}
-                      disabled={currentStep === 0}
-                    >
-                      <ChevronLeft className="mr-2 h-4 w-4" />
-                      Previous
-                    </Button>
+                    {currentStep > 0 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handlePrevious}
+                      >
+                        <ChevronLeft className="mr-2 h-4 w-4" />
+                        Previous
+                      </Button>
+                    )}
+                    {currentStep === 0 && <div />}
 
                     {currentStep === steps.length - 1 ? (
                       <Button 
@@ -614,7 +647,8 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
               {/* Right Sidebar - Always Visible Preview */}
               <div className="hidden lg:block lg:col-span-3">
                 <CVPreview 
-                  data={getPreviewDataWithHints(formData)} 
+                  data={getPreviewDataWithHints(formData)}
+                  actualDataForScoring={formData}
                   onTemplateChange={(template) => form.setValue("template", template)}
                   onSectionOrderChange={(sectionOrder) => form.setValue("sectionOrder", sectionOrder)}
                   onStylingChange={(styling) => form.setValue("styling", styling)}

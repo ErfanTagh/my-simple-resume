@@ -40,8 +40,8 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
     
     const content = (
       <div className="flex items-center gap-1 mb-0.5">
-        <Icon className="h-2.5 w-2.5 text-foreground flex-shrink-0" />
-        <span className="text-[10px] text-foreground truncate" style={{ lineHeight: '1.3' }}>
+        <Icon className="h-3 w-3 text-foreground flex-shrink-0" />
+        <span className="text-xs text-foreground truncate" style={{ lineHeight: '1.3' }}>
           {text}
         </span>
       </div>
@@ -86,26 +86,26 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                   : '';
                 
                 return (
-                  <div key={index} className="flex gap-2 text-[10px]">
-                    <div className="w-[13%] flex-shrink-0 text-muted-foreground text-[9px]">
+                  <div key={index} className="flex gap-2 text-sm">
+                    <div className="w-[13%] flex-shrink-0 text-muted-foreground text-xs">
                       {dateRange}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start gap-2 mb-0.5">
-                        <h3 className="font-bold text-foreground text-[10px]">{proj.name}</h3>
+                        <h3 className="font-bold text-foreground text-sm">{proj.name}</h3>
                         {proj.link && (
                           <a 
                             href={proj.link} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="text-muted-foreground hover:underline flex-shrink-0 text-[8px] truncate max-w-[120px]"
+                            className="text-muted-foreground hover:underline flex-shrink-0 text-xs truncate max-w-[120px]"
                           >
                             {proj.link.replace(/^https?:\/\//, '').substring(0, 25)}
                           </a>
                         )}
                       </div>
                       {proj.description && (
-                        <p className="text-foreground mb-0.5 leading-snug break-words text-[10px]">
+                        <p className="text-foreground mb-0.5 leading-snug break-words text-sm">
                           {proj.description}
                         </p>
                       )}
@@ -114,15 +114,15 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                           {proj.highlights.map((highlight, i) => (
                             highlight.highlight && (
                               <li key={i} className="flex gap-1">
-                                <span className="text-foreground flex-shrink-0 text-[10px]">•</span>
-                                <span className="flex-1 break-words text-[10px] leading-snug">{highlight.highlight}</span>
+                                <span className="text-foreground flex-shrink-0 text-sm">•</span>
+                                <span className="flex-1 break-words text-sm leading-snug">{highlight.highlight}</span>
                               </li>
                             )
                           ))}
                         </ul>
                       )}
                       {technologies && (
-                        <p className="text-muted-foreground text-[8px] font-mono">
+                        <p className="text-muted-foreground text-xs font-mono">
                           {technologies}
                         </p>
                       )}
@@ -150,27 +150,27 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                 const dateRange = formatDateRangeLatex(edu.startDate, edu.endDate);
                 
                 return (
-                  <div key={index} className="flex gap-2 text-[10px]">
-                    <div className="w-[13%] flex-shrink-0 text-muted-foreground text-[9px]">
+                  <div key={index} className="flex gap-2 text-sm">
+                    <div className="w-[13%] flex-shrink-0 text-muted-foreground text-xs">
                       {dateRange}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start gap-2 mb-0.5">
-                        <h3 className="font-bold text-foreground text-[10px]">{edu.degree || ''}</h3>
+                        <h3 className="font-bold text-foreground text-sm">{edu.degree || ''}</h3>
                         <div className="text-right">
-                          <span className="text-[10px] font-bold text-foreground flex-shrink-0">
+                          <span className="text-sm font-bold text-foreground flex-shrink-0">
                             {edu.institution || ''}
                           </span>
                           {edu.location && (
-                            <span className="text-[8px] text-muted-foreground block">{edu.location}</span>
+                            <span className="text-xs text-muted-foreground block">{edu.location}</span>
                           )}
                         </div>
                       </div>
                       {edu.field && (
-                        <p className="text-foreground leading-snug break-words text-[10px]">{edu.field}</p>
+                        <p className="text-foreground leading-snug break-words text-sm">{edu.field}</p>
                       )}
                       {edu.keyCourses && edu.keyCourses.length > 0 && (
-                        <p className="text-muted-foreground text-[8px] mt-0.5">
+                        <p className="text-muted-foreground text-xs mt-0.5">
                           Key Courses: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(', ')}
                         </p>
                       )}
@@ -209,19 +209,19 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                   : [];
                 
                 return (
-                  <div key={index} className="flex gap-2 text-[10px]">
-                    <div className="w-[13%] flex-shrink-0 text-muted-foreground text-[9px]">
+                  <div key={index} className="flex gap-2 text-sm">
+                    <div className="w-[13%] flex-shrink-0 text-muted-foreground text-xs">
                       {dateRange}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start gap-2 mb-0.5">
-                        <h3 className="font-bold text-foreground text-[10px]">{exp.position || ''}</h3>
+                        <h3 className="font-bold text-foreground text-sm">{exp.position || ''}</h3>
                         <div className="text-right">
-                          <span className="text-[10px] font-bold text-foreground flex-shrink-0">
+                          <span className="text-sm font-bold text-foreground flex-shrink-0">
                             {exp.company || ''}
                           </span>
                           {exp.location && (
-                            <span className="text-[8px] text-muted-foreground block">{exp.location}</span>
+                            <span className="text-xs text-muted-foreground block">{exp.location}</span>
                           )}
                         </div>
                       </div>
@@ -229,8 +229,8 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                         <ul className="text-foreground space-y-0.5 mt-0.5 mb-0.5 list-none pl-0">
                           {responsibilities.map((resp, i) => (
                             <li key={i} className="flex gap-1">
-                              <span className="text-foreground flex-shrink-0 text-[10px]">•</span>
-                              <span className="flex-1 break-words text-[10px] leading-snug">{resp}</span>
+                              <span className="text-foreground flex-shrink-0 text-sm">•</span>
+                              <span className="flex-1 break-words text-sm leading-snug">{resp}</span>
                             </li>
                           ))}
                         </ul>
@@ -238,14 +238,14 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                       {technologies.length > 0 && (
                         <div className="flex flex-wrap gap-0.5 mt-0.5">
                           {technologies.map((tech, i) => (
-                            <span key={i} className="text-[8px] font-mono text-muted-foreground bg-muted/50 px-1 py-0.5 rounded">
+                            <span key={i} className="text-xs font-mono text-muted-foreground bg-muted/50 px-1 py-0.5 rounded">
                               {tech}
                             </span>
                           ))}
                         </div>
                       )}
                       {exp.competencies && exp.competencies.length > 0 && (
-                        <p className="text-muted-foreground text-[8px] mt-0.5">
+                        <p className="text-muted-foreground text-xs mt-0.5">
                           Power Skills: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(', ')}
                         </p>
                       )}
@@ -273,22 +273,22 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                 const dateRange = formatDateRangeLatex(cert.issueDate, cert.expirationDate);
                 
                 return (
-                  <div key={index} className="flex gap-2 text-[10px]">
-                    <div className="w-[13%] flex-shrink-0 text-muted-foreground text-[9px]">
+                  <div key={index} className="flex gap-2 text-sm">
+                    <div className="w-[13%] flex-shrink-0 text-muted-foreground text-xs">
                       {dateRange || cert.issueDate || ''}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start gap-2 mb-0.5">
-                        <h3 className="font-bold text-foreground text-[10px]">{cert.name}</h3>
-                        <span className="text-[10px] font-bold text-foreground flex-shrink-0">
+                        <h3 className="font-bold text-foreground text-sm">{cert.name}</h3>
+                        <span className="text-sm font-bold text-foreground flex-shrink-0">
                           {cert.organization || ''}
                         </span>
                       </div>
                       {cert.credentialId && (
-                        <p className="text-muted-foreground text-[8px]">ID: {cert.credentialId}</p>
+                        <p className="text-muted-foreground text-xs">ID: {cert.credentialId}</p>
                       )}
                       {cert.url && (
-                        <a href={cert.url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:underline text-[8px] block truncate max-w-[200px]">
+                        <a href={cert.url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:underline text-xs block truncate max-w-[200px]">
                           {cert.url.replace(/^https?:\/\/(www\.)?/, '')}
                         </a>
                       )}
@@ -309,7 +309,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
               </h2>
               <div className="flex-1 border-t border-foreground"></div>
             </div>
-            <div className="pl-[15%] text-[10px]">
+            <div className="pl-[15%] text-sm">
               {languages
                 .filter(lang => lang.language)
                 .map((lang, index, arr) => (
@@ -332,7 +332,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
               </h2>
               <div className="flex-1 border-t border-foreground"></div>
             </div>
-            <p className="text-[10px] text-foreground pl-[15%]">
+            <p className="text-sm text-foreground pl-[15%]">
               {personalInfo.interests.filter(i => i.interest).map(i => i.interest).join(', ')}
             </p>
           </div>
@@ -347,65 +347,77 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
   const professionalTitle = (personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0) ? personalInfo.professionalTitle.trim() : '';
 
   return (
-    <div className="bg-background text-foreground p-4 max-w-[1280px] mx-auto" style={{ fontFamily: 'sans-serif' }}>
-      {/* Header: More compact layout */}
-      <div className="flex items-start mb-2 gap-3">
-        <div className="flex items-start gap-2 flex-shrink-0">
-          {/* Profile image - smaller */}
-          {personalInfo.profileImage && (
-            <div className="flex-shrink-0">
-              <div className="w-16 h-16 overflow-hidden rounded-sm border border-foreground">
-                <img 
-                  src={personalInfo.profileImage} 
-                  alt={`Professional profile photo of ${fullName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                />
+    <div className="bg-background text-foreground p-8 max-w-4xl mx-auto text-base" style={{ fontFamily: 'sans-serif', fontSize: '16px' }}>
+      {/* Header: More spacious layout with full-width content */}
+      <div className="-mx-8 -mt-8 px-8 pt-8 mb-6 border-b-2 border-foreground/30">
+        <div className="flex items-start mb-6 gap-6">
+          <div className="flex items-start gap-4 flex-shrink-0">
+            {/* Profile image - using Tailwind classes like other templates */}
+            {personalInfo.profileImage ? (
+              <div className="flex-shrink-0">
+                <div className="w-28 h-28 overflow-hidden rounded-sm border-2 border-foreground/40">
+                  <img 
+                    src={personalInfo.profileImage} 
+                    alt={`Professional profile photo of ${fullName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
+                    className="w-full h-full object-cover object-center"
+                    loading="lazy"
+                  />
+                </div>
               </div>
-            </div>
-          )}
-          
-          <div className="flex-shrink-0">
-            {fullName && (
-              <h1 className="text-lg font-bold text-foreground uppercase mb-0 leading-tight">
+            ) : (
+              <div className="flex-shrink-0 w-28 h-28 bg-muted border-2 border-foreground/40 rounded-sm flex items-center justify-center">
+                <span className="text-xs text-muted-foreground">Photo</span>
+              </div>
+            )}
+            
+            <div className="flex-shrink-0 pt-2 flex flex-col gap-2">
+            {fullName ? (
+              <h1 className="text-3xl font-bold text-foreground uppercase mb-0 leading-tight">
                 {fullName}
               </h1>
+            ) : (
+              <h1 className="text-3xl font-bold text-foreground uppercase mb-0 leading-tight">
+                YOUR NAME HERE
+              </h1>
             )}
-            {professionalTitle && (
-              <p className="text-sm text-foreground mt-0.5 leading-tight">{professionalTitle}</p>
+            {professionalTitle ? (
+              <p className="text-lg text-foreground mt-0 leading-tight font-medium">{professionalTitle}</p>
+            ) : (
+              <p className="text-lg text-foreground mt-0 leading-tight font-medium">Your Professional Title</p>
             )}
-          </div>
-        </div>
-        
-        {/* Contact info - more compact, stacked layout */}
-        <div className="flex gap-2 flex-1 ml-auto justify-end">
-          <div className="flex-shrink-0 min-w-[110px]">
-            {personalInfo.website && renderIconText(Globe, personalInfo.website, personalInfo.website)}
-            {personalInfo.phone && renderIconText(Phone, personalInfo.phone)}
-            {personalInfo.location && renderIconText(MapPin, personalInfo.location)}
+            </div>
           </div>
           
-          <div className="flex-shrink-0 min-w-[150px]">
-            {personalInfo.email && renderIconText(Mail, personalInfo.email, `mailto:${personalInfo.email}`)}
-            {personalInfo.github && renderIconText(Github, personalInfo.github, personalInfo.github)}
-            {personalInfo.linkedin && renderIconText(Linkedin, personalInfo.linkedin, personalInfo.linkedin)}
+          {/* Contact info - more spacious, stacked layout using full width */}
+          <div className="flex gap-6 flex-1 ml-auto justify-end pt-2">
+            <div className="flex-shrink-0 min-w-[160px]">
+              {personalInfo.website ? renderIconText(Globe, personalInfo.website, personalInfo.website) : renderIconText(Globe, "yourwebsite.com", "#")}
+              {personalInfo.phone ? renderIconText(Phone, personalInfo.phone) : renderIconText(Phone, "+1 (555) 123-4567")}
+              {personalInfo.location ? renderIconText(MapPin, personalInfo.location) : renderIconText(MapPin, "City, Country")}
+            </div>
+            
+            <div className="flex-shrink-0 min-w-[200px]">
+              {personalInfo.email ? renderIconText(Mail, personalInfo.email, `mailto:${personalInfo.email}`) : renderIconText(Mail, "your.email@example.com", "#")}
+              {personalInfo.github ? renderIconText(Github, personalInfo.github, personalInfo.github) : renderIconText(Github, "github.com/username", "#")}
+              {personalInfo.linkedin ? renderIconText(Linkedin, personalInfo.linkedin, personalInfo.linkedin) : renderIconText(Linkedin, "linkedin.com/in/username", "#")}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Summary and Skills - better responsive layout */}
       {(personalInfo.summary || (skills && skills.length > 0 && skills.some(s => s.skill))) && (
-        <div className="mb-2">
+        <div className="mb-4">
           {/* Summary - full width if both exist, otherwise keep as is */}
           {personalInfo.summary && personalInfo.summary.trim() && (
-            <div className="mb-2">
-              <div className="flex items-center gap-2 mb-1">
+            <div className="mb-3">
+              <div className="flex items-center gap-2 mb-1.5">
                 <h2 className="text-[11px] font-bold text-foreground uppercase tracking-wide flex-shrink-0">
                   {t('resume.sections.summary').toUpperCase()}
                 </h2>
                 <div className="flex-1 border-t border-foreground"></div>
               </div>
-              <p className="text-[10px] text-foreground leading-relaxed break-words whitespace-pre-wrap" style={{ lineHeight: '1.4' }}>
+              <p className="text-sm text-foreground leading-relaxed break-words whitespace-pre-wrap" style={{ lineHeight: '1.5' }}>
                 {personalInfo.summary.trim()}
               </p>
             </div>
@@ -413,8 +425,8 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
           
           {/* Skills - full width */}
           {skills && skills.length > 0 && skills.some(s => s.skill) && (
-            <div>
-              <div className="flex items-center gap-2 mb-1">
+            <div className="mb-2">
+              <div className="flex items-center gap-2 mb-1.5">
                 <h2 className="text-[11px] font-bold text-foreground uppercase tracking-wide flex-shrink-0">
                   {t('resume.sections.skills').toUpperCase()}
                 </h2>
@@ -423,7 +435,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
               <div className="text-[10px]">
                 <div className="flex gap-2">
                   <span className="font-bold text-foreground flex-shrink-0" style={{ minWidth: '50px' }}>Skills:</span>
-                  <span className="text-foreground flex-1 break-words" style={{ lineHeight: '1.4' }}>
+                  <span className="text-foreground flex-1 break-words" style={{ lineHeight: '1.5' }}>
                     {skills.filter(s => s.skill).map(s => s.skill).join(', ')}
                   </span>
                 </div>

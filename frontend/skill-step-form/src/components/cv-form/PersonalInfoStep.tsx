@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2, Upload, X, User, Camera } from "lucide-react";
+import { Plus, Trash2, Upload, X, User, Camera, ChevronDown, ChevronUp } from "lucide-react";
 import { CVFormData } from "./types";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { ResumeUpload } from "./ResumeUpload";
@@ -26,6 +26,7 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [parsedData, setParsedData] = useState<Partial<CVFormData> | null>(null);
+  const [showMoreLinks, setShowMoreLinks] = useState(false);
 
   // Initialize image preview from form value (avoiding setState during render)
   useEffect(() => {
@@ -269,36 +270,55 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="github">{t('resume.fields.github')}</Label>
-          <Input
-            id="github"
-            type="url"
-            {...form.register("personalInfo.github")}
-            placeholder={t('resume.placeholders.github')}
-          />
-          {form.formState.errors.personalInfo?.github && (
-            <p className="text-sm text-destructive">
-              {form.formState.errors.personalInfo.github.message}
-            </p>
+      {/* More personal links - collapsible section */}
+      <div className="space-y-3">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setShowMoreLinks(!showMoreLinks)}
+          className="w-full justify-between"
+        >
+          <span>{t('resume.labels.morePersonalLinks') || 'More Personal Links'}</span>
+          {showMoreLinks ? (
+            <ChevronUp className="h-4 w-4" />
+          ) : (
+            <ChevronDown className="h-4 w-4" />
           )}
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="website">{t('resume.labels.personalWebsite')}</Label>
-          <Input
-            id="website"
-            type="url"
-            {...form.register("personalInfo.website")}
-            placeholder={t('resume.placeholders.website')}
-          />
-          {form.formState.errors.personalInfo?.website && (
-            <p className="text-sm text-destructive">
-              {form.formState.errors.personalInfo.website.message}
-            </p>
-          )}
-        </div>
+        </Button>
+
+        {showMoreLinks && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="github">{t('resume.fields.github')}</Label>
+              <Input
+                id="github"
+                type="url"
+                {...form.register("personalInfo.github")}
+                placeholder={t('resume.placeholders.github')}
+              />
+              {form.formState.errors.personalInfo?.github && (
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.personalInfo.github.message}
+                </p>
+              )}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="website">{t('resume.labels.personalWebsite')}</Label>
+              <Input
+                id="website"
+                type="url"
+                {...form.register("personalInfo.website")}
+                placeholder={t('resume.placeholders.website')}
+              />
+              {form.formState.errors.personalInfo?.website && (
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.personalInfo.website.message}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="space-y-2">

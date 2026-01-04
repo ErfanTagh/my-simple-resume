@@ -191,6 +191,7 @@
       "interestsHobbies": "Interessen & Hobbys",
       "interestsHint": "Fügen Sie einzelne Interessen als Stichwörter hinzu",
       "personalWebsite": "Persönliche Website",
+      "morePersonalLinks": "Weitere persönliche Links",
       "keyResponsibilities": "Schlüsselverantwortlichkeiten & Erfolge",
       "technologies": "Verwendete Technologien",
       "technologiesHint": "Fügen Sie in diesem Projekt verwendete Technologien hinzu",
@@ -295,7 +296,7 @@
       "score": "Bewertung"
     },
     "preview": {
-      "notice": "Vorschau - Der finale Export hat eine sauberere Formatierung",
+      "notice": "Hinweis: Standardwerte in der Vorschau erscheinen nicht im finalen Lebenslauf",
       "pages": "Seiten",
       "page": "Seite"
     },

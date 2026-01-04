@@ -19,12 +19,13 @@ import { calculateResumeScore } from "@/lib/resumeScorer";
 
 interface CVPreviewProps {
   data: CVFormData;
+  actualDataForScoring?: CVFormData; // Use actual form data (without hints) for score calculation
   onTemplateChange?: (template: CVTemplate) => void;
   onSectionOrderChange?: (sectionOrder: string[]) => void;
   onStylingChange?: (styling: CVFormData['styling']) => void;
 }
 
-export const CVPreview = ({ data, onTemplateChange, onSectionOrderChange, onStylingChange }: CVPreviewProps) => {
+export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSectionOrderChange, onStylingChange }: CVPreviewProps) => {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("design");
   const [pageCount, setPageCount] = useState(1);
@@ -36,14 +37,16 @@ export const CVPreview = ({ data, onTemplateChange, onSectionOrderChange, onStyl
   const defaultSectionOrder = ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"];
   const sectionOrder = data.sectionOrder || defaultSectionOrder;
 
-  // Calculate resume score
+  // Calculate resume score using actual form data (without hints), not preview data
   const resumeScore = useMemo(() => {
     try {
-      return calculateResumeScore(data);
+      // Use actualDataForScoring if provided (form data without hints), otherwise use data
+      const dataForScoring = actualDataForScoring || data;
+      return calculateResumeScore(dataForScoring);
     } catch {
       return { overallScore: 0 };
     }
-  }, [data]);
+  }, [actualDataForScoring, data]);
 
   // Calculate page count based on content height
   useEffect(() => {
@@ -396,7 +399,7 @@ export const CVPreview = ({ data, onTemplateChange, onSectionOrderChange, onStyl
         </TabsContent>
         
         <TabsContent value="score" className="mt-4">
-          <CVRating data={data} />
+          <CVRating data={actualDataForScoring || data} />
         </TabsContent>
       </Tabs>
     </div>

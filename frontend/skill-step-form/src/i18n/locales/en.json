@@ -198,6 +198,7 @@
       "interestsHobbies": "Interests & Hobbies",
       "interestsHint": "Add individual interests as keywords",
       "personalWebsite": "Personal Website",
+      "morePersonalLinks": "More Personal Links",
       "keyResponsibilities": "Key Responsibilities & Achievements",
       "technologies": "Technologies Used",
       "technologiesHint": "Add technologies used in this project",
@@ -302,7 +303,7 @@
       "score": "Score"
     },
     "preview": {
-      "notice": "Preview - Final export will have cleaner formatting",
+      "notice": "Note: Default values shown in preview will not appear in the final resume",
       "pages": "pages",
       "page": "Page"
     },
