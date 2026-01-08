@@ -365,6 +365,56 @@ function isMobileDevice(): boolean {
 }
 
 /**
+ * Get computed background color from CSS custom property
+ * Returns resolved hsl() value or fallback color
+ */
+function getComputedBackgroundColor(): string {
+  try {
+    // Create a temporary element to compute the background color
+    const tempDiv = document.createElement('div');
+    tempDiv.className = 'bg-background';
+    tempDiv.style.position = 'absolute';
+    tempDiv.style.visibility = 'hidden';
+    tempDiv.style.pointerEvents = 'none';
+    document.body.appendChild(tempDiv);
+    
+    // Get computed style
+    const computedStyle = window.getComputedStyle(tempDiv);
+    const backgroundColor = computedStyle.backgroundColor;
+    
+    // Clean up
+    document.body.removeChild(tempDiv);
+    
+    // If we got a valid color (not transparent), return it
+    if (backgroundColor && backgroundColor !== 'rgba(0, 0, 0, 0)' && backgroundColor !== 'transparent') {
+      return backgroundColor;
+    }
+    
+    // Fallback: try to get from root CSS variable
+    const rootStyle = getComputedStyle(document.documentElement);
+    const bgVar = rootStyle.getPropertyValue('--background').trim();
+    
+    if (bgVar) {
+      // If it's already an hsl() value, return it
+      if (bgVar.startsWith('hsl(') || bgVar.startsWith('rgb(')) {
+        return bgVar;
+      }
+      // If it's space-separated hsl values (e.g., "220 13% 91%"), convert to hsl()
+      const hslMatch = bgVar.match(/(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?%)\s+(\d+(?:\.\d+)?%)/);
+      if (hslMatch) {
+        return `hsl(${hslMatch[1]}, ${hslMatch[2]}, ${hslMatch[3]})`;
+      }
+    }
+    
+    // Final fallback
+    return '#f5f5f5';
+  } catch (error) {
+    console.warn('Failed to compute background color:', error);
+    return '#f5f5f5';
+  }
+}
+
+/**
  * Download PDF from resume HTML (from DOM element)
  */
 async function downloadPDFFromHTML(
@@ -383,6 +433,9 @@ async function downloadPDFFromHTML(
   // Also fetch old CSS files for backward compatibility
   const cssContents = await fetchCSSFiles();
   
+  // Get computed background color for PDF
+  const computedBackground = getComputedBackgroundColor();
+  
   // Get computed styles for the resume container to ensure proper styling
   const fullHTML = `
 <!DOCTYPE html>
@@ -395,23 +448,38 @@ async function downloadPDFFromHTML(
   ${pageStylesheets}
   ${cssContents.join('\n')}
   <style>
-    /* Remove page margins for PDF - no white space around the document */
+    :root {
+      --pdf-background: ${computedBackground};
+    }
+    /* Page margins for PDF - top margin on pages after first */
     @page {
-      margin: 0 !important;
+      margin: 15mm 0 20mm 0 !important;
       padding: 0 !important;
       size: A4;
+      background: var(--pdf-background) !important;
+      /* Page numbers via @bottom-center if not already set by template */
+      @bottom-center {
+        content: counter(page);
+        font-size: 10px;
+        color: #6b7280;
+        opacity: 0.6;
+      }
+    }
+    @page :first {
+      margin-top: 0 !important;
     }
     /* Ensure proper rendering */
     * {
       box-sizing: border-box;
     }
-    body {
+    html, body {
       margin: 0 !important;
       padding: 0 !important;
+      height: 100% !important;
+      min-height: 100% !important;
+      background: var(--pdf-background) !important;
       font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-      background: white;
       width: 100%;
-      min-height: 100vh;
     }
     /* Resume container fills the page with internal padding */
     /* The container's background will fill the entire page */
@@ -439,6 +507,57 @@ async function downloadPDFFromHTML(
       margin: 0 !important;
       min-height: 100vh !important;
       box-sizing: border-box;
+    }
+    /* Ensure last page background covers full page */
+    .resume-page-container {
+      min-height: 297mm !important;
+    }
+    /* In print, ensure container fills each page */
+    @media print {
+      @page {
+        size: A4;
+        background: var(--pdf-background) !important;
+        /* Page numbers via @bottom-center if not already set by template */
+        @bottom-center {
+          content: counter(page);
+          font-size: 10px;
+          color: #6b7280;
+          opacity: 0.6;
+        }
+      }
+      html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        height: 100% !important;
+        min-height: 100% !important;
+        background: var(--pdf-background) !important;
+      }
+      /* Force container to extend to exactly 297mm (A4 height) */
+      /* But allow it to grow if content is longer */
+      .resume-page-container {
+        min-height: 297mm !important;
+        height: auto !important;
+        page-break-inside: avoid;
+        background: var(--pdf-background) !important;
+        /* Ensure last page fills full height */
+        display: flex !important;
+        flex-direction: column !important;
+      }
+      /* Content wrapper should not grow */
+      .resume-page-container > div:not([aria-hidden="true"]) {
+        flex: 0 0 auto !important;
+      }
+      /* Spacer div at end will fill remaining space */
+      .resume-page-container > div[aria-hidden="true"] {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        background: var(--pdf-background) !important;
+      }
+      /* For gradient backgrounds, ensure they extend */
+      .resume-page-container.bg-gradient-to-br {
+        min-height: 297mm !important;
+        height: auto !important;
+      }
     }
     /* Override ALL possible Tailwind classes that could add margins/width constraints */
     body > div[class*="mx-auto"],

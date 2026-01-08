@@ -387,7 +387,54 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
   const fullName = `${personalInfo.firstName || ''} ${personalInfo.lastName || ''}`.trim().toUpperCase();
 
   return (
-    <div className="bg-background text-foreground p-8 max-w-4xl mx-auto text-base" style={{ fontFamily: 'system-ui, -apple-system, sans-serif', fontSize: '16px' }}>
+    <>
+      <style>{`
+        /* Apply padding for both screen (preview) and print */
+        .resume-page-container {
+          padding-top: 32px !important;
+          padding-bottom: 32px !important;
+        }
+        @media print {
+          @page {
+            size: A4;
+            margin: 15mm 0 0 0;
+            background: var(--pdf-background, hsl(var(--background))) !important;
+          }
+          @page :first {
+            margin-top: 0;
+          }
+          html, body {
+            background: var(--pdf-background, hsl(var(--background))) !important;
+            min-height: 100%;
+            height: 100%;
+          }
+          .resume-page-container {
+            min-height: 297mm !important;
+            background: var(--pdf-background, hsl(var(--background))) !important;
+            width: 210mm;
+            margin: 0 auto;
+            /* Use flexbox to ensure last page fills */
+            display: flex;
+            flex-direction: column;
+          }
+          /* Content wrapper should not grow */
+          .resume-page-container > div:not([aria-hidden="true"]) {
+            flex: 0 0 auto;
+          }
+          /* Spacer div at end will fill remaining space */
+          .resume-page-container > div[aria-hidden="true"] {
+            flex: 1 1 auto !important;
+            min-height: 0;
+            background: var(--pdf-background, hsl(var(--background))) !important;
+          }
+          /* Prevent sections from breaking awkwardly */
+          div[class*="mb-"] {
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
+        }
+      `}</style>
+      <div className="resume-page-container bg-background text-foreground p-8 max-w-4xl mx-auto text-base" style={{ fontFamily: 'system-ui, -apple-system, sans-serif', fontSize: '16px' }}>
       {/* Header: Large name in navy with optional photo - full width layout */}
       <div className="-mx-8 -mt-8 px-8 pt-8 mb-6 border-b-2" style={{ borderColor: ACCENT_COLOR }}>
         <div className="flex items-center justify-between mb-4 gap-6">
@@ -437,7 +484,39 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
       <div className="space-y-1">
         {orderedSections.map(section => renderSection(section))}
       </div>
-    </div>
+      
+      {/* Spacer to ensure last page fills full height */}
+      <div aria-hidden="true" style={{ flex: '1 1 auto', minHeight: 0 }}></div>
+
+      {/* Page Number Footer */}
+      <style>{`
+        /* Hide page numbers in preview (screen) */
+        .page-number-footer {
+          display: none;
+        }
+        @media print {
+          @page {
+            margin-bottom: 20mm;
+            margin-top: 15mm;
+            @bottom-center {
+              content: counter(page);
+              font-size: 10px;
+              color: #6b7280;
+              opacity: 0.6;
+            }
+          }
+          @page :first {
+            margin-top: 0;
+          }
+          /* Ensure our footer is hidden in print */
+          .page-number-footer {
+            display: none !important;
+          }
+        }
+      `}</style>
+      <div className="page-number-footer"></div>
+      </div>
+    </>
   );
 };
 

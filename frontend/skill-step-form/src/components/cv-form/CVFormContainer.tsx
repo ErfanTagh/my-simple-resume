@@ -28,6 +28,7 @@ interface CVFormContainerProps {
 
 export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) => {
   const [currentStep, setCurrentStep] = useState(0);
+  const [highestStepVisited, setHighestStepVisited] = useState(0); // Track the highest step number visited
   const [showSignupOverlay, setShowSignupOverlay] = useState(false);
   const [templateSelected, setTemplateSelected] = useState(!!initialData?.template);
   const navigate = useNavigate();
@@ -130,7 +131,7 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
     };
   };
 
-  // Merge form data with hint data for preview (show hints when fields are empty)
+  // Merge form data with hint data for preview (show hints only for current step)
   const getPreviewDataWithHints = (formData: CVFormData): CVFormData => {
     // Only show hints when creating a new resume (no initialData and no editId)
     if (initialData || editId) {
@@ -142,8 +143,12 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
       return formData;
     }
 
-    // Helper to use hint if field is empty
-    const useHintIfEmpty = <T,>(value: T, hint: T): T => {
+    // Helper to use hint if field is empty (only for current step)
+    const useHintIfEmpty = <T,>(value: T, hint: T, showHint: boolean): T => {
+      if (!showHint) {
+        // Don't show hint - return actual value (even if empty)
+        return value || (typeof value === 'string' ? '' : typeof value === 'object' && Array.isArray(value) ? [] : value) as T;
+      }
       if (typeof value === 'string') {
         return (value && value.trim() !== '') ? value : hint;
       }
@@ -153,51 +158,57 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
       return value || hint;
     };
 
-    // Merge personal info - use hint if empty, but preserve user's name/email if already filled
+    // Show hints for personalInfo if we haven't moved past step 0 yet
+    const showPersonalInfoHints = highestStepVisited < 1;
     const mergedPersonalInfo = {
-      firstName: useHintIfEmpty(formData.personalInfo?.firstName || "", hintData.personalInfo.firstName),
-      lastName: useHintIfEmpty(formData.personalInfo?.lastName || "", hintData.personalInfo.lastName),
-      professionalTitle: useHintIfEmpty(formData.personalInfo?.professionalTitle || "", hintData.personalInfo.professionalTitle || ""),
-      profileImage: formData.personalInfo?.profileImage || "https://ui-avatars.com/api/?name=Emily+Chen&size=200&background=6366f1&color=fff&bold=true&font-size=0.5",
-      email: useHintIfEmpty(formData.personalInfo?.email || "", hintData.personalInfo.email),
-      phone: useHintIfEmpty(formData.personalInfo?.phone || "", hintData.personalInfo.phone || ""),
-      location: useHintIfEmpty(formData.personalInfo?.location || "", hintData.personalInfo.location || ""),
-      linkedin: useHintIfEmpty(formData.personalInfo?.linkedin || "", hintData.personalInfo.linkedin || ""),
+      firstName: useHintIfEmpty(formData.personalInfo?.firstName || "", hintData.personalInfo.firstName, showPersonalInfoHints),
+      lastName: useHintIfEmpty(formData.personalInfo?.lastName || "", hintData.personalInfo.lastName, showPersonalInfoHints),
+      professionalTitle: useHintIfEmpty(formData.personalInfo?.professionalTitle || "", hintData.personalInfo.professionalTitle || "", showPersonalInfoHints),
+      profileImage: showPersonalInfoHints ? (formData.personalInfo?.profileImage || "https://ui-avatars.com/api/?name=Emily+Chen&size=200&background=6366f1&color=fff&bold=true&font-size=0.5") : (formData.personalInfo?.profileImage || ""),
+      email: useHintIfEmpty(formData.personalInfo?.email || "", hintData.personalInfo.email, showPersonalInfoHints),
+      phone: useHintIfEmpty(formData.personalInfo?.phone || "", hintData.personalInfo.phone || "", showPersonalInfoHints),
+      location: useHintIfEmpty(formData.personalInfo?.location || "", hintData.personalInfo.location || "", showPersonalInfoHints),
+      linkedin: useHintIfEmpty(formData.personalInfo?.linkedin || "", hintData.personalInfo.linkedin || "", showPersonalInfoHints),
       github: formData.personalInfo?.github || "", // Don't show hint for GitHub - many users don't have it
       website: formData.personalInfo?.website || "", // Don't show hint for website - many users don't have it
-      summary: useHintIfEmpty(formData.personalInfo?.summary || "", hintData.personalInfo.summary || ""),
-      interests: useHintIfEmpty(formData.personalInfo?.interests || [], hintData.personalInfo.interests || []),
+      summary: useHintIfEmpty(formData.personalInfo?.summary || "", hintData.personalInfo.summary || "", showPersonalInfoHints),
+      interests: useHintIfEmpty(formData.personalInfo?.interests || [], hintData.personalInfo.interests || [], showPersonalInfoHints),
     };
 
-    // Merge work experience - use hint if empty
-    const mergedWorkExperience = (formData.workExperience && formData.workExperience.length > 0 && 
-      formData.workExperience.some(exp => exp.position || exp.company)) 
-      ? formData.workExperience 
-      : (hintData.workExperience || []);
+    // Show hints for workExperience if we haven't moved past step 1 yet
+    const showWorkExperienceHints = highestStepVisited < 2;
+    const mergedWorkExperience = showWorkExperienceHints && (!formData.workExperience || formData.workExperience.length === 0 || 
+      !formData.workExperience.some(exp => exp.position || exp.company))
+      ? (hintData.workExperience || [])
+      : (formData.workExperience || []);
 
-    // Merge education - use hint if empty
-    const mergedEducation = (formData.education && formData.education.length > 0 && 
-      formData.education.some(edu => edu.degree || edu.institution))
-      ? formData.education
-      : (hintData.education || []);
+    // Show hints for education if we haven't moved past step 2 yet
+    const showEducationHints = highestStepVisited < 3;
+    const mergedEducation = showEducationHints && (!formData.education || formData.education.length === 0 || 
+      !formData.education.some(edu => edu.degree || edu.institution))
+      ? (hintData.education || [])
+      : (formData.education || []);
 
-    // Merge projects - use hint if empty (only first project to fit on one page)
-    const mergedProjects = (formData.projects && formData.projects.length > 0 && 
-      formData.projects.some(proj => proj.name || proj.description))
-      ? formData.projects
-      : (hintData.projects ? hintData.projects.slice(0, 1) : []);
+    // Show hints for projects if we haven't moved past step 1 yet
+    const showProjectsHints = highestStepVisited < 2;
+    const mergedProjects = showProjectsHints && (!formData.projects || formData.projects.length === 0 || 
+      !formData.projects.some(proj => proj.name || proj.description))
+      ? (hintData.projects ? hintData.projects.slice(0, 1) : [])
+      : (formData.projects || []);
 
-    // Merge languages - use hint if empty
-    const mergedLanguages = (formData.languages && formData.languages.length > 0 && 
-      formData.languages.some(lang => lang.language))
-      ? formData.languages
-      : (hintData.languages || []);
+    // Show hints for languages if we haven't moved past step 3 yet
+    const showLanguagesHints = highestStepVisited < 4;
+    const mergedLanguages = showLanguagesHints && (!formData.languages || formData.languages.length === 0 || 
+      !formData.languages.some(lang => lang.language))
+      ? (hintData.languages || [])
+      : (formData.languages || []);
 
-    // Merge skills - use hint if empty
-    const mergedSkills = (formData.skills && formData.skills.length > 0 && 
-      formData.skills.some(skill => skill.skill))
-      ? formData.skills
-      : (hintData.skills || []);
+    // Show hints for skills if we haven't moved past step 3 yet
+    const showSkillsHints = highestStepVisited < 4;
+    const mergedSkills = showSkillsHints && (!formData.skills || formData.skills.length === 0 || 
+      !formData.skills.some(skill => skill.skill))
+      ? (hintData.skills || [])
+      : (formData.skills || []);
 
     return {
       ...formData,
@@ -253,6 +264,27 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
     setCurrentStep(step);
   };
 
+  const handleStepClick = async (stepIndex: number) => {
+    // Allow going back to previous steps without validation
+    if (stepIndex <= currentStep) {
+      setCurrentStep(stepIndex);
+      return;
+    }
+    
+    // For future steps, validate required fields first (firstName, lastName, email)
+    if (stepIndex > currentStep) {
+      const isValid = await form.trigger("personalInfo");
+      
+      if (!isValid) {
+        // Validation failed - prevent navigation silently
+        return;
+      }
+    }
+    
+    setCurrentStep(stepIndex);
+    setHighestStepVisited(prev => Math.max(prev, stepIndex));
+  };
+
   // Test data loader (dev only)
   const handleLoadTestProfile = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const profileName = e.target.value;
@@ -284,6 +316,7 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
       if (currentStep < steps.length - 1) {
         const nextStep = currentStep + 1;
         setCurrentStep(nextStep);
+        setHighestStepVisited(prev => Math.max(prev, nextStep));
       }
     }
   };
@@ -333,9 +366,35 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
       
       // Normalize each to 0-10, then average (weighted by max scores)
       const totalCompletenessMax = contentQualityMax + educationMax + skillsMax;
-      const completenessScore = totalCompletenessMax > 0
+      let completenessScore = totalCompletenessMax > 0
         ? Math.min(10, Math.round(((contentQuality + education + skills) / totalCompletenessMax) * 10 * 10) / 10)
         : 0;
+      
+      // Penalize for excessive text - cap completeness score at 7.2
+      // Check for excessive text in work experience descriptions
+      const workExp = data.workExperience || [];
+      const workDescriptions = workExp.map(exp => exp.description || '').filter(Boolean);
+      const avgLength = workDescriptions.length > 0 
+        ? workDescriptions.reduce((sum, d) => sum + d.length, 0) / workDescriptions.length
+        : 0;
+      const summaryLength = (data.personalInfo.summary || '').length;
+      const projects = data.projects || [];
+      const projectDescriptions = projects.map(p => (p.description || '').length);
+      const avgProjectLength = projectDescriptions.length > 0
+        ? projectDescriptions.reduce((sum, len) => sum + len, 0) / projectDescriptions.length
+        : 0;
+      
+      // Apply penalty if there's too much text in any area - cap at 7.2
+      // More aggressive thresholds to catch excessive text
+      // Check if any work description exceeds 400 chars, or average exceeds 350
+      const hasLongWorkDesc = workDescriptions.some(d => d.length > 400) || avgLength > 350;
+      const hasLongSummary = summaryLength > 250;
+      const hasLongProjects = projectDescriptions.some(len => len > 400) || avgProjectLength > 350;
+      const hasExcessiveText = hasLongWorkDesc || hasLongSummary || hasLongProjects;
+      
+      if (hasExcessiveText && completenessScore > 7.2) {
+        completenessScore = 7.2; // Always cap at 7.2 when there's excessive text
+      }
       
       // Clarity: Structure & Format (2 max) + Professional Summary (1 max) = 3 max
       const structure = getCategoryScore("Structure & Format");
@@ -362,8 +421,8 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
         ? Math.min(10, Math.round((experience / experienceMax) * 10 * 10) / 10)
         : 0;
       
-      // Overall: Convert from 0-100 to 0-10
-      const overallScore = Math.round((scoreResult.overallScore / 10) * 10) / 10;
+      // Overall: Already in 0-10 format
+      const overallScore = scoreResult.overallScore;
       
       // Add scores to resume data
       const resumeDataWithScores: CVFormData & {
@@ -546,7 +605,7 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
                 currentStep={currentStep}
                 totalSteps={steps.length}
                 stepLabels={steps.map((s) => s.label)}
-                onStepClick={(stepIndex) => setCurrentStep(stepIndex)}
+                onStepClick={handleStepClick}
               />
 
               {/* Dev-only Test Data Loader */}

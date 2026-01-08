@@ -163,6 +163,7 @@ export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSect
     }
   }, [data, activeTab, template]);
 
+
   // Track scroll position to update current page indicator
   useEffect(() => {
     if (scrollContainerRef.current && activeTab === "design" && pageCount > 1) {
@@ -257,16 +258,16 @@ export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSect
                 </div>
                 <span 
                   className={`text-sm font-bold transition-colors duration-300 ${
-                    (resumeScore.overallScore > 10 ? resumeScore.overallScore / 10 : resumeScore.overallScore) >= 8 
+                    resumeScore.overallScore >= 8 
                       ? 'text-green-600 dark:text-green-400'
-                      : (resumeScore.overallScore > 10 ? resumeScore.overallScore / 10 : resumeScore.overallScore) >= 6 
+                      : resumeScore.overallScore >= 6 
                       ? 'text-yellow-600 dark:text-yellow-400'
-                      : (resumeScore.overallScore > 10 ? resumeScore.overallScore / 10 : resumeScore.overallScore) >= 4
+                      : resumeScore.overallScore >= 4
                       ? 'text-orange-600 dark:text-orange-400'
                       : 'text-red-600 dark:text-red-400'
                   }`}
                 >
-                  {Math.round(resumeScore.overallScore > 10 ? resumeScore.overallScore / 10 : resumeScore.overallScore)}/10
+                  {resumeScore.overallScore}/10
                 </span>
               </div>
 
@@ -319,55 +320,98 @@ export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSect
                       transparent 16px
                     );
                     pointer-events: none;
-                    z-index: 10;
+                    z-index: 999;
                     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
                   }
                   /* Page number indicator at bottom right of each page */
                   .page-number-indicator {
-                    position: absolute;
-                    right: 0;
-                    font-size: 10px;
-                    color: #6b7280;
-                    font-weight: 500;
+                    position: absolute !important;
+                    right: 8px !important;
+                    font-size: 12px !important;
+                    color: #374151 !important;
+                    font-weight: 700 !important;
                     pointer-events: none;
-                    z-index: 10;
-                    background: rgba(255, 255, 255, 0.9);
-                    padding: 2px 6px;
-                    border-radius: 3px;
+                    z-index: 50 !important;
+                    background: rgba(255, 255, 255, 0.98) !important;
+                    padding: 6px 10px !important;
+                    border-radius: 6px !important;
+                    border: 2px solid rgba(59, 130, 246, 0.3) !important;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+                    font-family: system-ui, -apple-system, sans-serif !important;
+                  }
+                  /* Add top padding to resume containers for proper spacing */
+                  .resume-page-container {
+                    padding-top: 32px !important;
+                    padding-bottom: 32px !important;
                   }
                 `}</style>
                 {renderTemplate()}
-                {/* Render page break lines and page numbers at calculated positions */}
-                {pageBreakPositions.map((position, index) => (
-                  <div key={`break-${index}`}>
-                    <div 
-                      className="page-break-line"
-                      style={{ top: `${position}px` }}
-                    />
-                    {/* Show page number at the bottom of each page (just before the break) */}
-                    <div 
-                      className="page-number-indicator"
-                      style={{ top: `${position - 16}px` }}
-                    >
-                      {t('resume.preview.page') || 'Page'} {index + 1}
-                    </div>
-                  </div>
-                ))}
-                {/* Show page number for the last page at the bottom */}
+                
+                {/* Page numbers and break lines */}
+                {/* First page number - at bottom of first page, before first break */}
                 {pageCount > 0 && (
                   <div 
                     className="page-number-indicator"
-                    style={{ bottom: '4px' }}
+                    style={{ 
+                      position: 'absolute',
+                      right: '8px',
+                      top: pageBreakPositions.length > 0 
+                        ? `${pageBreakPositions[0] - 25}px` 
+                        : 'auto',
+                      bottom: pageBreakPositions.length === 0 ? '8px' : 'auto',
+                      zIndex: 999
+                    }}
                   >
-                    {t('resume.preview.page') || 'Page'} {pageCount}
+                    Page 1
                   </div>
                 )}
+                {/* Page break lines and subsequent page numbers */}
+                {pageBreakPositions.map((position, index) => {
+                  const pageNumber = index + 2;
+                  // Position represents where page (index+1) ends, so we need next break for page (index+2)
+                  // If this is the last page break and there's one more page, position that page number at the end
+                  const isLastPage = pageNumber === pageCount;
+                  // For page 2, 3, etc., position at bottom of that page (before its next break)
+                  // pageBreakPositions[index] is where page (index+1) ends, so page (index+2) starts here
+                  // We need the break that marks where page (index+2) ends
+                  const pageBreakPosition = pageBreakPositions[index]; // Where this page starts
+                  const nextPageBreakPosition = index + 1 < pageBreakPositions.length 
+                    ? pageBreakPositions[index + 1] 
+                    : null; // Where this page ends (if not last page)
+                  
+                  return (
+                    <div key={`break-${index}`}>
+                      {/* Page break line - marks end of previous page, start of this page */}
+                      <div 
+                        className="page-break-line"
+                        style={{ top: `${position}px`, zIndex: 999 }}
+                      />
+                      {/* Page number at bottom of this page (before next break, or at end if last page) */}
+                      <div 
+                        className="page-number-indicator"
+                        style={{ 
+                          position: 'absolute',
+                          right: '8px',
+                          top: isLastPage 
+                            ? 'auto'
+                            : nextPageBreakPosition 
+                            ? `${nextPageBreakPosition - 25}px` // Bottom of this page (before next break)
+                            : 'auto',
+                          bottom: isLastPage ? '8px' : 'auto',
+                          zIndex: 999
+                        }}
+                      >
+                        Page {pageNumber}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
               </Card>
               <div className="flex items-center gap-2 px-1 mt-2">
                 <Info className="h-3.5 w-3.5 text-muted-foreground" />
                 <Badge variant="outline" className="text-xs font-normal text-muted-foreground border-muted-foreground/30 bg-muted/30">
-                  {t('resume.preview.notice') || 'Preview - Final export will have cleaner formatting'}
+                  {t('resume.preview.notice') || 'Preview only - Page breaks are approximate. PDF export will have proper formatting.'}
                 </Badge>
               </div>
             </div>

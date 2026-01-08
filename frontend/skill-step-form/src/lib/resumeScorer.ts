@@ -8,7 +8,7 @@ interface ScoreCategory {
 }
 
 interface ResumeScore {
-  overallScore: number; // 0-100 for display
+  overallScore: number; // 0-10 scale
   categories: ScoreCategory[];
   suggestions: string[];
 }
@@ -77,6 +77,18 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   const metricsPattern = /\b(\d+[%]|\$\d+[KM]?|€\d+[KM]?|\d+\s*[%]|\d+\s*(years?|months?|people|users|customers|clients|team members?|Jahre?|Monate?|Personen?|Mitarbeiter?|Kunden?|Menschen?))\b/i;
   const universalMetricsPattern = /\b\d+\s*(%|€|\$|Mio|Mio\.|Million|Millionen|Tausend|K|M|BN|Billion|Milliarden|Jahre|Monate|Personen|Mitarbeiter|Kunden|Menschen|users|people|years|months|customers|clients|team)\b/i;
 
+  // Calculate text length metrics once - used in multiple sections
+  const workDescriptions = workExp.map(exp => exp.description || '').filter(Boolean);
+  const avgLength = workDescriptions.length > 0 
+    ? workDescriptions.reduce((sum, d) => sum + d.length, 0) / workDescriptions.length
+    : 0;
+  const summaryLength = (data.personalInfo.summary || '').length;
+  const projects = data.projects || [];
+  const projectDescriptions = projects.map(p => (p.description || '').length);
+  const avgProjectLength = projectDescriptions.length > 0
+    ? projectDescriptions.reduce((sum, len) => sum + len, 0) / projectDescriptions.length
+    : 0;
+
   // ============================================
   // 1. CONTENT QUALITY (3 points)
   // ============================================
@@ -128,6 +140,22 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   if (impactFocusedCount >= Math.min(workExp.length, 2)) contentScore += 1;
   else if (workExp.length > 0) suggestions.push("Focus on outcomes and impact in your experience descriptions, not just responsibilities");
   
+  // Apply penalty to Content Quality if there's excessive text
+  // This ensures completeness score (Content Quality + Education + Skills) is capped at 7.2 when normalized
+  const hasLongWorkDesc = workDescriptions.some(d => d.length > 400) || avgLength > 350;
+  const hasLongSummary = summaryLength > 250;
+  const hasLongProjects = projectDescriptions.some(len => len > 400) || avgProjectLength > 350;
+  const hasExcessiveText = hasLongWorkDesc || hasLongSummary || hasLongProjects;
+  
+  if (hasExcessiveText) {
+    // Reduce Content Quality score to cap completeness at 7.2
+    // Completeness = (Content Quality + Education + Skills) normalized to 0-10
+    // Max completeness = 7.2 means max raw = 3.24 (instead of 4.5)
+    // If Education + Skills are at max (0.5 + 1 = 1.5), then Content Quality max = 3.24 - 1.5 = 1.74
+    // So reduction needed = 3 - 1.74 = 1.26
+    contentScore = Math.max(0, contentScore - 1.26);
+  }
+  
   categories.push({
     name: "Content Quality",
     score: Math.round(contentScore * 10) / 10,
@@ -144,21 +172,19 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   let structureScore = 0;
   
   // Clear hierarchy (0.5 pts) - template selected and sections organized
-  // Only give points if there's actual content, not just empty structure
-  const hasBasicContent = (data.personalInfo.firstName && data.personalInfo.lastName) || 
-                          (workExp.length > 0 && workExp.some(exp => exp.position || exp.company)) ||
-                          (education.length > 0 && education.some(edu => edu.degree || edu.institution));
-  if (data.template && data.sectionOrder && data.sectionOrder.length >= 4 && hasBasicContent) {
+  // Only give points if there's substantial content, not just name/email
+  const hasSubstantialContent = (workExp.length > 0 && workExp.some(exp => exp.position || exp.company)) ||
+                                (education.length > 0 && education.some(edu => edu.degree || edu.institution)) ||
+                                (summary && summary.trim().length >= 50) ||
+                                validSkills >= 3;
+  if (data.template && data.sectionOrder && data.sectionOrder.length >= 4 && hasSubstantialContent) {
     structureScore += 0.5;
   } else if (data.template || data.sectionOrder) {
     suggestions.push("Organize your resume sections in a clear, logical order");
   }
   
   // Concise (0.5 pts) - check if descriptions are reasonable length
-  const workDescriptions = workExp.map(exp => exp.description || '').filter(Boolean);
-  const avgLength = workDescriptions.length > 0 
-    ? workDescriptions.reduce((sum, d) => sum + d.length, 0) / workDescriptions.length
-    : 0;
+  // workDescriptions and avgLength are already calculated above
   const maxLength = workDescriptions.length > 0
     ? Math.max(...workDescriptions.map(d => d.length))
     : 0;
@@ -182,11 +208,13 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   // Work experience descriptions - penalize verbose descriptions
   if (avgLength > 1000) {
     lengthDeductions += 1.5; // Severe penalty for very long (avg > 1000 chars)
+    suggestions.push("Your resume has too much text - this reduces your data score. Keep descriptions concise (1-2 lines maximum)");
   } else if (avgLength > 700) {
     lengthDeductions += 1.0; // Large penalty for long (avg > 700 chars)
+    suggestions.push("Your resume has too much text - this reduces your data score. Keep descriptions concise (1-2 lines maximum)");
   } else if (avgLength > 500) {
     lengthDeductions += 0.5; // Moderate penalty (avg > 500 chars = ~3-4 lines)
-    suggestions.push("Your descriptions are too long - keep each bullet point to 1-2 lines maximum for better readability");
+    suggestions.push("Your resume has too much text - this reduces your data score. Keep each bullet point to 1-2 lines maximum for better readability");
   }
   
   // Check for individual extremely long descriptions (> 800 chars each)
@@ -196,21 +224,20 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   }
   
   // Summary should be brief (elevator pitch)
-  const summaryLength = (data.personalInfo.summary || '').length;
+  // summaryLength is already calculated above
   if (summaryLength > 400) {
     lengthDeductions += 0.8; // Penalty for verbose summary
+    suggestions.push("Your resume has too much text - this reduces your data score. Keep your summary brief (2-3 sentences)");
   } else if (summaryLength > 300) {
     lengthDeductions += 0.4;
+    suggestions.push("Your resume has too much text - this reduces your data score. Keep your summary brief (2-3 sentences)");
   }
   
   // Project descriptions should be punchy
-  const projects = data.projects || [];
-  const projectDescriptions = projects.map(p => (p.description || '').length);
-  const avgProjectLength = projectDescriptions.length > 0
-    ? projectDescriptions.reduce((sum, len) => sum + len, 0) / projectDescriptions.length
-    : 0;
+  // projects, projectDescriptions, and avgProjectLength are already calculated above
   if (avgProjectLength > 500) {
     lengthDeductions += 0.5;
+    suggestions.push("Your resume has too much text - this reduces your data score. Keep project descriptions concise");
   }
   
   // Don't penalize education field length - it's usually short
@@ -444,12 +471,12 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   }
   
   // Standard formatting (0.25 pts) - template-based (assumes templates are ATS-friendly)
-  // Only give points if there's actual resume content, not just contact info
-  const hasActualContent = (workExp.length > 0 && workExp.some(exp => exp.position || exp.company)) ||
-                            (education.length > 0 && education.some(edu => edu.degree || edu.institution)) ||
-                            validSkills > 0 ||
-                            (summary && summary.trim().length > 0);
-  if (data.template && hasActualContent) atsScore += 0.25;
+  // Only give points if there's substantial resume content, not just minimal fields
+  const hasSubstantialContentForATS = (workExp.length > 0 && workExp.some(exp => exp.position || exp.company)) ||
+                                      (education.length > 0 && education.some(edu => edu.degree || edu.institution)) ||
+                                      validSkills >= 3 ||
+                                      (summary && summary.trim().length >= 50);
+  if (data.template && hasSubstantialContentForATS) atsScore += 0.25;
   else if (!data.template) suggestions.push("Select a template - our templates are ATS-optimized");
   
   categories.push({
@@ -590,15 +617,15 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
     totalScore = Math.max(0, Math.min(10, totalScore - deductions + bonuses));
   }
   
-  // Convert to 0-100 scale for display
-  const overallScore = Math.round(totalScore * 10);
+  // Round to 1 decimal place for 0-10 scale
+  const overallScore = Math.round(totalScore * 10) / 10;
   
-  // Add overall suggestions based on score
-  if (overallScore < 60) {
+  // Add overall suggestions based on score (0-10 scale)
+  if (overallScore < 6) {
     suggestions.unshift("Your resume needs significant improvement. Focus on adding quantifiable achievements and strong action verbs.");
-  } else if (overallScore < 80) {
+  } else if (overallScore < 8) {
     suggestions.unshift("Your resume is good but can be improved. Focus on adding more metrics and impact-focused descriptions.");
-  } else if (overallScore >= 90) {
+  } else if (overallScore >= 9) {
     suggestions.unshift("Excellent resume! You're well-positioned for job applications.");
   }
 

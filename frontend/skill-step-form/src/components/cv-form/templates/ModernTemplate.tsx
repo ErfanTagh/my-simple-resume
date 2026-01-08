@@ -68,7 +68,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
     switch (sectionKey) {
       case "summary":
         return personalInfo.summary && personalInfo.summary.trim() ? (
-          <div key="summary" className="mb-6">
+          <div key="summary" className="mb-6" data-resume-section="true">
             <h2 
               className={`text-lg mb-3 border-b-2 pb-1`}
               style={{ 
@@ -87,7 +87,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
 
       case "workExperience":
         return workExperience.some(exp => exp.position || exp.company) ? (
-          <div key="workExperience" className="mb-6">
+          <div key="workExperience" className="mb-6" data-resume-section="true">
             <h2 className={getHeadingClassName()} style={getHeadingStyle()}>{t('resume.sections.experience').toUpperCase()}</h2>
             <div className="space-y-4">
               {workExperience.map((exp, index) => (
@@ -138,7 +138,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
 
       case "education":
         return education.some(edu => edu.degree || edu.institution) ? (
-          <div key="education" className="mb-6">
+          <div key="education" className="mb-6" data-resume-section="true">
             <h2 className={getHeadingClassName()} style={getHeadingStyle()}>{t('resume.sections.education').toUpperCase()}</h2>
             <div className="space-y-3">
               {education.map((edu, index) => (
@@ -169,7 +169,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
 
       case "projects":
         return projects.some(proj => proj.name) ? (
-          <div key="projects" className="mb-6">
+          <div key="projects" className="mb-6" data-resume-section="true">
             <h2 className={getHeadingClassName()} style={getHeadingStyle()}>{t('resume.sections.projects').toUpperCase()}</h2>
             <div className="space-y-3">
               {projects.map((proj, index) => (
@@ -213,7 +213,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
 
       case "certificates":
         return certificates.some(cert => cert.name) ? (
-          <div key="certificates" className="mb-6">
+          <div key="certificates" className="mb-6" data-resume-section="true">
             <h2 className={getHeadingClassName()} style={getHeadingStyle()}>{t('resume.sections.certifications').toUpperCase()}</h2>
             <div className="space-y-2">
               {certificates.map((cert, index) => (
@@ -247,7 +247,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
 
       case "skills":
         return skills.some(s => s.skill) ? (
-          <div key="skills" className="mb-6">
+          <div key="skills" className="mb-6" data-resume-section="true">
             <h2 className={getHeadingClassName()} style={getHeadingStyle()}>{t('resume.sections.skills').toUpperCase()}</h2>
             <div className="flex flex-wrap gap-2">
               {skills.map((s, index) => (
@@ -263,7 +263,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
 
       case "languages":
         return languages.some(lang => lang.language) ? (
-          <div key="languages" className="mb-6">
+          <div key="languages" className="mb-6" data-resume-section="true">
             <h2 className={getHeadingClassName()} style={getHeadingStyle()}>{t('resume.sections.languages').toUpperCase()}</h2>
             <div className="space-y-2">
               {languages.map((lang, index) => (
@@ -280,7 +280,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
 
       case "interests":
         return personalInfo.interests && personalInfo.interests.length > 0 && personalInfo.interests.some(i => i.interest) ? (
-          <div key="interests" className="mb-6">
+          <div key="interests" className="mb-6" data-resume-section="true">
             <h2 className={getHeadingClassName()} style={getHeadingStyle()}>{t('resume.sections.interests').toUpperCase()}</h2>
             <p className="text-sm" style={{ color: textColor, fontSize: sizes.baseText }}>{personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}</p>
           </div>
@@ -292,10 +292,57 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
   };
 
   return (
-    <div 
-      className="bg-background text-foreground p-8 max-w-4xl mx-auto"
-      style={{ fontFamily: `"${fontFamily}", ui-sans-serif, system-ui, sans-serif` }}
-    >
+    <>
+      <style>{`
+        /* Apply padding for both screen (preview) and print */
+        .resume-page-container {
+          padding-top: 32px !important;
+          padding-bottom: 32px !important;
+        }
+        @media print {
+          @page {
+            size: A4;
+            margin: 15mm 0 0 0;
+            background: var(--pdf-background, hsl(var(--background))) !important;
+          }
+          @page :first {
+            margin-top: 0;
+          }
+          html, body {
+            background: var(--pdf-background, hsl(var(--background))) !important;
+            min-height: 100%;
+            height: 100%;
+          }
+          .resume-page-container {
+            min-height: 297mm !important;
+            background: var(--pdf-background, hsl(var(--background))) !important;
+            width: 210mm;
+            margin: 0 auto;
+            /* Use flexbox to ensure last page fills */
+            display: flex;
+            flex-direction: column;
+          }
+          /* Content wrapper should not grow */
+          .resume-page-container > div:not([aria-hidden="true"]) {
+            flex: 0 0 auto;
+          }
+          /* Spacer div at end will fill remaining space */
+          .resume-page-container > div[aria-hidden="true"] {
+            flex: 1 1 auto !important;
+            min-height: 0;
+            background: var(--pdf-background, hsl(var(--background))) !important;
+          }
+          /* Prevent sections from breaking awkwardly */
+          div[class*="mb-"] {
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
+        }
+      `}</style>
+      <div 
+        className="resume-page-container bg-background text-foreground p-8 max-w-4xl mx-auto"
+        style={{ fontFamily: `"${fontFamily}", ui-sans-serif, system-ui, sans-serif` }}
+      >
       {/* Header with colored background */}
       <div className="bg-primary/5 -mx-8 -mt-8 px-8 py-6 mb-6 border-l-4 border-primary">
         <div className="flex items-start gap-6">
@@ -375,6 +422,38 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
       <div className="space-y-2">
         {orderedSections.map(section => renderSection(section))}
       </div>
-    </div>
+      
+      {/* Spacer to ensure last page fills full height */}
+      <div aria-hidden="true" style={{ flex: '1 1 auto', minHeight: 0 }}></div>
+
+      {/* Page Number Footer */}
+      <style>{`
+        /* Hide page numbers in preview (screen) */
+        .page-number-footer {
+          display: none;
+        }
+        @media print {
+          @page {
+            margin-bottom: 20mm;
+            margin-top: 15mm;
+            @bottom-center {
+              content: counter(page);
+              font-size: ${sizes.xs};
+              color: ${textColor};
+              opacity: 0.6;
+            }
+          }
+          @page :first {
+            margin-top: 0;
+          }
+          /* Ensure our footer is hidden in print */
+          .page-number-footer {
+            display: none !important;
+          }
+        }
+      `}</style>
+      <div className="page-number-footer"></div>
+      </div>
+    </>
   );
 };

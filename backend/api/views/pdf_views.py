@@ -24,15 +24,17 @@ def generate_pdf_from_html(html_content: str) -> bytes:
         page.set_content(html_content, wait_until='networkidle')
         
         # Generate PDF with A4 format and zero margins (padding is handled in CSS)
+        # prefer_css_page_size ensures @page rules and margin boxes are respected
         pdf_bytes = page.pdf(
             format='A4',
             margin={
                 'top': '0mm',
                 'right': '0mm',
-                'bottom': '0mm',
+                'bottom': '0mm',  # Keep 0 - CSS @page handles it
                 'left': '0mm'
             },
             print_background=True,
+            prefer_css_page_size=True,  # Important for @page rules and margin boxes
         )
         
         browser.close()

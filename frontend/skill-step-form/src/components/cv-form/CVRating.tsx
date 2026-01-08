@@ -46,32 +46,29 @@ export const CVRating = ({ data, onAnalyze, isAnalyzing, rating: externalRating 
   };
 
   const getOverallScoreColor = (score: number) => {
-    // Score is already 0-10 from backend, or 0-100 from frontend scorer
-    // Check if it's 0-100 scale (frontend) or 0-10 scale (backend)
-    const scoreOutOf10 = score > 10 ? score / 10 : score;
-    if (scoreOutOf10 >= 8) return "text-green-600 dark:text-green-400";
-    if (scoreOutOf10 >= 6) return "text-yellow-600 dark:text-yellow-400";
+    // Score is now always in 0-10 format
+    if (score >= 8) return "text-green-600 dark:text-green-400";
+    if (score >= 6) return "text-yellow-600 dark:text-yellow-400";
     return "text-red-600 dark:text-red-400";
   };
 
   const getOverallStatus = (score: number) => {
-    // Score is already 0-10 from backend, or 0-100 from frontend scorer
-    const scoreOutOf10 = score > 10 ? score / 10 : score;
-    if (scoreOutOf10 >= 8) return { 
+    // Score is now always in 0-10 format
+    if (score >= 8) return { 
       label: t('resume.score.status.excellent') || "Excellent", 
       color: "bg-green-500",
       borderColor: "border-green-500",
       bgColor: "bg-green-50 dark:bg-green-950/20",
       textColor: "text-green-700 dark:text-green-400"
     };
-    if (scoreOutOf10 >= 6) return { 
+    if (score >= 6) return { 
       label: t('resume.score.status.good') || "Good", 
       color: "bg-yellow-500",
       borderColor: "border-yellow-500",
       bgColor: "bg-yellow-50 dark:bg-yellow-950/20",
       textColor: "text-yellow-700 dark:text-yellow-400"
     };
-    if (scoreOutOf10 >= 4) return { 
+    if (score >= 4) return { 
       label: t('resume.score.status.fair') || "Fair", 
       color: "bg-orange-500",
       borderColor: "border-orange-500",
@@ -131,11 +128,11 @@ if (!rating) {
         {/* Overall Score */}
         <div className="space-y-3 text-center">
           <div className={`text-5xl font-bold ${getOverallScoreColor(rating.overallScore)}`}>
-            {Math.round(rating.overallScore > 10 ? rating.overallScore / 10 : rating.overallScore)}
+            {rating.overallScore}
             <span className="text-2xl text-muted-foreground">/10</span>
           </div>
           <Badge className={status.color}>{status.label}</Badge>
-          <Progress value={rating.overallScore} className="h-3" />
+          <Progress value={rating.overallScore * 10} className="h-3" />
         </div>
 
         {/* Category Scores */}

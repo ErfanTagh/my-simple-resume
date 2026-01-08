@@ -17,8 +17,8 @@ export const ProgressIndicator = ({
   const progressPercentage = (currentStep / (totalSteps - 1)) * 100;
 
   const handleStepClick = (index: number) => {
-    // Only allow clicking on completed steps (already visited)
-    if (index <= currentStep && onStepClick) {
+    // Allow clicking on any step (forward or backward navigation)
+    if (onStepClick) {
       onStepClick(index);
     }
   };
@@ -39,7 +39,7 @@ export const ProgressIndicator = ({
           {stepLabels.map((label, index) => {
             const isCompleted = index < currentStep;
             const isCurrent = index === currentStep;
-            const isClickable = index <= currentStep && onStepClick;
+            const isClickable = onStepClick !== undefined;
 
             return (
               <div key={index} className="flex flex-col items-center flex-shrink-0">
