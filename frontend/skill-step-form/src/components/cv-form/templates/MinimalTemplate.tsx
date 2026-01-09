@@ -46,7 +46,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                       <h3 className="text-sm font-semibold text-foreground">{exp.position}</h3>
                       {(exp.startDate || exp.endDate) && (
                         <span className="text-xs text-muted-foreground">
-                          {formatDateRange(exp.startDate, exp.endDate)}
+                          {formatDateRange(exp.startDate, exp.endDate, t('resume.fields.present'))}
                         </span>
                       )}
                     </div>
@@ -73,12 +73,12 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                     )}
                     {exp.technologies && exp.technologies.length > 0 && (
                       <p className="text-xs text-muted-foreground mt-1">
-                        Technologies: {exp.technologies.map(t => typeof t === 'string' ? t : t.technology).filter(Boolean).join(", ")}
+                        {t('resume.sections.technologies')}: {exp.technologies.map(t => typeof t === 'string' ? t : t.technology).filter(Boolean).join(", ")}
                       </p>
                     )}
                     {exp.competencies && exp.competencies.length > 0 && (
                       <p className="text-xs text-muted-foreground mt-1">
-                        Power Skills: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(", ")}
+                        {t('resume.labels.keyCompetencies')}: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(", ")}
                       </p>
                     )}
                   </div>
@@ -100,7 +100,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                       <h3 className="text-sm font-semibold text-foreground">{edu.degree}</h3>
                       {(edu.startDate || edu.endDate) && (
                         <span className="text-xs text-muted-foreground">
-                          {formatDateRange(edu.startDate, edu.endDate)}
+                          {formatDateRange(edu.startDate, edu.endDate, t('resume.fields.present'))}
                         </span>
                       )}
                     </div>
@@ -130,7 +130,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                       <h3 className="text-sm font-semibold text-foreground">{proj.name}</h3>
                       {(proj.startDate || proj.endDate) && (
                         <span className="text-xs text-muted-foreground">
-                          {formatDateRange(proj.startDate, proj.endDate)}
+                          {formatDateRange(proj.startDate, proj.endDate, t('resume.fields.present'))}
                         </span>
                       )}
                     </div>

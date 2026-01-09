@@ -1,10 +1,12 @@
 import { UseFormReturn, useFieldArray, Controller } from "react-hook-form";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { MonthPicker } from "@/components/ui/month-picker";
+import { Switch } from "@/components/ui/switch";
 import { Plus, Trash2 } from "lucide-react";
 import { CVFormData } from "./types";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -18,6 +20,19 @@ interface ExperienceStepProps {
 
 const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: number }) => {
   const { t } = useLanguage();
+  const endDate = form.watch(`workExperience.${index}.endDate`);
+  const [isCurrentlyWorking, setIsCurrentlyWorking] = useState(() => {
+    // Initialize based on endDate - if empty, assume currently working
+    return !endDate || endDate === "";
+  });
+
+  // Sync checkbox state when endDate changes externally
+  useEffect(() => {
+    if (endDate && endDate !== "") {
+      setIsCurrentlyWorking(false);
+    }
+  }, [endDate]);
+
   const { fields: respFields, append: appendResp, remove: removeResp } = useFieldArray({
     control: form.control,
     name: `workExperience.${index}.responsibilities`,
@@ -36,18 +51,18 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
   return (
     <>
       <div className="space-y-2">
-        <Label htmlFor={`workExperience.${index}.position`}>Position *</Label>
+        <Label htmlFor={`workExperience.${index}.position`}>{t('resume.fields.position')} *</Label>
         <Input
           {...form.register(`workExperience.${index}.position`)}
-          placeholder="Software Engineer"
+          placeholder={t('resume.placeholders.position')}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor={`workExperience.${index}.company`}>Company *</Label>
+        <Label htmlFor={`workExperience.${index}.company`}>{t('resume.fields.company')} *</Label>
         <Input
           {...form.register(`workExperience.${index}.company`)}
-          placeholder="Tech Corp"
+          placeholder={t('resume.placeholders.company')}
         />
       </div>
 
@@ -67,41 +82,71 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label>Start Date</Label>
-          <Controller
-            control={form.control}
-            name={`workExperience.${index}.startDate`}
-            render={({ field }) => (
-              <MonthPicker
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="Select start date"
-              />
-            )}
+      <div className="space-y-3">
+        <div className="flex items-center space-x-3">
+          <Switch
+            id={`workExperience.${index}.currentlyWorking`}
+            checked={isCurrentlyWorking}
+            onCheckedChange={(checked) => {
+              setIsCurrentlyWorking(checked);
+              if (checked) {
+                // When checked, clear the end date
+                form.setValue(`workExperience.${index}.endDate`, "");
+              }
+              // When unchecked, keep endDate as is (user can select it)
+            }}
           />
+          <Label
+            htmlFor={`workExperience.${index}.currentlyWorking`}
+            className="text-sm font-normal cursor-pointer"
+          >
+            {t('resume.labels.currentlyWorking')}
+          </Label>
         </div>
         
-        <div className="space-y-2">
-          <Label>End Date</Label>
-          <Controller
-            control={form.control}
-            name={`workExperience.${index}.endDate`}
-            render={({ field }) => (
-              <MonthPicker
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="Select end date"
-              />
-            )}
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>{t('resume.fields.startDate')}</Label>
+            <Controller
+              control={form.control}
+              name={`workExperience.${index}.startDate`}
+              render={({ field }) => (
+                <MonthPicker
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder={t('resume.placeholders.selectStartDate')}
+                />
+              )}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label>{t('resume.fields.endDate')}</Label>
+            <Controller
+              control={form.control}
+              name={`workExperience.${index}.endDate`}
+              render={({ field }) => (
+                <MonthPicker
+                  value={field.value}
+                  onChange={(value) => {
+                    field.onChange(value);
+                    // If user selects a date, automatically uncheck "currently working"
+                    if (value && value !== "") {
+                      setIsCurrentlyWorking(false);
+                    }
+                  }}
+                  placeholder={t('resume.placeholders.selectEndDate')}
+                  disabled={isCurrentlyWorking}
+                />
+              )}
+            />
+          </div>
         </div>
       </div>
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <Label>Key Responsibilities & Achievements</Label>
+          <Label>{t('resume.labels.keyResponsibilities')}</Label>
           <Button
             type="button"
             variant="outline"
@@ -110,7 +155,7 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
             className="h-8"
           >
             <Plus className="h-4 w-4 mr-1" />
-            Add
+            {t('resume.labels.add')}
           </Button>
         </div>
         <div className="space-y-2">
@@ -118,7 +163,7 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
             <div key={field.id} className="flex gap-2">
               <Input
                 {...form.register(`workExperience.${index}.responsibilities.${respIndex}.responsibility`)}
-                placeholder="e.g., Led development of microservices architecture"
+                placeholder={t('resume.placeholders.responsibility')}
                 className="flex-1"
               />
               <Button
@@ -137,8 +182,8 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
 
       <div className="space-y-3">
         <div>
-          <Label>Technologies</Label>
-          <p className="text-xs text-muted-foreground mt-1">Add technologies used in this role</p>
+          <Label>{t('resume.labels.technologies')}</Label>
+          <p className="text-xs text-muted-foreground mt-1">{t('resume.labels.technologiesHintWork')}</p>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
           {techFields.map((field, techIndex) => (
@@ -150,7 +195,7 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
                   <TechnologyAutocomplete
                     value={techField.value || ""}
                     onChange={techField.onChange}
-                    placeholder="e.g., React"
+                    placeholder={t('resume.placeholders.technology')}
                     className="text-sm"
                   />
                 )}
@@ -176,7 +221,7 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
           onClick={() => appendTech({ technology: "" })}
         >
           <Plus className="mr-1 h-3 w-3" />
-          Add Technology
+          {t('resume.labels.addTechnology')}
         </Button>
       </div>
 
@@ -269,7 +314,7 @@ const ProjectItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: 
                   <TechnologyAutocomplete
                     value={techField.value || ""}
                     onChange={techField.onChange}
-                    placeholder="e.g., React"
+                    placeholder={t('resume.placeholders.technology')}
                     className="text-sm"
                   />
                 )}
@@ -295,7 +340,7 @@ const ProjectItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: 
           onClick={() => appendTech({ technology: "" })}
         >
           <Plus className="mr-1 h-3 w-3" />
-          Add Technology
+          {t('resume.labels.addTechnology')}
         </Button>
       </div>
 
@@ -349,6 +394,7 @@ const ProjectItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: 
 };
 
 export const ExperienceStep = ({ form }: ExperienceStepProps) => {
+  const { t } = useLanguage();
   const { fields: workFields, append: appendWork, remove: removeWork } = useFieldArray({
     control: form.control,
     name: "workExperience",
@@ -364,8 +410,8 @@ export const ExperienceStep = ({ form }: ExperienceStepProps) => {
       {/* Work Experience Section */}
       <div>
         <div className="mb-6">
-          <h2 className="text-2xl font-semibold mb-2">Work Experience</h2>
-          <p className="text-muted-foreground">Add your professional experience</p>
+          <h2 className="text-2xl font-semibold mb-2">{t('resume.steps.workExperience')}</h2>
+          <p className="text-muted-foreground">{t('resume.steps.workExperienceDesc')}</p>
         </div>
 
         {workFields.map((field, index) => (
@@ -403,7 +449,7 @@ export const ExperienceStep = ({ form }: ExperienceStepProps) => {
           className="w-full"
         >
           <Plus className="mr-2 h-4 w-4" />
-          Add Experience
+          {t('resume.actions.addExperience')}
         </Button>
       </div>
 
@@ -412,13 +458,13 @@ export const ExperienceStep = ({ form }: ExperienceStepProps) => {
       {/* Projects Section */}
       <div>
         <div className="mb-6">
-          <h2 className="text-2xl font-semibold mb-2">Projects (Optional)</h2>
-          <p className="text-muted-foreground">Showcase your notable projects and achievements - skip if not applicable</p>
+          <h2 className="text-2xl font-semibold mb-2">{t('resume.labels.projectsTitle')}</h2>
+          <p className="text-muted-foreground">{t('resume.labels.projectsDesc')}</p>
         </div>
 
         {projectFields.length === 0 && (
           <div className="text-center py-8 border-2 border-dashed rounded-lg mb-4">
-            <p className="text-muted-foreground mb-4">No projects added yet</p>
+            <p className="text-muted-foreground mb-4">{t('resume.labels.noProjects')}</p>
             <Button
               type="button"
               variant="outline"
@@ -432,7 +478,7 @@ export const ExperienceStep = ({ form }: ExperienceStepProps) => {
               })}
             >
               <Plus className="mr-2 h-4 w-4" />
-              Add Your First Project
+              {t('resume.labels.addFirstProject')}
             </Button>
           </div>
         )}
@@ -468,7 +514,7 @@ export const ExperienceStep = ({ form }: ExperienceStepProps) => {
             className="w-full"
           >
             <Plus className="mr-2 h-4 w-4" />
-            Add Another Project
+            {t('resume.labels.addAnotherProject')}
           </Button>
         )}
       </div>

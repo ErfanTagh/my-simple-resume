@@ -28,15 +28,16 @@ export const formatMonthYear = (dateString: string | undefined): string => {
  * Format a date range
  * @param startDate - Start date in YYYY-MM format
  * @param endDate - End date in YYYY-MM format or empty for present
+ * @param presentText - Text to show when endDate is empty (defaults to "Present")
  * @returns Formatted date range (e.g., "Mar 2025 - Dec 2025" or "Mar 2025 - Present")
  */
-export const formatDateRange = (startDate: string | undefined, endDate: string | undefined): string => {
+export const formatDateRange = (startDate: string | undefined, endDate: string | undefined, presentText: string = 'Present'): string => {
   const start = formatMonthYear(startDate);
-  const end = endDate ? formatMonthYear(endDate) : 'Present';
+  const end = endDate ? formatMonthYear(endDate) : presentText;
   
   if (!start && !end) return '';
   if (!start) return end;
-  if (!end || end === 'Present') return `${start} - Present`;
+  if (!end || end === presentText) return `${start} - ${presentText}`;
   
   return `${start} - ${end}`;
 };

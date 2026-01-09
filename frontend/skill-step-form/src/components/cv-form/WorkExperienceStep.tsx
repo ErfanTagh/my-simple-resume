@@ -137,8 +137,8 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
 
       <div className="space-y-3">
         <div>
-          <Label>Technologies</Label>
-          <p className="text-xs text-muted-foreground mt-1">Add technologies used in this role</p>
+          <Label>{t('resume.labels.technologies')}</Label>
+          <p className="text-xs text-muted-foreground mt-1">{t('resume.labels.technologiesHintWork')}</p>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {techFields.map((field, techIndex) => (

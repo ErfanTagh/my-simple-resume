@@ -171,7 +171,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                       )}
                       {edu.keyCourses && edu.keyCourses.length > 0 && (
                         <p className="text-muted-foreground text-xs mt-0.5">
-                          Key Courses: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(', ')}
+                          {t('resume.labels.keyCourses')}: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(', ')}
                         </p>
                       )}
                     </div>
@@ -246,7 +246,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                       )}
                       {exp.competencies && exp.competencies.length > 0 && (
                         <p className="text-muted-foreground text-xs mt-0.5">
-                          Power Skills: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(', ')}
+                          {t('resume.labels.keyCompetencies')}: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(', ')}
                         </p>
                       )}
                     </div>
@@ -285,7 +285,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                         </span>
                       </div>
                       {cert.credentialId && (
-                        <p className="text-muted-foreground text-xs">ID: {cert.credentialId}</p>
+                        <p className="text-muted-foreground text-xs">{t('resume.fields.credentialId')}: {cert.credentialId}</p>
                       )}
                       {cert.url && (
                         <a href={cert.url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:underline text-xs block truncate max-w-[200px]">
@@ -481,7 +481,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
               </div>
               <div className="text-[10px]">
                 <div className="flex gap-2">
-                  <span className="font-bold text-foreground flex-shrink-0" style={{ minWidth: '50px' }}>Skills:</span>
+                  <span className="font-bold text-foreground flex-shrink-0" style={{ minWidth: '50px' }}>{t('resume.sections.skills')}:</span>
                   <span className="text-foreground flex-1 break-words" style={{ lineHeight: '1.5' }}>
                     {skills.filter(s => s.skill).map(s => s.skill).join(', ')}
                   </span>

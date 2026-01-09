@@ -126,7 +126,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                     )}
                     {edu.keyCourses && edu.keyCourses.length > 0 && (
                       <p className="text-sm text-muted-foreground mt-1">
-                        Key Courses: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(', ')}
+                        {t('resume.labels.keyCourses')}: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(', ')}
                       </p>
                     )}
                   </div>
@@ -188,7 +188,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                     )}
                     {exp.competencies && exp.competencies.length > 0 && (
                       <p className="text-sm text-muted-foreground mt-1">
-                        Power Skills: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(', ')}
+                        {t('resume.labels.keyCompetencies')}: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(', ')}
                       </p>
                     )}
                   </div>
@@ -294,7 +294,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                       <div>
                         <span className="text-sm text-foreground break-words">{cert.name}, {cert.organization || ''}</span>
                         {cert.credentialId && (
-                          <span className="text-xs text-muted-foreground ml-2">ID: {cert.credentialId}</span>
+                          <span className="text-xs text-muted-foreground ml-2">{t('resume.fields.credentialId')}: {cert.credentialId}</span>
                         )}
                         {cert.url && (
                           <a href={cert.url} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:underline ml-2 block">
@@ -328,7 +328,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
               </div>
             </div>
             <div className="text-sm text-foreground break-words">
-              <span className="font-semibold">Technical: </span>
+              <span className="font-semibold">{t('resume.sections.skills')}: </span>
               {skills.filter(s => s.skill).map(s => s.skill).join(', ')}
             </div>
           </div>
@@ -347,7 +347,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
               </div>
             </div>
             <div className="text-sm text-foreground break-words">
-              <span className="font-semibold">Language: </span>
+              <span className="font-semibold">{t('resume.sections.languages')}: </span>
               {languages
                 .filter(lang => lang.language)
                 .map((lang, index, arr) => (
@@ -373,7 +373,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
               </div>
             </div>
             <div className="text-sm text-foreground break-words">
-              <span className="font-semibold">Interests: </span>
+              <span className="font-semibold">{t('resume.sections.interests')}: </span>
               {personalInfo.interests.filter(i => i.interest).map(i => i.interest).join(', ')}
             </div>
           </div>

@@ -40,7 +40,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                       <p className="text-base font-semibold text-primary">{exp.company}{exp.location && ` • ${exp.location}`}</p>
                       {(exp.startDate || exp.endDate) && (
                         <p className="text-xs text-muted-foreground mt-1">
-                          {formatDateRange(exp.startDate, exp.endDate)}
+                          {formatDateRange(exp.startDate, exp.endDate, t('resume.fields.present'))}
                         </p>
                       )}
                       {((exp.responsibilities && exp.responsibilities.length > 0) || exp.description) && (
@@ -76,7 +76,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                       )}
                       {exp.competencies && exp.competencies.length > 0 && (
                         <p className="text-xs text-muted-foreground mt-2">
-                          Power Skills: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(", ")}
+                          {t('resume.labels.keyCompetencies')}: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(", ")}
                         </p>
                       )}
                     </div>
@@ -102,7 +102,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                       {edu.field && <p className="text-sm text-muted-foreground italic">{edu.field}</p>}
                       {edu.keyCourses && edu.keyCourses.length > 0 && (
                         <p className="text-xs text-muted-foreground mt-1">
-                          Key Courses: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(", ")}
+                          {t('resume.labels.keyCourses')}: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(", ")}
                         </p>
                       )}
                     </div>
@@ -127,7 +127,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                         <h3 className="text-lg font-bold text-foreground">{proj.name}</h3>
                         {(proj.startDate || proj.endDate) && (
                           <span className="text-xs text-muted-foreground">
-                            {formatDateRange(proj.startDate, proj.endDate)}
+                            {formatDateRange(proj.startDate, proj.endDate, t('resume.fields.present'))}
                           </span>
                         )}
                       </div>

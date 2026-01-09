@@ -1,6 +1,7 @@
 import { CVFormData } from "../types";
 import { Mail, Phone, MapPin, Linkedin, Github, Globe, Calendar, ExternalLink } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { formatDateRange } from "@/lib/dateFormatter";
 
 interface ModernTemplateProps {
   data: CVFormData;
@@ -102,7 +103,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                       {(exp.startDate || exp.endDate) && (
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Calendar className="h-3 w-3" />
-                          <span>{exp.startDate} - {exp.endDate || t('resume.fields.present')}</span>
+                          <span>{formatDateRange(exp.startDate, exp.endDate, t('resume.fields.present'))}</span>
                         </div>
                       )}
                     </div>
@@ -121,12 +122,12 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                     )}
                     {exp.technologies && exp.technologies.length > 0 && (
                       <p className="text-xs text-primary mt-2">
-                        Tech: {exp.technologies.map(t => typeof t === 'string' ? t : t.technology).filter(Boolean).join(", ")}
+                        {t('resume.sections.technologies')}: {exp.technologies.map(t => typeof t === 'string' ? t : t.technology).filter(Boolean).join(", ")}
                       </p>
                     )}
                     {exp.competencies && exp.competencies.length > 0 && (
                       <p className="text-xs text-muted-foreground mt-1">
-                        Power Skills: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(", ")}
+                        {t('resume.labels.keyCompetencies')}: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(", ")}
                       </p>
                     )}
                   </div>
@@ -157,7 +158,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                         )}
                       </div>
                       {(edu.startDate || edu.endDate) && (
-                        <span className="text-xs text-muted-foreground">{edu.startDate} - {edu.endDate || t('resume.fields.present')}</span>
+                        <span className="text-xs text-muted-foreground">{formatDateRange(edu.startDate, edu.endDate, t('resume.fields.present'))}</span>
                       )}
                     </div>
                   </div>
@@ -178,7 +179,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                     <div className="flex justify-between items-start mb-1">
                       <h3 className="font-bold text-foreground">{proj.name}</h3>
                       {(proj.startDate || proj.endDate) && (
-                        <span className="text-xs text-muted-foreground">{proj.startDate} - {proj.endDate || t('resume.fields.present')}</span>
+                        <span className="text-xs text-muted-foreground">{formatDateRange(proj.startDate, proj.endDate, t('resume.fields.present'))}</span>
                       )}
                     </div>
                     {proj.description && <p className="text-sm text-muted-foreground mb-2">{proj.description}</p>}
@@ -196,7 +197,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                     )}
                     {proj.technologies && proj.technologies.length > 0 && (
                       <p className="text-xs text-primary mt-1">
-                        Tech: {proj.technologies.map(t => typeof t === 'string' ? t : t.technology).filter(Boolean).join(", ")}
+                        {t('resume.sections.technologies')}: {proj.technologies.map(t => typeof t === 'string' ? t : t.technology).filter(Boolean).join(", ")}
                       </p>
                     )}
                     {proj.link && (
