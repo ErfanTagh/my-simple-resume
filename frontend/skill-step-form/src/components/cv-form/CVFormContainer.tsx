@@ -164,7 +164,7 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
       firstName: useHintIfEmpty(formData.personalInfo?.firstName || "", hintData.personalInfo.firstName, showPersonalInfoHints),
       lastName: useHintIfEmpty(formData.personalInfo?.lastName || "", hintData.personalInfo.lastName, showPersonalInfoHints),
       professionalTitle: useHintIfEmpty(formData.personalInfo?.professionalTitle || "", hintData.personalInfo.professionalTitle || "", showPersonalInfoHints),
-      profileImage: showPersonalInfoHints ? (formData.personalInfo?.profileImage || "https://ui-avatars.com/api/?name=Emily+Chen&size=200&background=6366f1&color=fff&bold=true&font-size=0.5") : (formData.personalInfo?.profileImage || ""),
+      profileImage: showPersonalInfoHints ? (formData.personalInfo?.profileImage || "/resume-sample-3.png") : (formData.personalInfo?.profileImage || ""),
       email: useHintIfEmpty(formData.personalInfo?.email || "", hintData.personalInfo.email, showPersonalInfoHints),
       phone: useHintIfEmpty(formData.personalInfo?.phone || "", hintData.personalInfo.phone || "", showPersonalInfoHints),
       location: useHintIfEmpty(formData.personalInfo?.location || "", hintData.personalInfo.location || "", showPersonalInfoHints),

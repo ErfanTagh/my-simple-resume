@@ -6,9 +6,22 @@ import { MinimalTemplate } from "@/components/cv-form/templates/MinimalTemplate"
 import { LatexTemplate } from "@/components/cv-form/templates/LatexTemplate";
 import { StarRoverTemplate } from "@/components/cv-form/templates/StarRoverTemplate";
 
+// Helper function to get profile image based on template (rotate through 4 images)
+const getProfileImageForTemplate = (templateName: string): string => {
+  const imageMap: Record<string, string> = {
+    modern: "/resume-sample-1.png",    // East Asian man
+    classic: "/resume-sample-2.png",     // Caucasian man
+    creative: "/resume-sample-3.png",    // Woman (Hispanic/Latina)
+    minimal: "/resume-sample-4.png",    // Black woman
+    latex: "/resume-sample-1.png",      // East Asian man (reuse)
+    starRover: "/resume-sample-2.png",  // Caucasian man (reuse)
+  };
+  return imageMap[templateName] || "/resume-sample-1.png";
+};
+
 // Sample data for preview - realistic resume data
-const sampleData: CVFormData = {
-  template: "modern",
+const createSampleData = (templateName: string): CVFormData => ({
+  template: templateName as any,
   personalInfo: {
     firstName: "Alex",
     lastName: "Martinez",
@@ -20,7 +33,7 @@ const sampleData: CVFormData = {
     github: "github.com/alexmartinez",
     summary:
       "Experienced software engineer with 8+ years building scalable web applications. Expertise in React, Node.js, and cloud architecture. Passionate about creating efficient, maintainable code and leading high-performing development teams. Strong background in full-stack development, system design, and DevOps practices.",
-    profileImage: "https://ui-avatars.com/api/?name=Alex+Martinez&size=200&background=6366f1&color=fff&bold=true&font-size=0.5",
+    profileImage: getProfileImageForTemplate(templateName),
     website: "alexmartinez.dev",
     interests: [
       { interest: "Open Source Contribution" },
@@ -222,7 +235,7 @@ const sampleData: CVFormData = {
     { skill: "Microservices" },
   ],
   sectionOrder: ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"],
-};
+});
 
 interface LandingTemplatePreviewProps {
   templateName: "modern" | "classic" | "creative" | "minimal" | "latex" | "starRover";
@@ -231,17 +244,21 @@ interface LandingTemplatePreviewProps {
 export const LandingTemplatePreview = ({
   templateName,
 }: LandingTemplatePreviewProps) => {
+  // Create base sample data with template-specific profile image
+  const baseSampleData = createSampleData(templateName);
+  
   // Enhanced data specifically for LaTeX template to ensure it fills properly
   const enhancedData: CVFormData = templateName === "latex" ? {
-    ...sampleData,
+    ...baseSampleData,
     template: templateName,
     personalInfo: {
-      ...sampleData.personalInfo,
+      ...baseSampleData.personalInfo,
+      profileImage: getProfileImageForTemplate(templateName), // Ensure correct image for latex template
       summary:
         "Experienced software engineer with 8+ years building scalable web applications. Expertise in React, Node.js, and cloud architecture. Passionate about creating efficient, maintainable code and leading high-performing development teams. Strong background in full-stack development, system design, and DevOps practices. Proven track record of delivering high-quality software solutions that drive business value and improve user experiences.",
     },
     workExperience: [
-      ...sampleData.workExperience,
+      ...baseSampleData.workExperience,
       {
         position: "Software Development Intern",
         company: "Innovation Labs",
@@ -263,7 +280,7 @@ export const LandingTemplatePreview = ({
       },
     ],
     projects: [
-      ...sampleData.projects,
+      ...baseSampleData.projects,
       {
         name: "Open Source Contribution Platform",
         description:
@@ -310,7 +327,7 @@ export const LandingTemplatePreview = ({
       },
     ],
     certificates: [
-      ...sampleData.certificates,
+      ...baseSampleData.certificates,
       {
         name: "React Advanced Patterns",
         organization: "React Training",
@@ -345,7 +362,7 @@ export const LandingTemplatePreview = ({
       },
     ],
     education: [
-      ...sampleData.education,
+      ...baseSampleData.education,
       {
         degree: "High School Diploma",
         institution: "Berkeley High School",
@@ -361,12 +378,12 @@ export const LandingTemplatePreview = ({
       },
     ],
     languages: [
-      ...sampleData.languages,
+      ...baseSampleData.languages,
       { language: "German", proficiency: "Basic" },
       { language: "Japanese", proficiency: "Basic" },
     ],
     skills: [
-      ...sampleData.skills,
+      ...baseSampleData.skills,
       { skill: "GraphQL" },
       { skill: "REST APIs" },
       { skill: "TypeScript" },
@@ -388,13 +405,13 @@ export const LandingTemplatePreview = ({
       { skill: "Monitoring" },
     ],
     interests: [
-      ...(sampleData.personalInfo.interests || []),
+      ...(baseSampleData.personalInfo.interests || []),
       { interest: "Machine Learning" },
       { interest: "DevOps" },
       { interest: "Architecture Design" },
       { interest: "Code Reviews" },
     ],
-  } : sampleData;
+  } : baseSampleData;
 
   const data: CVFormData = {
     ...enhancedData,

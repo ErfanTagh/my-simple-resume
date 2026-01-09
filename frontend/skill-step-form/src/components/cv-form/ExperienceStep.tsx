@@ -274,6 +274,20 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
 };
 
 const ProjectItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: number }) => {
+  const { t } = useLanguage();
+  const endDate = form.watch(`projects.${index}.endDate`);
+  const [isOngoing, setIsOngoing] = useState(() => {
+    // Initialize based on endDate - if empty, assume ongoing
+    return !endDate || endDate === "";
+  });
+
+  // Sync checkbox state when endDate changes externally
+  useEffect(() => {
+    if (endDate && endDate !== "") {
+      setIsOngoing(false);
+    }
+  }, [endDate]);
+
   const { fields: techFields, append: appendTech, remove: removeTech } = useFieldArray({
     control: form.control,
     name: `projects.${index}.technologies`,
@@ -282,18 +296,18 @@ const ProjectItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: 
   return (
     <>
       <div className="space-y-2">
-        <Label htmlFor={`projects.${index}.name`}>Project Name</Label>
+        <Label htmlFor={`projects.${index}.name`}>{t('resume.fields.projectName')}</Label>
         <Input
           {...form.register(`projects.${index}.name`)}
-          placeholder="E-commerce Platform"
+          placeholder={t('resume.placeholders.projectName')}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor={`projects.${index}.description`}>Description</Label>
+        <Label htmlFor={`projects.${index}.description`}>{t('resume.fields.projectDescription')}</Label>
         <Textarea
           {...form.register(`projects.${index}.description`)}
-          placeholder="Describe the project, your role, and key achievements..."
+          placeholder={t('resume.placeholders.projectDescription')}
           rows={3}
           className="resize-none"
         />
@@ -301,8 +315,8 @@ const ProjectItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: 
 
       <div className="space-y-3">
         <div>
-          <Label>Technologies Used</Label>
-          <p className="text-xs text-muted-foreground mt-1">Add technologies used in this project</p>
+          <Label>{t('resume.labels.technologies')}</Label>
+          <p className="text-xs text-muted-foreground mt-1">{t('resume.labels.technologiesHint')}</p>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
           {techFields.map((field, techIndex) => (
@@ -344,44 +358,74 @@ const ProjectItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: 
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label>Start Date</Label>
-          <Controller
-            control={form.control}
-            name={`projects.${index}.startDate`}
-            render={({ field }) => (
-              <MonthPicker
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="Select start date"
-              />
-            )}
+      <div className="space-y-3">
+        <div className="flex items-center space-x-3">
+          <Switch
+            id={`projects.${index}.ongoing`}
+            checked={isOngoing}
+            onCheckedChange={(checked) => {
+              setIsOngoing(checked);
+              if (checked) {
+                // When checked, clear the end date
+                form.setValue(`projects.${index}.endDate`, "");
+              }
+              // When unchecked, keep endDate as is (user can select it)
+            }}
           />
+          <Label
+            htmlFor={`projects.${index}.ongoing`}
+            className="text-sm font-normal cursor-pointer"
+          >
+            {t('resume.labels.ongoing')}
+          </Label>
         </div>
         
-        <div className="space-y-2">
-          <Label>End Date</Label>
-          <Controller
-            control={form.control}
-            name={`projects.${index}.endDate`}
-            render={({ field }) => (
-              <MonthPicker
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="Present"
-              />
-            )}
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>{t('resume.fields.startDate')}</Label>
+            <Controller
+              control={form.control}
+              name={`projects.${index}.startDate`}
+              render={({ field }) => (
+                <MonthPicker
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder={t('resume.placeholders.selectStartDate')}
+                />
+              )}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label>{t('resume.fields.endDate')}</Label>
+            <Controller
+              control={form.control}
+              name={`projects.${index}.endDate`}
+              render={({ field }) => (
+                <MonthPicker
+                  value={field.value}
+                  onChange={(value) => {
+                    field.onChange(value);
+                    // If user selects a date, automatically uncheck "ongoing"
+                    if (value && value !== "") {
+                      setIsOngoing(false);
+                    }
+                  }}
+                  placeholder={t('resume.placeholders.selectEndDate')}
+                  disabled={isOngoing}
+                />
+              )}
+            />
+          </div>
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor={`projects.${index}.link`}>Project Link</Label>
+        <Label htmlFor={`projects.${index}.link`}>{t('resume.labels.projectLink')}</Label>
         <Input
           type="url"
           {...form.register(`projects.${index}.link`)}
-          placeholder="https://github.com/username/project"
+          placeholder={t('resume.placeholders.projectLink')}
         />
         {form.formState.errors.projects?.[index]?.link && (
           <p className="text-sm text-destructive">

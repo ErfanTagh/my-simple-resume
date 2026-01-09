@@ -1,10 +1,11 @@
 import { UseFormReturn, useFieldArray, Controller } from "react-hook-form";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { MonthPicker } from "@/components/ui/month-picker";
+import { Switch } from "@/components/ui/switch";
 import { Plus, Trash2 } from "lucide-react";
 import { CVFormData } from "./types";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -18,6 +19,19 @@ interface EducationStepProps {
 
 const EducationItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: number }) => {
   const { t } = useLanguage();
+  const endDate = form.watch(`education.${index}.endDate`);
+  const [isCurrentlyStudying, setIsCurrentlyStudying] = useState(() => {
+    // Initialize based on endDate - if empty, assume currently studying
+    return !endDate || endDate === "";
+  });
+
+  // Sync checkbox state when endDate changes externally
+  useEffect(() => {
+    if (endDate && endDate !== "") {
+      setIsCurrentlyStudying(false);
+    }
+  }, [endDate]);
+
   const { fields: courseFields, append: appendCourse, remove: removeCourse } = useFieldArray({
     control: form.control,
     name: `education.${index}.keyCourses`,
@@ -65,35 +79,65 @@ const EducationItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-        <div className="space-y-2">
-          <Label>{t('resume.fields.startDate')}</Label>
-          <Controller
-            control={form.control}
-            name={`education.${index}.startDate`}
-            render={({ field }) => (
-              <MonthPicker
-                value={field.value}
-                onChange={field.onChange}
-                placeholder={t('resume.placeholders.selectStartDate')}
-              />
-            )}
+      <div className="space-y-3">
+        <div className="flex items-center space-x-3">
+          <Switch
+            id={`education.${index}.currentlyStudying`}
+            checked={isCurrentlyStudying}
+            onCheckedChange={(checked) => {
+              setIsCurrentlyStudying(checked);
+              if (checked) {
+                // When checked, clear the end date
+                form.setValue(`education.${index}.endDate`, "");
+              }
+              // When unchecked, keep endDate as is (user can select it)
+            }}
           />
+          <Label
+            htmlFor={`education.${index}.currentlyStudying`}
+            className="text-sm font-normal cursor-pointer"
+          >
+            {t('resume.labels.currentlyStudying')}
+          </Label>
         </div>
         
-        <div className="space-y-2">
-          <Label>{t('resume.fields.endDate')}</Label>
-          <Controller
-            control={form.control}
-            name={`education.${index}.endDate`}
-            render={({ field }) => (
-              <MonthPicker
-                value={field.value}
-                onChange={field.onChange}
-                placeholder={t('resume.placeholders.selectEndDate')}
-              />
-            )}
-          />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="space-y-2">
+            <Label>{t('resume.fields.startDate')}</Label>
+            <Controller
+              control={form.control}
+              name={`education.${index}.startDate`}
+              render={({ field }) => (
+                <MonthPicker
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder={t('resume.placeholders.selectStartDate')}
+                />
+              )}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label>{t('resume.fields.endDate')}</Label>
+            <Controller
+              control={form.control}
+              name={`education.${index}.endDate`}
+              render={({ field }) => (
+                <MonthPicker
+                  value={field.value}
+                  onChange={(value) => {
+                    field.onChange(value);
+                    // If user selects a date, automatically uncheck "currently studying"
+                    if (value && value !== "") {
+                      setIsCurrentlyStudying(false);
+                    }
+                  }}
+                  placeholder={t('resume.placeholders.selectEndDate')}
+                  disabled={isCurrentlyStudying}
+                />
+              )}
+            />
+          </div>
         </div>
       </div>
 

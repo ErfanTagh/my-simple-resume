@@ -217,6 +217,8 @@
       "addCourse": "Add Course",
       "addResponsibility": "Add Responsibility",
       "currentlyWorking": "Currently working",
+      "currentlyStudying": "Currently studying",
+      "ongoing": "Ongoing",
       "educationDesc": "Tell us about your educational background",
       "keyCoursesHint": "Add notable courses you completed",
       "certificatesTitle": "Certificates & Licenses (Optional)",

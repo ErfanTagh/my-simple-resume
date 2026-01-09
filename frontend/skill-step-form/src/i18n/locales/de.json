@@ -210,6 +210,8 @@
       "addCourse": "Kurs hinzufügen",
       "addResponsibility": "Verantwortlichkeit hinzufügen",
       "currentlyWorking": "Aktuell tätig",
+      "currentlyStudying": "Aktuell studierend",
+      "ongoing": "Laufend",
       "educationDesc": "Erzählen Sie uns von Ihrem Bildungsweg",
       "keyCoursesHint": "Fügen Sie bemerkenswerte Kurse hinzu, die Sie abgeschlossen haben",
       "certificatesTitle": "Zertifikate & Lizenzen (Optional)",
