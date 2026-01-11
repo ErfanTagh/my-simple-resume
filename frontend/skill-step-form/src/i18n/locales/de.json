@@ -227,7 +227,8 @@
       "projectsTitle": "Projekte (Optional)",
       "projectsDesc": "Zeigen Sie Ihre bemerkenswerten Projekte und Erfolge - überspringen, wenn nicht zutreffend",
       "noProjects": "Noch keine Projekte hinzugefügt",
-      "addFirstProject": "Ihr erstes Projekt hinzufügen"
+      "addFirstProject": "Ihr erstes Projekt hinzufügen",
+      "addAnotherProject": "Weiteres Projekt hinzufügen"
     },
     "proficiency": {
       "native": "Muttersprache",

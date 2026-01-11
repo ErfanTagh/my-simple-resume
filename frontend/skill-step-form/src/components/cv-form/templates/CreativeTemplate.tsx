@@ -132,14 +132,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                         )}
                       </div>
                       {proj.description && (
-                        <ul className="text-sm text-muted-foreground space-y-1 mt-1">
-                          {proj.description.split('\n').filter(line => line.trim()).map((line, i) => (
-                            <li key={i} className="flex gap-2">
-                              <span className="text-primary font-bold">•</span>
-                              <span className="flex-1">{line.trim()}</span>
-                            </li>
-                          ))}
-                        </ul>
+                        <p className="text-sm text-muted-foreground mt-1">{proj.description}</p>
                       )}
                       {proj.highlights && proj.highlights.length > 0 && (
                         <ul className="text-sm text-muted-foreground space-y-1 mt-1">
@@ -368,11 +361,11 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
           {/* Profile image */}
           {personalInfo.profileImage && (
             <div className="flex-shrink-0">
-              <div className="w-28 h-28">
+              <div className="w-28 h-28 rounded-lg border-4 border-primary shadow-lg overflow-hidden">
                 <img 
                   src={personalInfo.profileImage} 
                   alt={`Professional profile photo of ${personalInfo.firstName} ${personalInfo.lastName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
-                  className="w-full h-full object-cover rounded-lg border-4 border-primary shadow-lg"
+                  className="w-full h-full object-cover"
                   loading="lazy"
                 />
               </div>

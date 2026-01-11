@@ -1,4 +1,4 @@
-import { UseFormReturn, useFieldArray } from "react-hook-form";
+import { UseFormReturn, useFieldArray, Controller } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -111,21 +111,27 @@ export const SkillsStep = ({ form }: SkillsStepProps) => {
 
               <div className="space-y-2">
                 <Label htmlFor={`languages.${index}.proficiency`}>{t('resume.fields.proficiency')} *</Label>
-                <Select
-                  onValueChange={(value) => form.setValue(`languages.${index}.proficiency`, value)}
-                  value={field.proficiency || ""}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('resume.placeholders.selectLevel')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {proficiencyLevels.map((level) => (
-                      <SelectItem key={level} value={level}>
-                        {getProficiencyTranslation(level)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Controller
+                  control={form.control}
+                  name={`languages.${index}.proficiency`}
+                  render={({ field: proficiencyField }) => (
+                    <Select
+                      onValueChange={proficiencyField.onChange}
+                      value={proficiencyField.value || ""}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={t('resume.placeholders.selectLevel')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {proficiencyLevels.map((level) => (
+                          <SelectItem key={level} value={level}>
+                            {getProficiencyTranslation(level)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
               </div>
             </div>
           </div>

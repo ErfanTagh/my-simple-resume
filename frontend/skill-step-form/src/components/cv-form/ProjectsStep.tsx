@@ -200,7 +200,7 @@ export const ProjectsStep = ({ form }: ProjectsStepProps) => {
           className="w-full"
         >
           <Plus className="mr-2 h-4 w-4" />
-          {t('resume.actions.addAnotherProject')}
+          {t('resume.labels.addAnotherProject')}
         </Button>
       )}
     </div>

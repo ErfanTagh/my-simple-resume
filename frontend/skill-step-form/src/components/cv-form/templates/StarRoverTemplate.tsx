@@ -247,9 +247,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                       )}
                     </div>
                     {proj.description && (
-                      <ul className="text-base text-foreground space-y-0.5 mt-1 list-none pl-0">
-                        <li className="break-words">{proj.description}</li>
-                      </ul>
+                      <p className="text-base text-foreground mt-1 break-words">{proj.description}</p>
                     )}
                     {proj.highlights && proj.highlights.length > 0 && (
                       <ul className="text-base text-foreground space-y-0.5 mt-1 list-none pl-0">
@@ -452,12 +450,11 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
           {/* Profile photo on the right */}
           {personalInfo.profileImage && (
             <div className="flex-shrink-0">
-              <div className="w-28 h-28">
+              <div className="w-28 h-28 rounded-md border-2 overflow-hidden" style={{ borderColor: ACCENT_COLOR }}>
                 <img 
                   src={personalInfo.profileImage} 
                   alt={`Professional profile photo of ${personalInfo.firstName} ${personalInfo.lastName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
-                  className="w-full h-full object-cover rounded-md border-2"
-                  style={{ borderColor: ACCENT_COLOR }}
+                  className="w-full h-full object-cover"
                   loading="lazy"
                 />
               </div>

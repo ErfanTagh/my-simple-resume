@@ -406,11 +406,11 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
           {/* Profile image */}
           {personalInfo.profileImage && (
             <div className="flex-shrink-0">
-              <div className="w-24 h-24 md:w-28 md:h-28">
+              <div className="w-24 h-24 md:w-28 md:h-28 rounded-md border-2 border-primary overflow-hidden">
                 <img 
                   src={personalInfo.profileImage} 
                   alt={`Professional profile photo of ${personalInfo.firstName} ${personalInfo.lastName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
-                  className="w-full h-full object-cover rounded-md border-2 border-primary"
+                  className="w-full h-full object-cover"
                   loading="lazy"
                 />
               </div>

@@ -131,14 +131,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
                       )}
                     </div>
                     {proj.description && (
-                      <ul className="text-sm text-foreground space-y-1 mt-1">
-                        {proj.description.split('\n').filter(line => line.trim()).map((line, i) => (
-                          <li key={i} className="flex gap-2">
-                            <span className="text-primary">•</span>
-                            <span className="flex-1">{line.trim()}</span>
-                          </li>
-                        ))}
-                      </ul>
+                      <p className="text-sm text-foreground mt-1">{proj.description}</p>
                     )}
                     {proj.highlights && proj.highlights.length > 0 && (
                       <ul className="text-sm text-foreground space-y-1 mt-1">
@@ -293,11 +286,11 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
         {/* Profile image */}
         {personalInfo.profileImage && (
           <div className="flex justify-center mb-4">
-            <div className="w-28 h-28">
+            <div className="w-28 h-28 rounded-full border-2 border-foreground overflow-hidden flex-shrink-0">
                 <img 
                   src={personalInfo.profileImage} 
                   alt={`Professional profile photo of ${personalInfo.firstName} ${personalInfo.lastName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
-                  className="w-full h-full object-cover rounded-full border-2 border-foreground"
+                  className="w-full h-full object-cover"
                   loading="lazy"
                 />
             </div>

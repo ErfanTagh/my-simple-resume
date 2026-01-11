@@ -234,7 +234,8 @@
       "projectsTitle": "Projects (Optional)",
       "projectsDesc": "Showcase your notable projects and achievements - skip if not applicable",
       "noProjects": "No projects added yet",
-      "addFirstProject": "Add Your First Project"
+      "addFirstProject": "Add Your First Project",
+      "addAnotherProject": "Add Another Project"
     },
     "proficiency": {
       "native": "Native",

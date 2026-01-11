@@ -135,14 +135,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                       )}
                     </div>
                     {proj.description && (
-                      <ul className="text-xs text-foreground space-y-1 mt-1">
-                        {proj.description.split('\n').filter(line => line.trim()).map((line, i) => (
-                          <li key={i} className="flex gap-2">
-                            <span className="text-muted-foreground">•</span>
-                            <span className="flex-1">{line.trim()}</span>
-                          </li>
-                        ))}
-                      </ul>
+                      <p className="text-xs text-foreground mt-1">{proj.description}</p>
                     )}
                     {proj.highlights && proj.highlights.length > 0 && (
                       <ul className="text-xs text-foreground space-y-1 mt-1">
@@ -323,11 +316,11 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
           {/* Profile image */}
           {personalInfo.profileImage && (
             <div className="flex-shrink-0">
-              <div className="w-20 h-20">
+              <div className="w-20 h-20 rounded-sm overflow-hidden">
                 <img 
                   src={personalInfo.profileImage} 
                   alt={`Professional profile photo of ${personalInfo.firstName} ${personalInfo.lastName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
-                  className="w-full h-full object-cover rounded-sm"
+                  className="w-full h-full object-cover"
                   loading="lazy"
                 />
               </div>
