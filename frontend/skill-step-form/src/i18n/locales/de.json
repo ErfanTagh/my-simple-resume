@@ -545,6 +545,10 @@
         "cancel": "Abbrechen",
         "delete": "Löschen"
       },
+      "downloading": {
+        "title": "PDF wird erstellt",
+        "description": "Bitte warten Sie, während wir Ihr Lebenslauf-PDF erstellen..."
+      },
       "toast": {
         "deleted": {
           "title": "Lebenslauf gelöscht",

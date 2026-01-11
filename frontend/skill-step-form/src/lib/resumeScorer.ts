@@ -138,7 +138,7 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   }).length;
   
   if (impactFocusedCount >= Math.min(workExp.length, 2)) contentScore += 1;
-  else if (workExp.length > 0) suggestions.push("Focus on outcomes and impact in your experience descriptions, not just responsibilities");
+  // Removed duplicate suggestion - similar message is in Experience Section
   
   // Apply penalty to Content Quality if there's excessive text
   // This ensures completeness score (Content Quality + Education + Skills) is capped at 7.2 when normalized
@@ -148,12 +148,9 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   const hasExcessiveText = hasLongWorkDesc || hasLongSummary || hasLongProjects;
   
   if (hasExcessiveText) {
-    // Reduce Content Quality score to cap completeness at 7.2
-    // Completeness = (Content Quality + Education + Skills) normalized to 0-10
-    // Max completeness = 7.2 means max raw = 3.24 (instead of 4.5)
-    // If Education + Skills are at max (0.5 + 1 = 1.5), then Content Quality max = 3.24 - 1.5 = 1.74
-    // So reduction needed = 3 - 1.74 = 1.26
-    contentScore = Math.max(0, contentScore - 1.26);
+    // Reduced penalty - only apply small reduction instead of large cap
+    // Being more lenient with longer descriptions
+    contentScore = Math.max(0, contentScore - 0.5);
   }
   
   categories.push({
@@ -205,39 +202,39 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   // Brevity is power: keep descriptions concise for optimal readability
   let lengthDeductions = 0;
   
-  // Work experience descriptions - penalize verbose descriptions
-  if (avgLength > 1000) {
-    lengthDeductions += 1.5; // Severe penalty for very long (avg > 1000 chars)
-    suggestions.push("Your resume has too much text - this reduces your data score. Keep descriptions concise (1-2 lines maximum)");
+  // Work experience descriptions - reduced penalties (being more lenient)
+  if (avgLength > 1200) {
+    lengthDeductions += 0.8; // Reduced penalty for very long (avg > 1200 chars)
+    suggestions.push("Consider making your descriptions more concise (1-2 lines maximum) for better readability");
+  } else if (avgLength > 900) {
+    lengthDeductions += 0.5; // Reduced penalty for long (avg > 900 chars)
+    suggestions.push("Consider keeping descriptions concise (1-2 lines maximum) for better readability");
   } else if (avgLength > 700) {
-    lengthDeductions += 1.0; // Large penalty for long (avg > 700 chars)
-    suggestions.push("Your resume has too much text - this reduces your data score. Keep descriptions concise (1-2 lines maximum)");
-  } else if (avgLength > 500) {
-    lengthDeductions += 0.5; // Moderate penalty (avg > 500 chars = ~3-4 lines)
-    suggestions.push("Your resume has too much text - this reduces your data score. Keep each bullet point to 1-2 lines maximum for better readability");
+    lengthDeductions += 0.2; // Small penalty (avg > 700 chars)
+    // No suggestion for this level - it's acceptable
   }
   
-  // Check for individual extremely long descriptions (> 800 chars each)
-  const extremelyLongDescriptions = workDescriptions.filter(d => d.length > 800).length;
-  if (extremelyLongDescriptions > 1) {
-    lengthDeductions += extremelyLongDescriptions * 0.3; // Penalize each
+  // Check for individual extremely long descriptions (> 1000 chars each) - higher threshold
+  const extremelyLongDescriptions = workDescriptions.filter(d => d.length > 1000).length;
+  if (extremelyLongDescriptions > 2) {
+    lengthDeductions += extremelyLongDescriptions * 0.15; // Reduced penalty
   }
   
-  // Summary should be brief (elevator pitch)
+  // Summary should be brief (elevator pitch) - more lenient
   // summaryLength is already calculated above
-  if (summaryLength > 400) {
-    lengthDeductions += 0.8; // Penalty for verbose summary
-    suggestions.push("Your resume has too much text - this reduces your data score. Keep your summary brief (2-3 sentences)");
-  } else if (summaryLength > 300) {
-    lengthDeductions += 0.4;
-    suggestions.push("Your resume has too much text - this reduces your data score. Keep your summary brief (2-3 sentences)");
+  if (summaryLength > 500) {
+    lengthDeductions += 0.3; // Reduced penalty for verbose summary
+    suggestions.push("Consider keeping your summary brief (2-3 sentences) for better impact");
+  } else if (summaryLength > 400) {
+    lengthDeductions += 0.1; // Very small penalty
+    // No suggestion for this level
   }
   
-  // Project descriptions should be punchy
+  // Project descriptions should be punchy - more lenient
   // projects, projectDescriptions, and avgProjectLength are already calculated above
-  if (avgProjectLength > 500) {
-    lengthDeductions += 0.5;
-    suggestions.push("Your resume has too much text - this reduces your data score. Keep project descriptions concise");
+  if (avgProjectLength > 700) {
+    lengthDeductions += 0.2; // Reduced penalty
+    suggestions.push("Consider keeping project descriptions concise for better readability");
   }
   
   // Don't penalize education field length - it's usually short
@@ -621,10 +618,12 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   const overallScore = Math.round(totalScore * 10) / 10;
   
   // Add overall suggestions based on score (0-10 scale)
-  if (overallScore < 6) {
-    suggestions.unshift("Your resume needs significant improvement. Focus on adding quantifiable achievements and strong action verbs.");
-  } else if (overallScore < 8) {
-    suggestions.unshift("Your resume is good but can be improved. Focus on adding more metrics and impact-focused descriptions.");
+  if (overallScore < 5) {
+    suggestions.unshift("Your resume has good foundations. Consider adding more quantifiable achievements and strong action verbs to strengthen it further.");
+  } else if (overallScore < 7) {
+    suggestions.unshift("Your resume is solid! Adding more metrics and impact-focused descriptions would make it even stronger.");
+  } else if (overallScore < 9) {
+    suggestions.unshift("Great resume! A few more quantified achievements would make it exceptional.");
   } else if (overallScore >= 9) {
     suggestions.unshift("Excellent resume! You're well-positioned for job applications.");
   }

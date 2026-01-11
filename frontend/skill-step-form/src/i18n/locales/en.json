@@ -552,6 +552,10 @@
         "cancel": "Cancel",
         "delete": "Delete"
       },
+      "downloading": {
+        "title": "Generating PDF",
+        "description": "Please wait while we generate your resume PDF..."
+      },
       "toast": {
         "deleted": {
           "title": "Resume Deleted",

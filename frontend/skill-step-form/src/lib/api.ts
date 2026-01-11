@@ -402,23 +402,33 @@ export const resumeAPI = {
    * @deprecated Use parseResumeText for better PDF extraction quality
    */
   parseResume: async (file: File | FormData): Promise<ResumeData> => {
-    const formData = file instanceof FormData ? file : (() => {
-      const fd = new FormData();
-      fd.append('file', file);
-      return fd;
-    })();
-
-    const makeRequest = () => fetch(`${API_BASE_URL}/resumes/parse/`, {
-      method: 'POST',
-      headers: {
-        // Don't set Content-Type - let browser set it with boundary for FormData
-        ...(getAccessToken() ? { Authorization: `Bearer ${getAccessToken()}` } : {}),
-      },
-      body: formData,
-    });
+    // Store original file to recreate FormData if retry is needed
+    // Note: If FormData is passed, retry won't work (FormData can only be read once)
+    const originalFile = file instanceof File ? file : null;
+    const isFile = file instanceof File;
+    
+    const makeRequest = () => {
+      // Recreate FormData for each request (FormData can only be read once)
+      // If File was passed, recreate FormData; otherwise use the FormData as-is (no retry possible)
+      const formData = isFile && originalFile ? (() => {
+        const fd = new FormData();
+        fd.append('file', originalFile);
+        return fd;
+      })() : file as FormData;
+      
+      return fetch(`${API_BASE_URL}/resumes/parse/`, {
+        method: 'POST',
+        headers: {
+          // Don't set Content-Type - let browser set it with boundary for FormData
+          ...(getAccessToken() ? { Authorization: `Bearer ${getAccessToken()}` } : {}),
+        },
+        body: formData,
+      });
+    };
     
     const response = await makeRequest();
-    const parsedData = await handleResponse(response, makeRequest);
+    // Use handleResponse with retry function for automatic token refresh (retry only works if File was passed)
+    const parsedData = await handleResponse(response, isFile ? makeRequest : undefined);
     
     // Convert snake_case back to camelCase
     return snakeToCamelObject(parsedData);

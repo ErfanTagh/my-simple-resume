@@ -877,10 +877,21 @@ export async function downloadResumePDF(
       const maxFrames = 30;
       const maxWaitTime = 2000;
       const startTime = Date.now();
+      let resolved = false;
       
       const checkRender = () => {
+        if (resolved) return; // Prevent multiple resolves
+        
         frameCount++;
         const elapsed = Date.now() - startTime;
+        
+        // Check if innerWrapper still exists in DOM
+        if (!innerWrapper.parentNode) {
+          resolved = true;
+          resolve();
+          return;
+        }
+        
         const html = innerWrapper.innerHTML;
         
         // Check if we have substantial content
@@ -890,6 +901,7 @@ export async function downloadResumePDF(
            html.includes('resume-header') || html.includes('resume-main'));
         
         if (hasSubstantialContent || frameCount >= maxFrames || elapsed >= maxWaitTime) {
+          resolved = true;
           resolve();
         } else {
           requestAnimationFrame(checkRender);
@@ -903,7 +915,8 @@ export async function downloadResumePDF(
     
     // Get the innerHTML exactly like downloadResumePDFFromElement does
     // This is the working method - just get innerHTML and pass to downloadPDFFromHTML
-    let resumeHTML = innerWrapper.innerHTML;
+    // Check if innerWrapper still exists before getting innerHTML
+    let resumeHTML = innerWrapper.parentNode ? innerWrapper.innerHTML : '';
     
     // Strip margin classes that create side margins (mx-auto, max-w-*, etc.)
     // Replace them to remove the margin/width constraints
