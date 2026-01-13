@@ -153,7 +153,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                         {edu.field && <p className="text-sm text-muted-foreground italic">{edu.field}</p>}
                         {edu.keyCourses && edu.keyCourses.length > 0 && (
                           <p className="text-xs text-muted-foreground mt-1">
-                            Key Courses: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(", ")}
+                            {t('resume.labels.keyCourses')}: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(", ")}
                           </p>
                         )}
                       </div>
