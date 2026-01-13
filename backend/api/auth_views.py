@@ -514,7 +514,12 @@ def forgot_password(request):
         token = generate_verification_token()
         
         # Invalidate any previous unused reset tokens for this user
-        PasswordReset.objects.filter(user=user, is_used=False).update(is_used=True)
+        # Iterate and update individually to avoid djongo SQL translation issues with NOT operator
+        unused_resets = PasswordReset.objects.filter(user=user)
+        for reset in unused_resets:
+            if not reset.is_used:
+                reset.is_used = True
+                reset.save()
         
         # Create new password reset record
         password_reset = PasswordReset.objects.create(
