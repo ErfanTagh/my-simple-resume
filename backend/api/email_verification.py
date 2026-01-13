@@ -319,7 +319,7 @@ https://123resume.de
             <td style="padding: 20px 0;">
                 <table role="presentation" style="width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <tr>
-                        <td style="padding: 40px 40px 20px; text-align: center; background-color: #ef4444; border-radius: 8px 8px 0 0;">
+                        <td style="padding: 40px 40px 20px; text-align: center; background-color: #667eea; border-radius: 8px 8px 0 0;">
                             <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 600;">Password Reset Request</h1>
                         </td>
                     </tr>
@@ -331,15 +331,15 @@ https://123resume.de
                             <table role="presentation" style="width: 100%; margin: 30px 0;">
                                 <tr>
                                     <td style="text-align: center;">
-                                        <a href="{reset_link}" style="display: inline-block; padding: 14px 32px; background-color: #ef4444; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">Reset Password</a>
+                                        <a href="{reset_link}" style="display: inline-block; padding: 14px 32px; background-color: #667eea; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">Reset Password</a>
                                     </td>
                                 </tr>
                             </table>
                             <p style="margin: 20px 0 10px; font-size: 14px; color: #666666;">Or copy and paste this link into your browser:</p>
-                            <p style="margin: 0 0 20px; font-size: 14px; color: #ef4444; word-break: break-all;">{reset_link}</p>
-                            <div style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; margin: 20px 0; border-radius: 4px;">
-                                <p style="margin: 0 0 10px; font-size: 14px; font-weight: 600; color: #991b1b;">SECURITY NOTICE:</p>
-                                <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: #991b1b;">
+                            <p style="margin: 0 0 20px; font-size: 14px; color: #667eea; word-break: break-all;">{reset_link}</p>
+                            <div style="background-color: #f0f4ff; border-left: 4px solid #667eea; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                                <p style="margin: 0 0 10px; font-size: 14px; font-weight: 600; color: #4c51bf;">SECURITY NOTICE:</p>
+                                <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: #4c51bf;">
                                     <li style="margin-bottom: 5px;">This link expires in 1 hour</li>
                                     <li style="margin-bottom: 5px;">If you didn't request this, please ignore this email</li>
                                     <li style="margin-bottom: 5px;">Your password won't change unless you click the link above</li>
