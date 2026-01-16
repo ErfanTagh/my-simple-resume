@@ -175,6 +175,7 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
                   src={imagePreview}
                   alt={`Profile photo preview for ${form.getValues("personalInfo.firstName") || ""} ${form.getValues("personalInfo.lastName") || ""}${form.getValues("personalInfo.professionalTitle") ? ` - ${form.getValues("personalInfo.professionalTitle")}` : ""}`}
                   className="w-full h-full object-cover"
+                  style={{ objectPosition: '50% 40%' }}
                 />
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <Camera className="h-6 w-6 text-white" />

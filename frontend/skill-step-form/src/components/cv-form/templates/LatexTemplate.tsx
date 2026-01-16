@@ -406,7 +406,8 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                   <img 
                     src={personalInfo.profileImage} 
                     alt={`Professional profile photo of ${fullName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
-                    className="w-full h-full object-cover object-center"
+                    className="w-full h-full object-cover"
+                    style={{ objectPosition: '50% 40%' }}
                     loading="lazy"
                   />
                 </div>

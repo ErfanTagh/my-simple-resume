@@ -455,6 +455,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                   src={personalInfo.profileImage} 
                   alt={`Professional profile photo of ${personalInfo.firstName} ${personalInfo.lastName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
                   className="w-full h-full object-cover"
+                  style={{ objectPosition: '50% 40%' }}
                   loading="lazy"
                 />
               </div>
