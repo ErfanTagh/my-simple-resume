@@ -173,6 +173,7 @@ class SkillSerializer(serializers.Serializer):
 
 class ResumeSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True, source='_id')
+    name = serializers.CharField(max_length=200, required=False, allow_blank=True)
     personal_info = PersonalInfoSerializer()
     work_experience = WorkExperienceSerializer(many=True, required=False, allow_empty=True)
     education = EducationSerializer(many=True, required=False, allow_empty=True)

@@ -16,6 +16,8 @@ import {
   Edit,
   X,
   Download,
+  Pencil,
+  Check,
 } from 'lucide-react';
 import { downloadResumePDF } from '@/lib/resumePdfUtils';
 import {
@@ -38,6 +40,26 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Input } from '@/components/ui/input';
+
+// Helper function to generate default resume name
+const generateDefaultResumeName = (resume: Resume): string => {
+  const parts: string[] = [];
+  
+  // Only add non-empty strings
+  if (resume.personalInfo?.firstName?.trim()) {
+    parts.push(resume.personalInfo.firstName.trim());
+  }
+  if (resume.personalInfo?.lastName?.trim()) {
+    parts.push(resume.personalInfo.lastName.trim());
+  }
+  if (resume.personalInfo?.professionalTitle?.trim()) {
+    parts.push(resume.personalInfo.professionalTitle.trim());
+  }
+  
+  // Return joined parts or fallback
+  return parts.length > 0 ? parts.join('-') : 'Untitled Resume';
+};
 
 export default function Resumes() {
   const { t } = useLanguage();
@@ -46,6 +68,8 @@ export default function Resumes() {
   const [error, setError] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [editingResumeId, setEditingResumeId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState<string>('');
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -181,6 +205,50 @@ export default function Resumes() {
     }
   };
 
+  // Handle resume name update
+  const handleNameUpdate = async (resumeId: string, newName: string) => {
+    try {
+      // Get the full resume data
+      const fullResume = await resumeAPI.getById(resumeId);
+      
+      // Update only the name field
+      await resumeAPI.update(resumeId, {
+        ...fullResume,
+        name: newName.trim() || undefined, // Remove name if empty
+      });
+      
+      // Refresh the list
+      loadResumes();
+      
+      toast({
+        title: t('pages.resumes.toast.updated.title') || 'Resume Updated',
+        description: t('pages.resumes.toast.updated.description') || 'Resume name has been updated.',
+      });
+      
+      setEditingResumeId(null);
+      setEditingName('');
+    } catch (err: any) {
+      toast({
+        title: t('pages.resumes.toast.error.title') || 'Error',
+        description: err.message || t('pages.resumes.toast.error.updateFailed') || 'Failed to update resume name',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  // Start editing resume name
+  const startEditing = (resume: Resume) => {
+    const currentName = resume.name || generateDefaultResumeName(resume);
+    setEditingResumeId(resume.id);
+    setEditingName(currentName);
+  };
+
+  // Cancel editing
+  const cancelEditing = () => {
+    setEditingResumeId(null);
+    setEditingName('');
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
@@ -265,7 +333,58 @@ export default function Resumes() {
                       </Badge>
                     </div>
                     <CardTitle className="text-lg sm:text-xl break-words pr-6">
-                      {resume.personalInfo.firstName} {resume.personalInfo.lastName}
+                      {editingResumeId === resume.id ? (
+                        <div className="flex items-center gap-2">
+                          <Input
+                            value={editingName}
+                            onChange={(e) => setEditingName(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                handleNameUpdate(resume.id, editingName);
+                              } else if (e.key === 'Escape') {
+                                cancelEditing();
+                              }
+                            }}
+                            className="flex-1 text-lg sm:text-xl font-semibold h-auto py-1"
+                            autoFocus
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleNameUpdate(resume.id, editingName);
+                            }}
+                          >
+                            <Check className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              cancelEditing();
+                            }}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <div 
+                          className="flex items-center gap-2 group cursor-pointer hover:text-primary transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            startEditing(resume);
+                          }}
+                          title={t('pages.resumes.editName') || 'Click to edit resume name'}
+                        >
+                          <span>{resume.name || generateDefaultResumeName(resume)}</span>
+                          <Pencil className="h-4 w-4 opacity-60 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                        </div>
+                      )}
                     </CardTitle>
                     <CardDescription className="flex items-center gap-2 text-xs sm:text-sm">
                       <Clock className="h-3 w-3 flex-shrink-0" />

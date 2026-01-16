@@ -11,6 +11,59 @@ import { StarRoverTemplate } from '@/components/cv-form/templates/StarRoverTempl
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
 /**
+ * Sanitize filename for filesystem compatibility
+ * Removes invalid characters, replaces spaces with dashes, and ensures .pdf extension
+ */
+function sanitizeFilename(name: string): string {
+  // Remove invalid filename characters: < > : " / \ | ? *
+  // Replace spaces and multiple dashes with single dash
+  // Remove leading/trailing dashes and dots
+  let sanitized = name
+    .replace(/[<>:"/\\|?*]/g, '') // Remove invalid chars
+    .replace(/\s+/g, '-') // Replace spaces with dashes
+    .replace(/-+/g, '-') // Replace multiple dashes with single dash
+    .replace(/^-+|-+$/g, '') // Remove leading/trailing dashes
+    .trim();
+  
+  // If empty after sanitization, return default
+  if (!sanitized) {
+    return 'resume';
+  }
+  
+  // Ensure it doesn't end with a dot (Windows issue)
+  sanitized = sanitized.replace(/\.+$/, '');
+  
+  // Limit length to avoid filesystem issues (keep it reasonable)
+  if (sanitized.length > 200) {
+    sanitized = sanitized.substring(0, 200);
+  }
+  
+  return sanitized;
+}
+
+/**
+ * Generate default resume name from personal info
+ * Format: FirstName-LastName-ProfessionalTitle
+ */
+function generateDefaultResumeName(resume: Resume): string {
+  const parts: string[] = [];
+  
+  // Only add non-empty strings
+  if (resume.personalInfo?.firstName?.trim()) {
+    parts.push(resume.personalInfo.firstName.trim());
+  }
+  if (resume.personalInfo?.lastName?.trim()) {
+    parts.push(resume.personalInfo.lastName.trim());
+  }
+  if (resume.personalInfo?.professionalTitle?.trim()) {
+    parts.push(resume.personalInfo.professionalTitle.trim());
+  }
+  
+  // Return joined parts or fallback
+  return parts.length > 0 ? parts.join('-') : 'Untitled Resume';
+}
+
+/**
  * CSS files needed for resume rendering
  */
 const CSS_FILES = [
@@ -926,8 +979,18 @@ export async function downloadResumePDF(
     resumeHTML = resumeHTML.replace(/\s*ml-auto\s*/g, ' ');
     resumeHTML = resumeHTML.replace(/\s*mr-auto\s*/g, ' ');
     
-    // Generate filename
-    const finalFilename = filename || `${resume.personalInfo.firstName || 'resume'}_${resume.personalInfo.lastName || 'download'}.pdf`;
+    // Generate filename - use resume name if available, otherwise fallback to personalInfo
+    let finalFilename = filename;
+    if (!finalFilename) {
+      if (resume.name && resume.name.trim()) {
+        // Use resume name, sanitize it, and add .pdf extension
+        finalFilename = `${sanitizeFilename(resume.name)}.pdf`;
+      } else {
+        // Fallback to FirstName-LastName-ProfessionalTitle format
+        const defaultName = generateDefaultResumeName(resume);
+        finalFilename = `${sanitizeFilename(defaultName)}.pdf`;
+      }
+    }
     
     // Call downloadPDFFromHTML directly - same as downloadResumePDFFromElement does
     await downloadPDFFromHTML(resume.id, resumeHTML, finalFilename);
@@ -989,7 +1052,14 @@ export async function downloadResumePDFFromElement(
   
   // Generate filename from resume if provided, otherwise use provided filename or default
   if (!finalFilename && resume) {
-    finalFilename = `${resume.personalInfo.firstName || 'resume'}_${resume.personalInfo.lastName || 'download'}.pdf`;
+    if (resume.name && resume.name.trim()) {
+      // Use resume name, sanitize it, and add .pdf extension
+      finalFilename = `${sanitizeFilename(resume.name)}.pdf`;
+    } else {
+      // Fallback to FirstName-LastName-ProfessionalTitle format
+      const defaultName = generateDefaultResumeName(resume);
+      finalFilename = `${sanitizeFilename(defaultName)}.pdf`;
+    }
   }
   if (!finalFilename) {
     finalFilename = `resume_${resumeId}.pdf`;

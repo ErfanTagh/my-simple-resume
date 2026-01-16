@@ -135,6 +135,7 @@ def resume_list(request):
                 
                 resume_dict = {
                     'id': str(resume_doc['_id']),
+                    'name': resume_doc.get('name', ''),  # Include resume name
                     'personal_info': resume_doc.get('personal_info', {}),
                     'work_experience': resume_doc.get('work_experience', []),
                     'education': resume_doc.get('education', []),
@@ -281,6 +282,7 @@ def resume_list(request):
                 
                 resume_doc = {
                     'user_id': request.user.id,
+                    'name': data.get('name', ''),  # Include resume name
                     'personal_info': personal_info_final,
                     'work_experience': data.get('work_experience', []),
                     'education': data.get('education', []),
@@ -319,6 +321,7 @@ def resume_list(request):
                 # Format response
                 resume_dict = {
                     'id': str(created_doc['_id']),
+                    'name': created_doc.get('name', ''),  # Include resume name
                     'personal_info': created_doc.get('personal_info', {}),
                     'work_experience': created_doc.get('work_experience', []),
                     'education': created_doc.get('education', []),
@@ -441,6 +444,7 @@ def resume_detail(request, pk):
             
             resume_dict = {
                 'id': str(resume_doc['_id']),
+                'name': resume_doc.get('name', ''),  # Include resume name
                 'personal_info': resume_doc.get('personal_info', {}),
                 'work_experience': resume_doc.get('work_experience', []),
                 'education': resume_doc.get('education', []),
@@ -534,6 +538,7 @@ def resume_detail(request, pk):
                 updated_doc = db.resumes.find_one({'_id': resume_id})
                 resume_dict = {
                     'id': str(updated_doc['_id']),
+                    'name': updated_doc.get('name', ''),  # Include resume name
                     'personal_info': updated_doc.get('personal_info', {}),
                     'work_experience': updated_doc.get('work_experience', []),
                     'education': updated_doc.get('education', []),

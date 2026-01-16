@@ -157,6 +157,7 @@ class Resume(models.Model):
     """Main Resume/CV model that contains all user information"""
     _id = models.ObjectIdField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='resumes')
+    name = models.CharField(max_length=200, blank=True, null=True)  # User-defined resume name
     personal_info = models.EmbeddedField(model_container=PersonalInfo)
     work_experience = models.ArrayField(model_container=WorkExperience, blank=True, null=True)
     education = models.ArrayField(model_container=Education, blank=True, null=True)

@@ -307,6 +307,7 @@ export interface ResumeData {
 
 export interface Resume extends ResumeData {
   id: string;
+  name?: string;
   createdAt: string;
   updatedAt: string;
   completenessScore?: number;
