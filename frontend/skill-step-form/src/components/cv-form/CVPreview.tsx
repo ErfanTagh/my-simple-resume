@@ -33,6 +33,7 @@ export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSect
   const [currentPage, setCurrentPage] = useState(1);
   const previewRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const horizontalScrollRef = useRef<HTMLDivElement>(null);
   const template = data.template || "modern";
   const defaultSectionOrder = ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"];
   const sectionOrder = data.sectionOrder || defaultSectionOrder;
@@ -192,6 +193,48 @@ export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSect
       setCurrentPage(1);
     }
   }, [pageCount, activeTab, pageBreakPositions]);
+
+  // Sync horizontal scroll between horizontal scrollbar and content for LaTeX
+  useEffect(() => {
+    if (template !== 'latex' || !horizontalScrollRef.current || !previewRef.current) return;
+
+    const horizontalScrollEl = horizontalScrollRef.current;
+    const contentEl = previewRef.current.querySelector('.resume-content-wrapper') as HTMLElement;
+    
+    if (!contentEl) return;
+
+    // Set the scrollable width to match content width
+    const updateScrollWidth = () => {
+      const scrollWidth = contentEl.scrollWidth;
+      const spacer = horizontalScrollEl.querySelector('div');
+      if (spacer) {
+        spacer.style.width = `${scrollWidth}px`;
+      }
+    };
+
+    updateScrollWidth();
+    
+    // Update on resize
+    const resizeObserver = new ResizeObserver(updateScrollWidth);
+    resizeObserver.observe(contentEl);
+
+    const handleHorizontalScroll = () => {
+      contentEl.scrollLeft = horizontalScrollEl.scrollLeft;
+    };
+
+    const handleContentScroll = () => {
+      horizontalScrollEl.scrollLeft = contentEl.scrollLeft;
+    };
+
+    horizontalScrollEl.addEventListener('scroll', handleHorizontalScroll);
+    contentEl.addEventListener('scroll', handleContentScroll);
+
+    return () => {
+      resizeObserver.disconnect();
+      horizontalScrollEl.removeEventListener('scroll', handleHorizontalScroll);
+      contentEl.removeEventListener('scroll', handleContentScroll);
+    };
+  }, [template, data]);
   
   const handleTemplateSelect = (selectedTemplate: CVTemplate) => {
     if (onTemplateChange) {
@@ -248,9 +291,9 @@ export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSect
         </TabsList>
         
         <TabsContent value="design" className="mt-4">
-          <div className="relative flex flex-col" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+          <div className="relative flex flex-col overflow-hidden" style={{ height: 'calc(100vh - 200px)' }}>
             {/* Score indicator - sticky at top */}
-            <div className="sticky top-0 z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 pb-2 mb-2">
+            <div className="sticky top-0 flex-shrink-0 pb-2 mb-2 z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -298,13 +341,35 @@ export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSect
               </div>
             </div>
             
+            {/* Horizontal scroll container - below page indicator for LaTeX */}
+            {template === 'latex' && (
+              <div 
+                ref={horizontalScrollRef}
+                className="overflow-x-auto flex-shrink-0 mb-2 pb-1" 
+                id="latex-horizontal-scroll"
+                style={{ scrollbarWidth: 'thin' }}
+              >
+                <div style={{ width: '210mm', height: '1px' }}></div>
+              </div>
+            )}
+            
             {/* Scrollable resume content */}
-            <div className="overflow-y-auto flex-1" ref={scrollContainerRef}>
-              <Card className="overflow-hidden h-fit" ref={previewRef}>
-              <div className="resume-content-wrapper relative">
+            <div 
+              className={`flex-1 min-h-0 ${
+                template === 'latex' 
+                  ? 'overflow-x-hidden overflow-y-auto' 
+                  : 'overflow-y-auto bg-muted/30'
+              }`} 
+              ref={scrollContainerRef}
+            >
+              <Card className={`h-fit ${template === 'latex' ? 'overflow-x-hidden overflow-y-hidden bg-background' : 'overflow-hidden'}`} ref={previewRef}>
+              <div className={`resume-content-wrapper relative ${template === 'latex' ? 'overflow-x-auto overflow-y-hidden' : ''}`} style={template === 'latex' ? { scrollbarWidth: 'none', msOverflowStyle: 'none' } : {}}>
                 <style>{`
                   .resume-content-wrapper {
                     position: relative;
+                  }
+                  .resume-content-wrapper::-webkit-scrollbar {
+                    display: none;
                   }
                   /* Visual page break indicator at calculated page boundaries */
                   .page-break-line {

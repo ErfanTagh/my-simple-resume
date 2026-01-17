@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { resumeAPI, Resume } from '@/lib/api';
+import { resumeAPI, Resume, ResumeData } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -212,10 +212,24 @@ export default function Resumes() {
       const fullResume = await resumeAPI.getById(resumeId);
       
       // Update only the name field
-      await resumeAPI.update(resumeId, {
-        ...fullResume,
+      const updateData: ResumeData = {
         name: newName.trim() || undefined, // Remove name if empty
-      });
+        personalInfo: fullResume.personalInfo,
+        workExperience: fullResume.workExperience,
+        education: fullResume.education,
+        projects: fullResume.projects,
+        certificates: fullResume.certificates,
+        languages: fullResume.languages,
+        skills: fullResume.skills,
+        template: fullResume.template,
+        sectionOrder: fullResume.sectionOrder,
+        completenessScore: fullResume.completenessScore,
+        clarityScore: fullResume.clarityScore,
+        formattingScore: fullResume.formattingScore,
+        impactScore: fullResume.impactScore,
+        overallScore: fullResume.overallScore,
+      };
+      await resumeAPI.update(resumeId, updateData);
       
       // Refresh the list
       loadResumes();
@@ -251,7 +265,7 @@ export default function Resumes() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
+      <div className="w-full px-4 py-6 sm:py-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
           <div>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">{t('pages.resumes.title') || 'My Resumes'}</h1>
@@ -332,9 +346,9 @@ export default function Resumes() {
                         {template}
                       </Badge>
                     </div>
-                    <CardTitle className="text-lg sm:text-xl break-words pr-6">
+                    <CardTitle className={`text-lg sm:text-xl break-words ${editingResumeId === resume.id ? 'pr-0' : 'pr-6'}`}>
                       {editingResumeId === resume.id ? (
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 -mx-4 px-4">
                           <Input
                             value={editingName}
                             onChange={(e) => setEditingName(e.target.value)}
@@ -352,7 +366,7 @@ export default function Resumes() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8"
+                            className="h-8 w-8 flex-shrink-0"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleNameUpdate(resume.id, editingName);
@@ -363,7 +377,7 @@ export default function Resumes() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8"
+                            className="h-8 w-8 flex-shrink-0"
                             onClick={(e) => {
                               e.stopPropagation();
                               cancelEditing();

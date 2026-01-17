@@ -101,14 +101,14 @@ const Landing = () => {
                   className="bg-card rounded-2xl border border-border p-3 sm:p-4 shadow-lg hover:shadow-[0_8px_25px_-5px_hsl(var(--primary)/0.35)] transition-all duration-300 hover:-translate-y-1.5"
                   style={{ animationDelay: `${i * 0.1}s` }}
                 >
-                  <div className="aspect-[3/4] bg-white rounded-lg mb-3 sm:mb-4 overflow-hidden border border-border shadow-inner relative max-h-[280px] sm:max-h-[320px]">
+                  <div className="aspect-[3/4] bg-white rounded-lg mb-2 sm:mb-3 overflow-hidden border border-border shadow-inner relative max-h-[350px] sm:max-h-[420px]">
                     <div className="absolute inset-0 w-full h-full">
                       <LandingTemplatePreview templateName={template.key} />
                     </div>
                   </div>
-                  <div className="space-y-1 pt-1">
-                    <h3 className="font-bold text-base sm:text-lg" style={{ color: 'hsl(215 25% 15%)' }}>{t(`landing.${template.nameKey}`)} {t('landing.templateLabel')}</h3>
-                    <p className="text-xs sm:text-sm font-medium" style={{ color: 'hsl(214 95% 45%)' }}>{t(`landing.${template.descKey}`)}</p>
+                  <div className="space-y-0.5 pt-0.5">
+                    <h3 className="font-bold text-sm sm:text-base" style={{ color: 'hsl(215 25% 15%)' }}>{t(`landing.${template.nameKey}`)} {t('landing.templateLabel')}</h3>
+                    <p className="text-xs font-medium line-clamp-2" style={{ color: 'hsl(214 95% 45%)' }}>{t(`landing.${template.descKey}`)}</p>
                   </div>
                 </div>
               ))}

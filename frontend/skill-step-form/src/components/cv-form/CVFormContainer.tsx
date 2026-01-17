@@ -507,8 +507,8 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
           onClose={() => setShowSignupOverlay(false)}
         />
       )}
-      <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background py-12 px-4">
-      <div className="max-w-7xl mx-auto">
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background py-12 px-4 sm:px-6">
+      <div className="max-w-full mx-6 sm:mx-8 lg:mx-12">
         {!templateSelected ? (
           // Template Selection Screen (before starting the form)
           <div className="max-w-6xl mx-auto">
@@ -521,7 +521,7 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {[
                 { nameKey: 'templateModern', descKey: 'templateModernDesc', key: 'modern' as const },
                 { nameKey: 'templateClassic', descKey: 'templateClassicDesc', key: 'classic' as const },
@@ -547,16 +547,16 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
                       setTemplateSelected(true);
                     }}
                   >
-                    <div className="aspect-[3/4] bg-white rounded-t-2xl overflow-hidden border-b border-border shadow-inner relative max-h-[400px] sm:max-h-[450px] flex-shrink-0">
+                    <div className="aspect-[3/4] bg-white rounded-t-2xl overflow-hidden border-b border-border shadow-inner relative max-h-[550px] sm:max-h-[650px] lg:max-h-[700px] flex-shrink-0">
                       <div className="absolute inset-0 w-full h-full">
                         <LandingTemplatePreview templateName={template.key} />
                       </div>
                     </div>
-                    <div className="p-4 sm:p-5 flex flex-col" style={{ height: '140px' }}>
-                      <h3 className="font-bold text-lg sm:text-xl mb-2 flex-shrink-0" style={{ color: 'hsl(215 25% 15%)' }}>
+                    <div className="p-3 sm:p-4 flex flex-col" style={{ height: '100px' }}>
+                      <h3 className="font-bold text-base sm:text-lg mb-1 flex-shrink-0" style={{ color: 'hsl(215 25% 15%)' }}>
                         {t(`landing.${template.nameKey}`)} {t('landing.templateLabel')}
                       </h3>
-                      <p className="text-sm sm:text-base font-medium mb-2 flex-shrink-0" style={{ color: 'hsl(214 95% 45%)' }}>
+                      <p className="text-xs sm:text-sm font-medium flex-shrink-0 line-clamp-2" style={{ color: 'hsl(214 95% 45%)' }}>
                         {t(`landing.${template.descKey}`)}
                       </p>
                       {isSelected && (
@@ -597,9 +597,9 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
               </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
           {/* Form Section - Takes 4 columns */}
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-6">
             <Card className="p-8 shadow-elevated">
               <ProgressIndicator
                 currentStep={currentStep}
@@ -704,7 +704,7 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
           </div>
 
               {/* Right Sidebar - Always Visible Preview */}
-              <div className="hidden lg:block lg:col-span-3">
+              <div className="hidden lg:block lg:col-span-4">
                 <CVPreview 
                   data={getPreviewDataWithHints(formData)}
                   actualDataForScoring={formData}

@@ -420,7 +420,9 @@ export const LandingTemplatePreview = ({
 
   // Scale factor to fit in the preview card (aspect ratio 3:4)
   // Templates are typically A4 size, so we scale down significantly
-  const scale = 0.24;
+  // Increased scale to make templates appear larger
+  // Minimal template needs larger scale due to its compact design
+  const scale = templateName === "minimal" ? 0.50 : 0.40;
 
   return (
     <div

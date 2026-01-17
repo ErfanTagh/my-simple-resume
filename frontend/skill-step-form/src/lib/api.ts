@@ -237,6 +237,7 @@ export const authAPI = {
 // ============================================
 
 export interface ResumeData {
+  name?: string;
   personalInfo: {
     firstName: string;
     lastName: string;
