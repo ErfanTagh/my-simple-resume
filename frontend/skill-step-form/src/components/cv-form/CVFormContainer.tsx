@@ -158,8 +158,8 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
       return value || hint;
     };
 
-    // Show hints for personalInfo if we haven't moved past step 0 yet
-    const showPersonalInfoHints = highestStepVisited < 1;
+    // Show hints for personalInfo only when on step 0
+    const showPersonalInfoHints = currentStep === 0;
     const mergedPersonalInfo = {
       firstName: useHintIfEmpty(formData.personalInfo?.firstName || "", hintData.personalInfo.firstName, showPersonalInfoHints),
       lastName: useHintIfEmpty(formData.personalInfo?.lastName || "", hintData.personalInfo.lastName, showPersonalInfoHints),
@@ -175,36 +175,36 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
       interests: useHintIfEmpty(formData.personalInfo?.interests || [], hintData.personalInfo.interests || [], showPersonalInfoHints),
     };
 
-    // Show hints for workExperience if we haven't moved past step 1 yet
-    const showWorkExperienceHints = highestStepVisited < 2;
+    // Show hints for workExperience only when on step 1
+    const showWorkExperienceHints = currentStep === 1;
     const mergedWorkExperience = showWorkExperienceHints && (!formData.workExperience || formData.workExperience.length === 0 || 
       !formData.workExperience.some(exp => exp.position || exp.company))
       ? (hintData.workExperience || [])
       : (formData.workExperience || []);
 
-    // Show hints for education if we haven't moved past step 2 yet
-    const showEducationHints = highestStepVisited < 3;
+    // Show hints for education only when on step 2
+    const showEducationHints = currentStep === 2;
     const mergedEducation = showEducationHints && (!formData.education || formData.education.length === 0 || 
       !formData.education.some(edu => edu.degree || edu.institution))
       ? (hintData.education || [])
       : (formData.education || []);
 
-    // Show hints for projects if we haven't moved past step 1 yet
-    const showProjectsHints = highestStepVisited < 2;
+    // Show hints for projects only when on step 1
+    const showProjectsHints = currentStep === 1;
     const mergedProjects = showProjectsHints && (!formData.projects || formData.projects.length === 0 || 
       !formData.projects.some(proj => proj.name || proj.description))
       ? (hintData.projects ? hintData.projects.slice(0, 1) : [])
       : (formData.projects || []);
 
-    // Show hints for languages if we haven't moved past step 3 yet
-    const showLanguagesHints = highestStepVisited < 4;
+    // Show hints for languages only when on step 3
+    const showLanguagesHints = currentStep === 3;
     const mergedLanguages = showLanguagesHints && (!formData.languages || formData.languages.length === 0 || 
       !formData.languages.some(lang => lang.language))
       ? (hintData.languages || [])
       : (formData.languages || []);
 
-    // Show hints for skills if we haven't moved past step 3 yet
-    const showSkillsHints = highestStepVisited < 4;
+    // Show hints for skills only when on step 3
+    const showSkillsHints = currentStep === 3;
     const mergedSkills = showSkillsHints && (!formData.skills || formData.skills.length === 0 || 
       !formData.skills.some(skill => skill.skill))
       ? (hintData.skills || [])

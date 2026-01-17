@@ -106,14 +106,14 @@ export const ResumeUpload = ({ onDataParsed, onClose }: ResumeUploadProps) => {
 
   return (
     <div className="space-y-4">
-      <div className="border-2 border-dashed rounded-lg p-6 text-center transition-colors hover:border-primary/50">
+      <div className="border-2 border-dashed rounded-lg p-3 text-center transition-colors hover:border-primary/50">
         {!selectedFile ? (
           <>
-            <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground mb-4">
+            <Upload className="h-5 w-5 mx-auto mb-1.5 text-muted-foreground" />
+            <p className="text-xs text-muted-foreground mb-2">
               Upload your existing resume to auto-fill the form
             </p>
-            <p className="text-xs text-muted-foreground mb-4">
+            <p className="text-xs text-muted-foreground mb-2">
               Supports PDF and text files (max 10MB)
             </p>
             <Input
