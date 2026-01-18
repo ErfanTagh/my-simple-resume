@@ -120,6 +120,7 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
     }
 
     // If initialData exists, use it but ensure workExperience and education have at least one entry
+    // Also ensure all array fields are properly initialized to prevent crashes
     return {
       ...initialData,
       workExperience: initialData.workExperience && initialData.workExperience.length > 0
@@ -128,13 +129,18 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
       education: initialData.education && initialData.education.length > 0
         ? initialData.education
         : defaults.education,
+      languages: Array.isArray(initialData.languages) ? initialData.languages : defaults.languages,
+      skills: Array.isArray(initialData.skills) ? initialData.skills : defaults.skills,
+      projects: Array.isArray(initialData.projects) ? initialData.projects : defaults.projects,
+      certificates: Array.isArray(initialData.certificates) ? initialData.certificates : defaults.certificates,
     };
   };
 
   // Merge form data with hint data for preview (show hints only for current step)
   const getPreviewDataWithHints = (formData: CVFormData): CVFormData => {
-    // Only show hints when creating a new resume (no initialData and no editId)
-    if (initialData || editId) {
+    // Only show hints when creating a new resume (no editId)
+    // Allow hints even if initialData exists (e.g., when coming from template selection)
+    if (editId) {
       return formData;
     }
 
@@ -292,7 +298,15 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
 
     const profile = getTestProfile(profileName);
     if (profile) {
-      form.reset(profile);
+      // Ensure all array fields are present to prevent crashes
+      const normalizedProfile = {
+        ...profile,
+        languages: Array.isArray(profile.languages) ? profile.languages : [],
+        skills: Array.isArray(profile.skills) ? profile.skills : [],
+        projects: Array.isArray(profile.projects) ? profile.projects : [],
+        certificates: Array.isArray(profile.certificates) ? profile.certificates : [],
+      };
+      form.reset(normalizedProfile);
       setCurrentStep(0);
       toast({
         title: "Test Profile Loaded! 🧪",

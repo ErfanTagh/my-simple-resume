@@ -40,7 +40,7 @@ export default function JobMatching() {
 
   useEffect(() => {
     if (!user) {
-      navigate('/login');
+      navigate('/');
       return;
     }
     loadResumes();

@@ -106,10 +106,18 @@ const Landing = () => {
                       <LandingTemplatePreview templateName={template.key} />
                     </div>
                   </div>
-                  <div className="space-y-0.5 pt-0.5">
+                  <div className="space-y-0.5 pt-0.5 mb-3">
                     <h3 className="font-bold text-sm sm:text-base" style={{ color: 'hsl(215 25% 15%)' }}>{t(`landing.${template.nameKey}`)} {t('landing.templateLabel')}</h3>
-                    <p className="text-xs font-medium line-clamp-2" style={{ color: 'hsl(214 95% 45%)' }}>{t(`landing.${template.descKey}`)}</p>
+                    <p className="text-xs font-medium line-clamp-2 mb-3" style={{ color: 'hsl(214 95% 45%)' }}>{t(`landing.${template.descKey}`)}</p>
                   </div>
+                  <Link to={`/create?template=${template.key}`} className="block w-full">
+                    <Button 
+                      size="sm" 
+                      className="w-full bg-primary hover:bg-primary/90 text-white text-xs sm:text-sm px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-semibold"
+                    >
+{t('landing.chooseThisTemplate')}
+                    </Button>
+                  </Link>
                 </div>
               ))}
             </div>

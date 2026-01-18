@@ -105,6 +105,7 @@ const mapResumeToCVFormData = (resume: Resume): CVFormData => {
 const CreateResume = () => {
   const [searchParams] = useSearchParams();
   const editId = searchParams.get("edit") || undefined;
+  const templateParam = searchParams.get("template") || undefined;
 
   const [initialData, setInitialData] = useState<CVFormData | undefined>(
     undefined,
@@ -118,7 +119,17 @@ const CreateResume = () => {
       // Only restore pendingResume if explicitly needed (e.g., after signup flow)
       // For now, always start fresh to show the new template selection UI
       localStorage.removeItem('pendingResume');
-      setInitialData(undefined);
+      
+      // If template param is provided, set initialData with that template
+      if (templateParam) {
+        const validTemplates = ['modern', 'classic', 'creative', 'minimal', 'latex', 'starRover'];
+        const template = validTemplates.includes(templateParam) ? templateParam : 'modern';
+        const dataWithTemplate = createEmptyCVFormData();
+        dataWithTemplate.template = template as CVFormData['template'];
+        setInitialData(dataWithTemplate);
+      } else {
+        setInitialData(undefined);
+      }
       setIsLoading(false);
       return;
     }
@@ -144,7 +155,7 @@ const CreateResume = () => {
     return () => {
       isMounted = false;
     };
-  }, [editId]);
+  }, [editId, templateParam]);
 
   if (editId && isLoading) {
     return (
