@@ -534,7 +534,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                 </div>
               )}
 
-              <div className="pt-2 flex flex-col gap-2 flex-shrink-0 min-w-0 flex-1">
+              <div className="pt-0 flex flex-col gap-2 flex-shrink-0 min-w-0 flex-1">
                 {fullName ? (
                   <h1 className="uppercase mb-0 leading-tight break-words" style={{ fontSize: personalInfoTitleSizes.name, fontWeight: titleBold ? 'bold' : 'normal', color: personalInfoTitleColor }}>
                     {fullName}
