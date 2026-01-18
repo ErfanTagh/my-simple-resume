@@ -102,11 +102,11 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                     <div className="flex justify-between items-start mb-1">
                       <div>
                         <h3 className="font-bold text-foreground">{exp.position}</h3>
-                        <p className="text-sm font-semibold text-primary">{exp.company}</p>
-                        {exp.location && <p className="text-xs text-muted-foreground">{exp.location}</p>}
+                        <p className="font-semibold text-primary" style={{ fontSize: sizes.sm }}>{exp.company}</p>
+                        {exp.location && <p className="text-muted-foreground" style={{ fontSize: sizes.xs }}>{exp.location}</p>}
                       </div>
                       {(exp.startDate || exp.endDate) && (
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-1 text-muted-foreground" style={{ fontSize: sizes.xs }}>
                           <Calendar className="h-3 w-3" />
                           <span>{formatDateRange(exp.startDate, exp.endDate, t('resume.fields.present'))}</span>
                         </div>
@@ -126,12 +126,12 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                       </ul>
                     )}
                     {exp.technologies && exp.technologies.length > 0 && (
-                      <p className="text-xs text-primary mt-2">
+                      <p className="text-primary mt-2" style={{ fontSize: sizes.xs }}>
                         {t('resume.sections.technologies')}: {exp.technologies.map(t => typeof t === 'string' ? t : t.technology).filter(Boolean).join(", ")}
                       </p>
                     )}
                     {exp.competencies && exp.competencies.length > 0 && (
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <p className="text-muted-foreground mt-1" style={{ fontSize: sizes.xs }}>
                         {t('resume.labels.keyCompetencies')}: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(", ")}
                       </p>
                     )}
@@ -153,17 +153,17 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                     <div className="flex justify-between items-start">
                       <div>
                         <h3 className="font-bold text-foreground">{edu.degree}</h3>
-                        <p className="text-sm text-muted-foreground">{edu.institution}</p>
-                        {edu.location && <p className="text-xs text-muted-foreground">{edu.location}</p>}
-                        {edu.field && <p className="text-sm text-muted-foreground italic">{edu.field}</p>}
+                        <p className="text-muted-foreground" style={{ fontSize: sizes.sm }}>{edu.institution}</p>
+                        {edu.location && <p className="text-muted-foreground" style={{ fontSize: sizes.xs }}>{edu.location}</p>}
+                        {edu.field && <p className="text-muted-foreground italic" style={{ fontSize: sizes.sm }}>{edu.field}</p>}
                         {edu.keyCourses && edu.keyCourses.length > 0 && (
-                          <p className="text-xs text-muted-foreground mt-1">
+                          <p className="text-muted-foreground mt-1" style={{ fontSize: sizes.xs }}>
                             {t('resume.labels.keyCourses')}: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(", ")}
                           </p>
                         )}
                       </div>
                       {(edu.startDate || edu.endDate) && (
-                        <span className="text-xs text-muted-foreground">{formatDateRange(edu.startDate, edu.endDate, t('resume.fields.present'))}</span>
+                        <span className="text-muted-foreground" style={{ fontSize: sizes.xs }}>{formatDateRange(edu.startDate, edu.endDate, t('resume.fields.present'))}</span>
                       )}
                     </div>
                   </div>
@@ -184,12 +184,12 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                     <div className="flex justify-between items-start mb-1">
                       <h3 className="font-bold text-foreground">{proj.name}</h3>
                       {(proj.startDate || proj.endDate) && (
-                        <span className="text-xs text-muted-foreground">{formatDateRange(proj.startDate, proj.endDate, t('resume.fields.present'))}</span>
+                        <span className="text-muted-foreground" style={{ fontSize: sizes.xs }}>{formatDateRange(proj.startDate, proj.endDate, t('resume.fields.present'))}</span>
                       )}
                     </div>
-                    {proj.description && <p className="text-sm text-muted-foreground mb-2">{proj.description}</p>}
+                    {proj.description && <p className="text-muted-foreground mb-2" style={{ fontSize: sizes.sm }}>{proj.description}</p>}
                     {proj.highlights && proj.highlights.length > 0 && (
-                      <ul className="text-sm text-foreground space-y-1 mb-2">
+                      <ul className="text-foreground space-y-1 mb-2" style={{ fontSize: sizes.sm }}>
                         {proj.highlights.map((highlight, i) => (
                           highlight.highlight && (
                             <li key={i} className="flex gap-2">
@@ -201,12 +201,12 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                       </ul>
                     )}
                     {proj.technologies && proj.technologies.length > 0 && (
-                      <p className="text-xs text-primary mt-1">
+                      <p className="text-primary mt-1" style={{ fontSize: sizes.xs }}>
                         {t('resume.sections.technologies')}: {proj.technologies.map(t => typeof t === 'string' ? t : t.technology).filter(Boolean).join(", ")}
                       </p>
                     )}
                     {proj.link && (
-                      <a href={proj.link} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline mt-1 block">
+                      <a href={proj.link} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline mt-1 block" style={{ fontSize: sizes.xs }}>
                         {proj.link.replace(/^https?:\/\/(www\.)?/, '')}
                       </a>
                     )}
@@ -228,17 +228,17 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                     <div className="flex justify-between items-start">
                       <div>
                         <h3 className="font-semibold text-foreground">{cert.name}</h3>
-                        <p className="text-sm text-muted-foreground">{cert.organization}</p>
+                        <p className="text-muted-foreground" style={{ fontSize: sizes.sm }}>{cert.organization}</p>
                         {(cert.issueDate || cert.expirationDate) && (
-                          <p className="text-xs text-muted-foreground mt-1">
+                          <p className="text-muted-foreground mt-1" style={{ fontSize: sizes.xs }}>
                             {cert.issueDate} {cert.expirationDate && `- ${cert.expirationDate}`}
                           </p>
                         )}
                         {cert.credentialId && (
-                          <p className="text-xs text-muted-foreground">ID: {cert.credentialId}</p>
+                          <p className="text-muted-foreground" style={{ fontSize: sizes.xs }}>ID: {cert.credentialId}</p>
                         )}
                         {cert.url && (
-                          <a href={cert.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline mt-1 block">
+                          <a href={cert.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline mt-1 block" style={{ fontSize: sizes.xs }}>
                             {cert.url.replace(/^https?:\/\/(www\.)?/, '')}
                           </a>
                         )}
@@ -258,7 +258,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
             <div className="flex flex-wrap gap-2">
               {skills.map((s, index) => (
                 s.skill && (
-                  <span key={index} className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
+                  <span key={index} className="px-3 py-1 bg-primary/10 text-primary rounded-full font-medium" style={{ fontSize: sizes.sm }}>
                     {s.skill}
                   </span>
                 )
@@ -274,7 +274,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
             <div className="space-y-2">
               {languages.map((lang, index) => (
                 lang.language && (
-                  <div key={index} className="text-sm flex justify-between items-center gap-4 pr-2">
+                  <div key={index} className="flex justify-between items-center gap-4 pr-2" style={{ fontSize: sizes.sm }}>
                     <span className="font-semibold text-foreground">{lang.language}</span>
                     <span className="text-muted-foreground whitespace-nowrap flex-shrink-0">{lang.proficiency}</span>
                   </div>
@@ -369,10 +369,10 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
           {personalInfo.firstName} {personalInfo.lastName}
         </h1>
         {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (
-          <p className="text-base text-primary font-semibold mb-2">{personalInfo.professionalTitle.trim()}</p>
+          <p className="text-primary font-semibold mb-2" style={{ fontSize: sizes.base }}>{personalInfo.professionalTitle.trim()}</p>
         )}
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-muted-foreground mt-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-muted-foreground mt-3" style={{ fontSize: sizes.sm }}>
           {personalInfo.email && (
             <div className="flex items-center gap-2 min-w-0">
               <Mail className="h-4 w-4 text-primary flex-shrink-0" />

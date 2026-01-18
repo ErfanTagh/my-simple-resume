@@ -7,52 +7,90 @@ interface MinimalTemplateProps {
 }
 
 // Helper component for section headings with decorative lines
-const SectionHeading = ({ title }: { title: string }) => (
+const SectionHeading = ({ title, fontSize, color }: { title: string; fontSize: string; color: string }) => (
   <div className="flex items-center gap-4 mb-6 mt-12">
-    <div className="flex-1 border-t border-foreground"></div>
-    <h2 className="text-xs font-bold text-foreground uppercase tracking-widest whitespace-nowrap">
+    <div className="flex-1 border-t" style={{ borderColor: color }}></div>
+    <h2 className="font-bold uppercase tracking-widest whitespace-nowrap" style={{ fontSize, color }}>
       {title}
     </h2>
-    <div className="flex-1 border-t border-foreground"></div>
+    <div className="flex-1 border-t" style={{ borderColor: color }}></div>
   </div>
 );
 
 export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
   const { t } = useLanguage();
-  const { personalInfo, workExperience, education, projects, certificates, languages, skills, sectionOrder } = data;
+  const { personalInfo, workExperience, education, projects, certificates, languages, skills, sectionOrder, styling } = data;
   
   const defaultOrder = ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"];
   const orderedSections = sectionOrder || defaultOrder;
+
+  // Extract styling options with defaults
+  const fontFamily = styling?.fontFamily || "sans-serif";
+  const fontSizeInput = styling?.fontSize || "medium";
+  const fontSize: "small" | "medium" | "large" = 
+    (fontSizeInput === "small" || fontSizeInput === "medium" || fontSizeInput === "large") 
+      ? fontSizeInput 
+      : "medium";
+  const titleColor = styling?.titleColor || "#1f2937";
+  const titleBold = styling?.titleBold ?? true;
+  const headingColor = styling?.headingColor || "#1f2937";
+  const headingBold = styling?.headingBold ?? true;
+  const textColor = styling?.textColor || "#1f2937";
+  const linkColor = styling?.linkColor || "#2563eb";
+  
+  // Font size mappings - Minimal uses mostly text-xs (12px) and text-sm (14px)
+  const fontSizeMap = {
+    small: {
+      xs: '0.625rem',      // 10px
+      sm: '0.75rem',       // 12px
+      base: '0.875rem',    // 14px
+      heading: '0.625rem', // 10px
+    },
+    medium: {
+      xs: '0.75rem',       // 12px (text-xs)
+      sm: '0.875rem',      // 14px (text-sm)
+      base: '1rem',        // 16px
+      heading: '0.75rem',  // 12px
+    },
+    large: {
+      xs: '0.875rem',      // 14px
+      sm: '1rem',          // 16px
+      base: '1.125rem',    // 18px
+      heading: '0.875rem', // 14px
+    },
+  };
+  
+  const sizes = fontSizeMap[fontSize];
 
   const renderSection = (sectionKey: string) => {
     switch (sectionKey) {
       case "summary":
         return personalInfo.summary && personalInfo.summary.trim() ? (
           <div key="summary">
-            <SectionHeading title={t('resume.sections.professionalSummary') || 'Summary'} />
-            <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{personalInfo.summary.trim()}</p>
+            <SectionHeading title={t('resume.sections.professionalSummary') || 'Summary'} fontSize={sizes.heading} color={headingColor} />
+            <p className="text-foreground leading-relaxed whitespace-pre-wrap" style={{ fontSize: sizes.sm, color: textColor }}>{personalInfo.summary.trim()}</p>
           </div>
         ) : null;
 
       case "workExperience":
         return workExperience.some(exp => exp.position || exp.company) ? (
           <div key="workExperience">
-            <SectionHeading title={t('resume.sections.experience') || 'Experience'} />
+            <SectionHeading title={t('resume.sections.experience') || 'Experience'} fontSize={sizes.heading} color={headingColor} />
             <div className="space-y-5">
               {workExperience.map((exp, index) => (
                 (exp.position || exp.company) && (
                   <div key={index} className="space-y-1">
                     <div className="flex justify-between items-baseline">
-                      <h3 className="text-sm font-semibold text-foreground">{exp.position}</h3>
+                      <h3 className="font-semibold text-foreground" style={{ fontSize: sizes.sm }}>{exp.position}</h3>
                       {(exp.startDate || exp.endDate) && (
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-muted-foreground" style={{ fontSize: sizes.xs }}>
                           {formatDateRange(exp.startDate, exp.endDate, t('resume.fields.present'))}
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground">{exp.company}{exp.location && ` • ${exp.location}`}</p>
+                    <p className="text-muted-foreground" style={{ fontSize: sizes.xs, color: textColor }}>{exp.company}{exp.location && ` • ${exp.location}`}</p>
                     {((exp.responsibilities && exp.responsibilities.length > 0) || exp.description) && (
-                      <ul className="text-xs text-foreground space-y-1 mt-2">
+                      <ul className="text-foreground space-y-1 mt-2" style={{ fontSize: sizes.xs }}>
                         {exp.responsibilities && exp.responsibilities.length > 0 
                           ? exp.responsibilities.map((resp, i) => (
                               resp.responsibility && (
@@ -72,12 +110,12 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                       </ul>
                     )}
                     {exp.technologies && exp.technologies.length > 0 && (
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <p className="text-muted-foreground mt-1" style={{ fontSize: sizes.xs }}>
                         {t('resume.sections.technologies')}: {exp.technologies.map(t => typeof t === 'string' ? t : t.technology).filter(Boolean).join(", ")}
                       </p>
                     )}
                     {exp.competencies && exp.competencies.length > 0 && (
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <p className="text-muted-foreground mt-1" style={{ fontSize: sizes.xs }}>
                         {t('resume.labels.keyCompetencies')}: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(", ")}
                       </p>
                     )}
@@ -91,7 +129,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
       case "education":
         return education.some(edu => edu.degree || edu.institution) ? (
           <div key="education">
-            <SectionHeading title={t('resume.sections.education') || 'Education'} />
+            <SectionHeading title={t('resume.sections.education') || 'Education'} fontSize={sizes.heading} color={headingColor} />
             <div className="space-y-4">
               {education.map((edu, index) => (
                 (edu.degree || edu.institution) && (
@@ -104,10 +142,10 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground">{edu.institution}{edu.location && ` • ${edu.location}`}</p>
-                    {edu.field && <p className="text-xs text-muted-foreground">{edu.field}</p>}
+                    <p className="text-muted-foreground" style={{ fontSize: sizes.xs, color: textColor }}>{edu.institution}{edu.location && ` • ${edu.location}`}</p>
+                    {edu.field && <p className="text-muted-foreground" style={{ fontSize: sizes.xs }}>{edu.field}</p>}
                     {edu.keyCourses && edu.keyCourses.length > 0 && (
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <p className="text-muted-foreground mt-1" style={{ fontSize: sizes.xs }}>
                         {t('resume.labels.keyCourses')}: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(", ")}
                       </p>
                     )}
@@ -121,7 +159,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
       case "projects":
         return projects.some(proj => proj.name) ? (
           <div key="projects">
-            <SectionHeading title={t('resume.sections.projects') || 'Projects'} />
+            <SectionHeading title={t('resume.sections.projects') || 'Projects'} fontSize={sizes.heading} color={headingColor} />
             <div className="space-y-4">
               {projects.map((proj, index) => (
                 proj.name && (
@@ -135,10 +173,10 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                       )}
                     </div>
                     {proj.description && (
-                      <p className="text-xs text-foreground mt-1">{proj.description}</p>
+                      <p className="text-foreground mt-1" style={{ fontSize: sizes.xs, color: textColor }}>{proj.description}</p>
                     )}
                     {proj.highlights && proj.highlights.length > 0 && (
-                      <ul className="text-xs text-foreground space-y-1 mt-1">
+                      <ul className="text-foreground space-y-1 mt-1" style={{ fontSize: sizes.xs }}>
                         {proj.highlights.map((highlight, i) => (
                           highlight.highlight && (
                             <li key={i} className="flex gap-2">
@@ -150,12 +188,12 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                       </ul>
                     )}
                     {proj.technologies && proj.technologies.length > 0 && (
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <p className="text-muted-foreground mt-1" style={{ fontSize: sizes.xs }}>
                         {t('resume.sections.technologies')}: {proj.technologies.map(techItem => techItem.technology).filter(Boolean).join(", ")}
                       </p>
                     )}
                     {proj.link && (
-                      <a href={proj.link} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:underline mt-1 block">
+                      <a href={proj.link} target="_blank" rel="noopener noreferrer" className="hover:underline mt-1 block" style={{ fontSize: sizes.xs, color: linkColor }}>
                         {proj.link.replace(/^https?:\/\/(www\.)?/, '')}
                       </a>
                     )}
@@ -169,23 +207,23 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
       case "certificates":
         return certificates.some(cert => cert.name) ? (
           <div key="certificates">
-            <SectionHeading title={t('resume.sections.certifications') || 'Certifications'} />
+            <SectionHeading title={t('resume.sections.certifications') || 'Certifications'} fontSize={sizes.heading} color={headingColor} />
             <div className="space-y-3">
               {certificates.map((cert, index) => (
                 cert.name && (
                   <div key={index}>
-                    <h3 className="text-sm font-semibold text-foreground">{cert.name}</h3>
-                    <p className="text-xs text-muted-foreground">{cert.organization}</p>
+                    <h3 className="font-semibold text-foreground" style={{ fontSize: sizes.sm }}>{cert.name}</h3>
+                    <p className="text-muted-foreground" style={{ fontSize: sizes.xs }}>{cert.organization}</p>
                     {(cert.issueDate || cert.expirationDate) && (
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <p className="text-muted-foreground mt-1" style={{ fontSize: sizes.xs }}>
                         {cert.issueDate} {cert.expirationDate && `- ${cert.expirationDate}`}
                       </p>
                     )}
                     {cert.credentialId && (
-                      <p className="text-xs text-muted-foreground">ID: {cert.credentialId}</p>
+                      <p className="text-muted-foreground" style={{ fontSize: sizes.xs }}>ID: {cert.credentialId}</p>
                     )}
                     {cert.url && (
-                      <a href={cert.url} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:underline mt-1 block">
+                      <a href={cert.url} target="_blank" rel="noopener noreferrer" className="hover:underline mt-1 block" style={{ fontSize: sizes.xs, color: linkColor }}>
                         {cert.url.replace(/^https?:\/\/(www\.)?/, '')}
                       </a>
                     )}
@@ -199,8 +237,8 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
       case "skills":
         return skills.some(s => s.skill) ? (
           <div key="skills">
-            <SectionHeading title={t('resume.sections.skills') || 'Skills'} />
-            <p className="text-xs text-foreground leading-relaxed">
+            <SectionHeading title={t('resume.sections.skills') || 'Skills'} fontSize={sizes.heading} color={headingColor} />
+            <p className="text-foreground leading-relaxed" style={{ fontSize: sizes.xs, color: textColor }}>
               {skills.filter(s => s.skill).map(s => s.skill).join(", ")}
             </p>
           </div>
@@ -209,11 +247,11 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
       case "languages":
         return languages.some(lang => lang.language) ? (
           <div key="languages">
-            <SectionHeading title={t('resume.sections.languages') || 'Languages'} />
+            <SectionHeading title={t('resume.sections.languages') || 'Languages'} fontSize={sizes.heading} color={headingColor} />
             <div className="space-y-1">
               {languages.map((lang, index) => (
                 lang.language && (
-                  <div key={index} className="text-xs text-foreground flex justify-between items-center gap-4 pr-2">
+                  <div key={index} className="text-foreground flex justify-between items-center gap-4 pr-2" style={{ fontSize: sizes.xs }}>
                     <span>{lang.language}</span>
                     <span className="text-muted-foreground whitespace-nowrap flex-shrink-0">— {lang.proficiency}</span>
                   </div>
@@ -226,8 +264,8 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
       case "interests":
         return personalInfo.interests && personalInfo.interests.length > 0 && personalInfo.interests.some(i => i.interest) ? (
           <div key="interests">
-            <SectionHeading title={t('resume.sections.interests') || 'Interests'} />
-            <p className="text-xs text-foreground leading-relaxed">{personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}</p>
+            <SectionHeading title={t('resume.sections.interests') || 'Interests'} fontSize={sizes.heading} color={headingColor} />
+            <p className="text-foreground leading-relaxed" style={{ fontSize: sizes.xs, color: textColor }}>{personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}</p>
           </div>
         ) : null;
 
@@ -297,16 +335,16 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
           }
         }
       `}</style>
-      <div className="resume-page-container bg-background text-foreground p-12 max-w-3xl mx-auto font-minimal">
+      <div className="resume-page-container bg-background text-foreground p-12 max-w-3xl mx-auto font-minimal" style={{ fontFamily: `"${fontFamily}", sans-serif` }}>
       {/* Header with large, widely-spaced name */}
       <div className="mb-12">
         <div className="flex items-start gap-6 mb-6">
           <div className="flex-1">
-            <h1 className="text-3xl font-bold text-foreground mb-4" style={{ letterSpacing: '0.3em' }}>
+            <h1 className="font-bold mb-4" style={{ fontSize: '1.875rem', letterSpacing: '0.3em', fontWeight: titleBold ? 'bold' : 'normal', color: titleColor }}>
               {personalInfo.firstName.toUpperCase()} {personalInfo.lastName.toUpperCase()}
             </h1>
             {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (
-              <p className="text-xs text-muted-foreground font-normal mb-4">{personalInfo.professionalTitle.trim()}</p>
+              <p className="font-normal mb-4" style={{ fontSize: sizes.xs, color: textColor }}>{personalInfo.professionalTitle.trim()}</p>
             )}
             
             {/* Contact info in single line with separators */}

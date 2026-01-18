@@ -28,22 +28,34 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
   const textColor = styling?.textColor || "#1f2937";
   const linkColor = styling?.linkColor || "#2563eb";
   
-  // Font size mappings for base text
+  // Font size mappings - all relative to ensure consistency
   const fontSizeMap = {
     small: {
-      base: '14px',
-      name: '22px',
-      title: '15px',
+      base: '14px',        // Main text
+      name: '22px',        // Name in header
+      title: '15px',       // Professional title
+      heading: '11px',     // Section headings
+      body: '14px',        // Body text in sections
+      small: '12px',       // Small text (dates, links)
+      xs: '10px',          // Extra small (technologies, courses)
     },
     medium: {
-      base: '16px',
-      name: '24px',
-      title: '16px',
+      base: '16px',        // Main text
+      name: '24px',        // Name in header  
+      title: '16px',       // Professional title
+      heading: '11px',     // Section headings (consistent)
+      body: '14px',        // Body text in sections
+      small: '12px',       // Small text (dates, links)
+      xs: '10px',          // Extra small (technologies, courses)
     },
     large: {
-      base: '18px',
-      name: '26px',
-      title: '18px',
+      base: '18px',        // Main text
+      name: '26px',        // Name in header
+      title: '18px',       // Professional title
+      heading: '11px',     // Section headings (consistent)
+      body: '16px',        // Body text in sections
+      small: '13px',       // Small text (dates, links)
+      xs: '11px',          // Extra small (technologies, courses)
     },
   };
   
@@ -95,7 +107,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
     const content = (
       <div className="flex items-center gap-1 mb-0.5 min-w-0">
         <Icon className="h-3 w-3 flex-shrink-0" style={{ color: textColor }} />
-        <span className="truncate min-w-0" style={{ fontSize: '12px', color: textColor, lineHeight: '1.3' }}>
+        <span className="truncate min-w-0" style={{ fontSize: sizes.small, color: textColor, lineHeight: '1.3' }}>
           {displayText}
         </span>
       </div>
@@ -122,7 +134,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
         return projects && projects.length > 0 && projects.some(proj => proj.name) ? (
           <div key="projects" className="mb-3">
             <div className="flex items-center gap-2 mb-1">
-              <h2 className="uppercase tracking-wide flex-shrink-0" style={{ fontSize: '11px', fontWeight: headingBold ? 'bold' : 'normal', color: headingColor }}>
+              <h2 className="uppercase tracking-wide flex-shrink-0" style={{ fontSize: sizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: headingColor }}>
                 {t('resume.sections.projects').toUpperCase()}
               </h2>
               <div className="flex-1 border-t" style={{ borderColor: headingColor }}></div>
@@ -140,26 +152,27 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                   : '';
                 
                 return (
-                  <div key={index} className="flex gap-2 text-sm">
-                    <div className="w-[13%] flex-shrink-0 text-muted-foreground text-xs">
+                  <div key={index} className="flex gap-2" style={{ fontSize: sizes.body }}>
+                    <div className="w-[13%] flex-shrink-0 text-muted-foreground" style={{ fontSize: sizes.small }}>
                       {dateRange}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start gap-2 mb-0.5">
-                        <h3 className="font-bold text-foreground text-sm">{proj.name}</h3>
+                        <h3 className="font-bold text-foreground" style={{ fontSize: sizes.body }}>{proj.name}</h3>
                         {proj.link && (
                           <a 
                             href={proj.link} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="text-muted-foreground hover:underline flex-shrink-0 text-xs truncate max-w-[120px]"
+                            className="text-muted-foreground hover:underline flex-shrink-0 truncate max-w-[120px]"
+                            style={{ fontSize: sizes.small }}
                           >
                             {proj.link.replace(/^https?:\/\//, '').substring(0, 25)}
                           </a>
                         )}
                       </div>
                       {proj.description && (
-                        <p className="text-foreground mb-0.5 leading-snug break-words text-sm">
+                        <p className="text-foreground mb-0.5 leading-snug break-words" style={{ fontSize: sizes.body }}>
                           {proj.description}
                         </p>
                       )}
@@ -168,15 +181,15 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                           {proj.highlights.map((highlight, i) => (
                             highlight.highlight && (
                               <li key={i} className="flex gap-1">
-                                <span className="text-foreground flex-shrink-0 text-sm">•</span>
-                                <span className="flex-1 break-words text-sm leading-snug">{highlight.highlight}</span>
+                                <span className="text-foreground flex-shrink-0" style={{ fontSize: sizes.body }}>•</span>
+                                <span className="flex-1 break-words leading-snug" style={{ fontSize: sizes.body }}>{highlight.highlight}</span>
                               </li>
                             )
                           ))}
                         </ul>
                       )}
                       {technologies && (
-                        <p className="text-muted-foreground text-xs font-mono">
+                        <p className="text-muted-foreground font-mono" style={{ fontSize: sizes.xs }}>
                           {technologies}
                         </p>
                       )}
@@ -192,7 +205,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
         return education && education.length > 0 && education.some(edu => edu.degree || edu.institution) ? (
           <div key="education" className="mb-3">
             <div className="flex items-center gap-2 mb-1">
-              <h2 className="uppercase tracking-wide flex-shrink-0" style={{ fontSize: '11px', fontWeight: headingBold ? 'bold' : 'normal', color: headingColor }}>
+              <h2 className="uppercase tracking-wide flex-shrink-0" style={{ fontSize: sizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: headingColor }}>
                 {t('resume.sections.education').toUpperCase()}
               </h2>
               <div className="flex-1 border-t" style={{ borderColor: headingColor }}></div>
@@ -204,27 +217,27 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                 const dateRange = formatDateRangeLatex(edu.startDate, edu.endDate);
                 
                 return (
-                  <div key={index} className="flex gap-2 text-sm">
-                    <div className="w-[13%] flex-shrink-0 text-muted-foreground text-xs">
+                  <div key={index} className="flex gap-2" style={{ fontSize: sizes.body }}>
+                    <div className="w-[13%] flex-shrink-0 text-muted-foreground" style={{ fontSize: sizes.small }}>
                       {dateRange}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start gap-2 mb-0.5">
-                        <h3 className="font-bold text-foreground text-sm">{edu.degree || ''}</h3>
+                        <h3 className="font-bold text-foreground" style={{ fontSize: sizes.body }}>{edu.degree || ''}</h3>
                         <div className="text-right">
-                          <span className="text-sm font-bold text-foreground flex-shrink-0">
+                          <span className="font-bold text-foreground flex-shrink-0" style={{ fontSize: sizes.body }}>
                             {edu.institution || ''}
                           </span>
                           {edu.location && (
-                            <span className="text-xs text-muted-foreground block">{edu.location}</span>
+                            <span className="text-muted-foreground block" style={{ fontSize: sizes.small }}>{edu.location}</span>
                           )}
                         </div>
                       </div>
                       {edu.field && (
-                        <p className="text-foreground leading-snug break-words text-sm">{edu.field}</p>
+                        <p className="text-foreground leading-snug break-words" style={{ fontSize: sizes.body }}>{edu.field}</p>
                       )}
                       {edu.keyCourses && edu.keyCourses.length > 0 && (
-                        <p className="text-muted-foreground text-xs mt-0.5">
+                        <p className="text-muted-foreground mt-0.5" style={{ fontSize: sizes.xs }}>
                           {t('resume.labels.keyCourses')}: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(', ')}
                         </p>
                       )}
@@ -240,7 +253,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
         return workExperience && workExperience.length > 0 && workExperience.some(exp => exp.position || exp.company) ? (
           <div key="workExperience" className="mb-3">
             <div className="flex items-center gap-2 mb-1">
-              <h2 className="uppercase tracking-wide flex-shrink-0" style={{ fontSize: '11px', fontWeight: headingBold ? 'bold' : 'normal', color: headingColor }}>
+              <h2 className="uppercase tracking-wide flex-shrink-0" style={{ fontSize: sizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: headingColor }}>
                 {t('resume.sections.experience').toUpperCase()}
               </h2>
               <div className="flex-1 border-t" style={{ borderColor: headingColor }}></div>
@@ -263,19 +276,19 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                   : [];
                 
                 return (
-                  <div key={index} className="flex gap-2 text-sm">
-                    <div className="w-[13%] flex-shrink-0 text-muted-foreground text-xs">
+                  <div key={index} className="flex gap-2" style={{ fontSize: sizes.body }}>
+                    <div className="w-[13%] flex-shrink-0 text-muted-foreground" style={{ fontSize: sizes.small }}>
                       {dateRange}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start gap-2 mb-0.5">
-                        <h3 className="font-bold text-foreground text-sm">{exp.position || ''}</h3>
+                        <h3 className="font-bold text-foreground" style={{ fontSize: sizes.body }}>{exp.position || ''}</h3>
                         <div className="text-right">
-                          <span className="text-sm font-bold text-foreground flex-shrink-0">
+                          <span className="font-bold text-foreground flex-shrink-0" style={{ fontSize: sizes.body }}>
                             {exp.company || ''}
                           </span>
                           {exp.location && (
-                            <span className="text-xs text-muted-foreground block">{exp.location}</span>
+                            <span className="text-muted-foreground block" style={{ fontSize: sizes.small }}>{exp.location}</span>
                           )}
                         </div>
                       </div>
@@ -283,8 +296,8 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                         <ul className="text-foreground space-y-0.5 mt-0.5 mb-0.5 list-none pl-0">
                           {responsibilities.map((resp, i) => (
                             <li key={i} className="flex gap-1">
-                              <span className="text-foreground flex-shrink-0 text-sm">•</span>
-                              <span className="flex-1 break-words text-sm leading-snug">{resp}</span>
+                              <span className="text-foreground flex-shrink-0" style={{ fontSize: sizes.body }}>•</span>
+                              <span className="flex-1 break-words leading-snug" style={{ fontSize: sizes.body }}>{resp}</span>
                             </li>
                           ))}
                         </ul>
@@ -292,14 +305,14 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                       {technologies.length > 0 && (
                         <div className="flex flex-wrap gap-0.5 mt-0.5">
                           {technologies.map((tech, i) => (
-                            <span key={i} className="text-xs font-mono text-muted-foreground bg-muted/50 px-1 py-0.5 rounded">
+                            <span key={i} className="font-mono text-muted-foreground bg-muted/50 px-1 py-0.5 rounded" style={{ fontSize: sizes.xs }}>
                               {tech}
                             </span>
                           ))}
                         </div>
                       )}
                       {exp.competencies && exp.competencies.length > 0 && (
-                        <p className="text-muted-foreground text-xs mt-0.5">
+                        <p className="text-muted-foreground mt-0.5" style={{ fontSize: sizes.xs }}>
                           {t('resume.labels.keyCompetencies')}: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(', ')}
                         </p>
                       )}
@@ -315,7 +328,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
         return certificates && certificates.length > 0 && certificates.some(cert => cert.name) ? (
           <div key="certificates" className="mb-3">
             <div className="flex items-center gap-2 mb-1">
-              <h2 className="uppercase tracking-wide flex-shrink-0" style={{ fontSize: '11px', fontWeight: headingBold ? 'bold' : 'normal', color: headingColor }}>
+              <h2 className="uppercase tracking-wide flex-shrink-0" style={{ fontSize: sizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: headingColor }}>
                 {t('resume.sections.certifications').toUpperCase()}
               </h2>
               <div className="flex-1 border-t" style={{ borderColor: headingColor }}></div>
@@ -327,22 +340,22 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                 const dateRange = formatDateRangeLatex(cert.issueDate, cert.expirationDate);
                 
                 return (
-                  <div key={index} className="flex gap-2 text-sm">
-                    <div className="w-[13%] flex-shrink-0 text-muted-foreground text-xs">
+                  <div key={index} className="flex gap-2" style={{ fontSize: sizes.body }}>
+                    <div className="w-[13%] flex-shrink-0 text-muted-foreground" style={{ fontSize: sizes.small }}>
                       {dateRange || cert.issueDate || ''}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start gap-2 mb-0.5">
-                        <h3 className="font-bold text-foreground text-sm">{cert.name}</h3>
-                        <span className="text-sm font-bold text-foreground flex-shrink-0">
+                        <h3 className="font-bold text-foreground" style={{ fontSize: sizes.body }}>{cert.name}</h3>
+                        <span className="font-bold text-foreground flex-shrink-0" style={{ fontSize: sizes.body }}>
                           {cert.organization || ''}
                         </span>
                       </div>
                       {cert.credentialId && (
-                        <p className="text-muted-foreground text-xs">{t('resume.fields.credentialId')}: {cert.credentialId}</p>
+                        <p className="text-muted-foreground" style={{ fontSize: sizes.xs }}>{t('resume.fields.credentialId')}: {cert.credentialId}</p>
                       )}
                       {cert.url && (
-                        <a href={cert.url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:underline text-xs block truncate max-w-[200px]">
+                        <a href={cert.url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:underline block truncate max-w-[200px]" style={{ fontSize: sizes.xs }}>
                           {cert.url.replace(/^https?:\/\/(www\.)?/, '')}
                         </a>
                       )}
@@ -358,12 +371,12 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
         return languages && languages.length > 0 && languages.some(lang => lang.language) ? (
           <div key="languages" className="mb-3">
             <div className="flex items-center gap-2 mb-1">
-              <h2 className="uppercase tracking-wide flex-shrink-0" style={{ fontSize: '11px', fontWeight: headingBold ? 'bold' : 'normal', color: headingColor }}>
+              <h2 className="uppercase tracking-wide flex-shrink-0" style={{ fontSize: sizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: headingColor }}>
                 {t('resume.sections.languages').toUpperCase()}
               </h2>
               <div className="flex-1 border-t" style={{ borderColor: headingColor }}></div>
             </div>
-            <div className="pl-[15%] text-sm">
+            <div className="pl-[15%]" style={{ fontSize: sizes.body }}>
               {languages
                 .filter(lang => lang.language)
                 .map((lang, index, arr) => (
@@ -381,12 +394,12 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
         return personalInfo.interests && personalInfo.interests.length > 0 && personalInfo.interests.some(i => i.interest) ? (
           <div key="interests" className="mb-3">
             <div className="flex items-center gap-2 mb-1">
-              <h2 className="uppercase tracking-wide flex-shrink-0" style={{ fontSize: '11px', fontWeight: headingBold ? 'bold' : 'normal', color: headingColor }}>
+              <h2 className="uppercase tracking-wide flex-shrink-0" style={{ fontSize: sizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: headingColor }}>
                 {t('resume.sections.interests').toUpperCase()}
               </h2>
               <div className="flex-1 border-t" style={{ borderColor: headingColor }}></div>
             </div>
-            <p className="text-sm text-foreground pl-[15%]">
+            <p className="text-foreground pl-[15%]" style={{ fontSize: sizes.body }}>
               {personalInfo.interests.filter(i => i.interest).map(i => i.interest).join(', ')}
             </p>
           </div>
@@ -518,7 +531,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
           {personalInfo.summary && personalInfo.summary.trim() && (
             <div className="mb-3">
               <div className="flex items-center gap-2 mb-1.5">
-                <h2 className="uppercase tracking-wide flex-shrink-0" style={{ fontSize: '11px', fontWeight: headingBold ? 'bold' : 'normal', color: headingColor }}>
+                <h2 className="uppercase tracking-wide flex-shrink-0" style={{ fontSize: sizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: headingColor }}>
                   {t('resume.sections.summary').toUpperCase()}
                 </h2>
                 <div className="flex-1 border-t" style={{ borderColor: headingColor }}></div>
@@ -533,7 +546,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
           {skills && skills.length > 0 && skills.some(s => s.skill) && (
             <div className="mb-2">
               <div className="flex items-center gap-2 mb-1.5">
-                <h2 className="uppercase tracking-wide flex-shrink-0" style={{ fontSize: '11px', fontWeight: headingBold ? 'bold' : 'normal', color: headingColor }}>
+                <h2 className="uppercase tracking-wide flex-shrink-0" style={{ fontSize: sizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: headingColor }}>
                   {t('resume.sections.skills').toUpperCase()}
                 </h2>
                 <div className="flex-1 border-t" style={{ borderColor: headingColor }}></div>
