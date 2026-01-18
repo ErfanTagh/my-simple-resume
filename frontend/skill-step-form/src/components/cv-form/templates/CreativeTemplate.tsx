@@ -57,14 +57,58 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
   
   const sizes = fontSizeMap[fontSize];
 
+  // Helper function to get section-specific styling
+  const getSectionStyling = (sectionName: string) => {
+    const sectionStyling = styling?.sectionStyling?.[sectionName];
+    return {
+      titleColor: sectionStyling?.titleColor || headingColor,
+      titleSize: sectionStyling?.titleSize || fontSize,
+      bodyColor: sectionStyling?.bodyColor || textColor,
+      bodySize: sectionStyling?.bodySize || fontSize,
+    };
+  };
+
+  // Extract section-specific styling for personalInfo
+  const personalInfoSectionStyling = styling?.sectionStyling?.personalInfo;
+  const personalInfoTitleColor = personalInfoSectionStyling?.titleColor || titleColor;
+  const personalInfoTitleSize = personalInfoSectionStyling?.titleSize || fontSize;
+  const personalInfoBodyColor = personalInfoSectionStyling?.bodyColor || textColor;
+  const personalInfoBodySize = personalInfoSectionStyling?.bodySize || fontSize;
+
+  // Extract section-specific styling for all sections
+  const workExperienceStyling = getSectionStyling('workExperience');
+  const projectsStyling = getSectionStyling('projects');
+  const educationStyling = getSectionStyling('education');
+  const certificatesStyling = getSectionStyling('certificates');
+  const skillsStyling = getSectionStyling('skills');
+  const languagesStyling = getSectionStyling('languages');
+
+  // Size mappings for personalInfo section-specific sizes
+  const personalInfoTitleSizes = fontSizeMap[personalInfoTitleSize];
+  const personalInfoBodySizes = fontSizeMap[personalInfoBodySize];
+
+  // Create size mappings for each section
+  const workExperienceTitleSizes = fontSizeMap[workExperienceStyling.titleSize];
+  const workExperienceBodySizes = fontSizeMap[workExperienceStyling.bodySize];
+  const projectsTitleSizes = fontSizeMap[projectsStyling.titleSize];
+  const projectsBodySizes = fontSizeMap[projectsStyling.bodySize];
+  const educationTitleSizes = fontSizeMap[educationStyling.titleSize];
+  const educationBodySizes = fontSizeMap[educationStyling.bodySize];
+  const certificatesTitleSizes = fontSizeMap[certificatesStyling.titleSize];
+  const certificatesBodySizes = fontSizeMap[certificatesStyling.bodySize];
+  const skillsTitleSizes = fontSizeMap[skillsStyling.titleSize];
+  const skillsBodySizes = fontSizeMap[skillsStyling.bodySize];
+  const languagesTitleSizes = fontSizeMap[languagesStyling.titleSize];
+  const languagesBodySizes = fontSizeMap[languagesStyling.bodySize];
+
   const renderSection = (sectionKey: string) => {
     switch (sectionKey) {
       case "summary":
         return personalInfo.summary && personalInfo.summary.trim() ? (
           <div key="summary" className="mb-6">
             <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="font-black mb-3 italic" style={{ fontSize: sizes.sectionHeading, fontWeight: headingBold ? '900' : 'bold', color: headingColor }}>{t('resume.sections.aboutMe')}</h2>
-              <p className="text-foreground leading-relaxed whitespace-pre-wrap" style={{ fontSize: sizes.sm, color: textColor }}>{personalInfo.summary.trim()}</p>
+              <h2 className="font-black mb-3 italic" style={{ fontSize: personalInfoTitleSizes.sectionHeading, fontWeight: headingBold ? '900' : 'bold', color: personalInfoTitleColor }}>{t('resume.sections.aboutMe')}</h2>
+              <p className="text-foreground leading-relaxed whitespace-pre-wrap" style={{ fontSize: personalInfoBodySizes.sm, color: personalInfoBodyColor }}>{personalInfo.summary.trim()}</p>
             </div>
           </div>
         ) : null;
@@ -73,7 +117,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
         return workExperience.some(exp => exp.position || exp.company) ? (
           <div key="workExperience" className="mb-6">
             <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="font-black mb-4 italic" style={{ fontSize: sizes.sectionHeading, fontWeight: headingBold ? '900' : 'bold', color: headingColor }}>{t('resume.sections.experience')}</h2>
+              <h2 className="font-black mb-4 italic" style={{ fontSize: workExperienceTitleSizes.sectionHeading, fontWeight: headingBold ? '900' : 'bold', color: workExperienceStyling.titleColor }}>{t('resume.sections.experience')}</h2>
               <div className="space-y-5">
                 {workExperience.map((exp, index) => (
                   (exp.position || exp.company) && (
@@ -134,7 +178,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
         return education.some(edu => edu.degree || edu.institution) ? (
           <div key="education" className="mb-6">
             <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="font-black mb-4 italic" style={{ fontSize: sizes.sectionHeading, fontWeight: headingBold ? '900' : 'bold', color: headingColor }}>{t('resume.sections.education')}</h2>
+              <h2 className="font-black mb-4 italic" style={{ fontSize: educationTitleSizes.sectionHeading, fontWeight: headingBold ? '900' : 'bold', color: educationStyling.titleColor }}>{t('resume.sections.education')}</h2>
               <div className="space-y-4">
                 {education.map((edu, index) => (
                   (edu.degree || edu.institution) && (
@@ -160,7 +204,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
         return projects.some(proj => proj.name) ? (
           <div key="projects" className="mb-6">
             <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="text-2xl font-black mb-4 text-primary italic">{t('resume.sections.projects')}</h2>
+              <h2 className="text-2xl font-black mb-4 italic" style={{ color: projectsStyling.titleColor, fontSize: projectsTitleSizes.sectionHeading }}>{t('resume.sections.projects')}</h2>
               <div className="space-y-4">
                 {projects.map((proj, index) => (
                   proj.name && (
@@ -217,7 +261,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
         return certificates.some(cert => cert.name) ? (
           <div key="certificates" className="mb-6">
             <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="font-black mb-4 italic" style={{ fontSize: sizes.sectionHeading, fontWeight: headingBold ? '900' : 'bold', color: headingColor }}>{t('resume.sections.certifications')}</h2>
+              <h2 className="font-black mb-4 italic" style={{ fontSize: certificatesTitleSizes.sectionHeading, fontWeight: headingBold ? '900' : 'bold', color: certificatesStyling.titleColor }}>{t('resume.sections.certifications')}</h2>
               <div className="space-y-3">
                 {certificates.map((cert, index) => (
                   cert.name && (
@@ -250,7 +294,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
         return skills.some(s => s.skill) ? (
           <div key="skills" className="mb-6">
             <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="font-black mb-4 italic" style={{ fontSize: sizes.sectionHeading, fontWeight: headingBold ? '900' : 'bold', color: headingColor }}>{t('resume.sections.skills')}</h2>
+              <h2 className="font-black mb-4 italic" style={{ fontSize: skillsTitleSizes.sectionHeading, fontWeight: headingBold ? '900' : 'bold', color: skillsStyling.titleColor }}>{t('resume.sections.skills')}</h2>
               <div className="flex flex-wrap gap-2">
                 {skills.map((s, index) => (
                   s.skill && (
@@ -268,7 +312,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
         return languages.some(lang => lang.language) ? (
           <div key="languages" className="mb-6">
             <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="font-black mb-4 italic" style={{ fontSize: sizes.sectionHeading, fontWeight: headingBold ? '900' : 'bold', color: headingColor }}>{t('resume.sections.languages')}</h2>
+              <h2 className="font-black mb-4 italic" style={{ fontSize: languagesTitleSizes.sectionHeading, fontWeight: headingBold ? '900' : 'bold', color: languagesStyling.titleColor }}>{t('resume.sections.languages')}</h2>
               <div className="grid grid-cols-2 gap-3">
                 {languages.map((lang, index) => (
                   lang.language && (
@@ -287,8 +331,8 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
         return personalInfo.interests && personalInfo.interests.length > 0 && personalInfo.interests.some(i => i.interest) ? (
           <div key="interests" className="mb-6">
             <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="font-black mb-3 italic" style={{ fontSize: sizes.sectionHeading, fontWeight: headingBold ? '900' : 'bold', color: headingColor }}>{t('resume.sections.interests')}</h2>
-              <p className="text-foreground" style={{ fontSize: sizes.sm, color: textColor }}>{personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}</p>
+              <h2 className="font-black mb-3 italic" style={{ fontSize: personalInfoTitleSizes.sectionHeading, fontWeight: headingBold ? '900' : 'bold', color: personalInfoTitleColor }}>{t('resume.sections.interests')}</h2>
+              <p className="text-foreground" style={{ fontSize: personalInfoBodySizes.sm, color: personalInfoBodyColor }}>{personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}</p>
             </div>
           </div>
         ) : null;

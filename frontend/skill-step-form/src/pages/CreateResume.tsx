@@ -99,6 +99,7 @@ const mapResumeToCVFormData = (resume: Resume): CVFormData => {
         ? anyResume.sectionOrder
         : base.sectionOrder,
     template: anyResume.template || base.template,
+    styling: anyResume.styling || undefined,
   };
 };
 

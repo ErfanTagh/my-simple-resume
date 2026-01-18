@@ -54,6 +54,50 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
   
   const sizes = fontSizeMap[fontSize];
 
+  // Helper function to get section-specific styling
+  const getSectionStyling = (sectionName: string) => {
+    const sectionStyling = styling?.sectionStyling?.[sectionName];
+    return {
+      titleColor: sectionStyling?.titleColor || headingColor,
+      titleSize: sectionStyling?.titleSize || fontSize,
+      bodyColor: sectionStyling?.bodyColor || textColor,
+      bodySize: sectionStyling?.bodySize || fontSize,
+    };
+  };
+
+  // Extract section-specific styling for personalInfo
+  const personalInfoSectionStyling = styling?.sectionStyling?.personalInfo;
+  const personalInfoTitleColor = personalInfoSectionStyling?.titleColor || titleColor;
+  const personalInfoTitleSize = personalInfoSectionStyling?.titleSize || fontSize;
+  const personalInfoBodyColor = personalInfoSectionStyling?.bodyColor || textColor;
+  const personalInfoBodySize = personalInfoSectionStyling?.bodySize || fontSize;
+
+  // Extract section-specific styling for all sections
+  const workExperienceStyling = getSectionStyling('workExperience');
+  const projectsStyling = getSectionStyling('projects');
+  const educationStyling = getSectionStyling('education');
+  const certificatesStyling = getSectionStyling('certificates');
+  const skillsStyling = getSectionStyling('skills');
+  const languagesStyling = getSectionStyling('languages');
+
+  // Size mappings for personalInfo section-specific sizes
+  const personalInfoTitleSizes = fontSizeMap[personalInfoTitleSize];
+  const personalInfoBodySizes = fontSizeMap[personalInfoBodySize];
+
+  // Create size mappings for each section
+  const workExperienceTitleSizes = fontSizeMap[workExperienceStyling.titleSize];
+  const workExperienceBodySizes = fontSizeMap[workExperienceStyling.bodySize];
+  const projectsTitleSizes = fontSizeMap[projectsStyling.titleSize];
+  const projectsBodySizes = fontSizeMap[projectsStyling.bodySize];
+  const educationTitleSizes = fontSizeMap[educationStyling.titleSize];
+  const educationBodySizes = fontSizeMap[educationStyling.bodySize];
+  const certificatesTitleSizes = fontSizeMap[certificatesStyling.titleSize];
+  const certificatesBodySizes = fontSizeMap[certificatesStyling.bodySize];
+  const skillsTitleSizes = fontSizeMap[skillsStyling.titleSize];
+  const skillsBodySizes = fontSizeMap[skillsStyling.bodySize];
+  const languagesTitleSizes = fontSizeMap[languagesStyling.titleSize];
+  const languagesBodySizes = fontSizeMap[languagesStyling.bodySize];
+
   // Helper to format date range for Star Rover style (MMM YYYY format)
   const formatDateRangeStar = (startDate: string | undefined, endDate: string | undefined): string => {
     if (!startDate && !endDate) return '';
@@ -106,13 +150,13 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
             <div className="mb-3">
               <div className="flex items-center gap-2">
                 <div className="flex-1" style={{ borderTop: `1px solid ${headingColor}` }}></div>
-                <h2 className="font-bold uppercase tracking-wide px-2" style={{ fontSize: sizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: headingColor }}>
+                <h2 className="font-bold uppercase tracking-wide px-2" style={{ fontSize: personalInfoTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: personalInfoTitleColor }}>
                   {t('resume.sections.summary').toUpperCase()}
                 </h2>
-                <div className="flex-1" style={{ borderTop: `1px solid ${headingColor}` }}></div>
+                <div className="flex-1" style={{ borderTop: `1px solid ${personalInfoTitleColor}` }}></div>
               </div>
             </div>
-            <p className="text-foreground leading-relaxed break-words whitespace-pre-wrap" style={{ fontSize: sizes.base, color: textColor }}>{personalInfo.summary.trim()}</p>
+            <p className="text-foreground leading-relaxed break-words whitespace-pre-wrap" style={{ fontSize: personalInfoBodySizes.base, color: personalInfoBodyColor }}>{personalInfo.summary.trim()}</p>
           </div>
         ) : null;
 
@@ -122,10 +166,10 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
             <div className="mb-3">
               <div className="flex items-center gap-2">
                 <div className="flex-1" style={{ borderTop: `1px solid ${headingColor}` }}></div>
-                <h2 className="font-bold uppercase tracking-wide px-2" style={{ fontSize: sizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: headingColor }}>
+                <h2 className="font-bold uppercase tracking-wide px-2" style={{ fontSize: educationTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: educationStyling.titleColor }}>
                   {t('resume.sections.education').toUpperCase()}
                 </h2>
-                <div className="flex-1" style={{ borderTop: `1px solid ${headingColor}` }}></div>
+                <div className="flex-1" style={{ borderTop: `1px solid ${educationStyling.titleColor}` }}></div>
               </div>
             </div>
             <div className="space-y-3">
@@ -242,10 +286,10 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
             <div className="mb-3">
               <div className="flex items-center gap-2">
                 <div className="flex-1" style={{ borderTop: `1px solid ${headingColor}` }}></div>
-                <h2 className="font-bold uppercase tracking-wide px-2" style={{ fontSize: sizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: headingColor }}>
+                <h2 className="font-bold uppercase tracking-wide px-2" style={{ fontSize: projectsTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: projectsStyling.titleColor }}>
                   {t('resume.sections.projects').toUpperCase()}
                 </h2>
-                <div className="flex-1" style={{ borderTop: `1px solid ${headingColor}` }}></div>
+                <div className="flex-1" style={{ borderTop: `1px solid ${projectsStyling.titleColor}` }}></div>
               </div>
             </div>
             <div className="space-y-3">
@@ -312,10 +356,10 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
             <div className="mb-3">
               <div className="flex items-center gap-2">
                 <div className="flex-1" style={{ borderTop: `1px solid ${headingColor}` }}></div>
-                <h2 className="font-bold uppercase tracking-wide px-2" style={{ fontSize: sizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: headingColor }}>
+                <h2 className="font-bold uppercase tracking-wide px-2" style={{ fontSize: certificatesTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: certificatesStyling.titleColor }}>
                   {t('resume.sections.certifications').toUpperCase()}
                 </h2>
-                <div className="flex-1" style={{ borderTop: `1px solid ${headingColor}` }}></div>
+                <div className="flex-1" style={{ borderTop: `1px solid ${certificatesStyling.titleColor}` }}></div>
               </div>
             </div>
             <div className="space-y-1">
@@ -357,10 +401,10 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
             <div className="mb-3">
               <div className="flex items-center gap-2">
                 <div className="flex-1" style={{ borderTop: `1px solid ${headingColor}` }}></div>
-                <h2 className="font-bold uppercase tracking-wide px-2" style={{ fontSize: sizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: headingColor }}>
+                <h2 className="font-bold uppercase tracking-wide px-2" style={{ fontSize: skillsTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: skillsStyling.titleColor }}>
                   {t('resume.sections.skills').toUpperCase()}
                 </h2>
-                <div className="flex-1" style={{ borderTop: `1px solid ${headingColor}` }}></div>
+                <div className="flex-1" style={{ borderTop: `1px solid ${skillsStyling.titleColor}` }}></div>
               </div>
             </div>
             <div className="text-foreground break-words" style={{ fontSize: sizes.sm }}>
@@ -376,10 +420,10 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
             <div className="mb-3">
               <div className="flex items-center gap-2">
                 <div className="flex-1" style={{ borderTop: `1px solid ${headingColor}` }}></div>
-                <h2 className="font-bold uppercase tracking-wide px-2" style={{ fontSize: sizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: headingColor }}>
+                <h2 className="font-bold uppercase tracking-wide px-2" style={{ fontSize: languagesTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: languagesStyling.titleColor }}>
                   {t('resume.sections.languages').toUpperCase()}
                 </h2>
-                <div className="flex-1" style={{ borderTop: `1px solid ${headingColor}` }}></div>
+                <div className="flex-1" style={{ borderTop: `1px solid ${languagesStyling.titleColor}` }}></div>
               </div>
             </div>
             <div className="text-foreground break-words" style={{ fontSize: sizes.sm }}>
@@ -402,10 +446,10 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
             <div className="mb-3">
               <div className="flex items-center gap-2">
                 <div className="flex-1" style={{ borderTop: `1px solid ${headingColor}` }}></div>
-                <h2 className="font-bold uppercase tracking-wide px-2" style={{ fontSize: sizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: headingColor }}>
+                <h2 className="font-bold uppercase tracking-wide px-2" style={{ fontSize: personalInfoTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: personalInfoTitleColor }}>
                   {t('resume.sections.interests').toUpperCase()}
                 </h2>
-                <div className="flex-1" style={{ borderTop: `1px solid ${headingColor}` }}></div>
+                <div className="flex-1" style={{ borderTop: `1px solid ${personalInfoTitleColor}` }}></div>
               </div>
             </div>
             <div className="text-foreground break-words" style={{ fontSize: sizes.sm }}>

@@ -1,7 +1,7 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Palette, Type } from "lucide-react";
+import { Palette, Type, RotateCcw } from "lucide-react";
 import { CVFormData } from "./types";
 import { UseFormReturn } from "react-hook-form";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -41,6 +41,19 @@ export const SectionStylingControls = ({ form, sectionName, sectionLabel }: Sect
       },
     });
   };
+
+  const resetSectionStyling = () => {
+    const currentStyling = form.getValues("styling") || {};
+    const currentSectionStyling = currentStyling.sectionStyling || {};
+    const { [sectionName]: _, ...restSectionStyling } = currentSectionStyling;
+    
+    form.setValue("styling", {
+      ...currentStyling,
+      sectionStyling: Object.keys(restSectionStyling).length > 0 ? restSectionStyling : undefined,
+    });
+  };
+
+  const hasCustomStyling = sectionStyling.titleColor || sectionStyling.titleSize || sectionStyling.bodyColor || sectionStyling.bodySize;
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className="border rounded-lg bg-muted/30">
@@ -152,6 +165,21 @@ export const SectionStylingControls = ({ form, sectionName, sectionLabel }: Sect
               <SelectItem value="large">{SIZE_MAP.large}</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+
+        {/* Reset Button */}
+        <div className="pt-2 border-t flex justify-center">
+          <Button
+            type="button"
+            variant="ghost"
+            size="default"
+            onClick={resetSectionStyling}
+            disabled={!hasCustomStyling}
+            className="gap-2 text-sm text-muted-foreground hover:text-blue-600"
+          >
+            <RotateCcw className="h-4 w-4" />
+            Reset to Default
+          </Button>
         </div>
       </CollapsibleContent>
     </Collapsible>

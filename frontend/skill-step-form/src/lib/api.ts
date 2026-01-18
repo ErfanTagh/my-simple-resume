@@ -298,6 +298,22 @@ export interface ResumeData {
   }>;
   sectionOrder?: string[];
   template?: "modern" | "classic" | "minimal" | "creative" | "latex" | "starRover";
+  styling?: {
+    fontFamily?: string;
+    fontSize?: "small" | "medium" | "large";
+    titleColor?: string;
+    titleBold?: boolean;
+    headingColor?: string;
+    headingBold?: boolean;
+    textColor?: string;
+    linkColor?: string;
+    sectionStyling?: Record<string, {
+      titleColor?: string;
+      titleSize?: "small" | "medium" | "large";
+      bodyColor?: string;
+      bodySize?: "small" | "medium" | "large";
+    }>;
+  };
   // Score fields (calculated on frontend, stored on backend)
   completenessScore?: number;
   clarityScore?: number;

@@ -62,20 +62,64 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
   
   const sizes = fontSizeMap[fontSize];
 
+  // Helper function to get section-specific styling
+  const getSectionStyling = (sectionName: string) => {
+    const sectionStyling = styling?.sectionStyling?.[sectionName];
+    return {
+      titleColor: sectionStyling?.titleColor || headingColor,
+      titleSize: sectionStyling?.titleSize || fontSize,
+      bodyColor: sectionStyling?.bodyColor || textColor,
+      bodySize: sectionStyling?.bodySize || fontSize,
+    };
+  };
+
+  // Extract section-specific styling for personalInfo
+  const personalInfoSectionStyling = styling?.sectionStyling?.personalInfo;
+  const personalInfoTitleColor = personalInfoSectionStyling?.titleColor || titleColor;
+  const personalInfoTitleSize = personalInfoSectionStyling?.titleSize || fontSize;
+  const personalInfoBodyColor = personalInfoSectionStyling?.bodyColor || textColor;
+  const personalInfoBodySize = personalInfoSectionStyling?.bodySize || fontSize;
+
+  // Extract section-specific styling for all sections
+  const workExperienceStyling = getSectionStyling('workExperience');
+  const projectsStyling = getSectionStyling('projects');
+  const educationStyling = getSectionStyling('education');
+  const certificatesStyling = getSectionStyling('certificates');
+  const skillsStyling = getSectionStyling('skills');
+  const languagesStyling = getSectionStyling('languages');
+
+  // Size mappings for personalInfo section-specific sizes
+  const personalInfoTitleSizes = fontSizeMap[personalInfoTitleSize];
+  const personalInfoBodySizes = fontSizeMap[personalInfoBodySize];
+
+  // Create size mappings for each section
+  const workExperienceTitleSizes = fontSizeMap[workExperienceStyling.titleSize];
+  const workExperienceBodySizes = fontSizeMap[workExperienceStyling.bodySize];
+  const projectsTitleSizes = fontSizeMap[projectsStyling.titleSize];
+  const projectsBodySizes = fontSizeMap[projectsStyling.bodySize];
+  const educationTitleSizes = fontSizeMap[educationStyling.titleSize];
+  const educationBodySizes = fontSizeMap[educationStyling.bodySize];
+  const certificatesTitleSizes = fontSizeMap[certificatesStyling.titleSize];
+  const certificatesBodySizes = fontSizeMap[certificatesStyling.bodySize];
+  const skillsTitleSizes = fontSizeMap[skillsStyling.titleSize];
+  const skillsBodySizes = fontSizeMap[skillsStyling.bodySize];
+  const languagesTitleSizes = fontSizeMap[languagesStyling.titleSize];
+  const languagesBodySizes = fontSizeMap[languagesStyling.bodySize];
+
   const renderSection = (sectionKey: string) => {
     switch (sectionKey) {
       case "summary":
         return personalInfo.summary && personalInfo.summary.trim() ? (
           <div key="summary">
-            <SectionHeading title={t('resume.sections.professionalSummary') || 'Summary'} fontSize={sizes.heading} color={headingColor} />
-            <p className="text-foreground leading-relaxed whitespace-pre-wrap" style={{ fontSize: sizes.sm, color: textColor }}>{personalInfo.summary.trim()}</p>
+            <SectionHeading title={t('resume.sections.professionalSummary') || 'Summary'} fontSize={personalInfoTitleSizes.heading} color={personalInfoTitleColor} />
+            <p className="text-foreground leading-relaxed whitespace-pre-wrap" style={{ fontSize: personalInfoBodySizes.sm, color: personalInfoBodyColor }}>{personalInfo.summary.trim()}</p>
           </div>
         ) : null;
 
       case "workExperience":
         return workExperience.some(exp => exp.position || exp.company) ? (
           <div key="workExperience">
-            <SectionHeading title={t('resume.sections.experience') || 'Experience'} fontSize={sizes.heading} color={headingColor} />
+            <SectionHeading title={t('resume.sections.experience') || 'Experience'} fontSize={workExperienceTitleSizes.heading} color={workExperienceStyling.titleColor} />
             <div className="space-y-5">
               {workExperience.map((exp, index) => (
                 (exp.position || exp.company) && (
@@ -129,7 +173,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
       case "education":
         return education.some(edu => edu.degree || edu.institution) ? (
           <div key="education">
-            <SectionHeading title={t('resume.sections.education') || 'Education'} fontSize={sizes.heading} color={headingColor} />
+            <SectionHeading title={t('resume.sections.education') || 'Education'} fontSize={educationTitleSizes.heading} color={educationStyling.titleColor} />
             <div className="space-y-4">
               {education.map((edu, index) => (
                 (edu.degree || edu.institution) && (
@@ -159,7 +203,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
       case "projects":
         return projects.some(proj => proj.name) ? (
           <div key="projects">
-            <SectionHeading title={t('resume.sections.projects') || 'Projects'} fontSize={sizes.heading} color={headingColor} />
+            <SectionHeading title={t('resume.sections.projects') || 'Projects'} fontSize={projectsTitleSizes.heading} color={projectsStyling.titleColor} />
             <div className="space-y-4">
               {projects.map((proj, index) => (
                 proj.name && (
@@ -207,7 +251,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
       case "certificates":
         return certificates.some(cert => cert.name) ? (
           <div key="certificates">
-            <SectionHeading title={t('resume.sections.certifications') || 'Certifications'} fontSize={sizes.heading} color={headingColor} />
+            <SectionHeading title={t('resume.sections.certifications') || 'Certifications'} fontSize={certificatesTitleSizes.heading} color={certificatesStyling.titleColor} />
             <div className="space-y-3">
               {certificates.map((cert, index) => (
                 cert.name && (
@@ -237,7 +281,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
       case "skills":
         return skills.some(s => s.skill) ? (
           <div key="skills">
-            <SectionHeading title={t('resume.sections.skills') || 'Skills'} fontSize={sizes.heading} color={headingColor} />
+            <SectionHeading title={t('resume.sections.skills') || 'Skills'} fontSize={skillsTitleSizes.heading} color={skillsStyling.titleColor} />
             <p className="text-foreground leading-relaxed" style={{ fontSize: sizes.xs, color: textColor }}>
               {skills.filter(s => s.skill).map(s => s.skill).join(", ")}
             </p>
@@ -247,7 +291,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
       case "languages":
         return languages.some(lang => lang.language) ? (
           <div key="languages">
-            <SectionHeading title={t('resume.sections.languages') || 'Languages'} fontSize={sizes.heading} color={headingColor} />
+            <SectionHeading title={t('resume.sections.languages') || 'Languages'} fontSize={languagesTitleSizes.heading} color={languagesStyling.titleColor} />
             <div className="space-y-1">
               {languages.map((lang, index) => (
                 lang.language && (
@@ -264,7 +308,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
       case "interests":
         return personalInfo.interests && personalInfo.interests.length > 0 && personalInfo.interests.some(i => i.interest) ? (
           <div key="interests">
-            <SectionHeading title={t('resume.sections.interests') || 'Interests'} fontSize={sizes.heading} color={headingColor} />
+            <SectionHeading title={t('resume.sections.interests') || 'Interests'} fontSize={personalInfoTitleSizes.heading} color={personalInfoTitleColor} />
             <p className="text-foreground leading-relaxed" style={{ fontSize: sizes.xs, color: textColor }}>{personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}</p>
           </div>
         ) : null;
