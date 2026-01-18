@@ -12,6 +12,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { CityAutocomplete } from "@/components/ui/city-autocomplete";
 import { DegreeAutocomplete } from "@/components/DegreeAutocomplete";
 import { FieldOfStudyAutocomplete } from "@/components/FieldOfStudyAutocomplete";
+import { SectionStylingControls } from "./SectionStylingControls";
 
 interface EducationStepProps {
   form: UseFormReturn<CVFormData>;
@@ -237,6 +238,13 @@ export const EducationStep = ({ form }: EducationStepProps) => {
           <h2 className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">{t('resume.steps.education')}</h2>
           <p className="text-muted-foreground text-sm sm:text-base">{t('resume.labels.educationDesc')}</p>
         </div>
+
+        {/* Section Styling Controls */}
+        <SectionStylingControls 
+          form={form} 
+          sectionName="education" 
+          sectionLabel={t('resume.steps.education') || 'Education'} 
+        />
 
         {educationFields.map((field, index) => (
           <div key={field.id} className="p-4 sm:p-6 border rounded-lg bg-card space-y-3 sm:space-y-4 relative mb-4">

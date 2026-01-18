@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { CityAutocomplete } from "@/components/ui/city-autocomplete";
 import { ProfessionalTitleAutocomplete } from "@/components/ProfessionalTitleAutocomplete";
+import { SectionStylingControls } from "./SectionStylingControls";
 
 interface PersonalInfoStepProps {
   form: UseFormReturn<CVFormData>;
@@ -106,6 +107,13 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
         <h2 className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">{t('resume.steps.personalInfo')}</h2>
         <p className="text-muted-foreground text-sm sm:text-base">{t('resume.steps.personalInfoDesc')}</p>
       </div>
+
+      {/* Section Styling Controls */}
+      <SectionStylingControls 
+        form={form} 
+        sectionName="personalInfo" 
+        sectionLabel={t('resume.steps.personalInfo') || 'Personal Info'} 
+      />
 
       {/* Resume Upload Option */}
       <ResumeUpload onDataParsed={handleDataParsed} />

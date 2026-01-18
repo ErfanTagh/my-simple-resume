@@ -110,6 +110,12 @@ export const cvFormSchema = z.object({
     headingBold: z.boolean().optional(),
     textColor: z.string().optional(),
     linkColor: z.string().optional(),
+    sectionStyling: z.record(z.object({
+      titleColor: z.string().optional(),
+      titleSize: z.enum(["small", "medium", "large"]).optional(),
+      bodyColor: z.string().optional(),
+      bodySize: z.enum(["small", "medium", "large"]).optional(),
+    })).optional(),
   }).optional(),
 });
 export type CVFormData = z.infer<typeof cvFormSchema>;

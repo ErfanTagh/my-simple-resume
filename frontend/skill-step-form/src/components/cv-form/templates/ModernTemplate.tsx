@@ -16,7 +16,12 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
   
   // Extract styling options with defaults
   const fontFamily = styling?.fontFamily || "Inter";
-  const fontSize = styling?.fontSize || "medium";
+  const fontSizeInput = styling?.fontSize || "medium";
+  // Ensure fontSize is valid to prevent crashes
+  const fontSize: "small" | "medium" | "large" = 
+    (fontSizeInput === "small" || fontSizeInput === "medium" || fontSizeInput === "large") 
+      ? fontSizeInput 
+      : "medium";
   const titleColor = styling?.titleColor || "#1f2937";
   const titleBold = styling?.titleBold ?? true;
   const headingColor = styling?.headingColor || "#2563eb";

@@ -11,6 +11,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { CityAutocomplete } from "@/components/ui/city-autocomplete";
 import { TechnologyAutocomplete } from "@/components/TechnologyAutocomplete";
 import { PowerSkillsAutocomplete } from "@/components/PowerSkillsAutocomplete";
+import { SectionStylingControls } from "./SectionStylingControls";
 
 interface WorkExperienceStepProps {
   form: UseFormReturn<CVFormData>;
@@ -283,6 +284,13 @@ export const WorkExperienceStep = ({ form }: WorkExperienceStepProps) => {
         <h2 className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">{t('resume.steps.workExperience')}</h2>
         <p className="text-muted-foreground text-sm sm:text-base">{t('resume.steps.workExperienceDesc')}</p>
       </div>
+
+      {/* Section Styling Controls */}
+      <SectionStylingControls 
+        form={form} 
+        sectionName="workExperience" 
+        sectionLabel={t('resume.steps.workExperience') || 'Work Experience'} 
+      />
 
       {fields.map((field, index) => (
         <div key={field.id} className="p-4 sm:p-6 border rounded-lg bg-card space-y-3 sm:space-y-4 relative">

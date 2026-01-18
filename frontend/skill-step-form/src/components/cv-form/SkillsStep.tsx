@@ -8,6 +8,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { CVFormData } from "./types";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageAutocomplete } from "@/components/LanguageAutocomplete";
+import { SectionStylingControls } from "./SectionStylingControls";
 
 interface SkillsStepProps {
   form: UseFormReturn<CVFormData>;
@@ -40,6 +41,13 @@ export const SkillsStep = ({ form }: SkillsStepProps) => {
           <h2 className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">{t('resume.steps.skills')}</h2>
           <p className="text-muted-foreground text-sm sm:text-base">{t('resume.labels.skillsDesc')}</p>
         </div>
+
+        {/* Section Styling Controls */}
+        <SectionStylingControls 
+          form={form} 
+          sectionName="skills" 
+          sectionLabel={t('resume.steps.skills') || 'Skills'} 
+        />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
           {skillFields.map((field, index) => (
