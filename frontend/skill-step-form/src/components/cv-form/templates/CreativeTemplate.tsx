@@ -140,11 +140,11 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                   (edu.degree || edu.institution) && (
                     <div key={index} className="relative">
                       <div className="absolute -left-[26px] w-3 h-3 rounded-full bg-primary"></div>
-                      <h3 className="text-lg font-bold text-foreground">{edu.degree}</h3>
-                      <p className="text-sm text-muted-foreground">{edu.institution}{edu.location && ` • ${edu.location}`}</p>
-                      {edu.field && <p className="text-sm text-muted-foreground italic">{edu.field}</p>}
+                      <h3 className="font-bold text-foreground" style={{ fontSize: sizes.lg }}>{edu.degree}</h3>
+                      <p className="text-muted-foreground" style={{ fontSize: sizes.sm }}>{edu.institution}{edu.location && ` • ${edu.location}`}</p>
+                      {edu.field && <p className="text-muted-foreground italic" style={{ fontSize: sizes.sm }}>{edu.field}</p>}
                       {edu.keyCourses && edu.keyCourses.length > 0 && (
-                        <p className="text-xs text-muted-foreground mt-1">
+                        <p className="text-muted-foreground mt-1" style={{ fontSize: sizes.xs }}>
                           {t('resume.labels.keyCourses')}: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(", ")}
                         </p>
                       )}
@@ -420,7 +420,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
             </div>
           ) : (
             <div className="flex-shrink-0 w-28 h-28 rounded-lg border-4 border-primary shadow-lg bg-muted flex items-center justify-center photo-placeholder">
-              <span className="text-xs text-muted-foreground">Photo</span>
+              <span className="text-muted-foreground" style={{ fontSize: sizes.xs }}>Photo</span>
             </div>
           )}
         </div>
