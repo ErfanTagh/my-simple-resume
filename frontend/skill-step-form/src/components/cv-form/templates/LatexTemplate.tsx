@@ -553,7 +553,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
             </div>
 
             {/* Contact info - can shrink when needed */}
-            <div className="flex gap-1 flex-1 min-w-0 pt-2 justify-end" style={{ minWidth: '280px', maxWidth: '50%', overflow: 'visible' }}>
+            <div className="flex gap-2 flex-1 min-w-0 pt-2 justify-end" style={{ minWidth: '280px', maxWidth: '50%', overflow: 'visible' }}>
               <div className="flex-shrink-0 min-w-0" style={{ maxWidth: '160px' }}>
                 {personalInfo.website ? renderIconText(Globe, personalInfo.website, personalInfo.website) : renderIconText(Globe, "yourwebsite.com", "#")}
                 {personalInfo.phone ? renderIconText(Phone, personalInfo.phone) : renderIconText(Phone, "+1 (555) 123-4567")}
