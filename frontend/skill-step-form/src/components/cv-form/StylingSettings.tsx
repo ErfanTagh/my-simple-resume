@@ -79,7 +79,7 @@ export const StylingSettings = ({ data, currentStep, onStylingChange }: StylingS
     onStylingChange({ ...styling, ...updates });
   };
 
-  const updateSectionStyling = (sectionName: string, updates: Partial<NonNullable<CVFormData['styling']>['sectionStyling']>[string]) => {
+  const updateSectionStyling = (sectionName: string, updates: { titleColor?: string; titleSize?: "small" | "medium" | "large"; bodyColor?: string; bodySize?: "small" | "medium" | "large" }) => {
     const currentSectionStyling = styling.sectionStyling || {};
     updateStyling({
       sectionStyling: {

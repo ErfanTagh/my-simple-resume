@@ -26,7 +26,7 @@ export const SectionStylingControls = ({ form, sectionName, sectionLabel }: Sect
   const styling = form.watch("styling") || {};
   const sectionStyling = styling.sectionStyling?.[sectionName] || {};
 
-  const updateSectionStyling = (updates: Partial<NonNullable<CVFormData['styling']>['sectionStyling']>[string]>) => {
+  const updateSectionStyling = (updates: { titleColor?: string; titleSize?: "small" | "medium" | "large"; bodyColor?: string; bodySize?: "small" | "medium" | "large" }) => {
     const currentStyling = form.getValues("styling") || {};
     const currentSectionStyling = currentStyling.sectionStyling || {};
     

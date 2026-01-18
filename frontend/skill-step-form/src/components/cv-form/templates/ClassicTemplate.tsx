@@ -241,6 +241,10 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
           padding-bottom: 32px !important;
         }
         @media print {
+          /* Hide photo placeholders in print/PDF */
+          .photo-placeholder {
+            display: none !important;
+          }
           @page {
             size: A4;
             margin: 15mm 0 0 0;
@@ -284,7 +288,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
       {/* Header - centered and traditional */}
       <div className="text-center mb-6 pb-4 border-b-2 border-foreground">
         {/* Profile image */}
-        {personalInfo.profileImage && (
+        {personalInfo.profileImage ? (
           <div className="flex justify-center mb-4">
             <div className="w-28 h-28 rounded-full border-2 border-foreground overflow-hidden flex-shrink-0">
                 <img 
@@ -294,6 +298,12 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
                   style={{ objectPosition: '50% 40%' }}
                   loading="lazy"
                 />
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-center mb-4">
+            <div className="w-28 h-28 rounded-full border-2 border-foreground bg-muted flex items-center justify-center flex-shrink-0 photo-placeholder">
+              <span className="text-xs text-muted-foreground">Photo</span>
             </div>
           </div>
         )}

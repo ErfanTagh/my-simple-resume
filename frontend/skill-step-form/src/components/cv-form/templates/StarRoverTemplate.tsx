@@ -393,6 +393,10 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
           padding-bottom: 32px !important;
         }
         @media print {
+          /* Hide photo placeholders in print/PDF */
+          .photo-placeholder {
+            display: none !important;
+          }
           @page {
             size: A4;
             margin: 15mm 0 0 0;
@@ -448,7 +452,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
           </div>
           
           {/* Profile photo on the right */}
-          {personalInfo.profileImage && (
+          {personalInfo.profileImage ? (
             <div className="flex-shrink-0">
               <div className="w-28 h-28 rounded-md border-2 overflow-hidden" style={{ borderColor: ACCENT_COLOR }}>
                 <img 
@@ -459,6 +463,10 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                   loading="lazy"
                 />
               </div>
+            </div>
+          ) : (
+            <div className="flex-shrink-0 w-28 h-28 rounded-md border-2 bg-muted flex items-center justify-center photo-placeholder" style={{ borderColor: ACCENT_COLOR }}>
+              <span className="text-xs text-muted-foreground">Photo</span>
             </div>
           )}
         </div>

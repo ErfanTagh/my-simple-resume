@@ -306,6 +306,10 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
           padding-bottom: 32px !important;
         }
         @media print {
+          /* Hide photo placeholders in print/PDF */
+          .photo-placeholder {
+            display: none !important;
+          }
           @page {
             size: A4;
             margin: 15mm 0 0 0;
@@ -409,7 +413,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
           </div>
           
           {/* Profile image */}
-          {personalInfo.profileImage && (
+          {personalInfo.profileImage ? (
             <div className="flex-shrink-0">
               <div className="w-24 h-24 md:w-28 md:h-28 rounded-md border-2 border-primary overflow-hidden">
                 <img 
@@ -420,6 +424,10 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                   loading="lazy"
                 />
               </div>
+            </div>
+          ) : (
+            <div className="flex-shrink-0 w-24 h-24 md:w-28 md:h-28 rounded-md border-2 border-primary bg-muted flex items-center justify-center photo-placeholder">
+              <span className="text-xs text-muted-foreground">Photo</span>
             </div>
           )}
         </div>
@@ -440,6 +448,10 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
           display: none;
         }
         @media print {
+          /* Hide photo placeholders in print/PDF */
+          .photo-placeholder {
+            display: none !important;
+          }
           @page {
             margin-bottom: 20mm;
             margin-top: 15mm;

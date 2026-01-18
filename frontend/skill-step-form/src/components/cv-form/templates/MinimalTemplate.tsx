@@ -254,6 +254,10 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
           padding-bottom: 32px !important;
         }
         @media print {
+          /* Hide photo placeholders in print/PDF */
+          .photo-placeholder {
+            display: none !important;
+          }
           @page {
             size: A4;
             margin: 15mm 0 0 0;
@@ -314,7 +318,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
           </div>
           
           {/* Profile image */}
-          {personalInfo.profileImage && (
+          {personalInfo.profileImage ? (
             <div className="flex-shrink-0">
               <div className="w-20 h-20 rounded-sm overflow-hidden">
                 <img 
@@ -325,6 +329,10 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                   loading="lazy"
                 />
               </div>
+            </div>
+          ) : (
+            <div className="flex-shrink-0 w-20 h-20 rounded-sm border border-foreground/20 bg-muted flex items-center justify-center photo-placeholder">
+              <span className="text-xs text-muted-foreground">Photo</span>
             </div>
           )}
         </div>

@@ -264,6 +264,10 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
           padding-bottom: 32px !important;
         }
         @media print {
+          /* Hide photo placeholders in print/PDF */
+          .photo-placeholder {
+            display: none !important;
+          }
           @page {
             size: A4;
             margin: 15mm 0 0 0;
@@ -359,7 +363,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
           </div>
           
           {/* Profile image */}
-          {personalInfo.profileImage && (
+          {personalInfo.profileImage ? (
             <div className="flex-shrink-0">
               <div className="w-28 h-28 rounded-lg border-4 border-primary shadow-lg overflow-hidden">
                 <img 
@@ -370,6 +374,10 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                   loading="lazy"
                 />
               </div>
+            </div>
+          ) : (
+            <div className="flex-shrink-0 w-28 h-28 rounded-lg border-4 border-primary shadow-lg bg-muted flex items-center justify-center photo-placeholder">
+              <span className="text-xs text-muted-foreground">Photo</span>
             </div>
           )}
         </div>
