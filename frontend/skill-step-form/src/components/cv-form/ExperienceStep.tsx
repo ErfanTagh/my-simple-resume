@@ -13,6 +13,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { TechnologyAutocomplete } from "@/components/TechnologyAutocomplete";
 import { CityAutocomplete } from "@/components/ui/city-autocomplete";
 import { PowerSkillsAutocomplete } from "@/components/PowerSkillsAutocomplete";
+import { SectionStylingControls } from "./SectionStylingControls";
 
 interface ExperienceStepProps {
   form: UseFormReturn<CVFormData>;
@@ -103,7 +104,7 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
             {t('resume.labels.currentlyWorking')}
           </Label>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>{t('resume.fields.startDate')}</Label>
@@ -119,7 +120,7 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
               )}
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label>{t('resume.fields.endDate')}</Label>
             <Controller
@@ -379,7 +380,7 @@ const ProjectItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: 
             {t('resume.labels.ongoing')}
           </Label>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>{t('resume.fields.startDate')}</Label>
@@ -395,7 +396,7 @@ const ProjectItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: 
               )}
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label>{t('resume.fields.endDate')}</Label>
             <Controller
@@ -458,6 +459,13 @@ export const ExperienceStep = ({ form }: ExperienceStepProps) => {
           <p className="text-muted-foreground">{t('resume.steps.workExperienceDesc')}</p>
         </div>
 
+        {/* Section Styling Controls */}
+        <SectionStylingControls
+          form={form}
+          sectionName="workExperience"
+          sectionLabel={t('resume.steps.workExperience') || 'Work Experience'}
+        />
+
         {workFields.map((field, index) => (
           <div key={field.id} className="p-6 border rounded-lg bg-card space-y-4 relative mb-4">
             {workFields.length > 1 && (
@@ -471,7 +479,7 @@ export const ExperienceStep = ({ form }: ExperienceStepProps) => {
                 <Trash2 className="h-4 w-4" />
               </Button>
             )}
-            
+
             <WorkExperienceItem form={form} index={index} />
           </div>
         ))}
@@ -479,12 +487,12 @@ export const ExperienceStep = ({ form }: ExperienceStepProps) => {
         <Button
           type="button"
           variant="outline"
-          onClick={() => appendWork({ 
-            position: "", 
-            company: "", 
+          onClick={() => appendWork({
+            position: "",
+            company: "",
             location: "",
-            startDate: "", 
-            endDate: "", 
+            startDate: "",
+            endDate: "",
             description: "",
             responsibilities: [],
             technologies: [],
@@ -506,19 +514,26 @@ export const ExperienceStep = ({ form }: ExperienceStepProps) => {
           <p className="text-muted-foreground">{t('resume.labels.projectsDesc')}</p>
         </div>
 
+        {/* Section Styling Controls */}
+        <SectionStylingControls
+          form={form}
+          sectionName="projects"
+          sectionLabel={t('resume.labels.projectsTitle') || 'Projects'}
+        />
+
         {projectFields.length === 0 && (
           <div className="text-center py-8 border-2 border-dashed rounded-lg mb-4">
             <p className="text-muted-foreground mb-4">{t('resume.labels.noProjects')}</p>
             <Button
               type="button"
               variant="outline"
-              onClick={() => appendProject({ 
-                name: "", 
-                description: "", 
-                technologies: [], 
-                startDate: "", 
-                endDate: "", 
-                link: "" 
+              onClick={() => appendProject({
+                name: "",
+                description: "",
+                technologies: [],
+                startDate: "",
+                endDate: "",
+                link: ""
               })}
             >
               <Plus className="mr-2 h-4 w-4" />
@@ -538,7 +553,7 @@ export const ExperienceStep = ({ form }: ExperienceStepProps) => {
             >
               <Trash2 className="h-4 w-4" />
             </Button>
-            
+
             <ProjectItem form={form} index={index} />
           </div>
         ))}
@@ -547,13 +562,13 @@ export const ExperienceStep = ({ form }: ExperienceStepProps) => {
           <Button
             type="button"
             variant="outline"
-            onClick={() => appendProject({ 
-              name: "", 
-              description: "", 
-              technologies: [], 
-              startDate: "", 
-              endDate: "", 
-              link: "" 
+            onClick={() => appendProject({
+              name: "",
+              description: "",
+              technologies: [],
+              startDate: "",
+              endDate: "",
+              link: ""
             })}
             className="w-full"
           >

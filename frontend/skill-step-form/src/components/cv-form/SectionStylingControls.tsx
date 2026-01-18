@@ -29,7 +29,7 @@ export const SectionStylingControls = ({ form, sectionName, sectionLabel }: Sect
   const updateSectionStyling = (updates: { titleColor?: string; titleSize?: "small" | "medium" | "large"; bodyColor?: string; bodySize?: "small" | "medium" | "large" }) => {
     const currentStyling = form.getValues("styling") || {};
     const currentSectionStyling = currentStyling.sectionStyling || {};
-    
+
     form.setValue("styling", {
       ...currentStyling,
       sectionStyling: {
@@ -46,7 +46,7 @@ export const SectionStylingControls = ({ form, sectionName, sectionLabel }: Sect
     const currentStyling = form.getValues("styling") || {};
     const currentSectionStyling = currentStyling.sectionStyling || {};
     const { [sectionName]: _, ...restSectionStyling } = currentSectionStyling;
-    
+
     form.setValue("styling", {
       ...currentStyling,
       sectionStyling: Object.keys(restSectionStyling).length > 0 ? restSectionStyling : undefined,
@@ -56,7 +56,7 @@ export const SectionStylingControls = ({ form, sectionName, sectionLabel }: Sect
   const hasCustomStyling = sectionStyling.titleColor || sectionStyling.titleSize || sectionStyling.bodyColor || sectionStyling.bodySize;
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="border rounded-lg bg-muted/30">
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="border rounded-lg bg-muted/30 mb-6">
       <CollapsibleTrigger asChild>
         <Button
           type="button"
@@ -175,7 +175,7 @@ export const SectionStylingControls = ({ form, sectionName, sectionLabel }: Sect
             size="default"
             onClick={resetSectionStyling}
             disabled={!hasCustomStyling}
-            className="gap-2 text-sm text-muted-foreground hover:text-blue-600"
+            className="gap-2 text-sm text-blue-600 hover:text-blue-700"
           >
             <RotateCcw className="h-4 w-4" />
             Reset to Default

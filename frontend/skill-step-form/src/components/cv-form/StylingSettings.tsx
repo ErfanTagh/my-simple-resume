@@ -36,12 +36,12 @@ const SIZE_MAP = {
 
 export const StylingSettings = ({ data, currentStep, onStylingChange }: StylingSettingsProps) => {
   const { t } = useLanguage();
-  
+
   // Safety check: ensure data exists
   if (!data) {
     return null;
   }
-  
+
   const styling = data.styling || {};
 
   const updateStyling = (updates: Partial<CVFormData['styling']>) => {
@@ -77,7 +77,7 @@ export const StylingSettings = ({ data, currentStep, onStylingChange }: StylingS
             size="default"
             onClick={resetAllStyling}
             disabled={!hasGlobalStyling && !hasSectionStyling}
-            className="gap-2 text-sm text-muted-foreground hover:text-blue-600"
+            className="gap-2 text-sm text-blue-600 hover:text-blue-700"
           >
             <RotateCcw className="h-4 w-4" />
             {t('resume.settings.resetAll') || 'Reset All Settings'}
