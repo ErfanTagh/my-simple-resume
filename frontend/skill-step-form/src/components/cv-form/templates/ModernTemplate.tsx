@@ -29,6 +29,13 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
   const textColor = styling?.textColor || "#1f2937";
   const linkColor = styling?.linkColor || "#2563eb";
   
+  // Extract section-specific styling for personalInfo
+  const personalInfoSectionStyling = styling?.sectionStyling?.personalInfo;
+  const personalInfoTitleColor = personalInfoSectionStyling?.titleColor || titleColor;
+  const personalInfoTitleSize = personalInfoSectionStyling?.titleSize || fontSize;
+  const personalInfoBodyColor = personalInfoSectionStyling?.bodyColor || textColor;
+  const personalInfoBodySize = personalInfoSectionStyling?.bodySize || fontSize;
+  
   // Font size mappings
   const fontSizeMap = {
     small: {
@@ -58,6 +65,10 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
   };
   
   const sizes = fontSizeMap[fontSize];
+  
+  // Size mappings for personalInfo section-specific sizes
+  const personalInfoTitleSizes = fontSizeMap[personalInfoTitleSize];
+  const personalInfoBodySizes = fontSizeMap[personalInfoBodySize];
   
   // Helper function for section headings
   const getHeadingStyle = () => ({
@@ -360,19 +371,19 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
         <h1 
           className="mb-2"
           style={{ 
-            color: titleColor,
+            color: personalInfoTitleColor,
             fontWeight: titleBold ? 'bold' : 'normal',
-            fontSize: sizes.title,
+            fontSize: personalInfoTitleSizes.title,
             lineHeight: '1.2',
           }}
         >
           {personalInfo.firstName} {personalInfo.lastName}
         </h1>
         {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (
-          <p className="text-primary font-semibold mb-2" style={{ fontSize: sizes.base }}>{personalInfo.professionalTitle.trim()}</p>
+          <p className="text-primary font-semibold mb-2" style={{ fontSize: personalInfoBodySizes.base, color: personalInfoBodyColor }}>{personalInfo.professionalTitle.trim()}</p>
         )}
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-muted-foreground mt-3" style={{ fontSize: sizes.sm }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-muted-foreground mt-3" style={{ fontSize: personalInfoBodySizes.sm, color: personalInfoBodyColor }}>
           {personalInfo.email && (
             <div className="flex items-center gap-2 min-w-0">
               <Mail className="h-4 w-4 text-primary flex-shrink-0" />
