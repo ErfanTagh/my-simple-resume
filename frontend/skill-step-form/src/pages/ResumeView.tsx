@@ -196,7 +196,7 @@ export default function ResumeView() {
         description="View and download your professional resume."
         noindex={true}
       />
-      <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+      <div className="pb-10" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
         {/* Action Buttons - Hide on print */}
         <div className="no-print" style={{ padding: '20px', textAlign: 'center', backgroundColor: 'white', borderBottom: '1px solid #e9ecef' }}>
           <div style={{ maxWidth: '210mm', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -212,7 +212,7 @@ export default function ResumeView() {
         </div>
 
         {/* Resume Content */}
-        <div className="resume-container" ref={resumeContentRef} style={{ maxWidth: '210mm', margin: '0 auto', backgroundColor: 'white', padding: '40px' }}>
+        <div className="resume-container" ref={resumeContentRef} style={{ maxWidth: '210mm', margin: '40px auto 0 auto', backgroundColor: 'white', padding: '40px' }}>
           {renderTemplate()}
         </div>
 

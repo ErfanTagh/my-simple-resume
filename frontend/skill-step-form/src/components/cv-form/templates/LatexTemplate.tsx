@@ -515,10 +515,10 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
           <div className="flex items-start mb-6 gap-6" style={{ minWidth: 0, overflow: 'visible' }}>
             {/* Name and professional title container - fixed size with max-width */}
             <div className="flex items-start gap-4 flex-shrink-0" style={{ maxWidth: '50%', minWidth: 0 }}>
-              {/* Profile image - using Tailwind classes like other templates */}
+              {/* Profile image - can shrink with minimum size constraint */}
               {personalInfo.profileImage ? (
-                <div className="flex-shrink-0">
-                  <div className="w-28 h-28 overflow-hidden rounded-sm border-2 border-foreground/40">
+                <div style={{ flexShrink: 1, minWidth: '90px', width: '112px' }}>
+                  <div className="overflow-hidden rounded-sm border-2 border-foreground/40" style={{ width: '100%', aspectRatio: '1', minWidth: '90px' }}>
                     <img
                       src={personalInfo.profileImage}
                       alt={`Professional profile photo of ${fullName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
@@ -529,7 +529,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                   </div>
                 </div>
               ) : (
-                <div className="flex-shrink-0 w-28 h-28 bg-muted border-2 border-foreground/40 rounded-sm flex items-center justify-center photo-placeholder">
+                <div className="bg-muted border-2 border-foreground/40 rounded-sm flex items-center justify-center photo-placeholder" style={{ flexShrink: 1, minWidth: '90px', width: '112px', aspectRatio: '1' }}>
                   <span className="text-xs text-muted-foreground">Photo</span>
                 </div>
               )}
