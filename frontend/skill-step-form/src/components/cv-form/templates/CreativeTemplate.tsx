@@ -36,6 +36,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
       sm: '0.75rem',        // 12px (text-xs)
       xs: '0.625rem',       // 10px
       sectionHeading: '1.375rem', // 22px
+      lg: '1rem',           // 16px
     },
     medium: {
       heading: '1.5rem',    // 24px (text-2xl)
@@ -399,17 +400,17 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
         <div className="mb-8">
           <div className="flex items-start gap-6 mb-4">
             <div className="flex-1">
-              <h1 className="font-black mb-2 italic tracking-tight" style={{ fontSize: '3rem', fontWeight: titleBold ? '900' : 'bold', color: titleColor }}>
+              <h1 className="font-black mb-0 italic tracking-tight" style={{ fontSize: '3rem', fontWeight: titleBold ? '900' : 'bold', color: titleColor, lineHeight: '1.1' }}>
                 {personalInfo.firstName}
               </h1>
-              <h1 className="font-black mb-2 italic tracking-tight" style={{ fontSize: '3rem', fontWeight: titleBold ? '900' : 'bold', color: headingColor }}>
+              <h1 className="font-black mb-2 italic tracking-tight" style={{ fontSize: '3rem', fontWeight: titleBold ? '900' : 'bold', color: headingColor, lineHeight: '1.1' }}>
                 {personalInfo.lastName}
               </h1>
               {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (
                 <p className="font-bold mb-4 italic" style={{ fontSize: '1.25rem', color: headingColor }}>{personalInfo.professionalTitle.trim()}</p>
               )}
 
-              <div className="flex flex-wrap gap-4 text-muted-foreground mt-4" style={{ fontSize: sizes.sm }}>
+              <div className="flex flex-wrap gap-2 text-muted-foreground mt-4" style={{ fontSize: sizes.sm }}>
                 {personalInfo.email && (
                   <div className="flex items-center gap-2 bg-background/50 px-3 py-1 rounded-full">
                     <Mail className="h-4 w-4 text-primary" />
