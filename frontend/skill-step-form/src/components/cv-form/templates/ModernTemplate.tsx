@@ -469,6 +469,10 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                     loading="lazy"
                     decoding="async"
                     fetchPriority="low"
+                    onError={(e) => {
+                      // Hide broken images
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
                   />
                 </div>
               </div>

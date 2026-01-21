@@ -28,62 +28,54 @@ export async function compressImage(
 
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    
+
     reader.onload = (e) => {
       const img = new Image();
-      
+
       img.onload = () => {
         // Calculate new dimensions while maintaining aspect ratio
         let width = img.width;
         let height = img.height;
-        
+
         if (width > maxWidth || height > maxHeight) {
           const ratio = Math.min(maxWidth / width, maxHeight / height);
           width = width * ratio;
           height = height * ratio;
         }
-        
+
         // Create canvas and draw resized image
         const canvas = document.createElement('canvas');
         canvas.width = width;
         canvas.height = height;
-        
+
         const ctx = canvas.getContext('2d');
         if (!ctx) {
           reject(new Error('Could not get canvas context'));
           return;
         }
-        
+
         ctx.drawImage(img, 0, 0, width, height);
-        
-        // Convert to base64 with compression
-        const compressRecursive = (currentQuality: number): void => {
-          const base64 = canvas.toDataURL('image/jpeg', currentQuality);
-          const sizeKB = (base64.length * 3) / 4 / 1024; // Approximate size in KB
-          
-          // If size is acceptable or quality is too low, return
-          if (sizeKB <= maxSizeKB || currentQuality <= 0.5) {
-            resolve(base64);
-          } else {
-            // Reduce quality and try again
-            compressRecursive(currentQuality - 0.1);
-          }
-        };
-        
-        compressRecursive(quality);
+
+        // Convert to base64 with compression - simplified to avoid recursion issues
+        try {
+          const base64 = canvas.toDataURL('image/jpeg', quality);
+          resolve(base64);
+        } catch (error) {
+          reject(new Error('Failed to compress image'));
+        }
       };
-      
+
       img.onerror = () => {
         reject(new Error('Failed to load image'));
       };
-      
+
       img.src = e.target?.result as string;
     };
-    
+
     reader.onerror = () => {
       reject(new Error('Failed to read file'));
     };
-    
+
     reader.readAsDataURL(file);
   });
 }
@@ -97,5 +89,17 @@ export function getOptimizedProfileImageSize() {
     height: 400,
     quality: 0.85,
   };
+}
+
+/**
+ * Check if a base64 image string is too large and might cause performance issues
+ * @param base64String - The base64 image string to check
+ * @returns true if the image is too large (>500KB)
+ */
+export function isImageTooLarge(base64String: string): boolean {
+  if (!base64String) return false;
+  // Approximate size: base64 is ~33% larger than binary
+  const sizeKB = (base64String.length * 3) / 4 / 1024;
+  return sizeKB > 500; // Flag images larger than 500KB
 }
 

@@ -41,10 +41,10 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
   // Update form when parsed data is available
   useEffect(() => {
     if (!parsedData) return;
-    
+
     // Merge parsed data with current form values
     const currentValues = form.getValues();
-    
+
     const mergedData = {
       ...currentValues,
       ...parsedData,
@@ -57,7 +57,7 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
       education: parsedData.education || currentValues.education,
       skills: parsedData.skills || currentValues.skills,
     };
-    
+
     form.reset(mergedData);
 
     // Clear parsed data after updating form
@@ -80,19 +80,24 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
       }
 
       try {
-        // Compress and optimize the image
-        const compressedBase64 = await compressImage(file, {
+        // Compress and optimize the image with timeout
+        const compressionPromise = compressImage(file, {
           maxWidth: 400,
           maxHeight: 400,
           quality: 0.85,
           maxSizeKB: 200,
         });
-        
+
+        const timeoutPromise = new Promise<string>((_, reject) =>
+          setTimeout(() => reject(new Error('Compression timeout')), 5000)
+        );
+
+        const compressedBase64 = await Promise.race([compressionPromise, timeoutPromise]);
+
         setImagePreview(compressedBase64);
         form.setValue("personalInfo.profileImage", compressedBase64);
       } catch (error) {
-        console.error('Error compressing image:', error);
-        // Fallback to original if compression fails
+        // Fallback to original if compression fails or times out
         const reader = new FileReader();
         reader.onloadend = () => {
           const base64String = reader.result as string;
@@ -125,16 +130,16 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
       </div>
 
       {/* Section Styling Controls */}
-      <SectionStylingControls 
-        form={form} 
-        sectionName="personalInfo" 
-        sectionLabel={t('resume.steps.personalInfo') || 'Personal Info'} 
+      <SectionStylingControls
+        form={form}
+        sectionName="personalInfo"
+        sectionLabel={t('resume.steps.personalInfo') || 'Personal Info'}
       />
 
       {/* Resume Upload Option */}
       <ResumeUpload onDataParsed={handleDataParsed} />
       <Separator />
-      
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div className="space-y-2">
           <Label htmlFor="firstName">{t('resume.fields.firstName')} *</Label>
@@ -149,7 +154,7 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
             </p>
           )}
         </div>
-        
+
         <div className="space-y-2">
           <Label htmlFor="lastName">{t('resume.fields.lastName')} *</Label>
           <Input
@@ -262,7 +267,7 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
             placeholder={t('resume.placeholders.phone')}
           />
         </div>
-        
+
         <div className="space-y-2">
           <Label htmlFor="location">{t('resume.fields.location')}</Label>
           <Controller
@@ -327,7 +332,7 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
                 </p>
               )}
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="website">{t('resume.labels.personalWebsite')}</Label>
               <Input
