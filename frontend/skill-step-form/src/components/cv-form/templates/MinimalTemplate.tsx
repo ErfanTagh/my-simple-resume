@@ -20,16 +20,16 @@ const SectionHeading = ({ title, fontSize, color }: { title: string; fontSize: s
 export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
   const { t } = useLanguage();
   const { personalInfo, workExperience, education, projects, certificates, languages, skills, sectionOrder, styling } = data;
-  
+
   const defaultOrder = ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"];
   const orderedSections = sectionOrder || defaultOrder;
 
   // Extract styling options with defaults
   const fontFamily = styling?.fontFamily || "sans-serif";
   const fontSizeInput = styling?.fontSize || "medium";
-  const fontSize: "small" | "medium" | "large" = 
-    (fontSizeInput === "small" || fontSizeInput === "medium" || fontSizeInput === "large") 
-      ? fontSizeInput 
+  const fontSize: "small" | "medium" | "large" =
+    (fontSizeInput === "small" || fontSizeInput === "medium" || fontSizeInput === "large")
+      ? fontSizeInput
       : "medium";
   const titleColor = styling?.titleColor || "#1f2937";
   const titleBold = styling?.titleBold ?? true;
@@ -37,7 +37,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
   const headingBold = styling?.headingBold ?? true;
   const textColor = styling?.textColor || "#1f2937";
   const linkColor = styling?.linkColor || "#2563eb";
-  
+
   // Font size mappings - Minimal uses mostly text-xs (12px) and text-sm (14px)
   const fontSizeMap = {
     small: {
@@ -59,7 +59,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
       heading: '0.875rem', // 14px
     },
   };
-  
+
   const sizes = fontSizeMap[fontSize];
 
   // Helper function to get section-specific styling
@@ -135,21 +135,21 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                     <p className="text-muted-foreground" style={{ fontSize: sizes.xs, color: textColor }}>{exp.company}{exp.location && ` • ${exp.location}`}</p>
                     {((exp.responsibilities && exp.responsibilities.length > 0) || exp.description) && (
                       <ul className="text-foreground space-y-1 mt-2" style={{ fontSize: sizes.xs }}>
-                        {exp.responsibilities && exp.responsibilities.length > 0 
+                        {exp.responsibilities && exp.responsibilities.length > 0
                           ? exp.responsibilities.map((resp, i) => (
-                              resp.responsibility && (
-                                <li key={i} className="flex gap-2">
-                                  <span className="text-muted-foreground">•</span>
-                                  <span className="flex-1">{resp.responsibility}</span>
-                                </li>
-                              )
-                            ))
-                          : exp.description?.split('\n').filter(line => line.trim()).map((line, i) => (
+                            resp.responsibility && (
                               <li key={i} className="flex gap-2">
                                 <span className="text-muted-foreground">•</span>
-                                <span className="flex-1">{line.trim()}</span>
+                                <span className="flex-1">{resp.responsibility}</span>
                               </li>
-                            ))
+                            )
+                          ))
+                          : exp.description?.split('\n').filter(line => line.trim()).map((line, i) => (
+                            <li key={i} className="flex gap-2">
+                              <span className="text-muted-foreground">•</span>
+                              <span className="flex-1">{line.trim()}</span>
+                            </li>
+                          ))
                         }
                       </ul>
                     )}
@@ -380,58 +380,58 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
         }
       `}</style>
       <div className="resume-page-container bg-background text-foreground p-12 max-w-3xl mx-auto font-minimal" style={{ fontFamily: `"${fontFamily}", sans-serif` }}>
-      {/* Header with large, widely-spaced name */}
-      <div className="mb-12">
-        <div className="flex items-start gap-6 mb-6">
-          <div className="flex-1">
-            <h1 className="font-bold mb-4" style={{ fontSize: '1.875rem', letterSpacing: '0.3em', fontWeight: titleBold ? 'bold' : 'normal', color: titleColor }}>
-              {personalInfo.firstName.toUpperCase()} {personalInfo.lastName.toUpperCase()}
-            </h1>
-            {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (
-              <p className="font-normal mb-4" style={{ fontSize: sizes.xs, color: textColor }}>{personalInfo.professionalTitle.trim()}</p>
-            )}
-            
-            {/* Contact info in single line with separators */}
-            {contactItems.length > 0 && (
-              <p className="text-xs text-muted-foreground">
-                {contactItems.join(' | ')}
-              </p>
+        {/* Header with large, widely-spaced name */}
+        <div className="mb-12">
+          <div className="flex items-start gap-6 mb-6">
+            <div className="flex-1">
+              <h1 className="font-bold mb-4" style={{ fontSize: '1.875rem', letterSpacing: '0.3em', fontWeight: titleBold ? 'bold' : 'normal', color: titleColor }}>
+                {personalInfo.firstName.toUpperCase()} {personalInfo.lastName.toUpperCase()}
+              </h1>
+              {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (
+                <p className="font-normal mb-4" style={{ fontSize: sizes.xs, color: textColor }}>{personalInfo.professionalTitle.trim()}</p>
+              )}
+
+              {/* Contact info in single line with separators */}
+              {contactItems.length > 0 && (
+                <p className="text-xs text-muted-foreground">
+                  {contactItems.join(' | ')}
+                </p>
+              )}
+            </div>
+
+            {/* Profile image */}
+            {personalInfo.profileImage ? (
+              <div className="flex-shrink-0">
+                <div className="w-20 h-20 rounded-sm overflow-hidden">
+                  <img
+                    src={personalInfo.profileImage}
+                    alt={`Professional profile photo of ${personalInfo.firstName} ${personalInfo.lastName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
+                    className="w-full h-full object-cover"
+                    style={{ objectPosition: '50% 40%' }}
+                    loading="lazy"
+                    decoding="async"
+                    fetchPriority="low"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="flex-shrink-0 w-20 h-20 rounded-sm border border-foreground/20 bg-muted flex items-center justify-center photo-placeholder">
+                <span className="text-xs text-muted-foreground">Photo</span>
+              </div>
             )}
           </div>
-          
-          {/* Profile image */}
-          {personalInfo.profileImage ? (
-            <div className="flex-shrink-0">
-              <div className="w-20 h-20 rounded-sm overflow-hidden">
-                <img 
-                  src={personalInfo.profileImage} 
-                  alt={`Professional profile photo of ${personalInfo.firstName} ${personalInfo.lastName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
-                  className="w-full h-full object-cover"
-                  style={{ objectPosition: '50% 40%' }}
-                  loading="lazy"
-                  decoding="async"
-                  fetchPriority="low"
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="flex-shrink-0 w-20 h-20 rounded-sm border border-foreground/20 bg-muted flex items-center justify-center photo-placeholder">
-              <span className="text-xs text-muted-foreground">Photo</span>
-            </div>
-          )}
         </div>
-      </div>
 
-      {/* Sections with decorative headings and generous spacing */}
-      <div>
-        {orderedSections.map(section => renderSection(section))}
-      </div>
-      
-      {/* Spacer to ensure last page fills full height */}
-      <div aria-hidden="true" style={{ flex: '1 1 auto', minHeight: 0 }}></div>
+        {/* Sections with decorative headings and generous spacing */}
+        <div>
+          {orderedSections.map(section => renderSection(section))}
+        </div>
 
-      {/* Page Number Footer */}
-      <style>{`
+        {/* Spacer to ensure last page fills full height */}
+        <div aria-hidden="true" style={{ flex: '1 1 auto', minHeight: 0 }}></div>
+
+        {/* Page Number Footer */}
+        <style>{`
         /* Hide page numbers in preview (screen) */
         .page-number-footer {
           display: none;
@@ -456,7 +456,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
           }
         }
       `}</style>
-      <div className="page-number-footer"></div>
+        <div className="page-number-footer"></div>
       </div>
     </>
   );

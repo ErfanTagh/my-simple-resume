@@ -10,7 +10,7 @@ interface ClassicTemplateProps {
 export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
   const { t } = useLanguage();
   const { personalInfo, workExperience, education, projects, certificates, languages, skills, sectionOrder, styling } = data;
-  
+
   const defaultOrder = ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"];
   const orderedSections = sectionOrder || defaultOrder;
 
@@ -18,9 +18,9 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
   const fontFamily = styling?.fontFamily || "serif";
   const fontSizeInput = styling?.fontSize || "medium";
   // Ensure fontSize is valid to prevent crashes
-  const fontSize: "small" | "medium" | "large" = 
-    (fontSizeInput === "small" || fontSizeInput === "medium" || fontSizeInput === "large") 
-      ? fontSizeInput 
+  const fontSize: "small" | "medium" | "large" =
+    (fontSizeInput === "small" || fontSizeInput === "medium" || fontSizeInput === "large")
+      ? fontSizeInput
       : "medium";
   const titleColor = styling?.titleColor || "#1f2937";
   const titleBold = styling?.titleBold ?? true;
@@ -28,7 +28,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
   const headingBold = styling?.headingBold ?? true;
   const textColor = styling?.textColor || "#1f2937";
   const linkColor = styling?.linkColor || "#2563eb";
-  
+
   // Font size mappings - Classic template uses text-base (16px), text-sm (14px), text-xs (12px)
   const fontSizeMap = {
     small: {
@@ -53,7 +53,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
       body: '1rem',       // 16px
     },
   };
-  
+
   const sizes = fontSizeMap[fontSize];
 
   // Helper function to get section-specific styling
@@ -132,21 +132,21 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
                     </div>
                     {((exp.responsibilities && exp.responsibilities.length > 0) || exp.description) && (
                       <ul className="text-foreground space-y-1 mt-2" style={{ fontSize: workExperienceBodySizes.body, color: workExperienceStyling.bodyColor }}>
-                        {exp.responsibilities && exp.responsibilities.length > 0 
+                        {exp.responsibilities && exp.responsibilities.length > 0
                           ? exp.responsibilities.map((resp, i) => (
-                              resp.responsibility && (
-                                <li key={i} className="flex gap-2">
-                                  <span className="text-primary">•</span>
-                                  <span className="flex-1">{resp.responsibility}</span>
-                                </li>
-                              )
-                            ))
-                          : exp.description?.split('\n').filter(line => line.trim()).map((line, i) => (
+                            resp.responsibility && (
                               <li key={i} className="flex gap-2">
                                 <span className="text-primary">•</span>
-                                <span className="flex-1">{line.trim()}</span>
+                                <span className="flex-1">{resp.responsibility}</span>
                               </li>
-                            ))
+                            )
+                          ))
+                          : exp.description?.split('\n').filter(line => line.trim()).map((line, i) => (
+                            <li key={i} className="flex gap-2">
+                              <span className="text-primary">•</span>
+                              <span className="flex-1">{line.trim()}</span>
+                            </li>
+                          ))
                         }
                       </ul>
                     )}
@@ -175,7 +175,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
               {education.map((edu, index) => (
                 (edu.degree || edu.institution) && (
                   <div key={index}>
-                        <h3 className="font-semibold" style={{ color: educationStyling.bodyColor }}>{edu.degree}</h3>
+                    <h3 className="font-semibold" style={{ color: educationStyling.bodyColor }}>{edu.degree}</h3>
                     <div className="flex justify-between items-center text-sm" style={{ color: educationStyling.bodyColor }}>
                       <div>
                         <span className="italic text-muted-foreground">{edu.institution}</span>
@@ -371,14 +371,14 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
         }
       `}</style>
       <div className="resume-page-container bg-background text-foreground p-8 max-w-3xl mx-auto font-classic" style={{ fontFamily: `"${fontFamily}", serif` }}>
-      {/* Header - centered and traditional */}
-      <div className="text-center mb-6 pb-4 border-b-2 border-foreground">
-        {/* Profile image */}
-        {personalInfo.profileImage ? (
-          <div className="flex justify-center mb-4">
-            <div className="w-28 h-28 rounded-full border-2 border-foreground overflow-hidden flex-shrink-0">
-                <img 
-                  src={personalInfo.profileImage} 
+        {/* Header - centered and traditional */}
+        <div className="text-center mb-6 pb-4 border-b-2 border-foreground">
+          {/* Profile image */}
+          {personalInfo.profileImage ? (
+            <div className="flex justify-center mb-4">
+              <div className="w-28 h-28 rounded-full border-2 border-foreground overflow-hidden flex-shrink-0">
+                <img
+                  src={personalInfo.profileImage}
                   alt={`Professional profile photo of ${personalInfo.firstName} ${personalInfo.lastName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
                   className="w-full h-full object-cover"
                   style={{ objectPosition: '50% 40%' }}
@@ -386,73 +386,73 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
                   decoding="async"
                   fetchPriority="low"
                 />
+              </div>
             </div>
+          ) : (
+            <div className="flex justify-center mb-4">
+              <div className="w-28 h-28 rounded-full border-2 border-foreground bg-muted flex items-center justify-center flex-shrink-0 photo-placeholder">
+                <span className="text-xs text-muted-foreground">Photo</span>
+              </div>
+            </div>
+          )}
+
+          <h1 className="font-bold mb-2 uppercase tracking-wide" style={{ fontSize: '1.5rem', fontWeight: titleBold ? 'bold' : 'normal', color: titleColor }}>
+            {personalInfo.firstName} {personalInfo.lastName}
+          </h1>
+          {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (
+            <p className="font-normal mb-3 italic" style={{ fontSize: sizes.base, color: textColor }}>{personalInfo.professionalTitle.trim()}</p>
+          )}
+
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-muted-foreground" style={{ fontSize: sizes.xs }}>
+            {personalInfo.email && (
+              <div className="flex items-center gap-1">
+                <Mail className="h-3 w-3" />
+                <span>{personalInfo.email}</span>
+              </div>
+            )}
+            {personalInfo.phone && (
+              <div className="flex items-center gap-1">
+                <Phone className="h-3 w-3" />
+                <span>{personalInfo.phone}</span>
+              </div>
+            )}
+            {personalInfo.location && (
+              <div className="flex items-center gap-1">
+                <MapPin className="h-3 w-3" />
+                <span>{personalInfo.location}</span>
+              </div>
+            )}
+            {personalInfo.linkedin && (
+              <div className="flex items-center gap-1 min-w-0">
+                <Linkedin className="h-3 w-3 flex-shrink-0" />
+                <span className="truncate">{personalInfo.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span>
+              </div>
+            )}
+            {personalInfo.github && (
+              <div className="flex items-center gap-1 min-w-0">
+                <Github className="h-3 w-3 flex-shrink-0" />
+                <span className="truncate">{personalInfo.github.replace(/^https?:\/\/(www\.)?/, '')}</span>
+              </div>
+            )}
+            {personalInfo.website && (
+              <div className="flex items-center gap-1 min-w-0">
+                <Globe className="h-3 w-3 flex-shrink-0" />
+                <span className="truncate">{personalInfo.website.replace(/^https?:\/\/(www\.)?/, '')}</span>
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="flex justify-center mb-4">
-            <div className="w-28 h-28 rounded-full border-2 border-foreground bg-muted flex items-center justify-center flex-shrink-0 photo-placeholder">
-              <span className="text-xs text-muted-foreground">Photo</span>
-            </div>
-          </div>
-        )}
-        
-        <h1 className="font-bold mb-2 uppercase tracking-wide" style={{ fontSize: '1.5rem', fontWeight: titleBold ? 'bold' : 'normal', color: titleColor }}>
-          {personalInfo.firstName} {personalInfo.lastName}
-        </h1>
-        {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (
-          <p className="font-normal mb-3 italic" style={{ fontSize: sizes.base, color: textColor }}>{personalInfo.professionalTitle.trim()}</p>
-        )}
-        
-        <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-muted-foreground" style={{ fontSize: sizes.xs }}>
-          {personalInfo.email && (
-            <div className="flex items-center gap-1">
-              <Mail className="h-3 w-3" />
-              <span>{personalInfo.email}</span>
-            </div>
-          )}
-          {personalInfo.phone && (
-            <div className="flex items-center gap-1">
-              <Phone className="h-3 w-3" />
-              <span>{personalInfo.phone}</span>
-            </div>
-          )}
-          {personalInfo.location && (
-            <div className="flex items-center gap-1">
-              <MapPin className="h-3 w-3" />
-              <span>{personalInfo.location}</span>
-            </div>
-          )}
-          {personalInfo.linkedin && (
-            <div className="flex items-center gap-1 min-w-0">
-              <Linkedin className="h-3 w-3 flex-shrink-0" />
-              <span className="truncate">{personalInfo.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span>
-            </div>
-          )}
-          {personalInfo.github && (
-            <div className="flex items-center gap-1 min-w-0">
-              <Github className="h-3 w-3 flex-shrink-0" />
-              <span className="truncate">{personalInfo.github.replace(/^https?:\/\/(www\.)?/, '')}</span>
-            </div>
-          )}
-          {personalInfo.website && (
-            <div className="flex items-center gap-1 min-w-0">
-              <Globe className="h-3 w-3 flex-shrink-0" />
-              <span className="truncate">{personalInfo.website.replace(/^https?:\/\/(www\.)?/, '')}</span>
-            </div>
-          )}
         </div>
-      </div>
 
-      {/* Sections - traditional single column */}
-      <div>
-        {orderedSections.map(section => renderSection(section))}
-      </div>
-      
-      {/* Spacer to ensure last page fills full height */}
-      <div aria-hidden="true" style={{ flex: '1 1 auto', minHeight: 0 }}></div>
+        {/* Sections - traditional single column */}
+        <div>
+          {orderedSections.map(section => renderSection(section))}
+        </div>
 
-      {/* Page Number Footer */}
-      <style>{`
+        {/* Spacer to ensure last page fills full height */}
+        <div aria-hidden="true" style={{ flex: '1 1 auto', minHeight: 0 }}></div>
+
+        {/* Page Number Footer */}
+        <style>{`
         /* Hide page numbers in preview (screen) */
         .page-number-footer {
           display: none;
@@ -477,7 +477,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
           }
         }
       `}</style>
-      <div className="page-number-footer"></div>
+        <div className="page-number-footer"></div>
       </div>
     </>
   );

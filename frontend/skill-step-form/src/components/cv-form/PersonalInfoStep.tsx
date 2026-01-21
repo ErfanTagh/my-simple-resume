@@ -12,7 +12,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { CityAutocomplete } from "@/components/ui/city-autocomplete";
 import { ProfessionalTitleAutocomplete } from "@/components/ProfessionalTitleAutocomplete";
 import { SectionStylingControls } from "./SectionStylingControls";
-import { compressImage } from "@/lib/imageUtils";
 
 interface PersonalInfoStepProps {
   form: UseFormReturn<CVFormData>;
@@ -64,11 +63,11 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
     setParsedData(null);
   }, [parsedData, form]);
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Check file size (max 2MB before compression)
-      if (file.size > 2 * 1024 * 1024) {
+      // Check file size (max 1MB before compression)
+      if (file.size > 1 * 1024 * 1024) {
         alert(t('resume.alerts.imageSizeError'));
         return;
       }
@@ -79,33 +78,58 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
         return;
       }
 
-      try {
-        // Compress and optimize the image with timeout
-        const compressionPromise = compressImage(file, {
-          maxWidth: 400,
-          maxHeight: 400,
-          quality: 0.85,
-          maxSizeKB: 200,
-        });
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          // Resize to max 400x400 (plenty for profile photos)
+          const maxSize = 400;
+          let width = img.width;
+          let height = img.height;
 
-        const timeoutPromise = new Promise<string>((_, reject) =>
-          setTimeout(() => reject(new Error('Compression timeout')), 5000)
-        );
+          if (width > maxSize || height > maxSize) {
+            const ratio = Math.min(maxSize / width, maxSize / height);
+            width = width * ratio;
+            height = height * ratio;
+          }
 
-        const compressedBase64 = await Promise.race([compressionPromise, timeoutPromise]);
+          // Create canvas and resize
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
 
-        setImagePreview(compressedBase64);
-        form.setValue("personalInfo.profileImage", compressedBase64);
-      } catch (error) {
-        // Fallback to original if compression fails or times out
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64String = reader.result as string;
+          if (!ctx) {
+            // Fallback to original if canvas fails
+            const base64String = e.target?.result as string;
+            setImagePreview(base64String);
+            form.setValue("personalInfo.profileImage", base64String);
+            return;
+          }
+
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Convert to base64 with compression (JPEG at 0.85 quality)
+          const base64String = canvas.toDataURL('image/jpeg', 0.85);
           setImagePreview(base64String);
           form.setValue("personalInfo.profileImage", base64String);
         };
-        reader.readAsDataURL(file);
-      }
+
+        img.onerror = () => {
+          // Fallback to original if resize fails
+          const base64String = e.target?.result as string;
+          setImagePreview(base64String);
+          form.setValue("personalInfo.profileImage", base64String);
+        };
+
+        img.src = e.target?.result as string;
+      };
+
+      reader.onerror = () => {
+        alert('Failed to read image file');
+      };
+
+      reader.readAsDataURL(file);
     }
   };
 

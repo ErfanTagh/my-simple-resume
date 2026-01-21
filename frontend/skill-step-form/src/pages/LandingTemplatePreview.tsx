@@ -9,14 +9,14 @@ import { StarRoverTemplate } from "@/components/cv-form/templates/StarRoverTempl
 // Helper function to get profile image based on template (rotate through 4 images)
 const getProfileImageForTemplate = (templateName: string): string => {
   const imageMap: Record<string, string> = {
-    modern: "/resume-sample-1.png",    // East Asian man
-    classic: "/resume-sample-2.png",     // Caucasian man
-    creative: "/resume-sample-3.png",    // Woman (Hispanic/Latina)
-    minimal: "/resume-sample-4.png",    // Black woman
-    latex: "/resume-sample-1.png",      // East Asian man (reuse)
-    starRover: "/resume-sample-2.png",  // Caucasian man (reuse)
+    modern: "/resume-sample-1-optimized.jpg",    // East Asian man
+    classic: "/resume-sample-2-optimized.jpg",     // Caucasian man
+    creative: "/resume-sample-3-optimized.jpg",    // Woman (Hispanic/Latina)
+    minimal: "/resume-sample-4-optimized.jpg",    // Black woman
+    latex: "/resume-sample-1-optimized.jpg",      // East Asian man (reuse)
+    starRover: "/resume-sample-2-optimized.jpg",  // Caucasian man (reuse)
   };
-  return imageMap[templateName] || "/resume-sample-1.png";
+  return imageMap[templateName] || "/resume-sample-1-optimized.jpg";
 };
 
 // Sample data for preview - realistic resume data
@@ -246,7 +246,7 @@ export const LandingTemplatePreview = ({
 }: LandingTemplatePreviewProps) => {
   // Create base sample data with template-specific profile image
   const baseSampleData = createSampleData(templateName);
-  
+
   // Enhanced data specifically for LaTeX template to ensure it fills properly
   const enhancedData: CVFormData = templateName === "latex" ? {
     ...baseSampleData,

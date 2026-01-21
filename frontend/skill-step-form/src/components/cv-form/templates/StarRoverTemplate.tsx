@@ -12,16 +12,16 @@ const ACCENT_COLOR = "#141E61"; // Navy blue accent
 export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
   const { t } = useLanguage();
   const { personalInfo, workExperience, education, projects, certificates, languages, skills, sectionOrder, styling } = data;
-  
+
   const defaultOrder = ["summary", "education", "workExperience", "projects", "certificates", "skills", "languages", "interests"];
   const orderedSections = sectionOrder || defaultOrder;
 
   // Extract styling options with defaults
   const fontFamily = styling?.fontFamily || "monospace";
   const fontSizeInput = styling?.fontSize || "medium";
-  const fontSize: "small" | "medium" | "large" = 
-    (fontSizeInput === "small" || fontSizeInput === "medium" || fontSizeInput === "large") 
-      ? fontSizeInput 
+  const fontSize: "small" | "medium" | "large" =
+    (fontSizeInput === "small" || fontSizeInput === "medium" || fontSizeInput === "large")
+      ? fontSizeInput
       : "medium";
   const titleColor = styling?.titleColor || "#141E61";
   const titleBold = styling?.titleBold ?? true;
@@ -29,7 +29,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
   const headingBold = styling?.headingBold ?? true;
   const textColor = styling?.textColor || "#1f2937";
   const linkColor = styling?.linkColor || "#141E61";
-  
+
   // Font size mappings - StarRover uses text-base (16px), text-sm (14px), text-xs (12px)
   const fontSizeMap = {
     small: {
@@ -51,7 +51,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
       heading: '1.125rem',  // 18px
     },
   };
-  
+
   const sizes = fontSizeMap[fontSize];
 
   // Helper function to get section-specific styling
@@ -101,7 +101,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
   // Helper to format date range for Star Rover style (MMM YYYY format)
   const formatDateRangeStar = (startDate: string | undefined, endDate: string | undefined): string => {
     if (!startDate && !endDate) return '';
-    
+
     const formatDate = (dateStr: string | undefined): string => {
       if (!dateStr) return '';
       const match = dateStr.match(/^(\d{4})-(\d{2})$/);
@@ -112,20 +112,20 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
       if (monthNum < 1 || monthNum > 12) return dateStr;
       return `${monthNames[monthNum - 1]} ${year}`;
     };
-    
+
     const start = formatDate(startDate);
     const end = endDate ? formatDate(endDate) : t('resume.fields.present');
-    
+
     if (!start && !end) return '';
     if (!start) return end;
-    
+
     return `${start} -- ${end}`;
   };
 
   // Render contact info icon
   const renderContactIcon = (Icon: any, text: string | undefined, url?: string) => {
     if (!text) return null;
-    
+
     const content = (
       <>
         <Icon className="h-3 w-3 text-muted-foreground inline mr-1.5" />
@@ -138,7 +138,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
         )}
       </>
     );
-    
+
     return <span style={{ fontSize: sizes.sm }}>{content}</span>;
   };
 
@@ -175,10 +175,10 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
             <div className="space-y-3">
               {education.map((edu, index) => {
                 if (!edu.degree && !edu.institution) return null;
-                
+
                 const dateRange = formatDateRangeStar(edu.startDate, edu.endDate);
                 const hasAux = edu.degree && edu.institution;
-                
+
                 return (
                   <div key={index}>
                     <div className="flex justify-between items-start gap-2 mb-1">
@@ -233,14 +233,14 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
             <div className="space-y-3">
               {workExperience.map((exp, index) => {
                 if (!exp.position && !exp.company) return null;
-                
+
                 const dateRange = formatDateRangeStar(exp.startDate, exp.endDate);
-                const responsibilities = exp.responsibilities 
+                const responsibilities = exp.responsibilities
                   ? exp.responsibilities.filter(r => r.responsibility).map(r => r.responsibility!)
-                  : exp.description 
-                  ? exp.description.split('\n').filter(line => line.trim())
-                  : [];
-                
+                  : exp.description
+                    ? exp.description.split('\n').filter(line => line.trim())
+                    : [];
+
                 return (
                   <div key={index}>
                     <div className="flex justify-between items-start gap-2 mb-1">
@@ -295,15 +295,15 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
             <div className="space-y-3">
               {projects.map((proj, index) => {
                 if (!proj.name) return null;
-                
+
                 const dateRange = formatDateRangeStar(proj.startDate, proj.endDate);
-                const technologies = proj.technologies 
+                const technologies = proj.technologies
                   ? proj.technologies
-                      .map(t => typeof t === 'string' ? t : t.technology)
-                      .filter(Boolean)
-                      .join(', ')
+                    .map(t => typeof t === 'string' ? t : t.technology)
+                    .filter(Boolean)
+                    .join(', ')
                   : '';
-                
+
                 return (
                   <div key={index}>
                     <div className="flex justify-between items-start gap-2 mb-1">
@@ -311,9 +311,9 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                         {proj.name}
                         {proj.link && (
                           <span className="font-normal normal-case ml-2" style={{ fontSize: sizes.xs }}>
-                            <a 
-                              href={proj.link} 
-                              target="_blank" 
+                            <a
+                              href={proj.link}
+                              target="_blank"
                               rel="noopener noreferrer"
                               className="text-muted-foreground hover:underline"
                             >
@@ -365,9 +365,9 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
             <div className="space-y-1">
               {certificates.map((cert, index) => {
                 if (!cert.name) return null;
-                
+
                 const dateRange = formatDateRangeStar(cert.issueDate, cert.expirationDate);
-                
+
                 return (
                   <div key={index}>
                     <div className="flex justify-between items-start gap-2">
@@ -519,67 +519,67 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
         }
       `}</style>
       <div className="resume-page-container bg-background text-foreground p-8 max-w-4xl mx-auto" style={{ fontFamily: `"${fontFamily}", monospace`, fontSize: sizes.base }}>
-      {/* Header: Large name in navy with optional photo - full width layout */}
-      <div className="-mx-8 -mt-8 px-8 pt-8 mb-6 border-b-2" style={{ borderColor: headingColor }}>
-        <div className="flex items-center justify-between mb-4 gap-6">
-          <div className="flex-1">
-            <h1 className="font-black mb-2" style={{ fontSize: '2.25rem', fontWeight: titleBold ? '900' : 'bold', color: titleColor, letterSpacing: '0.02em' }}>
-              {fullName || 'YOUR NAME'}
-            </h1>
-            {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (
-              <p className="font-semibold mb-2" style={{ fontSize: '1.125rem', color: headingColor }}>
-                {personalInfo.professionalTitle.trim().toUpperCase()}
-              </p>
+        {/* Header: Large name in navy with optional photo - full width layout */}
+        <div className="-mx-8 -mt-8 px-8 pt-8 mb-6 border-b-2" style={{ borderColor: headingColor }}>
+          <div className="flex items-center justify-between mb-4 gap-6">
+            <div className="flex-1">
+              <h1 className="font-black mb-2" style={{ fontSize: '2.25rem', fontWeight: titleBold ? '900' : 'bold', color: titleColor, letterSpacing: '0.02em' }}>
+                {fullName || 'YOUR NAME'}
+              </h1>
+              {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (
+                <p className="font-semibold mb-2" style={{ fontSize: '1.125rem', color: headingColor }}>
+                  {personalInfo.professionalTitle.trim().toUpperCase()}
+                </p>
+              )}
+            </div>
+
+            {/* Profile photo on the right */}
+            {personalInfo.profileImage ? (
+              <div className="flex-shrink-0">
+                <div className="w-28 h-28 rounded-md border-2 overflow-hidden" style={{ borderColor: headingColor }}>
+                  <img
+                    src={personalInfo.profileImage}
+                    alt={`Professional profile photo of ${personalInfo.firstName} ${personalInfo.lastName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
+                    className="w-full h-full object-cover"
+                    style={{ objectPosition: '50% 40%' }}
+                    loading="lazy"
+                    decoding="async"
+                    fetchPriority="low"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="flex-shrink-0 w-28 h-28 rounded-md border-2 bg-muted flex items-center justify-center photo-placeholder" style={{ borderColor: headingColor }}>
+                <span className="text-muted-foreground" style={{ fontSize: sizes.xs }}>Photo</span>
+              </div>
             )}
           </div>
-          
-          {/* Profile photo on the right */}
-          {personalInfo.profileImage ? (
-            <div className="flex-shrink-0">
-              <div className="w-28 h-28 rounded-md border-2 overflow-hidden" style={{ borderColor: headingColor }}>
-                <img 
-                  src={personalInfo.profileImage} 
-                  alt={`Professional profile photo of ${personalInfo.firstName} ${personalInfo.lastName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
-                  className="w-full h-full object-cover"
-                  style={{ objectPosition: '50% 40%' }}
-                  loading="lazy"
-                  decoding="async"
-                  fetchPriority="low"
-                />
-              </div>
+
+          {/* Contact info - full width horizontal layout */}
+          <div className="flex flex-wrap items-center justify-between gap-4 pb-2" style={{ fontSize: sizes.sm }}>
+            <div className="flex flex-wrap items-center gap-4">
+              {personalInfo.phone ? renderContactIcon(Phone, personalInfo.phone, `tel:${personalInfo.phone}`) : renderContactIcon(Phone, "+1 (555) 123-4567", "#")}
+              {personalInfo.email ? renderContactIcon(Mail, personalInfo.email, `mailto:${personalInfo.email}`) : renderContactIcon(Mail, "your.email@example.com", "#")}
+              {personalInfo.location ? renderContactIcon(MapPin, personalInfo.location) : renderContactIcon(MapPin, "City, Country")}
             </div>
-          ) : (
-            <div className="flex-shrink-0 w-28 h-28 rounded-md border-2 bg-muted flex items-center justify-center photo-placeholder" style={{ borderColor: headingColor }}>
-              <span className="text-muted-foreground" style={{ fontSize: sizes.xs }}>Photo</span>
+            <div className="flex flex-wrap items-center gap-4">
+              {personalInfo.linkedin ? renderContactIcon(Linkedin, personalInfo.linkedin, personalInfo.linkedin) : renderContactIcon(Linkedin, "linkedin.com/in/username", "#")}
+              {personalInfo.github ? renderContactIcon(Github, personalInfo.github, personalInfo.github) : renderContactIcon(Github, "github.com/username", "#")}
+              {personalInfo.website ? renderContactIcon(Globe, personalInfo.website, personalInfo.website) : renderContactIcon(Globe, "yourwebsite.com", "#")}
             </div>
-          )}
-        </div>
-        
-        {/* Contact info - full width horizontal layout */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pb-2" style={{ fontSize: sizes.sm }}>
-          <div className="flex flex-wrap items-center gap-4">
-            {personalInfo.phone ? renderContactIcon(Phone, personalInfo.phone, `tel:${personalInfo.phone}`) : renderContactIcon(Phone, "+1 (555) 123-4567", "#")}
-            {personalInfo.email ? renderContactIcon(Mail, personalInfo.email, `mailto:${personalInfo.email}`) : renderContactIcon(Mail, "your.email@example.com", "#")}
-            {personalInfo.location ? renderContactIcon(MapPin, personalInfo.location) : renderContactIcon(MapPin, "City, Country")}
-          </div>
-          <div className="flex flex-wrap items-center gap-4">
-            {personalInfo.linkedin ? renderContactIcon(Linkedin, personalInfo.linkedin, personalInfo.linkedin) : renderContactIcon(Linkedin, "linkedin.com/in/username", "#")}
-            {personalInfo.github ? renderContactIcon(Github, personalInfo.github, personalInfo.github) : renderContactIcon(Github, "github.com/username", "#")}
-            {personalInfo.website ? renderContactIcon(Globe, personalInfo.website, personalInfo.website) : renderContactIcon(Globe, "yourwebsite.com", "#")}
           </div>
         </div>
-      </div>
 
-      {/* Sections */}
-      <div className="space-y-1">
-        {orderedSections.map(section => renderSection(section))}
-      </div>
-      
-      {/* Spacer to ensure last page fills full height */}
-      <div aria-hidden="true" style={{ flex: '1 1 auto', minHeight: 0 }}></div>
+        {/* Sections */}
+        <div className="space-y-1">
+          {orderedSections.map(section => renderSection(section))}
+        </div>
 
-      {/* Page Number Footer */}
-      <style>{`
+        {/* Spacer to ensure last page fills full height */}
+        <div aria-hidden="true" style={{ flex: '1 1 auto', minHeight: 0 }}></div>
+
+        {/* Page Number Footer */}
+        <style>{`
         /* Hide page numbers in preview (screen) */
         .page-number-footer {
           display: none;
@@ -604,7 +604,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
           }
         }
       `}</style>
-      <div className="page-number-footer"></div>
+        <div className="page-number-footer"></div>
       </div>
     </>
   );
