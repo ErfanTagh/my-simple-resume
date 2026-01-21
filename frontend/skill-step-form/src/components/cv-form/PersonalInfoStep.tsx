@@ -12,6 +12,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { CityAutocomplete } from "@/components/ui/city-autocomplete";
 import { ProfessionalTitleAutocomplete } from "@/components/ProfessionalTitleAutocomplete";
 import { SectionStylingControls } from "./SectionStylingControls";
+import { compressImage } from "@/lib/imageUtils";
 
 interface PersonalInfoStepProps {
   form: UseFormReturn<CVFormData>;
@@ -63,10 +64,10 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
     setParsedData(null);
   }, [parsedData, form]);
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Check file size (max 2MB)
+      // Check file size (max 2MB before compression)
       if (file.size > 2 * 1024 * 1024) {
         alert(t('resume.alerts.imageSizeError'));
         return;
@@ -78,13 +79,28 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
         return;
       }
 
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        setImagePreview(base64String);
-        form.setValue("personalInfo.profileImage", base64String);
-      };
-      reader.readAsDataURL(file);
+      try {
+        // Compress and optimize the image
+        const compressedBase64 = await compressImage(file, {
+          maxWidth: 400,
+          maxHeight: 400,
+          quality: 0.85,
+          maxSizeKB: 200,
+        });
+        
+        setImagePreview(compressedBase64);
+        form.setValue("personalInfo.profileImage", compressedBase64);
+      } catch (error) {
+        console.error('Error compressing image:', error);
+        // Fallback to original if compression fails
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64String = reader.result as string;
+          setImagePreview(base64String);
+          form.setValue("personalInfo.profileImage", base64String);
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 

@@ -409,6 +409,8 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                   className="w-full h-full object-cover"
                   style={{ objectPosition: '50% 40%' }}
                   loading="lazy"
+                  decoding="async"
+                  fetchPriority="low"
                 />
               </div>
             </div>
