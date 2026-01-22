@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useLayoutEffect, useRef } from "react";
 import { CVFormData, CVTemplate } from "./types";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -32,12 +32,22 @@ export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSect
   const [pageCount, setPageCount] = useState(1);
   const [pageBreakPositions, setPageBreakPositions] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [templateChangeKey, setTemplateChangeKey] = useState(0); // Force rerender on template change
   const previewRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const horizontalScrollRef = useRef<HTMLDivElement>(null);
   const template = data.template || "modern";
   const defaultSectionOrder = ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"];
   const sectionOrder = data.sectionOrder || defaultSectionOrder;
+
+  // Track template changes and force rerender
+  const prevTemplateRef = useRef(template);
+  useEffect(() => {
+    if (prevTemplateRef.current !== template) {
+      prevTemplateRef.current = template;
+      setTemplateChangeKey(prev => prev + 1); // Force rerender
+    }
+  }, [template]);
 
   // Calculate resume score using actual form data (without hints), not preview data
   const resumeScore = useMemo(() => {
@@ -51,30 +61,41 @@ export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSect
   }, [actualDataForScoring, data]);
 
   // Calculate page count based on content height
-  useEffect(() => {
+  // Use useLayoutEffect for synchronous DOM measurement after React updates
+  useLayoutEffect(() => {
     if (previewRef.current && activeTab === "design") {
-      const calculatePages = () => {
+      let retryTimeoutId: NodeJS.Timeout | null = null;
+      let retryCount = 0;
+      const maxRetries = 10; // Reduced retries since useLayoutEffect runs after DOM updates
+      const retryInterval = 100; // Faster retries
+
+      const calculatePages = (): boolean => {
         const card = previewRef.current;
         if (!card) {
           setPageCount(1);
-          return;
+          return false;
         }
 
         // Find the wrapper div that contains the template
         const wrapper = card.querySelector('.resume-content-wrapper');
         if (!wrapper) {
           setPageCount(1);
-          return;
+          return false;
         }
 
-        // Find the template's root element - it's the first direct child of wrapper
-        // Templates render a div with classes like "bg-background", "p-8", etc.
-        let templateRoot = wrapper.firstElementChild as HTMLElement;
+        // Find the template's root element - prioritize .resume-page-container class
+        // which is the standard root element for all templates
+        let templateRoot = wrapper.querySelector('.resume-page-container') as HTMLElement;
 
-        // Fallback: if first child is not found, look for divs with template-like classes
+        // Fallback: if resume-page-container not found, try first direct child
+        if (!templateRoot || templateRoot.scrollHeight === 0) {
+          templateRoot = wrapper.firstElementChild as HTMLElement;
+        }
+
+        // Fallback: if first child is not found or has no height, look for divs with template-like classes
         if (!templateRoot || templateRoot.scrollHeight === 0) {
           // Try to find the template root by looking for divs with common template classes
-          const possibleRoots = wrapper.querySelectorAll('div.bg-background, div.p-8, div.max-w-4xl');
+          const possibleRoots = wrapper.querySelectorAll('div.bg-background, div.p-8, div.max-w-4xl, div.max-w-3xl');
           if (possibleRoots.length > 0) {
             templateRoot = possibleRoots[0] as HTMLElement;
           }
@@ -90,9 +111,26 @@ export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSect
           }
         }
 
-        if (!templateRoot || templateRoot.scrollHeight === 0) {
-          setPageCount(1);
-          return;
+        // If still no valid template root found, return false to indicate retry needed
+        if (!templateRoot) {
+          return false;
+        }
+
+        // Wait for content to actually render - check if height is meaningful
+        // Templates should have at least some minimum height (e.g., header section)
+        const minExpectedHeight = 200; // Minimum height for a valid template
+        if (templateRoot.scrollHeight < minExpectedHeight) {
+          // Content might still be loading, retry
+          return false;
+        }
+
+        // Verify we're measuring the correct template by checking for expected structure
+        // All templates should have a resume-page-container class or be a direct child with content
+        const hasResumeContainer = templateRoot.classList.contains('resume-page-container');
+        const hasContent = templateRoot.querySelector('h1, h2, [data-resume-section]') !== null;
+        if (!hasResumeContainer && !hasContent) {
+          // Might be measuring wrong element or template not fully rendered, retry
+          return false;
         }
 
         // Get the actual rendered height of the content
@@ -123,38 +161,74 @@ export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSect
           }
         }
         setPageBreakPositions(breaks);
+        return true; // Success
+      };
+
+      // Retry logic for template changes
+      // useLayoutEffect runs after DOM updates, but we still need retries for async content
+      const attemptCalculation = () => {
+        const success = calculatePages();
+        if (!success && retryCount < maxRetries) {
+          retryCount++;
+          retryTimeoutId = setTimeout(attemptCalculation, retryInterval);
+        } else if (!success) {
+          // After max retries, default to 1 page
+          setPageCount(1);
+          setPageBreakPositions([]);
+        } else {
+          // Reset retry count on success
+          retryCount = 0;
+        }
       };
 
       // Use ResizeObserver to watch for content size changes
       const wrapperElement = previewRef.current?.querySelector('.resume-content-wrapper');
       let resizeObserver: ResizeObserver | null = null;
+      let mutationObserver: MutationObserver | null = null;
 
       if (wrapperElement) {
         resizeObserver = new ResizeObserver(() => {
-          calculatePages();
+          retryCount = 0; // Reset retry count on resize
+          attemptCalculation();
         });
         resizeObserver.observe(wrapperElement);
+
+        // Also use MutationObserver to detect when template content changes
+        mutationObserver = new MutationObserver(() => {
+          retryCount = 0; // Reset retry count on mutation
+          // Add small delay to ensure React has finished rendering
+          setTimeout(() => {
+            attemptCalculation();
+          }, 50);
+        });
+        mutationObserver.observe(wrapperElement, {
+          childList: true,
+          subtree: true,
+          attributes: false,
+        });
       }
 
-      // Calculate immediately and after delays
-      calculatePages();
-      const timeout1 = setTimeout(calculatePages, 100);
-      const timeout2 = setTimeout(calculatePages, 300);
-      const timeout3 = setTimeout(calculatePages, 600);
+      // Start calculation immediately - useLayoutEffect runs after DOM is updated
+      retryCount = 0; // Reset retry count when effect runs
+      attemptCalculation();
 
       // Also recalculate on window resize
       const handleResize = () => {
-        calculatePages();
+        retryCount = 0; // Reset retry count on resize
+        attemptCalculation();
       };
       window.addEventListener('resize', handleResize);
 
       return () => {
+        if (retryTimeoutId) {
+          clearTimeout(retryTimeoutId);
+        }
         if (resizeObserver) {
           resizeObserver.disconnect();
         }
-        clearTimeout(timeout1);
-        clearTimeout(timeout2);
-        clearTimeout(timeout3);
+        if (mutationObserver) {
+          mutationObserver.disconnect();
+        }
         window.removeEventListener('resize', handleResize);
       };
     } else {
@@ -163,8 +237,95 @@ export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSect
       setPageBreakPositions([]);
       setCurrentPage(1);
     }
-  }, [data, activeTab, template]);
+  }, [data, activeTab, template, templateChangeKey]); // Add templateChangeKey to dependencies
 
+  // Separate effect to handle template changes specifically
+  // Use useLayoutEffect for immediate DOM measurement after template change
+  useLayoutEffect(() => {
+    if (previewRef.current && activeTab === "design") {
+      let attemptCount = 0;
+      const maxAttempts = 10;
+      let timeoutId: NodeJS.Timeout | null = null;
+      
+      const attemptCalculation = () => {
+        attemptCount++;
+        const card = previewRef.current;
+        if (!card) {
+          if (attemptCount < maxAttempts) {
+            timeoutId = setTimeout(attemptCalculation, 100);
+          }
+          return;
+        }
+
+        const wrapper = card.querySelector('.resume-content-wrapper');
+        if (!wrapper) {
+          if (attemptCount < maxAttempts) {
+            timeoutId = setTimeout(attemptCalculation, 100);
+          }
+          return;
+        }
+
+        // Look for the template root - prioritize .resume-page-container
+        let templateRoot = wrapper.querySelector('.resume-page-container') as HTMLElement;
+        
+        // Fallback to first child if resume-page-container not found
+        if (!templateRoot) {
+          templateRoot = wrapper.firstElementChild as HTMLElement;
+        }
+        
+        // Last fallback: find largest div
+        if (!templateRoot || templateRoot.scrollHeight === 0) {
+          const allDivs = Array.from(wrapper.querySelectorAll('div')) as HTMLElement[];
+          if (allDivs.length > 0) {
+            templateRoot = allDivs.reduce((largest, current) => {
+              return (current.scrollHeight > largest.scrollHeight) ? current : largest;
+            }, allDivs[0]);
+          }
+        }
+        
+        if (!templateRoot) {
+          if (attemptCount < maxAttempts) {
+            timeoutId = setTimeout(attemptCalculation, 100);
+          }
+          return;
+        }
+
+        // Wait for content to render - check if height is meaningful
+        if (templateRoot.scrollHeight < 200) {
+          if (attemptCount < maxAttempts) {
+            timeoutId = setTimeout(attemptCalculation, 100);
+          }
+          return;
+        }
+
+        // Valid measurement - calculate pages
+        const contentHeight = templateRoot.scrollHeight;
+        const pageHeight = 1010;
+        const pages = contentHeight > pageHeight + 50
+          ? Math.ceil(contentHeight / pageHeight)
+          : 1;
+
+        setPageCount(Math.max(1, pages));
+
+        const breaks: number[] = [];
+        if (pages > 1) {
+          for (let i = 1; i < pages; i++) {
+            breaks.push(pageHeight * i);
+          }
+        }
+        setPageBreakPositions(breaks);
+      };
+
+      // Start attempts immediately - useLayoutEffect runs after DOM is updated
+      attemptCalculation();
+
+      return () => {
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
+      };
+    }
+  }, [template, activeTab, templateChangeKey]); // Add templateChangeKey to force recalculation
 
   // Track scroll position to update current page indicator
   useEffect(() => {
