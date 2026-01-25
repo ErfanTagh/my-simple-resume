@@ -28,31 +28,31 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
   const textColor = styling?.textColor || "#1f2937";
   const linkColor = styling?.linkColor || "#2563eb";
 
-  // Font size mappings - Creative uses text-2xl (24px), text-lg (18px), text-base (16px), text-sm (14px), text-xs (12px)
+  // Font size mappings - Reduced sizes for more compact layout
   const fontSizeMap = {
     small: {
-      heading: '1.125rem',  // 18px (text-lg)
-      base: '0.875rem',     // 14px (text-sm)
-      sm: '0.75rem',        // 12px (text-xs)
-      xs: '0.625rem',       // 10px
-      sectionHeading: '1.375rem', // 22px
-      lg: '1rem',           // 16px
+      heading: '0.9375rem',   // 15px (reduced from 18px)
+      base: '0.75rem',        // 12px (reduced from 14px)
+      sm: '0.6875rem',        // 11px (reduced from 12px)
+      xs: '0.5625rem',        // 9px (reduced from 10px)
+      sectionHeading: '1.125rem', // 18px (reduced from 22px)
+      lg: '0.875rem',         // 14px (reduced from 16px)
     },
     medium: {
-      heading: '1.5rem',    // 24px (text-2xl)
-      base: '1rem',         // 16px (text-base)
-      sm: '0.875rem',       // 14px (text-sm)
-      xs: '0.75rem',        // 12px (text-xs)
-      sectionHeading: '1.5rem', // 24px
-      lg: '1.125rem',       // 18px (text-lg)
+      heading: '1.25rem',     // 20px (reduced from 24px)
+      base: '0.875rem',       // 14px (reduced from 16px)
+      sm: '0.75rem',          // 12px (reduced from 14px)
+      xs: '0.625rem',         // 10px (reduced from 12px)
+      sectionHeading: '1.375rem', // 22px (reduced from 24px)
+      lg: '1rem',             // 16px (reduced from 18px)
     },
     large: {
-      heading: '1.875rem',  // 30px
-      base: '1.125rem',     // 18px
-      sm: '1rem',           // 16px
-      xs: '0.875rem',       // 14px
-      sectionHeading: '1.875rem', // 30px
-      lg: '1.375rem',       // 22px
+      heading: '1.625rem',    // 26px (reduced from 30px)
+      base: '1rem',           // 16px (reduced from 18px)
+      sm: '0.875rem',         // 14px (reduced from 16px)
+      xs: '0.75rem',          // 12px (reduced from 14px)
+      sectionHeading: '1.75rem', // 28px (reduced from 30px)
+      lg: '1.125rem',         // 20px (reduced from 22px)
     },
   };
 
@@ -106,9 +106,9 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
     switch (sectionKey) {
       case "summary":
         return personalInfo.summary && personalInfo.summary.trim() ? (
-          <div key="summary" className="mb-6">
+          <div key="summary" className="mb-3">
             <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="font-black mb-3 italic" style={{ fontSize: personalInfoTitleSizes.sectionHeading, fontWeight: headingBold ? '900' : 'bold', color: personalInfoTitleColor }}>{t('resume.sections.aboutMe')}</h2>
+              <h2 className="font-black mb-2 italic" style={{ fontSize: `calc(${personalInfoTitleSizes.sectionHeading} * 0.8)`, fontWeight: headingBold ? '900' : 'bold', color: personalInfoTitleColor }}>{t('resume.sections.aboutMe')}</h2>
               <p className="text-foreground leading-relaxed whitespace-pre-wrap" style={{ fontSize: personalInfoBodySizes.sm, color: personalInfoBodyColor }}>{personalInfo.summary.trim()}</p>
             </div>
           </div>
@@ -116,23 +116,29 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
 
       case "workExperience":
         return workExperience.some(exp => exp.position || exp.company) ? (
-          <div key="workExperience" className="mb-6">
+          <div key="workExperience" className="mb-3">
             <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="font-black mb-4 italic" style={{ fontSize: workExperienceTitleSizes.sectionHeading, fontWeight: headingBold ? '900' : 'bold', color: workExperienceStyling.titleColor }}>{t('resume.sections.experience')}</h2>
-              <div className="space-y-5">
+              <h2 className="font-black mb-2 italic" style={{ fontSize: `calc(${workExperienceTitleSizes.sectionHeading} * 0.8)`, fontWeight: headingBold ? '900' : 'bold', color: workExperienceStyling.titleColor }}>{t('resume.sections.experience')}</h2>
+              <div className="space-y-2">
                 {workExperience.map((exp, index) => (
                   (exp.position || exp.company) && (
                     <div key={index} className="relative">
                       <div className="absolute -left-[26px] w-3 h-3 rounded-full bg-primary"></div>
-                      <h3 className="font-bold text-foreground" style={{ fontSize: sizes.lg }}>{exp.position}</h3>
-                      <p className="font-semibold" style={{ fontSize: sizes.base, color: headingColor }}>{exp.company}{exp.location && ` • ${exp.location}`}</p>
-                      {(exp.startDate || exp.endDate) && (
-                        <p className="text-muted-foreground mt-1" style={{ fontSize: sizes.xs }}>
-                          {formatDateRange(exp.startDate, exp.endDate, t('resume.fields.present'))}
+                      {/* Position title on its own line */}
+                      <h3 className="font-bold text-foreground mb-0.5" style={{ fontSize: sizes.lg }}>{exp.position}</h3>
+                      {/* Company/Location (left) and Date (right) on same line */}
+                      <div className="flex justify-between items-center gap-4 mb-0.5">
+                        <p className="font-semibold" style={{ fontSize: sizes.base, color: headingColor }}>
+                          {exp.company}{exp.location && ` • ${exp.location}`}
                         </p>
-                      )}
+                        {(exp.startDate || exp.endDate) && (
+                          <span className="text-muted-foreground whitespace-nowrap" style={{ fontSize: sizes.xs }}>
+                            {formatDateRange(exp.startDate, exp.endDate, t('resume.fields.present'))}
+                          </span>
+                        )}
+                      </div>
                       {((exp.responsibilities && exp.responsibilities.length > 0) || exp.description) && (
-                        <ul className="text-muted-foreground space-y-1 mt-2" style={{ fontSize: sizes.sm }}>
+                        <ul className="text-muted-foreground space-y-0.5 mt-1.5" style={{ fontSize: sizes.sm }}>
                           {exp.responsibilities && exp.responsibilities.length > 0
                             ? exp.responsibilities.map((resp, i) => (
                               resp.responsibility && (
@@ -152,7 +158,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                         </ul>
                       )}
                       {exp.technologies && exp.technologies.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
+                        <div className="flex flex-wrap gap-1 mt-1.5">
                           {exp.technologies.map((tech, i) => (
                             tech.technology && (
                               <span key={i} className="px-2 py-0.5 bg-primary/20 rounded" style={{ fontSize: sizes.xs, color: headingColor }}>
@@ -163,7 +169,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                         </div>
                       )}
                       {exp.competencies && exp.competencies.length > 0 && (
-                        <p className="text-muted-foreground mt-2" style={{ fontSize: sizes.xs }}>
+                        <p className="text-muted-foreground mt-1.5" style={{ fontSize: sizes.xs }}>
                           {t('resume.labels.keyCompetencies')}: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(", ")}
                         </p>
                       )}
@@ -177,19 +183,30 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
 
       case "education":
         return education.some(edu => edu.degree || edu.institution) ? (
-          <div key="education" className="mb-6">
+          <div key="education" className="mb-3">
             <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="font-black mb-4 italic" style={{ fontSize: educationTitleSizes.sectionHeading, fontWeight: headingBold ? '900' : 'bold', color: educationStyling.titleColor }}>{t('resume.sections.education')}</h2>
-              <div className="space-y-4">
+              <h2 className="font-black mb-2 italic" style={{ fontSize: `calc(${educationTitleSizes.sectionHeading} * 0.8)`, fontWeight: headingBold ? '900' : 'bold', color: educationStyling.titleColor }}>{t('resume.sections.education')}</h2>
+              <div className="space-y-2">
                 {education.map((edu, index) => (
                   (edu.degree || edu.institution) && (
                     <div key={index} className="relative">
                       <div className="absolute -left-[26px] w-3 h-3 rounded-full bg-primary"></div>
-                      <h3 className="font-bold text-foreground" style={{ fontSize: sizes.lg }}>{edu.degree}</h3>
-                      <p className="text-muted-foreground" style={{ fontSize: sizes.sm }}>{edu.institution}{edu.location && ` • ${edu.location}`}</p>
+                      {/* Degree on its own line */}
+                      <h3 className="font-bold text-foreground mb-0.5" style={{ fontSize: sizes.lg }}>{edu.degree}</h3>
+                      {/* Institution/Location (left) and Date (right) on same line */}
+                      <div className="flex justify-between items-center gap-4 mb-0.5">
+                        <p className="text-muted-foreground" style={{ fontSize: sizes.sm }}>
+                          {edu.institution}{edu.location && ` • ${edu.location}`}
+                        </p>
+                        {(edu.startDate || edu.endDate) && (
+                          <span className="text-muted-foreground whitespace-nowrap" style={{ fontSize: sizes.xs }}>
+                            {formatDateRange(edu.startDate, edu.endDate, t('resume.fields.present'))}
+                          </span>
+                        )}
+                      </div>
                       {edu.field && <p className="text-muted-foreground italic" style={{ fontSize: sizes.sm }}>{edu.field}</p>}
                       {edu.keyCourses && edu.keyCourses.length > 0 && (
-                        <p className="text-muted-foreground mt-1" style={{ fontSize: sizes.xs }}>
+                        <p className="text-muted-foreground mt-0.5" style={{ fontSize: sizes.xs }}>
                           {t('resume.labels.keyCourses')}: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(", ")}
                         </p>
                       )}
@@ -203,27 +220,28 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
 
       case "projects":
         return projects.some(proj => proj.name) ? (
-          <div key="projects" className="mb-6">
+          <div key="projects" className="mb-3">
             <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="text-2xl font-black mb-4 italic" style={{ color: projectsStyling.titleColor, fontSize: projectsTitleSizes.sectionHeading }}>{t('resume.sections.projects')}</h2>
-              <div className="space-y-4">
+              <h2 className="font-black mb-2 italic" style={{ fontSize: `calc(${projectsTitleSizes.sectionHeading} * 0.8)`, fontWeight: headingBold ? '900' : 'bold', color: projectsStyling.titleColor }}>{t('resume.sections.projects')}</h2>
+              <div className="space-y-2">
                 {projects.map((proj, index) => (
                   proj.name && (
                     <div key={index} className="relative">
                       <div className="absolute -left-[26px] w-3 h-3 rounded-full bg-primary"></div>
-                      <div className="flex justify-between items-start">
-                        <h3 className="font-bold text-foreground" style={{ fontSize: sizes.lg }}>{proj.name}</h3>
+                      {/* Project name (left) and Date (right) on same line */}
+                      <div className="flex justify-between items-start gap-4 mb-0.5">
+                        <h3 className="font-bold text-foreground flex-1" style={{ fontSize: sizes.lg }}>{proj.name}</h3>
                         {(proj.startDate || proj.endDate) && (
-                          <span className="text-muted-foreground" style={{ fontSize: sizes.xs }}>
+                          <span className="text-muted-foreground whitespace-nowrap" style={{ fontSize: sizes.xs }}>
                             {formatDateRange(proj.startDate, proj.endDate, t('resume.fields.present'))}
                           </span>
                         )}
                       </div>
                       {proj.description && (
-                        <p className="text-muted-foreground mt-1" style={{ fontSize: sizes.sm }}>{proj.description}</p>
+                        <p className="text-muted-foreground mt-0.5" style={{ fontSize: sizes.sm }}>{proj.description}</p>
                       )}
                       {proj.highlights && proj.highlights.length > 0 && (
-                        <ul className="text-muted-foreground space-y-1 mt-1" style={{ fontSize: sizes.sm }}>
+                        <ul className="text-muted-foreground space-y-0.5 mt-1" style={{ fontSize: sizes.sm }}>
                           {proj.highlights.map((highlight, i) => (
                             highlight.highlight && (
                               <li key={i} className="flex gap-2">
@@ -235,7 +253,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                         </ul>
                       )}
                       {proj.technologies && proj.technologies.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
+                        <div className="flex flex-wrap gap-1 mt-1.5">
                           {proj.technologies.map((tech, i) => (
                             tech.technology && (
                               <span key={i} className="px-2 py-0.5 bg-primary/20 rounded" style={{ fontSize: sizes.xs, color: headingColor }}>
@@ -246,7 +264,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                         </div>
                       )}
                       {proj.link && (
-                        <a href={proj.link} target="_blank" rel="noopener noreferrer" className="hover:underline mt-2 block" style={{ fontSize: sizes.xs, color: linkColor }}>
+                        <a href={proj.link} target="_blank" rel="noopener noreferrer" className="hover:underline mt-1.5 block" style={{ fontSize: sizes.xs, color: linkColor }}>
                           {proj.link.replace(/^https?:\/\/(www\.)?/, '')}
                         </a>
                       )}
@@ -260,26 +278,30 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
 
       case "certificates":
         return certificates.some(cert => cert.name) ? (
-          <div key="certificates" className="mb-6">
+          <div key="certificates" className="mb-3">
             <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="font-black mb-4 italic" style={{ fontSize: certificatesTitleSizes.sectionHeading, fontWeight: headingBold ? '900' : 'bold', color: certificatesStyling.titleColor }}>{t('resume.sections.certifications')}</h2>
-              <div className="space-y-3">
+              <h2 className="font-black mb-2 italic" style={{ fontSize: `calc(${certificatesTitleSizes.sectionHeading} * 0.8)`, fontWeight: headingBold ? '900' : 'bold', color: certificatesStyling.titleColor }}>{t('resume.sections.certifications')}</h2>
+              <div className="space-y-1.5">
                 {certificates.map((cert, index) => (
                   cert.name && (
                     <div key={index} className="relative">
                       <div className="absolute -left-[26px] w-3 h-3 rounded-full bg-primary"></div>
-                      <h3 className="font-bold text-foreground">{cert.name}</h3>
-                      <p className="text-muted-foreground" style={{ fontSize: sizes.sm }}>{cert.organization}</p>
-                      {(cert.issueDate || cert.expirationDate) && (
-                        <p className="text-muted-foreground mt-1" style={{ fontSize: sizes.xs }}>
-                          {cert.issueDate} {cert.expirationDate && `- ${cert.expirationDate}`}
-                        </p>
-                      )}
+                      {/* Certificate name on its own line */}
+                      <h3 className="font-bold text-foreground mb-0.5">{cert.name}</h3>
+                      {/* Organization (left) and Date (right) on same line */}
+                      <div className="flex justify-between items-center gap-4 mb-0.5">
+                        <p className="text-muted-foreground" style={{ fontSize: sizes.sm }}>{cert.organization}</p>
+                        {(cert.issueDate || cert.expirationDate) && (
+                          <span className="text-muted-foreground whitespace-nowrap" style={{ fontSize: sizes.xs }}>
+                            {cert.issueDate} {cert.expirationDate && `- ${cert.expirationDate}`}
+                          </span>
+                        )}
+                      </div>
                       {cert.credentialId && (
                         <p className="text-muted-foreground" style={{ fontSize: sizes.xs }}>ID: {cert.credentialId}</p>
                       )}
                       {cert.url && (
-                        <a href={cert.url} target="_blank" rel="noopener noreferrer" className="hover:underline mt-1 block" style={{ fontSize: sizes.xs, color: linkColor }}>
+                        <a href={cert.url} target="_blank" rel="noopener noreferrer" className="hover:underline mt-0.5 block" style={{ fontSize: sizes.xs, color: linkColor }}>
                           {cert.url.replace(/^https?:\/\/(www\.)?/, '')}
                         </a>
                       )}
@@ -293,13 +315,13 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
 
       case "skills":
         return skills.some(s => s.skill) ? (
-          <div key="skills" className="mb-6">
+          <div key="skills" className="mb-3">
             <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="font-black mb-4 italic" style={{ fontSize: skillsTitleSizes.sectionHeading, fontWeight: headingBold ? '900' : 'bold', color: skillsStyling.titleColor }}>{t('resume.sections.skills')}</h2>
-              <div className="flex flex-wrap gap-2">
+              <h2 className="font-black mb-2 italic" style={{ fontSize: `calc(${skillsTitleSizes.sectionHeading} * 0.8)`, fontWeight: headingBold ? '900' : 'bold', color: skillsStyling.titleColor }}>{t('resume.sections.skills')}</h2>
+              <div className="flex flex-wrap gap-1.5">
                 {skills.map((s, index) => (
                   s.skill && (
-                    <span key={index} className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-bold shadow-md" style={{ fontSize: sizes.sm }}>
+                    <span key={index} className="px-2 py-1 bg-primary text-primary-foreground rounded font-bold" style={{ fontSize: sizes.xs }}>
                       {s.skill}
                     </span>
                   )
@@ -311,13 +333,13 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
 
       case "languages":
         return languages.some(lang => lang.language) ? (
-          <div key="languages" className="mb-6">
+          <div key="languages" className="mb-3">
             <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="font-black mb-4 italic" style={{ fontSize: languagesTitleSizes.sectionHeading, fontWeight: headingBold ? '900' : 'bold', color: languagesStyling.titleColor }}>{t('resume.sections.languages')}</h2>
-              <div className="grid grid-cols-2 gap-3">
+              <h2 className="font-black mb-2 italic" style={{ fontSize: `calc(${languagesTitleSizes.sectionHeading} * 0.8)`, fontWeight: headingBold ? '900' : 'bold', color: languagesStyling.titleColor }}>{t('resume.sections.languages')}</h2>
+              <div className="grid grid-cols-2 gap-2">
                 {languages.map((lang, index) => (
                   lang.language && (
-                    <div key={index} className="bg-primary/5 p-3 rounded-lg">
+                    <div key={index} className="bg-primary/5 p-2 rounded-lg">
                       <p className="font-bold text-foreground">{lang.language}</p>
                       <p className="text-muted-foreground" style={{ fontSize: sizes.sm }}>{lang.proficiency}</p>
                     </div>
@@ -330,9 +352,9 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
 
       case "interests":
         return personalInfo.interests && personalInfo.interests.length > 0 && personalInfo.interests.some(i => i.interest) ? (
-          <div key="interests" className="mb-6">
+          <div key="interests" className="mb-3">
             <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="font-black mb-3 italic" style={{ fontSize: personalInfoTitleSizes.sectionHeading, fontWeight: headingBold ? '900' : 'bold', color: personalInfoTitleColor }}>{t('resume.sections.interests')}</h2>
+              <h2 className="font-black mb-2 italic" style={{ fontSize: `calc(${personalInfoTitleSizes.sectionHeading} * 0.8)`, fontWeight: headingBold ? '900' : 'bold', color: personalInfoTitleColor }}>{t('resume.sections.interests')}</h2>
               <p className="text-foreground" style={{ fontSize: personalInfoBodySizes.sm, color: personalInfoBodyColor }}>{personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}</p>
             </div>
           </div>
@@ -348,8 +370,8 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
       <style>{`
         /* Apply padding for both screen (preview) and print */
         .resume-page-container {
-          padding-top: 32px !important;
-          padding-bottom: 32px !important;
+          padding-top: 20px !important;
+          padding-bottom: 20px !important;
         }
         @media print {
           /* Hide photo placeholders in print/PDF */
@@ -395,55 +417,55 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
           }
         }
       `}</style>
-      <div className="resume-page-container bg-gradient-to-br from-background to-primary/5 text-foreground p-8 max-w-4xl mx-auto font-creative" style={{ fontFamily: `"${fontFamily}", ui-sans-serif, system-ui, sans-serif` }}>
+      <div className="resume-page-container bg-gradient-to-br from-background to-primary/5 text-foreground p-4 max-w-4xl mx-auto font-creative" style={{ fontFamily: `"${fontFamily}", ui-sans-serif, system-ui, sans-serif` }}>
         {/* Bold creative header */}
-        <div className="mb-8">
+        <div className="mb-4">
           <div className="flex items-start gap-6 mb-4">
             <div className="flex-1">
-              <h1 className="font-black mb-0 italic tracking-tight" style={{ fontSize: '3rem', fontWeight: titleBold ? '900' : 'bold', color: titleColor, lineHeight: '1.1' }}>
+              <h1 className="font-black mb-0 italic tracking-tight" style={{ fontSize: '1.75rem', fontWeight: titleBold ? '900' : 'bold', color: titleColor, lineHeight: '1.1' }}>
                 {personalInfo.firstName}
               </h1>
-              <h1 className="font-black mb-2 italic tracking-tight" style={{ fontSize: '3rem', fontWeight: titleBold ? '900' : 'bold', color: headingColor, lineHeight: '1.1' }}>
+              <h1 className="font-black mb-1 italic tracking-tight" style={{ fontSize: '1.75rem', fontWeight: titleBold ? '900' : 'bold', color: headingColor, lineHeight: '1.1' }}>
                 {personalInfo.lastName}
               </h1>
               {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (
-                <p className="font-bold mb-4 italic" style={{ fontSize: '1.25rem', color: headingColor }}>{personalInfo.professionalTitle.trim()}</p>
+                <p className="font-bold mb-2 italic" style={{ fontSize: '0.9375rem', color: headingColor }}>{personalInfo.professionalTitle.trim()}</p>
               )}
 
-              <div className="flex flex-wrap gap-2 text-muted-foreground mt-4" style={{ fontSize: sizes.sm }}>
+              <div className="flex flex-wrap gap-1 text-muted-foreground mt-2" style={{ fontSize: sizes.xs }}>
                 {personalInfo.email && (
-                  <div className="flex items-center gap-2 bg-background/50 px-3 py-1 rounded-full">
-                    <Mail className="h-4 w-4 text-primary" />
+                  <div className="flex items-center gap-1 bg-background/50 px-2 py-0.5 rounded-full">
+                    <Mail className="h-3 w-3 text-primary" />
                     <span>{personalInfo.email}</span>
                   </div>
                 )}
                 {personalInfo.phone && (
-                  <div className="flex items-center gap-2 bg-background/50 px-3 py-1 rounded-full">
-                    <Phone className="h-4 w-4 text-primary" />
+                  <div className="flex items-center gap-1 bg-background/50 px-2 py-0.5 rounded-full">
+                    <Phone className="h-3 w-3 text-primary" />
                     <span>{personalInfo.phone}</span>
                   </div>
                 )}
                 {personalInfo.location && (
-                  <div className="flex items-center gap-2 bg-background/50 px-3 py-1 rounded-full">
-                    <MapPin className="h-4 w-4 text-primary" />
+                  <div className="flex items-center gap-1 bg-background/50 px-2 py-0.5 rounded-full">
+                    <MapPin className="h-3 w-3 text-primary" />
                     <span>{personalInfo.location}</span>
                   </div>
                 )}
                 {personalInfo.linkedin && (
-                  <div className="flex items-center gap-2 bg-background/50 px-3 py-1 rounded-full min-w-0 max-w-fit">
-                    <Linkedin className="h-4 w-4 text-primary flex-shrink-0" />
+                  <div className="flex items-center gap-1 bg-background/50 px-2 py-0.5 rounded-full min-w-0 max-w-fit">
+                    <Linkedin className="h-3 w-3 text-primary flex-shrink-0" />
                     <span className="truncate" style={{ fontSize: sizes.xs }}>{personalInfo.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span>
                   </div>
                 )}
                 {personalInfo.github && (
-                  <div className="flex items-center gap-2 bg-background/50 px-3 py-1 rounded-full min-w-0 max-w-fit">
-                    <Github className="h-4 w-4 text-primary flex-shrink-0" />
+                  <div className="flex items-center gap-1 bg-background/50 px-2 py-0.5 rounded-full min-w-0 max-w-fit">
+                    <Github className="h-3 w-3 text-primary flex-shrink-0" />
                     <span className="truncate" style={{ fontSize: sizes.xs }}>{personalInfo.github.replace(/^https?:\/\/(www\.)?/, '')}</span>
                   </div>
                 )}
                 {personalInfo.website && (
-                  <div className="flex items-center gap-2 bg-background/50 px-3 py-1 rounded-full min-w-0 max-w-fit">
-                    <Globe className="h-4 w-4 text-primary flex-shrink-0" />
+                  <div className="flex items-center gap-1 bg-background/50 px-2 py-0.5 rounded-full min-w-0 max-w-fit">
+                    <Globe className="h-3 w-3 text-primary flex-shrink-0" />
                     <span className="truncate" style={{ fontSize: sizes.xs }}>{personalInfo.website.replace(/^https?:\/\/(www\.)?/, '')}</span>
                   </div>
                 )}
@@ -453,7 +475,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
             {/* Profile image */}
             {personalInfo.profileImage ? (
               <div className="flex-shrink-0">
-                <div className="w-28 h-28 rounded-lg border-4 border-primary shadow-lg overflow-hidden">
+                <div className="w-16 h-16 rounded-lg border-4 border-primary shadow-lg overflow-hidden">
                   <img
                     src={personalInfo.profileImage}
                     alt={`Professional profile photo of ${personalInfo.firstName} ${personalInfo.lastName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
@@ -466,7 +488,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                 </div>
               </div>
             ) : (
-              <div className="flex-shrink-0 w-28 h-28 rounded-lg border-4 border-primary shadow-lg bg-muted flex items-center justify-center photo-placeholder">
+              <div className="flex-shrink-0 w-16 h-16 rounded-lg border-4 border-primary shadow-lg bg-muted flex items-center justify-center photo-placeholder">
                 <span className="text-muted-foreground" style={{ fontSize: sizes.xs }}>Photo</span>
               </div>
             )}
