@@ -325,7 +325,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
               <div className="flex flex-wrap gap-1.5">
                 {skills.map((s, index) => (
                   s.skill && (
-                    <span key={index} className="px-2 py-1 rounded font-bold" style={{ fontSize: sizes.xs, color: '#ffffff', backgroundColor: skillsStyling.bodyColor }}>
+                    <span key={index} className="px-2 py-1 rounded font-bold" style={{ fontSize: skillsBodySizes.xs, color: skillsStyling.bodyColor, backgroundColor: `${skillsStyling.bodyColor}15` }}>
                       {s.skill}
                     </span>
                   )
