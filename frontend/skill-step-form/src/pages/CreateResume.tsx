@@ -60,6 +60,16 @@ const createEmptyCVFormData = (): CVFormData => ({
   skills: [{ skill: "" }],
   sectionOrder: DEFAULT_SECTION_ORDER,
   template: "modern",
+  styling: {
+    titleColor: "#1f2937",
+    textColor: "#1f2937",
+    headingColor: "#2563eb",
+    linkColor: "#2563eb",
+    fontSize: "medium",
+    fontFamily: "Inter",
+    titleBold: true,
+    headingBold: true,
+  },
 });
 
 const mapResumeToCVFormData = (resume: Resume): CVFormData => {

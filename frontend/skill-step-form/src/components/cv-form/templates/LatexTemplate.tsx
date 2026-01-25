@@ -30,39 +30,40 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
 
   // Extract section-specific styling for personalInfo
   const personalInfoSectionStyling = styling?.sectionStyling?.personalInfo;
-  const personalInfoTitleColor = personalInfoSectionStyling?.titleColor || titleColor;
+  // Use headingColor as fallback (blue) instead of titleColor (black) to match template defaults
+  const personalInfoTitleColor = personalInfoSectionStyling?.titleColor || headingColor;
   const personalInfoTitleSize = personalInfoSectionStyling?.titleSize || fontSize;
   const personalInfoBodyColor = personalInfoSectionStyling?.bodyColor || textColor;
   const personalInfoBodySize = personalInfoSectionStyling?.bodySize || fontSize;
 
-  // Font size mappings - all relative to ensure consistency
+  // Font size mappings - Increased differences for more noticeable size changes
   const fontSizeMap = {
     small: {
-      base: '14px',        // Main text
-      name: '22px',        // Name in header
-      title: '15px',       // Professional title
-      heading: '11px',     // Section headings
-      body: '14px',        // Body text in sections
-      small: '12px',       // Small text (dates, links)
-      xs: '10px',          // Extra small (technologies, courses)
+      base: '12px',        // Main text
+      name: '20px',        // Name in header
+      title: '13px',       // Professional title
+      heading: '10px',     // Section headings
+      body: '12px',        // Body text in sections
+      small: '10px',       // Small text (dates, links)
+      xs: '8px',           // Extra small (technologies, courses)
     },
     medium: {
-      base: '16px',        // Main text
-      name: '24px',        // Name in header  
-      title: '16px',       // Professional title
-      heading: '11px',     // Section headings (consistent)
-      body: '14px',        // Body text in sections
-      small: '12px',       // Small text (dates, links)
-      xs: '10px',          // Extra small (technologies, courses)
+      base: '16px',        // Main text (+4px from small)
+      name: '24px',        // Name in header (+4px from small)
+      title: '16px',       // Professional title (+3px from small)
+      heading: '11px',     // Section headings (+1px from small)
+      body: '14px',        // Body text in sections (+2px from small)
+      small: '12px',       // Small text (dates, links) (+2px from small)
+      xs: '10px',          // Extra small (technologies, courses) (+2px from small)
     },
     large: {
-      base: '18px',        // Main text
-      name: '26px',        // Name in header
-      title: '18px',       // Professional title
-      heading: '11px',     // Section headings (consistent)
-      body: '16px',        // Body text in sections
-      small: '13px',       // Small text (dates, links)
-      xs: '11px',          // Extra small (technologies, courses)
+      base: '20px',        // Main text (+4px from medium)
+      name: '28px',        // Name in header (+4px from medium)
+      title: '19px',       // Professional title (+3px from medium)
+      heading: '12px',     // Section headings (+1px from medium)
+      body: '16px',        // Body text in sections (+2px from medium)
+      small: '14px',       // Small text (dates, links) (+2px from medium)
+      xs: '12px',          // Extra small (technologies, courses) (+2px from medium)
     },
   };
 
@@ -150,8 +151,8 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
 
     const content = (
       <div className="flex items-center gap-1 mb-0.5 min-w-0">
-        <Icon className="h-3 w-3 flex-shrink-0" style={{ color: personalInfoBodyColor }} />
-        <span className="break-words min-w-0 flex-1" style={{ fontSize: personalInfoBodySizes.small, color: personalInfoBodyColor, lineHeight: '1.3', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+        <Icon className="h-3 w-3 flex-shrink-0" style={{ color: textColor }} />
+        <span className="break-words min-w-0 flex-1" style={{ fontSize: personalInfoBodySizes.small, color: textColor, lineHeight: '1.3', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
           {displayText}
         </span>
       </div>
@@ -197,7 +198,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
 
                 return (
                   <div key={index} className="flex gap-2" style={{ fontSize: projectsBodySizes.body }}>
-                    <div className="w-[13%] flex-shrink-0 text-muted-foreground" style={{ fontSize: projectsBodySizes.small }}>
+                    <div className="w-[13%] flex-shrink-0" style={{ fontSize: projectsBodySizes.small, color: projectsStyling.bodyColor }}>
                       {dateRange}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -208,8 +209,8 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                             href={proj.link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-muted-foreground hover:underline flex-shrink-0 truncate max-w-[120px]"
-                            style={{ fontSize: projectsBodySizes.small }}
+                            className="hover:underline flex-shrink-0 truncate max-w-[120px]"
+                            style={{ fontSize: projectsBodySizes.small, color: linkColor }}
                           >
                             {proj.link.replace(/^https?:\/\//, '').substring(0, 25)}
                           </a>
@@ -233,7 +234,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                         </ul>
                       )}
                       {technologies && (
-                        <p className="text-muted-foreground font-mono" style={{ fontSize: projectsBodySizes.xs }}>
+                        <p className="font-mono" style={{ fontSize: projectsBodySizes.xs, color: projectsStyling.bodyColor }}>
                           {technologies}
                         </p>
                       )}
@@ -262,7 +263,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
 
                 return (
                   <div key={index} className="flex gap-2" style={{ fontSize: educationBodySizes.body }}>
-                    <div className="w-[13%] flex-shrink-0 text-muted-foreground" style={{ fontSize: educationBodySizes.small }}>
+                    <div className="w-[13%] flex-shrink-0" style={{ fontSize: educationBodySizes.small, color: educationStyling.bodyColor }}>
                       {dateRange}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -273,7 +274,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                             {edu.institution || ''}
                           </span>
                           {edu.location && (
-                            <span className="text-muted-foreground block" style={{ fontSize: educationBodySizes.small }}>{edu.location}</span>
+                            <span className="block" style={{ fontSize: educationBodySizes.small, color: educationStyling.bodyColor }}>{edu.location}</span>
                           )}
                         </div>
                       </div>
@@ -281,7 +282,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                         <p className="leading-snug break-words" style={{ fontSize: educationBodySizes.body, color: educationStyling.bodyColor }}>{edu.field}</p>
                       )}
                       {edu.keyCourses && edu.keyCourses.length > 0 && (
-                        <p className="text-muted-foreground mt-0.5" style={{ fontSize: educationBodySizes.xs }}>
+                        <p className="mt-0.5" style={{ fontSize: educationBodySizes.xs, color: educationStyling.bodyColor }}>
                           {t('resume.labels.keyCourses')}: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(', ')}
                         </p>
                       )}
@@ -321,7 +322,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
 
                 return (
                   <div key={index} className="flex gap-2" style={{ fontSize: workExperienceBodySizes.body }}>
-                    <div className="w-[13%] flex-shrink-0 text-muted-foreground" style={{ fontSize: workExperienceBodySizes.small }}>
+                    <div className="w-[13%] flex-shrink-0" style={{ fontSize: workExperienceBodySizes.small, color: workExperienceStyling.bodyColor }}>
                       {dateRange}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -332,7 +333,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                             {exp.company || ''}
                           </span>
                           {exp.location && (
-                            <span className="text-muted-foreground block" style={{ fontSize: workExperienceBodySizes.small }}>{exp.location}</span>
+                            <span className="block" style={{ fontSize: workExperienceBodySizes.small, color: workExperienceStyling.bodyColor }}>{exp.location}</span>
                           )}
                         </div>
                       </div>
@@ -349,14 +350,14 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                       {technologies.length > 0 && (
                         <div className="flex flex-wrap gap-0.5 mt-0.5">
                           {technologies.map((tech, i) => (
-                            <span key={i} className="font-mono text-muted-foreground bg-muted/50 px-1 py-0.5 rounded" style={{ fontSize: sizes.xs }}>
+                            <span key={i} className="font-mono px-1 py-0.5 rounded" style={{ fontSize: sizes.xs, color: workExperienceStyling.bodyColor, backgroundColor: `${workExperienceStyling.bodyColor}15` }}>
                               {tech}
                             </span>
                           ))}
                         </div>
                       )}
                       {exp.competencies && exp.competencies.length > 0 && (
-                        <p className="text-muted-foreground mt-0.5" style={{ fontSize: sizes.xs }}>
+                        <p className="mt-0.5" style={{ fontSize: sizes.xs, color: workExperienceStyling.bodyColor }}>
                           {t('resume.labels.keyCompetencies')}: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(', ')}
                         </p>
                       )}
@@ -538,18 +539,18 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
 
               <div className="pt-0 flex flex-col gap-2 flex-shrink-0 min-w-0 flex-1">
                 {fullName ? (
-                  <h1 className="uppercase mb-0 leading-tight break-words" style={{ fontSize: personalInfoTitleSizes.name, fontWeight: titleBold ? 'bold' : 'normal', color: personalInfoTitleColor }}>
+                  <h1 className="uppercase mb-0 leading-tight break-words" style={{ fontSize: personalInfoTitleSizes.name, fontWeight: titleBold ? 'bold' : 'normal', color: titleColor }}>
                     {fullName}
                   </h1>
                 ) : (
-                  <h1 className="uppercase mb-0 leading-tight break-words" style={{ fontSize: personalInfoTitleSizes.name, fontWeight: titleBold ? 'bold' : 'normal', color: personalInfoTitleColor }}>
+                  <h1 className="uppercase mb-0 leading-tight break-words" style={{ fontSize: personalInfoTitleSizes.name, fontWeight: titleBold ? 'bold' : 'normal', color: titleColor }}>
                     YOUR NAME HERE
                   </h1>
                 )}
                 {professionalTitle ? (
-                  <p className="mt-0 leading-tight font-medium break-words" style={{ fontSize: personalInfoBodySizes.title, color: personalInfoBodyColor }}>{professionalTitle}</p>
+                  <p className="mt-0 leading-tight font-medium break-words" style={{ fontSize: personalInfoBodySizes.title, color: textColor }}>{professionalTitle}</p>
                 ) : (
-                  <p className="mt-0 leading-tight font-medium break-words" style={{ fontSize: personalInfoBodySizes.title, color: personalInfoBodyColor }}>Your Professional Title</p>
+                  <p className="mt-0 leading-tight font-medium break-words" style={{ fontSize: personalInfoBodySizes.title, color: textColor }}>Your Professional Title</p>
                 )}
               </div>
             </div>

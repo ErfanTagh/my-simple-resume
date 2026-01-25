@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
@@ -70,8 +70,46 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
     return () => window.removeEventListener('popstate', handlePopState);
   }, [currentStep, templateSelected, editId, initialData]);
 
+  // Get template-specific default for headingColor (used by all sections)
+  // This matches each template's original headingColor default
+  const getTemplateDefaultHeadingColor = (template: string): string => {
+    const templateDefaults: Record<string, string> = {
+      modern: "#2563eb",    // Blue - ModernTemplate uses blue headings
+      creative: "#2563eb",  // Blue - CreativeTemplate uses blue headings
+      minimal: "#2563eb",   // Blue - MinimalTemplate uses blue headings
+      classic: "#2563eb",  // Blue - ClassicTemplate uses blue headings
+      latex: "#1f2937",     // Black - LatexTemplate uses black headings
+      starRover: "#141E61", // Dark blue - StarRoverTemplate uses dark blue headings
+    };
+    return templateDefaults[template] || "#2563eb"; // Default to blue if unknown
+  };
+
+  // Get template-specific default for personalInfo section heading color
+  // This matches each template's original headingColor default
+  const getTemplateDefaultPersonalInfoTitleColor = (template: string): string => {
+    return getTemplateDefaultHeadingColor(template);
+  };
+
   // Ensure workExperience and education always have at least one entry
   const getDefaultValues = (): CVFormData => {
+    // Get the template from initialData or default to "modern"
+    const template = initialData?.template || "modern";
+    const templateDefaultHeadingColor = getTemplateDefaultHeadingColor(template);
+    const templateDefaultPersonalInfoTitleColor = getTemplateDefaultPersonalInfoTitleColor(template);
+
+    // Default styling values that match template defaults
+    // Use template-specific headingColor instead of always blue
+    const defaultStyling = {
+      titleColor: "#1f2937",
+      textColor: "#1f2937",
+      headingColor: templateDefaultHeadingColor, // Use template-specific default
+      linkColor: "#2563eb",
+      fontSize: "medium" as const,
+      fontFamily: "Inter",
+      titleBold: true,
+      headingBold: true,
+    };
+
     const defaults = {
       personalInfo: {
         firstName: "",
@@ -113,6 +151,18 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
       skills: [],
       sectionOrder: ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"],
       template: "modern" as const,
+      styling: {
+        ...defaultStyling,
+        // Set personalInfo section styling with template-specific default
+        sectionStyling: {
+          personalInfo: {
+            titleColor: templateDefaultPersonalInfoTitleColor,
+            bodyColor: defaultStyling.textColor,
+            titleSize: defaultStyling.fontSize,
+            bodySize: defaultStyling.fontSize,
+          },
+        },
+      },
     };
 
     if (!initialData) {
@@ -121,6 +171,17 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
 
     // If initialData exists, use it but ensure workExperience and education have at least one entry
     // Also ensure all array fields are properly initialized to prevent crashes
+    // Merge styling to ensure defaults are set if not present
+    const dataTemplate = initialData.template || "modern";
+    const dataTemplateDefaultHeadingColor = getTemplateDefaultHeadingColor(dataTemplate);
+    const dataTemplateDefaultPersonalInfoTitleColor = getTemplateDefaultPersonalInfoTitleColor(dataTemplate);
+
+    // Use template-specific headingColor for the data template
+    const dataDefaultStyling = {
+      ...defaultStyling,
+      headingColor: dataTemplateDefaultHeadingColor, // Use template-specific default
+    };
+
     return {
       ...initialData,
       workExperience: initialData.workExperience && initialData.workExperience.length > 0
@@ -133,6 +194,22 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
       skills: Array.isArray(initialData.skills) ? initialData.skills : defaults.skills,
       projects: Array.isArray(initialData.projects) ? initialData.projects : defaults.projects,
       certificates: Array.isArray(initialData.certificates) ? initialData.certificates : defaults.certificates,
+      styling: {
+        ...dataDefaultStyling,
+        ...initialData.styling,
+        // Ensure headingColor matches template if not explicitly set
+        headingColor: initialData.styling?.headingColor || dataTemplateDefaultHeadingColor,
+        // Ensure personalInfo section styling has template-specific default if not set
+        sectionStyling: {
+          ...initialData.styling?.sectionStyling,
+          personalInfo: initialData.styling?.sectionStyling?.personalInfo || {
+            titleColor: dataTemplateDefaultPersonalInfoTitleColor,
+            bodyColor: dataDefaultStyling.textColor,
+            titleSize: dataDefaultStyling.fontSize,
+            bodySize: dataDefaultStyling.fontSize,
+          },
+        },
+      },
     };
   };
 
@@ -228,10 +305,22 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
     };
   };
 
+  const defaultValues = getDefaultValues();
+
   const form = useForm<CVFormData>({
     resolver: zodResolver(cvFormSchema),
-    defaultValues: getDefaultValues(),
+    defaultValues,
   });
+
+  // Log after form initialization
+  useEffect(() => {
+    const initialStyling = form.getValues("styling");
+    console.log('[CVFormContainer] Form initialized:', {
+      template: defaultValues.template,
+      titleColor: initialStyling?.titleColor,
+      textColor: initialStyling?.textColor,
+    });
+  }, [form]);
 
   // When creating a new resume, prefill personal info from logged-in user
   useEffect(() => {
@@ -250,6 +339,7 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
 
   // Watch form data for live preview
   const formData = form.watch();
+  const currentTemplate = form.watch("template");
 
   // Set template as selected and reset form when initialData has a template
   useEffect(() => {
@@ -263,6 +353,77 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
       }
     }
   }, [initialData, form]);
+
+  // Reset styling to defaults when template changes
+  // Use useLayoutEffect to ensure styling is set before browser paints
+  // Use form.reset() instead of form.setValue() to notify all subscribers
+  const prevTemplateRef = useRef<string | undefined>(currentTemplate);
+  useLayoutEffect(() => {
+    const prevTemplate = prevTemplateRef.current;
+
+    // Only reset styling if template actually changed
+    if (currentTemplate && currentTemplate !== prevTemplate) {
+      console.log('[CVFormContainer] Template changed:', { from: prevTemplate, to: currentTemplate });
+      prevTemplateRef.current = currentTemplate;
+
+      // Get template-specific defaults
+      const templateDefaultHeadingColor = getTemplateDefaultHeadingColor(currentTemplate);
+      const templateDefaultPersonalInfoTitleColor = getTemplateDefaultPersonalInfoTitleColor(currentTemplate);
+
+      // Default styling values that match template defaults
+      // Use template-specific headingColor instead of always blue
+      const defaultStyling = {
+        titleColor: "#1f2937",
+        textColor: "#1f2937",
+        headingColor: templateDefaultHeadingColor, // Use template-specific default
+        linkColor: "#2563eb",
+        fontSize: "medium" as const,
+        fontFamily: "Inter",
+        titleBold: true,
+        headingBold: true,
+      };
+
+      const currentValues = form.getValues();
+      const currentSectionStyling = currentValues.styling?.sectionStyling || {};
+
+      // Remove personalInfo section styling - it will fall back to template defaults
+      const { personalInfo: _, ...restSectionStyling } = currentSectionStyling;
+
+      // Only include personalInfo section styling if it exists and is different from template defaults
+      // Otherwise, let it fall back to template defaults (headingColor for title, textColor for body)
+      const existingPersonalInfo = currentSectionStyling.personalInfo;
+      const personalInfoNeedsCustomStyling = existingPersonalInfo && (
+        existingPersonalInfo.titleColor !== templateDefaultPersonalInfoTitleColor ||
+        existingPersonalInfo.bodyColor !== defaultStyling.textColor ||
+        existingPersonalInfo.titleSize !== defaultStyling.fontSize ||
+        existingPersonalInfo.bodySize !== defaultStyling.fontSize
+      );
+
+      const newStyling = {
+        ...defaultStyling,
+        sectionStyling: personalInfoNeedsCustomStyling && existingPersonalInfo
+          ? {
+            ...restSectionStyling,
+            personalInfo: existingPersonalInfo,
+          }
+          : (Object.keys(restSectionStyling).length > 0 ? restSectionStyling : undefined),
+      };
+
+      // Use reset with merge to notify all subscribers (including form.watch() subscribers)
+      // This ensures SectionStylingControls sees the updated styling immediately
+      form.reset({
+        ...currentValues,
+        styling: newStyling,
+      }, { keepDefaultValues: true });
+
+      console.log('[CVFormContainer] Styling reset:', {
+        titleColor: newStyling.titleColor,
+        textColor: newStyling.textColor,
+        personalInfoTitleColor: templateDefaultPersonalInfoTitleColor,
+        template: currentTemplate,
+      });
+    }
+  }, [currentTemplate]); // Remove 'form' from deps - it's stable
 
   const steps = [
     { component: PersonalInfoStep, label: t('resume.steps.personal') },

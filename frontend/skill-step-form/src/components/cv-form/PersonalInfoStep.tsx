@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2, Upload, X, User, Camera, ChevronDown, ChevronUp } from "lucide-react";
 import { CVFormData } from "./types";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
 import { ResumeUpload } from "./ResumeUpload";
 import { Separator } from "@/components/ui/separator";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -28,6 +28,35 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [parsedData, setParsedData] = useState<Partial<CVFormData> | null>(null);
   const [showMoreLinks, setShowMoreLinks] = useState(false);
+
+  // Ensure styling is initialized when component mounts or template changes
+  // Use useLayoutEffect to ensure styling is set before browser paints
+  const currentTemplate = form.watch("template");
+  const currentStyling = form.watch("styling");
+  
+  useLayoutEffect(() => {
+    // Default styling values that match template defaults
+    const defaultStyling = {
+      titleColor: "#1f2937",
+      textColor: "#1f2937",
+      headingColor: "#2563eb",
+      linkColor: "#2563eb",
+      fontSize: "medium" as const,
+      fontFamily: "Inter",
+      titleBold: true,
+      headingBold: true,
+    };
+
+    // If styling is missing or incomplete, initialize it
+    if (!currentStyling || !currentStyling.titleColor || !currentStyling.textColor || !currentStyling.headingColor || !currentStyling.fontSize) {
+      form.setValue("styling", {
+        ...defaultStyling,
+        ...currentStyling,
+        // Preserve section-specific styling if it exists
+        sectionStyling: currentStyling?.sectionStyling,
+      }, { shouldValidate: false, shouldDirty: false });
+    }
+  }, [currentTemplate, currentStyling, form]); // Re-run when template or styling changes
 
   // Initialize image preview from form value (avoiding setState during render)
   useEffect(() => {

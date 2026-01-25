@@ -31,36 +31,37 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
 
   // Extract section-specific styling for personalInfo
   const personalInfoSectionStyling = styling?.sectionStyling?.personalInfo;
-  const personalInfoTitleColor = personalInfoSectionStyling?.titleColor || titleColor;
+  // Use headingColor as fallback (blue) instead of titleColor (black) to match template defaults
+  const personalInfoTitleColor = personalInfoSectionStyling?.titleColor || headingColor;
   const personalInfoTitleSize = personalInfoSectionStyling?.titleSize || fontSize;
   const personalInfoBodyColor = personalInfoSectionStyling?.bodyColor || textColor;
   const personalInfoBodySize = personalInfoSectionStyling?.bodySize || fontSize;
 
-  // Font size mappings
+  // Font size mappings - Increased differences for more noticeable size changes
   const fontSizeMap = {
     small: {
-      base: '0.75rem',      // 12px
-      sm: '0.875rem',       // 14px
-      baseText: '0.75rem',  // 12px
-      title: '1.5rem',      // 24px
-      heading: '0.875rem',  // 14px
-      xs: '0.625rem',       // 10px
+      base: '0.6875rem',    // 11px
+      sm: '0.8125rem',      // 13px
+      baseText: '0.625rem', // 10px (reduced from 11px)
+      title: '1.25rem',     // 20px (reduced from 22px)
+      heading: '0.75rem',   // 12px (reduced from 13px)
+      xs: '0.5625rem',      // 9px
     },
     medium: {
-      base: '0.875rem',     // 14px
-      sm: '1rem',           // 16px
-      baseText: '0.875rem', // 14px
-      title: '1.875rem',    // 30px
-      heading: '1.125rem',  // 18px
-      xs: '0.75rem',        // 12px
+      base: '0.9375rem',    // 15px (+4px from small)
+      sm: '1.125rem',       // 18px (+5px from small)
+      baseText: '0.8125rem', // 13px (reduced from 15px)
+      title: '1.625rem',    // 26px (reduced from 30px)
+      heading: '1rem',      // 16px (reduced from 18px)
+      xs: '0.75rem',        // 12px (+3px from small)
     },
     large: {
-      base: '1rem',         // 16px
-      sm: '1.125rem',       // 18px
-      baseText: '1rem',     // 16px
-      title: '2.25rem',     // 36px
-      heading: '1.25rem',   // 20px
-      xs: '0.875rem',       // 14px
+      base: '1.1875rem',    // 19px (+4px from medium)
+      sm: '1.4375rem',      // 23px (+5px from medium)
+      baseText: '1rem',    // 16px (reduced from 19px)
+      title: '2rem',        // 32px (reduced from 38px)
+      heading: '1.25rem',   // 20px (reduced from 23px)
+      xs: '0.9375rem',      // 15px (+3px from medium)
     },
   };
 
@@ -146,24 +147,24 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                   <div key={index}>
                     <div className="flex justify-between items-start mb-1">
                       <div>
-                        <h3 className="font-bold text-foreground">{exp.position}</h3>
-                        <p className="font-semibold text-primary" style={{ fontSize: sizes.sm }}>{exp.company}</p>
-                        {exp.location && <p className="text-muted-foreground" style={{ fontSize: sizes.xs }}>{exp.location}</p>}
+                        <h3 className="font-bold" style={{ fontSize: workExperienceBodySizes.baseText, color: workExperienceStyling.bodyColor }}>{exp.position}</h3>
+                        <p className="font-semibold" style={{ fontSize: workExperienceBodySizes.baseText, color: workExperienceStyling.bodyColor }}>{exp.company}</p>
+                        {exp.location && <p style={{ fontSize: workExperienceBodySizes.xs, color: workExperienceStyling.bodyColor }}>{exp.location}</p>}
                       </div>
                       {(exp.startDate || exp.endDate) && (
-                        <div className="flex items-center gap-1 text-muted-foreground" style={{ fontSize: sizes.xs }}>
+                        <div className="flex items-center gap-1" style={{ fontSize: workExperienceBodySizes.xs, color: workExperienceStyling.bodyColor }}>
                           <Calendar className="h-3 w-3" />
                           <span>{formatDateRange(exp.startDate, exp.endDate, t('resume.fields.present'))}</span>
                         </div>
                       )}
                     </div>
-                    {exp.description && <p className="text-muted-foreground mb-2" style={{ color: workExperienceStyling.bodyColor, fontSize: workExperienceBodySizes.sm }}>{exp.description}</p>}
+                    {exp.description && <p className="mb-2" style={{ color: workExperienceStyling.bodyColor, fontSize: workExperienceBodySizes.baseText }}>{exp.description}</p>}
                     {exp.responsibilities && exp.responsibilities.length > 0 && (
-                      <ul className="space-y-1 mb-2" style={{ fontSize: workExperienceBodySizes.sm, color: workExperienceStyling.bodyColor }}>
+                      <ul className="space-y-1 mb-2" style={{ fontSize: workExperienceBodySizes.baseText, color: workExperienceStyling.bodyColor }}>
                         {exp.responsibilities.map((resp, i) => (
                           resp.responsibility && (
                             <li key={i} className="flex gap-2">
-                              <span className="text-primary">•</span>
+                              <span style={{ color: workExperienceStyling.bodyColor }}>•</span>
                               <span className="flex-1">{resp.responsibility}</span>
                             </li>
                           )
@@ -171,12 +172,12 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                       </ul>
                     )}
                     {exp.technologies && exp.technologies.length > 0 && (
-                      <p className="text-primary mt-2" style={{ fontSize: sizes.xs }}>
+                      <p className="mt-2" style={{ fontSize: workExperienceBodySizes.xs, color: workExperienceStyling.bodyColor }}>
                         {t('resume.sections.technologies')}: {exp.technologies.map(t => typeof t === 'string' ? t : t.technology).filter(Boolean).join(", ")}
                       </p>
                     )}
                     {exp.competencies && exp.competencies.length > 0 && (
-                      <p className="text-muted-foreground mt-1" style={{ fontSize: sizes.xs }}>
+                      <p className="mt-1" style={{ fontSize: workExperienceBodySizes.xs, color: workExperienceStyling.bodyColor }}>
                         {t('resume.labels.keyCompetencies')}: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(", ")}
                       </p>
                     )}
@@ -197,18 +198,18 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                   <div key={index}>
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="font-bold" style={{ color: educationStyling.bodyColor }}>{edu.degree}</h3>
-                        <p className="text-muted-foreground" style={{ fontSize: educationBodySizes.sm, color: educationStyling.bodyColor }}>{edu.institution}</p>
-                        {edu.location && <p className="text-muted-foreground" style={{ fontSize: educationBodySizes.xs, color: educationStyling.bodyColor }}>{edu.location}</p>}
-                        {edu.field && <p className="text-muted-foreground italic" style={{ fontSize: educationBodySizes.sm, color: educationStyling.bodyColor }}>{edu.field}</p>}
+                        <h3 className="font-bold" style={{ fontSize: educationBodySizes.baseText, color: educationStyling.bodyColor }}>{edu.degree}</h3>
+                        <p style={{ fontSize: educationBodySizes.baseText, color: educationStyling.bodyColor }}>{edu.institution}</p>
+                        {edu.location && <p style={{ fontSize: educationBodySizes.xs, color: educationStyling.bodyColor }}>{edu.location}</p>}
+                        {edu.field && <p className="italic" style={{ fontSize: educationBodySizes.baseText, color: educationStyling.bodyColor }}>{edu.field}</p>}
                         {edu.keyCourses && edu.keyCourses.length > 0 && (
-                          <p className="text-muted-foreground mt-1" style={{ fontSize: educationBodySizes.xs, color: educationStyling.bodyColor }}>
+                          <p className="mt-1" style={{ fontSize: educationBodySizes.xs, color: educationStyling.bodyColor }}>
                             {t('resume.labels.keyCourses')}: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(", ")}
                           </p>
                         )}
                       </div>
                       {(edu.startDate || edu.endDate) && (
-                        <span className="text-muted-foreground" style={{ fontSize: educationBodySizes.xs, color: educationStyling.bodyColor }}>{formatDateRange(edu.startDate, edu.endDate, t('resume.fields.present'))}</span>
+                        <span style={{ fontSize: educationBodySizes.xs, color: educationStyling.bodyColor }}>{formatDateRange(edu.startDate, edu.endDate, t('resume.fields.present'))}</span>
                       )}
                     </div>
                   </div>
@@ -227,18 +228,18 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                 proj.name && (
                   <div key={index}>
                     <div className="flex justify-between items-start mb-1">
-                      <h3 className="font-bold text-foreground">{proj.name}</h3>
+                      <h3 className="font-bold" style={{ fontSize: projectsBodySizes.baseText, color: projectsStyling.bodyColor }}>{proj.name}</h3>
                       {(proj.startDate || proj.endDate) && (
-                        <span className="text-muted-foreground" style={{ fontSize: sizes.xs }}>{formatDateRange(proj.startDate, proj.endDate, t('resume.fields.present'))}</span>
+                        <span style={{ fontSize: projectsBodySizes.xs, color: projectsStyling.bodyColor }}>{formatDateRange(proj.startDate, proj.endDate, t('resume.fields.present'))}</span>
                       )}
                     </div>
-                    {proj.description && <p className="text-muted-foreground mb-2" style={{ fontSize: projectsBodySizes.sm, color: projectsStyling.bodyColor }}>{proj.description}</p>}
+                    {proj.description && <p className="mb-2" style={{ fontSize: projectsBodySizes.baseText, color: projectsStyling.bodyColor }}>{proj.description}</p>}
                     {proj.highlights && proj.highlights.length > 0 && (
-                      <ul className="space-y-1 mb-2" style={{ fontSize: projectsBodySizes.sm, color: projectsStyling.bodyColor }}>
+                      <ul className="space-y-1 mb-2" style={{ fontSize: projectsBodySizes.baseText, color: projectsStyling.bodyColor }}>
                         {proj.highlights.map((highlight, i) => (
                           highlight.highlight && (
                             <li key={i} className="flex gap-2">
-                              <span className="text-primary">•</span>
+                              <span style={{ color: projectsStyling.bodyColor }}>•</span>
                               <span className="flex-1">{highlight.highlight}</span>
                             </li>
                           )
@@ -246,12 +247,12 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                       </ul>
                     )}
                     {proj.technologies && proj.technologies.length > 0 && (
-                      <p className="text-primary mt-1" style={{ fontSize: sizes.xs }}>
+                      <p className="mt-1" style={{ fontSize: projectsBodySizes.xs, color: projectsStyling.bodyColor }}>
                         {t('resume.sections.technologies')}: {proj.technologies.map(t => typeof t === 'string' ? t : t.technology).filter(Boolean).join(", ")}
                       </p>
                     )}
                     {proj.link && (
-                      <a href={proj.link} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline mt-1 block" style={{ fontSize: sizes.xs }}>
+                      <a href={proj.link} target="_blank" rel="noopener noreferrer" className="hover:underline mt-1 block" style={{ fontSize: projectsBodySizes.xs, color: linkColor }}>
                         {proj.link.replace(/^https?:\/\/(www\.)?/, '')}
                       </a>
                     )}
@@ -272,18 +273,18 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                   <div key={index}>
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="font-semibold" style={{ color: certificatesStyling.bodyColor }}>{cert.name}</h3>
-                        <p className="text-muted-foreground" style={{ fontSize: certificatesBodySizes.sm, color: certificatesStyling.bodyColor }}>{cert.organization}</p>
+                        <h3 className="font-semibold" style={{ fontSize: certificatesBodySizes.baseText, color: certificatesStyling.bodyColor }}>{cert.name}</h3>
+                        <p style={{ fontSize: certificatesBodySizes.baseText, color: certificatesStyling.bodyColor }}>{cert.organization}</p>
                         {(cert.issueDate || cert.expirationDate) && (
-                          <p className="text-muted-foreground mt-1" style={{ fontSize: certificatesBodySizes.xs, color: certificatesStyling.bodyColor }}>
+                          <p className="mt-1" style={{ fontSize: certificatesBodySizes.xs, color: certificatesStyling.bodyColor }}>
                             {cert.issueDate} {cert.expirationDate && `- ${cert.expirationDate}`}
                           </p>
                         )}
                         {cert.credentialId && (
-                          <p className="text-muted-foreground" style={{ fontSize: certificatesBodySizes.xs, color: certificatesStyling.bodyColor }}>ID: {cert.credentialId}</p>
+                          <p style={{ fontSize: certificatesBodySizes.xs, color: certificatesStyling.bodyColor }}>ID: {cert.credentialId}</p>
                         )}
                         {cert.url && (
-                          <a href={cert.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline mt-1 block" style={{ fontSize: sizes.xs }}>
+                          <a href={cert.url} target="_blank" rel="noopener noreferrer" className="hover:underline mt-1 block" style={{ fontSize: certificatesBodySizes.xs, color: linkColor }}>
                             {cert.url.replace(/^https?:\/\/(www\.)?/, '')}
                           </a>
                         )}
@@ -303,7 +304,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
             <div className="flex flex-wrap gap-2">
               {skills.map((s, index) => (
                 s.skill && (
-                  <span key={index} className="px-3 py-1 bg-primary/10 text-primary rounded-full font-medium" style={{ fontSize: skillsBodySizes.sm }}>
+                  <span key={index} className="px-3 py-1 rounded-full font-medium" style={{ fontSize: skillsBodySizes.xs, color: skillsStyling.bodyColor, backgroundColor: `${skillsStyling.bodyColor}15` }}>
                     {s.skill}
                   </span>
                 )
@@ -319,7 +320,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
             <div className="space-y-2">
               {languages.map((lang, index) => (
                 lang.language && (
-                  <div key={index} className="flex justify-between items-center gap-4 pr-2" style={{ fontSize: languagesBodySizes.sm, color: languagesStyling.bodyColor }}>
+                  <div key={index} className="flex justify-between items-center gap-4 pr-2" style={{ fontSize: languagesBodySizes.xs, color: languagesStyling.bodyColor }}>
                     <span className="font-semibold">{lang.language}</span>
                     <span className="whitespace-nowrap flex-shrink-0" style={{ color: languagesStyling.bodyColor, opacity: 0.7 }}>{lang.proficiency}</span>
                   </div>
@@ -333,7 +334,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
         return personalInfo.interests && personalInfo.interests.length > 0 && personalInfo.interests.some(i => i.interest) ? (
           <div key="interests" className="mb-6" data-resume-section="true">
             <h2 className={getHeadingClassName()} style={{ color: personalInfoTitleColor, fontWeight: headingBold ? 'bold' : 'normal', borderColor: personalInfoTitleColor, fontSize: personalInfoTitleSizes.heading }}>{t('resume.sections.interests').toUpperCase()}</h2>
-            <p className="text-sm" style={{ color: personalInfoBodyColor, fontSize: personalInfoBodySizes.baseText }}>{personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}</p>
+            <p style={{ color: personalInfoBodyColor, fontSize: personalInfoBodySizes.baseText }}>{personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}</p>
           </div>
         ) : null;
 
@@ -399,58 +400,58 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
         style={{ fontFamily: `"${fontFamily}", ui-sans-serif, system-ui, sans-serif` }}
       >
         {/* Header with colored background */}
-        <div className="bg-primary/5 -mx-8 -mt-8 px-8 py-6 mb-6 border-l-4 border-primary">
+        <div className="-mx-8 -mt-8 px-8 py-6 mb-6 border-l-4" style={{ backgroundColor: `${linkColor}0D`, borderColor: linkColor }}>
           <div className="flex items-start gap-6">
             <div className="flex-1">
               <h1
                 className="mb-2"
                 style={{
-                  color: personalInfoTitleColor,
+                  color: linkColor,
                   fontWeight: titleBold ? 'bold' : 'normal',
-                  fontSize: personalInfoTitleSizes.title,
+                  fontSize: sizes.title,
                   lineHeight: '1.2',
                 }}
               >
                 {personalInfo.firstName} {personalInfo.lastName}
               </h1>
               {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (
-                <p className="text-primary font-semibold mb-2" style={{ fontSize: personalInfoBodySizes.base, color: personalInfoBodyColor }}>{personalInfo.professionalTitle.trim()}</p>
+                <p className="font-semibold mb-2" style={{ fontSize: sizes.base, color: textColor }}>{personalInfo.professionalTitle.trim()}</p>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-muted-foreground mt-3" style={{ fontSize: personalInfoBodySizes.sm, color: personalInfoBodyColor }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-3" style={{ fontSize: sizes.xs, color: textColor }}>
                 {personalInfo.email && (
                   <div className="flex items-center gap-2 min-w-0">
-                    <Mail className="h-4 w-4 text-primary flex-shrink-0" />
+                    <Mail className="h-4 w-4 flex-shrink-0" style={{ color: linkColor }} />
                     <span className="truncate">{personalInfo.email}</span>
                   </div>
                 )}
                 {personalInfo.phone && (
                   <div className="flex items-center gap-2 min-w-0">
-                    <Phone className="h-4 w-4 text-primary flex-shrink-0" />
+                    <Phone className="h-4 w-4 flex-shrink-0" style={{ color: linkColor }} />
                     <span className="truncate">{personalInfo.phone}</span>
                   </div>
                 )}
                 {personalInfo.location && (
                   <div className="flex items-center gap-2 min-w-0">
-                    <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                    <MapPin className="h-4 w-4 flex-shrink-0" style={{ color: linkColor }} />
                     <span className="truncate">{personalInfo.location}</span>
                   </div>
                 )}
                 {personalInfo.linkedin && (
                   <div className="flex items-center gap-2 min-w-0">
-                    <Linkedin className="h-4 w-4 text-primary flex-shrink-0" />
+                    <Linkedin className="h-4 w-4 flex-shrink-0" style={{ color: linkColor }} />
                     <span className="truncate">{personalInfo.linkedin}</span>
                   </div>
                 )}
                 {personalInfo.github && (
                   <div className="flex items-center gap-2 min-w-0">
-                    <Github className="h-4 w-4 text-primary flex-shrink-0" />
+                    <Github className="h-4 w-4 flex-shrink-0" style={{ color: linkColor }} />
                     <span className="truncate">{personalInfo.github}</span>
                   </div>
                 )}
                 {personalInfo.website && (
                   <div className="flex items-center gap-2 min-w-0">
-                    <Globe className="h-4 w-4 text-primary flex-shrink-0" />
+                    <Globe className="h-4 w-4 flex-shrink-0" style={{ color: linkColor }} />
                     <span className="truncate">{personalInfo.website}</span>
                   </div>
                 )}
@@ -460,7 +461,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
             {/* Profile image */}
             {personalInfo.profileImage ? (
               <div className="flex-shrink-0">
-                <div className="w-24 h-24 md:w-28 md:h-28 rounded-md border-2 border-primary overflow-hidden">
+                <div className="w-24 h-24 md:w-28 md:h-28 rounded-md border-2 overflow-hidden" style={{ borderColor: linkColor }}>
                   <img
                     src={personalInfo.profileImage}
                     alt={`Professional profile photo of ${personalInfo.firstName} ${personalInfo.lastName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
@@ -473,7 +474,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                 </div>
               </div>
             ) : (
-              <div className="flex-shrink-0 w-24 h-24 md:w-28 md:h-28 rounded-md border-2 border-primary bg-muted flex items-center justify-center photo-placeholder">
+              <div className="flex-shrink-0 w-24 h-24 md:w-28 md:h-28 rounded-md border-2 bg-muted flex items-center justify-center photo-placeholder" style={{ borderColor: linkColor }}>
                 <span className="text-xs text-muted-foreground">Photo</span>
               </div>
             )}

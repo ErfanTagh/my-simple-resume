@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Palette, Type, RotateCcw } from "lucide-react";
 import { CVFormData } from "./types";
-import { UseFormReturn } from "react-hook-form";
+import { UseFormReturn, useWatch } from "react-hook-form";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
@@ -23,8 +23,67 @@ const SIZE_MAP = {
 
 export const SectionStylingControls = ({ form, sectionName, sectionLabel }: SectionStylingControlsProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const styling = form.watch("styling") || {};
+
+  // Use useWatch with fallback to form.getValues() to ensure we always have styling
+  const watchedStyling = useWatch({ control: form.control, name: "styling" });
+  const getValuesStyling = form.getValues("styling");
+  const styling = watchedStyling || getValuesStyling || {};
+
+  // Get template to determine template-specific defaults
+  const template = useWatch({ control: form.control, name: "template" }) || form.getValues("template") || "modern";
+
+  // Get template-specific default for personalInfo section heading color
+  const getTemplateDefaultPersonalInfoTitleColor = (templateName: string): string => {
+    const templateDefaults: Record<string, string> = {
+      modern: "#2563eb",    // Blue - ModernTemplate uses blue headings
+      creative: "#2563eb",  // Blue - CreativeTemplate uses blue headings
+      minimal: "#2563eb",   // Blue - MinimalTemplate uses blue headings
+      classic: "#2563eb",   // Blue - ClassicTemplate uses blue headings
+      latex: "#1f2937",     // Black - LatexTemplate uses black headings
+      starRover: "#141E61", // Dark blue - StarRoverTemplate uses dark blue headings
+    };
+    return templateDefaults[templateName] || "#2563eb"; // Default to blue if unknown
+  };
+
   const sectionStyling = styling.sectionStyling?.[sectionName] || {};
+
+  // For personalInfo section, use template-specific default. For other sections, use headingColor.
+  // Note: The "Title/Heading Color" in settings controls section headings, not the header name
+  const defaultTitleColor = sectionName === "personalInfo"
+    ? getTemplateDefaultPersonalInfoTitleColor(template)  // Use template-specific default
+    : (styling.headingColor || "#1f2937"); // Other sections use headingColor
+
+  // Body color always uses textColor as default
+  const defaultBodyColor = styling.textColor || "#1f2937";
+
+  // Use template fontSize as default, fallback to "medium"
+  const defaultFontSize = (styling.fontSize || "medium") as "small" | "medium" | "large";
+
+  // Essential logging only
+  const titleColorInputValue = sectionStyling.titleColor || defaultTitleColor;
+  const bodyColorInputValue = sectionStyling.bodyColor || defaultBodyColor;
+
+  // Check if styling is actually custom (different from template defaults)
+  // Only consider it custom if the value exists AND is different from the default
+  // Use explicit boolean conversion to ensure we always get true/false, not undefined
+  const hasCustomTitleColor = Boolean(sectionStyling.titleColor && sectionStyling.titleColor !== defaultTitleColor);
+  const hasCustomBodyColor = Boolean(sectionStyling.bodyColor && sectionStyling.bodyColor !== defaultBodyColor);
+  const hasCustomTitleSize = Boolean(sectionStyling.titleSize && sectionStyling.titleSize !== defaultFontSize);
+  const hasCustomBodySize = Boolean(sectionStyling.bodySize && sectionStyling.bodySize !== defaultFontSize);
+  const hasCustomStyling = hasCustomTitleColor || hasCustomBodyColor || hasCustomTitleSize || hasCustomBodySize;
+
+  if (sectionName === "personalInfo") {
+    console.log(`[${sectionName}] Colors:`, {
+      titleColor: titleColorInputValue,
+      bodyColor: bodyColorInputValue,
+      hasCustom: hasCustomStyling,
+      sectionTitleColor: sectionStyling.titleColor,
+      defaultTitleColor: defaultTitleColor,
+      templateHeadingColor: styling.headingColor,
+      templateTextColor: styling.textColor,
+      template: template,
+    });
+  }
 
   const updateSectionStyling = (updates: { titleColor?: string; titleSize?: "small" | "medium" | "large"; bodyColor?: string; bodySize?: "small" | "medium" | "large" }) => {
     const currentStyling = form.getValues("styling") || {};
@@ -53,7 +112,8 @@ export const SectionStylingControls = ({ form, sectionName, sectionLabel }: Sect
     });
   };
 
-  const hasCustomStyling = sectionStyling.titleColor || sectionStyling.titleSize || sectionStyling.bodyColor || sectionStyling.bodySize;
+  // Use the same hasCustomStyling logic we computed above
+  // (hasCustomStyling is already defined above, so we don't need to redefine it)
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className="border rounded-lg bg-muted/30 mb-6">
@@ -80,20 +140,23 @@ export const SectionStylingControls = ({ form, sectionName, sectionLabel }: Sect
           <Label htmlFor={`${sectionName}-titleColor`} className="flex items-center gap-2 text-sm">
             <Type className="h-3 w-3" />
             Title/Heading Color
+            {!sectionStyling.titleColor && (
+              <span className="text-xs text-muted-foreground ml-1">(Template default)</span>
+            )}
           </Label>
           <div className="flex items-center gap-2">
             <Input
               id={`${sectionName}-titleColor`}
               type="color"
-              value={sectionStyling.titleColor || styling.headingColor || "#1f2937"}
+              value={sectionStyling.titleColor || defaultTitleColor}
               onChange={(e) => updateSectionStyling({ titleColor: e.target.value })}
               className="w-12 h-9 cursor-pointer"
             />
             <Input
               type="text"
-              value={sectionStyling.titleColor || styling.headingColor || "#1f2937"}
+              value={sectionStyling.titleColor || defaultTitleColor}
               onChange={(e) => updateSectionStyling({ titleColor: e.target.value })}
-              placeholder="#1f2937"
+              placeholder={defaultTitleColor}
               className="flex-1 text-sm"
             />
           </div>
@@ -103,7 +166,7 @@ export const SectionStylingControls = ({ form, sectionName, sectionLabel }: Sect
         <div className="space-y-2">
           <Label htmlFor={`${sectionName}-titleSize`} className="text-sm">Title/Heading Size</Label>
           <Select
-            value={sectionStyling.titleSize || "medium"}
+            value={sectionStyling.titleSize || defaultFontSize}
             onValueChange={(value: "small" | "medium" | "large") => {
               if (value === "small" || value === "medium" || value === "large") {
                 updateSectionStyling({ titleSize: value });
@@ -126,20 +189,23 @@ export const SectionStylingControls = ({ form, sectionName, sectionLabel }: Sect
           <Label htmlFor={`${sectionName}-bodyColor`} className="flex items-center gap-2 text-sm">
             <Palette className="h-3 w-3" />
             Body Text Color
+            {!sectionStyling.bodyColor && (
+              <span className="text-xs text-muted-foreground ml-1">(Template default)</span>
+            )}
           </Label>
           <div className="flex items-center gap-2">
             <Input
               id={`${sectionName}-bodyColor`}
               type="color"
-              value={sectionStyling.bodyColor || styling.textColor || "#1f2937"}
+              value={sectionStyling.bodyColor || defaultBodyColor}
               onChange={(e) => updateSectionStyling({ bodyColor: e.target.value })}
               className="w-12 h-9 cursor-pointer"
             />
             <Input
               type="text"
-              value={sectionStyling.bodyColor || styling.textColor || "#1f2937"}
+              value={sectionStyling.bodyColor || defaultBodyColor}
               onChange={(e) => updateSectionStyling({ bodyColor: e.target.value })}
-              placeholder="#1f2937"
+              placeholder={defaultBodyColor}
               className="flex-1 text-sm"
             />
           </div>
@@ -149,7 +215,7 @@ export const SectionStylingControls = ({ form, sectionName, sectionLabel }: Sect
         <div className="space-y-2">
           <Label htmlFor={`${sectionName}-bodySize`} className="text-sm">Body Text Size</Label>
           <Select
-            value={sectionStyling.bodySize || "medium"}
+            value={sectionStyling.bodySize || defaultFontSize}
             onValueChange={(value: "small" | "medium" | "large") => {
               if (value === "small" || value === "medium" || value === "large") {
                 updateSectionStyling({ bodySize: value });

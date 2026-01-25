@@ -30,25 +30,28 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
   const textColor = styling?.textColor || "#1f2937";
   const linkColor = styling?.linkColor || "#141E61";
 
-  // Font size mappings - StarRover uses text-base (16px), text-sm (14px), text-xs (12px)
+  // Font size mappings - Increased differences for more noticeable size changes
   const fontSizeMap = {
     small: {
-      base: '0.875rem',     // 14px (text-sm)
-      sm: '0.75rem',        // 12px (text-xs)
-      xs: '0.625rem',       // 10px
-      heading: '0.875rem',  // 14px
+      base: '0.8125rem',    // 13px
+      sm: '0.6875rem',      // 11px
+      xs: '0.5625rem',      // 9px
+      baseText: '0.625rem', // 10px (reduced from 11px)
+      heading: '0.75rem',   // 12px (reduced from 13px)
     },
     medium: {
-      base: '1rem',         // 16px (text-base)
-      sm: '0.875rem',       // 14px (text-sm)
-      xs: '0.75rem',        // 12px (text-xs)
-      heading: '1rem',      // 16px
+      base: '1rem',         // 16px (+3px from small)
+      sm: '0.875rem',       // 14px (+3px from small)
+      xs: '0.75rem',        // 12px (+3px from small)
+      baseText: '0.8125rem', // 13px (reduced from 15px)
+      heading: '1rem',      // 16px (reduced from 18px)
     },
     large: {
-      base: '1.125rem',     // 18px
-      sm: '1rem',           // 16px
-      xs: '0.875rem',       // 14px
-      heading: '1.125rem',  // 18px
+      base: '1.1875rem',    // 19px (+3px from medium)
+      sm: '1.0625rem',      // 17px (+3px from medium)
+      xs: '0.9375rem',      // 15px (+3px from medium)
+      baseText: '1rem',    // 16px (reduced from 19px)
+      heading: '1.25rem',   // 20px (reduced from 23px)
     },
   };
 
@@ -67,7 +70,8 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
 
   // Extract section-specific styling for personalInfo
   const personalInfoSectionStyling = styling?.sectionStyling?.personalInfo;
-  const personalInfoTitleColor = personalInfoSectionStyling?.titleColor || titleColor;
+  // Use headingColor as fallback (blue) instead of titleColor (black) to match template defaults
+  const personalInfoTitleColor = personalInfoSectionStyling?.titleColor || headingColor;
   const personalInfoTitleSize = personalInfoSectionStyling?.titleSize || fontSize;
   const personalInfoBodyColor = personalInfoSectionStyling?.bodyColor || textColor;
   const personalInfoBodySize = personalInfoSectionStyling?.bodySize || fontSize;
@@ -156,7 +160,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                 <div className="flex-1" style={{ borderTop: `1px solid ${personalInfoTitleColor}` }}></div>
               </div>
             </div>
-            <p className="text-foreground leading-relaxed break-words whitespace-pre-wrap" style={{ fontSize: personalInfoBodySizes.base, color: personalInfoBodyColor }}>{personalInfo.summary.trim()}</p>
+            <p className="text-foreground leading-relaxed break-words whitespace-pre-wrap" style={{ fontSize: personalInfoBodySizes.baseText, color: personalInfoBodyColor }}>{personalInfo.summary.trim()}</p>
           </div>
         ) : null;
 
@@ -182,32 +186,32 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                 return (
                   <div key={index}>
                     <div className="flex justify-between items-start gap-2 mb-1">
-                      <h3 className="font-bold uppercase tracking-wide text-foreground" style={{ fontSize: sizes.heading }}>
+                      <h3 className="font-bold uppercase tracking-wide" style={{ fontSize: educationBodySizes.baseText, color: educationStyling.bodyColor }}>
                         {edu.institution || edu.degree}
                         {hasAux && (
-                          <span className="font-normal normal-case italic text-foreground">
+                          <span className="font-normal normal-case italic" style={{ color: educationStyling.bodyColor }}>
                             {' | '}{edu.degree}
                           </span>
                         )}
                       </h3>
                       {dateRange && (
-                        <span className="font-normal flex-shrink-0" style={{ fontSize: sizes.sm, color: headingColor }}>
+                        <span className="font-normal flex-shrink-0" style={{ fontSize: educationBodySizes.xs, color: educationStyling.bodyColor }}>
                           {dateRange}
                         </span>
                       )}
                     </div>
                     {edu.location && (
-                      <span className="font-normal" style={{ fontSize: sizes.sm, color: headingColor }}>
+                      <span className="font-normal" style={{ fontSize: educationBodySizes.xs, color: educationStyling.bodyColor }}>
                         {edu.location}
                       </span>
                     )}
                     {edu.field && (
-                      <ul className="text-foreground space-y-0.5 mt-1 list-none pl-0" style={{ fontSize: sizes.base }}>
+                      <ul className="space-y-0.5 mt-1 list-none pl-0" style={{ fontSize: educationBodySizes.baseText, color: educationStyling.bodyColor }}>
                         <li className="break-words">{edu.field}</li>
                       </ul>
                     )}
                     {edu.keyCourses && edu.keyCourses.length > 0 && (
-                      <p className="text-muted-foreground mt-1" style={{ fontSize: sizes.sm }}>
+                      <p className="mt-1" style={{ fontSize: educationBodySizes.xs, color: educationStyling.bodyColor }}>
                         {t('resume.labels.keyCourses')}: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(', ')}
                       </p>
                     )}
@@ -224,7 +228,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
             <div className="mb-3">
               <div className="flex items-center gap-2">
                 <div className="flex-1" style={{ borderTop: `1px solid ${headingColor}` }}></div>
-                <h2 className="font-bold uppercase tracking-wide px-2" style={{ fontSize: sizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: headingColor }}>
+                <h2 className="font-bold uppercase tracking-wide px-2" style={{ fontSize: workExperienceTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: workExperienceStyling.titleColor }}>
                   {t('resume.sections.experience').toUpperCase()}
                 </h2>
                 <div className="flex-1" style={{ borderTop: `1px solid ${headingColor}` }}></div>
@@ -244,32 +248,32 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                 return (
                   <div key={index}>
                     <div className="flex justify-between items-start gap-2 mb-1">
-                      <h3 className="font-bold uppercase tracking-wide text-foreground" style={{ fontSize: sizes.heading }}>
+                      <h3 className="font-bold uppercase tracking-wide" style={{ fontSize: workExperienceBodySizes.baseText, color: workExperienceStyling.bodyColor }}>
                         {exp.company || exp.position}
                       </h3>
                       {exp.location && (
-                        <span className="font-normal flex-shrink-0" style={{ fontSize: sizes.sm, color: headingColor }}>
+                        <span className="font-normal flex-shrink-0" style={{ fontSize: workExperienceBodySizes.xs, color: workExperienceStyling.bodyColor }}>
                           {exp.location}
                         </span>
                       )}
                     </div>
                     <div className="flex justify-between items-start gap-2 mb-1">
-                      <h4 className="font-bold text-foreground" style={{ fontSize: sizes.sm }}>{exp.position || exp.company}</h4>
+                      <h4 className="font-bold" style={{ fontSize: workExperienceBodySizes.baseText, color: workExperienceStyling.bodyColor }}>{exp.position || exp.company}</h4>
                       {dateRange && (
-                        <span className="font-normal flex-shrink-0" style={{ fontSize: sizes.sm, color: headingColor }}>
+                        <span className="font-normal flex-shrink-0" style={{ fontSize: workExperienceBodySizes.xs, color: workExperienceStyling.bodyColor }}>
                           {dateRange}
                         </span>
                       )}
                     </div>
                     {responsibilities.length > 0 && (
-                      <ul className="text-foreground space-y-0.5 mt-1 list-none pl-0" style={{ fontSize: sizes.base }}>
+                      <ul className="space-y-0.5 mt-1 list-none pl-0" style={{ fontSize: workExperienceBodySizes.baseText, color: workExperienceStyling.bodyColor }}>
                         {responsibilities.map((resp, i) => (
                           <li key={i} className="break-words">• {resp}</li>
                         ))}
                       </ul>
                     )}
                     {exp.competencies && exp.competencies.length > 0 && (
-                      <p className="text-muted-foreground mt-1" style={{ fontSize: sizes.sm }}>
+                      <p className="mt-1" style={{ fontSize: workExperienceBodySizes.xs, color: workExperienceStyling.bodyColor }}>
                         {t('resume.labels.keyCompetencies')}: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(', ')}
                       </p>
                     )}
@@ -307,15 +311,16 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                 return (
                   <div key={index}>
                     <div className="flex justify-between items-start gap-2 mb-1">
-                      <h3 className="font-bold uppercase tracking-wide text-foreground" style={{ fontSize: sizes.heading }}>
+                      <h3 className="font-bold uppercase tracking-wide" style={{ fontSize: projectsBodySizes.baseText, color: projectsStyling.bodyColor }}>
                         {proj.name}
                         {proj.link && (
-                          <span className="font-normal normal-case ml-2" style={{ fontSize: sizes.xs }}>
+                          <span className="font-normal normal-case ml-2" style={{ fontSize: projectsBodySizes.xs }}>
                             <a
                               href={proj.link}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-muted-foreground hover:underline"
+                              className="hover:underline"
+                              style={{ color: linkColor }}
                             >
                               {proj.link.replace(/^https?:\/\//, '').split('/')[0]}
                             </a>
@@ -323,16 +328,16 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                         )}
                       </h3>
                       {dateRange && (
-                        <span className="font-normal flex-shrink-0" style={{ fontSize: sizes.sm, color: headingColor }}>
+                        <span className="font-normal flex-shrink-0" style={{ fontSize: projectsBodySizes.xs, color: projectsStyling.bodyColor }}>
                           {dateRange}
                         </span>
                       )}
                     </div>
                     {proj.description && (
-                      <p className="text-foreground mt-1 break-words" style={{ fontSize: sizes.base, color: textColor }}>{proj.description}</p>
+                      <p className="mt-1 break-words" style={{ fontSize: projectsBodySizes.baseText, color: projectsStyling.bodyColor }}>{proj.description}</p>
                     )}
                     {proj.highlights && proj.highlights.length > 0 && (
-                      <ul className="text-foreground space-y-0.5 mt-1 list-none pl-0" style={{ fontSize: sizes.base }}>
+                      <ul className="space-y-0.5 mt-1 list-none pl-0" style={{ fontSize: projectsBodySizes.baseText, color: projectsStyling.bodyColor }}>
                         {proj.highlights.map((highlight, i) => (
                           highlight.highlight && (
                             <li key={i} className="break-words">• {highlight.highlight}</li>
@@ -341,7 +346,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                       </ul>
                     )}
                     {technologies && (
-                      <p className="text-muted-foreground mt-1 break-words" style={{ fontSize: sizes.xs }}>{technologies}</p>
+                      <p className="mt-1 break-words" style={{ fontSize: projectsBodySizes.xs, color: projectsStyling.bodyColor }}>{technologies}</p>
                     )}
                   </div>
                 );
@@ -372,18 +377,18 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                   <div key={index}>
                     <div className="flex justify-between items-start gap-2">
                       <div>
-                        <span className="text-foreground break-words" style={{ fontSize: sizes.sm }}>{cert.name}, {cert.organization || ''}</span>
+                        <span className="text-foreground break-words" style={{ fontSize: certificatesBodySizes.baseText }}>{cert.name}, {cert.organization || ''}</span>
                         {cert.credentialId && (
-                          <span className="text-muted-foreground ml-2" style={{ fontSize: sizes.xs }}>{t('resume.fields.credentialId')}: {cert.credentialId}</span>
+                          <span className="text-muted-foreground ml-2" style={{ fontSize: certificatesBodySizes.xs }}>{t('resume.fields.credentialId')}: {cert.credentialId}</span>
                         )}
                         {cert.url && (
-                          <a href={cert.url} target="_blank" rel="noopener noreferrer" className="hover:underline ml-2 block" style={{ fontSize: sizes.xs, color: linkColor }}>
+                          <a href={cert.url} target="_blank" rel="noopener noreferrer" className="hover:underline ml-2 block" style={{ fontSize: certificatesBodySizes.xs, color: linkColor }}>
                             {cert.url.replace(/^https?:\/\/(www\.)?/, '')}
                           </a>
                         )}
                       </div>
                       {dateRange && (
-                        <span className="font-normal flex-shrink-0" style={{ fontSize: sizes.sm, color: headingColor }}>
+                        <span className="font-normal flex-shrink-0" style={{ fontSize: certificatesBodySizes.xs, color: certificatesStyling.bodyColor }}>
                           {dateRange || cert.issueDate || ''}
                         </span>
                       )}
@@ -407,7 +412,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                 <div className="flex-1" style={{ borderTop: `1px solid ${skillsStyling.titleColor}` }}></div>
               </div>
             </div>
-            <div className="text-foreground break-words" style={{ fontSize: sizes.sm }}>
+            <div className="text-foreground break-words" style={{ fontSize: skillsBodySizes.xs }}>
               <span className="font-semibold">{t('resume.sections.skills')}: </span>
               {skills.filter(s => s.skill).map(s => s.skill).join(', ')}
             </div>
@@ -426,7 +431,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                 <div className="flex-1" style={{ borderTop: `1px solid ${languagesStyling.titleColor}` }}></div>
               </div>
             </div>
-            <div className="text-foreground break-words" style={{ fontSize: sizes.sm }}>
+            <div className="text-foreground break-words" style={{ fontSize: languagesBodySizes.xs }}>
               <span className="font-semibold">{t('resume.sections.languages')}: </span>
               {languages
                 .filter(lang => lang.language)
@@ -452,7 +457,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                 <div className="flex-1" style={{ borderTop: `1px solid ${personalInfoTitleColor}` }}></div>
               </div>
             </div>
-            <div className="text-foreground break-words" style={{ fontSize: sizes.sm }}>
+            <div className="text-foreground break-words" style={{ fontSize: personalInfoBodySizes.baseText }}>
               <span className="font-semibold">{t('resume.sections.interests')}: </span>
               {personalInfo.interests.filter(i => i.interest).map(i => i.interest).join(', ')}
             </div>
