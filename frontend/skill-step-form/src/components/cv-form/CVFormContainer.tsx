@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
@@ -338,8 +338,15 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
   }, [editId, user, form]);
 
   // Watch form data for live preview
+  // Explicitly watch skills to ensure score updates when skills change
   const formData = form.watch();
+  const skills = form.watch("skills"); // Explicitly watch skills array
   const currentTemplate = form.watch("template");
+
+  // Force formData to update when skills change by creating a new reference
+  const formDataWithSkills = useMemo(() => {
+    return { ...formData, skills };
+  }, [formData, skills]);
 
   // Set template as selected and reset form when initialData has a template
   useEffect(() => {
@@ -886,8 +893,8 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
                 {/* Right Sidebar - Always Visible Preview */}
                 <div className="hidden lg:block lg:col-span-4">
                   <CVPreview
-                    data={getPreviewDataWithHints(formData)}
-                    actualDataForScoring={formData}
+                    data={getPreviewDataWithHints(formDataWithSkills)}
+                    actualDataForScoring={formDataWithSkills}
                     onTemplateChange={(template) => form.setValue("template", template)}
                     onSectionOrderChange={(sectionOrder) => form.setValue("sectionOrder", sectionOrder)}
                     onStylingChange={(styling) => form.setValue("styling", styling)}

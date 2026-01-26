@@ -19,6 +19,7 @@ interface AuthContextType {
   login: (username: string, password: string) => Promise<void>;
   register: (username: string, email: string, password: string, firstName?: string, lastName?: string) => Promise<void>;
   logout: () => Promise<void>;
+  setAuthState: (authData: { user: User; tokens: AuthTokens }) => void;
   isAuthenticated: boolean;
   isLoading: boolean;
 }
@@ -46,12 +47,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     const storedTokens = localStorage.getItem('tokens');
-    
+
     if (storedUser && storedTokens) {
       setUser(JSON.parse(storedUser));
       setTokens(JSON.parse(storedTokens));
     }
-    
+
     setIsLoading(false);
   }, []);
 
@@ -67,7 +68,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       // Get response text first to handle non-JSON responses
       const responseText = await response.text();
-      
+
       let data: any = {};
       try {
         data = responseText ? JSON.parse(responseText) : {};
@@ -85,7 +86,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       setUser(data.user);
       setTokens(data.tokens);
-      
+
       localStorage.setItem('user', JSON.stringify(data.user));
       localStorage.setItem('tokens', JSON.stringify(data.tokens));
 
@@ -97,14 +98,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         (async () => {
           try {
             const resumeData = JSON.parse(pendingResume);
-            
+
             // Import API dynamically to avoid circular dependencies
             const { resumeAPI } = await import('@/lib/api');
-            
+
             await resumeAPI.create(resumeData);
-            
+
             localStorage.removeItem('pendingResume');
-            
+
             // Dispatch custom event to notify Resumes page
             window.dispatchEvent(new CustomEvent('resumeSaved'));
           } catch (err: any) {
@@ -141,7 +142,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       // Get response text first to handle non-JSON responses
       const responseText = await response.text();
-      
+
       let data: any = {};
       try {
         data = responseText ? JSON.parse(responseText) : {};
@@ -156,7 +157,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       // New flow: Registration doesn't log in immediately
       // User must verify email first, so tokens won't be in response
       // Don't set user/tokens here - they'll need to login after verification
-      
+
       return data; // Return the response so Signup page can show the message
     } catch (error) {
       throw error;
@@ -185,12 +186,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  const setAuthState = (authData: { user: User; tokens: AuthTokens }) => {
+    setUser(authData.user);
+    setTokens(authData.tokens);
+    localStorage.setItem('user', JSON.stringify(authData.user));
+    localStorage.setItem('tokens', JSON.stringify(authData.tokens));
+  };
+
   const value = {
     user,
     tokens,
     login,
     register,
     logout,
+    setAuthState,
     isAuthenticated: !!user && !!tokens,
     isLoading,
   };

@@ -17,6 +17,7 @@ import Signup from "./pages/Signup";
 import EmailVerification from "./pages/EmailVerification";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import OAuthCallback from "./pages/OAuthCallback";
 import Resumes from "./pages/Resumes";
 import CreateResume from "./pages/CreateResume";
 import ResumeView from "./pages/ResumeView";
@@ -26,7 +27,7 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 // Blog editing components - only loaded in development mode
 // In production builds, these will be tree-shaken out
-const BlogEditor = import.meta.env.DEV 
+const BlogEditor = import.meta.env.DEV
   ? React.lazy(() => import("./pages/BlogEditor"))
   : null;
 const BlogManagement = import.meta.env.DEV
@@ -57,99 +58,100 @@ const LandingOrRedirect = () => {
 // Component to handle conditional rendering (must be inside Router)
 const AppRoutes = () => {
   const location = useLocation();
-  // Hide header/footer on login and signup pages for focused experience
-  const hideHeaderFooter = location.pathname === '/login' || location.pathname === '/signup';
-  
+  // Hide header/footer on login, signup, and OAuth callback pages for focused experience
+  const hideHeaderFooter = location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/oauth/callback';
+
   return (
     <div className="flex flex-col min-h-screen">
       {!hideHeaderFooter && <Header />}
       <main className="flex-1">
         <Routes>
-        <Route path="/" element={<LandingOrRedirect />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/verify-email" element={<EmailVerification />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Index />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/create" element={<CreateResume />} />
-        <Route
-          path="/resumes"
-          element={
-            <ProtectedRoute>
-              <Resumes />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/job-matching"
-          element={
-            <ProtectedRoute>
-              <JobMatching />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/resume/:id"
-          element={
-            <ProtectedRoute>
-              <ResumeView />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/blog/:id" element={<BlogPost />} />
-        {/* Blog editing routes - only available in development */}
-        {import.meta.env.DEV && BlogEditor && (
-        <Route
-          path="/blog-editor/:id?"
-          element={
-            <ProtectedRoute>
-                <Suspense fallback={<div>Loading...</div>}>
-              <BlogEditor />
-                </Suspense>
-            </ProtectedRoute>
-          }
-        />
-        )}
-        {import.meta.env.DEV && BlogManagement && (
-        <Route
-          path="/blog-management"
-          element={
-            <ProtectedRoute>
-                <Suspense fallback={<div>Loading...</div>}>
-              <BlogManagement />
-                </Suspense>
-            </ProtectedRoute>
-          }
-        />
-        )}
-        <Route path="/about" element={<About />} />
-        <Route path="/careers" element={<Careers />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/templates" element={<Templates />} />
-        <Route path="/pricing" element={<Pricing />} />
-        <Route path="/privacy" element={<Privacy />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/data-protection" element={<DataProtection />} />
-        <Route path="/cookies" element={<Cookies />} />
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-        <Route path="*" element={<NotFound />} />
+          <Route path="/" element={<LandingOrRedirect />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/verify-email" element={<EmailVerification />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/oauth/callback" element={<OAuthCallback />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Index />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/create" element={<CreateResume />} />
+          <Route
+            path="/resumes"
+            element={
+              <ProtectedRoute>
+                <Resumes />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/job-matching"
+            element={
+              <ProtectedRoute>
+                <JobMatching />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/resume/:id"
+            element={
+              <ProtectedRoute>
+                <ResumeView />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:id" element={<BlogPost />} />
+          {/* Blog editing routes - only available in development */}
+          {import.meta.env.DEV && BlogEditor && (
+            <Route
+              path="/blog-editor/:id?"
+              element={
+                <ProtectedRoute>
+                  <Suspense fallback={<div>Loading...</div>}>
+                    <BlogEditor />
+                  </Suspense>
+                </ProtectedRoute>
+              }
+            />
+          )}
+          {import.meta.env.DEV && BlogManagement && (
+            <Route
+              path="/blog-management"
+              element={
+                <ProtectedRoute>
+                  <Suspense fallback={<div>Loading...</div>}>
+                    <BlogManagement />
+                  </Suspense>
+                </ProtectedRoute>
+              }
+            />
+          )}
+          <Route path="/about" element={<About />} />
+          <Route path="/careers" element={<Careers />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/templates" element={<Templates />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/data-protection" element={<DataProtection />} />
+          <Route path="/cookies" element={<Cookies />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       {!hideHeaderFooter && <Footer />}
@@ -161,19 +163,19 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <LanguageProvider>
-      <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter
-          future={{
-            v7_startTransition: true,
-            v7_relativeSplatPath: true,
-          }}
-        >
+        <AuthProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter
+            future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true,
+            }}
+          >
             <ScrollToTop />
-          <AppRoutes />
-        </BrowserRouter>
-      </AuthProvider>
+            <AppRoutes />
+          </BrowserRouter>
+        </AuthProvider>
       </LanguageProvider>
     </TooltipProvider>
   </QueryClientProvider>

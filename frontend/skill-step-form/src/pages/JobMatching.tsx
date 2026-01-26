@@ -85,6 +85,10 @@ export default function JobMatching() {
     setMatchResult(null);
 
     try {
+      // Ensure we have the latest resume data by fetching it first
+      // This ensures any recently saved changes are included
+      await resumeAPI.getById(selectedResumeId);
+      
       const result = await resumeAPI.matchToJob(
         selectedResumeId,
         jobTitle || 'Job Description',
@@ -147,6 +151,13 @@ export default function JobMatching() {
             <CardHeader>
               <CardTitle>Select Your Resume</CardTitle>
               <CardDescription>Choose which resume to compare</CardDescription>
+              <Alert className="mt-4">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription className="text-xs">
+                  <strong>Note:</strong> Make sure to save your resume after adding or updating skills. 
+                  Job matching uses the saved version from the database.
+                </AlertDescription>
+              </Alert>
             </CardHeader>
             <CardContent className="space-y-4">
               {isLoadingResumes ? (

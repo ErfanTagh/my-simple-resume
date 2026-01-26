@@ -3,7 +3,7 @@ URL routing for API endpoints
 """
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
-from . import views, auth_views
+from . import views, auth_views, social_views
 
 app_name = 'api'
 
@@ -21,6 +21,11 @@ urlpatterns = [
     path('auth/resend-verification/', auth_views.resend_verification, name='resend-verification'),
     path('auth/forgot-password/', auth_views.forgot_password, name='forgot-password'),
     path('auth/reset-password/', auth_views.reset_password, name='reset-password'),
+    
+    # Social authentication endpoints
+    path('auth/social/<str:provider>/url/', social_views.social_login_url, name='social-login-url'),
+    path('auth/social/<str:provider>/callback/', social_views.social_login_callback, name='social-login-callback'),
+    path('auth/social/xing/plugin/login/', social_views.xing_plugin_login, name='xing-plugin-login'),
     
     # Resume endpoints (protected)
     path('resumes/', views.resume_list, name='resume-list'),

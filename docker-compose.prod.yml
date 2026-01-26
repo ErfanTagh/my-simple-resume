@@ -52,6 +52,7 @@ services:
       dockerfile: Dockerfile.prod
       args:
         VITE_API_URL: https://${DOMAIN}/api
+        VITE_XING_CONSUMER_KEY: ${XING_CLIENT_ID}
     container_name: resume_frontend
     restart: always
     expose:

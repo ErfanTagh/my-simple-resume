@@ -50,6 +50,11 @@ export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSect
   }, [template]);
 
   // Calculate resume score using actual form data (without hints), not preview data
+  // Track skills array length and content to ensure score updates when skills change
+  const skillsForDependency = actualDataForScoring?.skills 
+    ? `${actualDataForScoring.skills.length}-${actualDataForScoring.skills.map(s => s.skill || '').join(',')}`
+    : '0-';
+  
   const resumeScore = useMemo(() => {
     try {
       // Use actualDataForScoring if provided (form data without hints), otherwise use data
@@ -58,7 +63,17 @@ export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSect
     } catch {
       return { overallScore: 0 };
     }
-  }, [actualDataForScoring, data]);
+  }, [
+    // Include skills as a dependency string to detect changes
+    skillsForDependency,
+    // Include other key fields that affect scoring
+    actualDataForScoring?.workExperience?.length || 0,
+    actualDataForScoring?.education?.length || 0,
+    actualDataForScoring?.personalInfo?.summary,
+    // Include full objects as fallback (though they may not change reference)
+    actualDataForScoring,
+    data
+  ]);
 
   // Calculate page count based on content height
   // Use useLayoutEffect for synchronous DOM measurement after React updates

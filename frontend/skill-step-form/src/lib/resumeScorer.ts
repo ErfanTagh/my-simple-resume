@@ -380,7 +380,11 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   } else if (validSkills > 0) {
     // Give base points for having skills, even if minimal
     skillsScore += 0.1; // Base points for having at least some skills
-    suggestions.push("Add more skills to showcase your expertise");
+    if (validSkills < 3) {
+      suggestions.push(`Add more skills to showcase your expertise (currently ${validSkills}, aim for at least 3-5 for better scoring)`);
+    } else {
+      suggestions.push("Add more skills to showcase your expertise");
+    }
   }
   
   // Relevant (0.4 pts) - skills match industry standards and experience
@@ -397,10 +401,14 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   } else if (validSkills >= 3) {
     // Give base points for having 3+ skills, even if not fully relevant
     skillsScore += 0.2;
-    suggestions.push("Add more relevant skills that match industry standards and your experience");
+    if (validSkills < 5) {
+      suggestions.push(`Add more relevant skills that match industry standards and your experience (currently ${validSkills}, aim for 5+ for maximum scoring)`);
+    } else {
+      suggestions.push("Add more relevant skills that match industry standards and your experience");
+    }
   } else if (validSkills > 0) {
     // Already got 0.1 from organized section, just suggest adding more
-    suggestions.push("Add more relevant skills that match industry standards and your experience");
+    suggestions.push(`Add more relevant skills that match industry standards and your experience (currently ${validSkills}, aim for 5+ for maximum scoring)`);
   }
   // Don't suggest if no skills - that's optional
   
