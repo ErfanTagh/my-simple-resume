@@ -12,7 +12,7 @@ export const Footer = () => {
           <div className="col-span-2 sm:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4 hover:opacity-80 transition-opacity">
               <img 
-                src="/logoo.png" 
+                src="/logo-white.jpg" 
                 alt="123Resume Logo" 
                 className="h-14 sm:h-16 md:h-20 w-auto flex-shrink-0 object-contain"
               />

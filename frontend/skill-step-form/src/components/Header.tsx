@@ -31,7 +31,7 @@ export const Header = () => {
             <img 
               src="/logoo.png" 
               alt="123Resume Logo" 
-              className="h-7 w-auto sm:h-8 md:h-10 flex-shrink-0 object-contain"
+              className="h-9 w-auto sm:h-10 md:h-12 flex-shrink-0 object-contain"
             />
           </Link>
 
