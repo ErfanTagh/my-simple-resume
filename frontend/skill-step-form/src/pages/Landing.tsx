@@ -9,8 +9,7 @@ import {
   CheckCircle2,
   Zap,
   Clock,
-  BookOpen,
-  FileText
+  BookOpen
 } from "lucide-react";
 import { LandingTemplatePreview } from "./LandingTemplatePreview";
 import { getBlogPosts } from "@/lib/blogPosts";
@@ -261,10 +260,11 @@ const Landing = () => {
                       />
                       {/* Watermark */}
                       <div className="absolute bottom-2 right-2 flex items-center gap-1.5 bg-white px-1.5 py-1 rounded-md shadow-sm">
-                        <div className="w-6 h-6 rounded-md bg-primary flex items-center justify-center">
-                          <FileText className="w-3 h-3 text-white" />
-                        </div>
-                        <span className="text-xs font-bold text-foreground">123Resume</span>
+                        <img 
+                          src="/logoo.png" 
+                          alt="123Resume Logo" 
+                          className="h-5 w-auto object-contain"
+                        />
                       </div>
                     </div>
                   ) : (

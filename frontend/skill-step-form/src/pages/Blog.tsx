@@ -5,8 +5,7 @@ import {
   BookOpen, 
   Clock, 
   ArrowRight,
-  Search,
-  FileText
+  Search
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -516,10 +515,11 @@ const Blog = () => {
                                     />
                                     {/* Watermark */}
                                     <div className="absolute bottom-2 right-2 flex items-center gap-1.5 bg-white px-1.5 py-1 rounded-md shadow-sm">
-                                      <div className="w-6 h-6 rounded-md bg-primary flex items-center justify-center">
-                                        <FileText className="w-3 h-3 text-white" />
-                                      </div>
-                                      <span className="text-xs font-bold text-foreground">123Resume</span>
+                                      <img 
+                                        src="/logoo.png" 
+                                        alt="123Resume Logo" 
+                                        className="h-5 w-auto object-contain"
+                                      />
                                     </div>
                                   </div>
                                 ) : (

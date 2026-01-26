@@ -88,7 +88,19 @@ def social_login_url(request, provider):
         'redirect_uri': request.GET.get('redirect_uri', ''),
     }
     
-    base_url = request.build_absolute_uri('/').rstrip('/')
+    # Build callback URL - use DOMAIN from settings if available, otherwise use request
+    # This ensures consistency in production when behind a reverse proxy
+    domain = getattr(settings, 'DOMAIN', '')
+    if domain and not domain.startswith('localhost'):
+        # Production: use configured domain
+        if domain.startswith('http'):
+            base_url = domain.rstrip('/')
+        else:
+            base_url = f"https://{domain}".rstrip('/')
+    else:
+        # Development: use request host
+        base_url = request.build_absolute_uri('/').rstrip('/')
+    
     callback_url = f"{base_url}/api/auth/social/{provider}/callback/"
     
     if provider == 'google':
@@ -195,7 +207,19 @@ def social_login_callback(request, provider):
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    base_url = request.build_absolute_uri('/').rstrip('/')
+    # Build callback URL - use DOMAIN from settings if available, otherwise use request
+    # This ensures consistency in production when behind a reverse proxy
+    domain = getattr(settings, 'DOMAIN', '')
+    if domain and not domain.startswith('localhost'):
+        # Production: use configured domain
+        if domain.startswith('http'):
+            base_url = domain.rstrip('/')
+        else:
+            base_url = f"https://{domain}".rstrip('/')
+    else:
+        # Development: use request host
+        base_url = request.build_absolute_uri('/').rstrip('/')
+    
     callback_url = f"{base_url}/api/auth/social/{provider}/callback/"
     
     try:

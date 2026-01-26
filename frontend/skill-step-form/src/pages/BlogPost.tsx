@@ -2,7 +2,6 @@ import { Link, useParams, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { 
-  FileText, 
   BookOpen, 
   Clock, 
   ArrowLeft,
@@ -211,10 +210,11 @@ const BlogPost = () => {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary flex items-center justify-center">
-              <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-            </div>
-            <span className="text-lg sm:text-xl font-bold text-foreground">{t('common.appName')}</span>
+            <img 
+              src="/logoo.png" 
+              alt="123Resume Logo" 
+              className="h-8 w-auto sm:h-10 flex-shrink-0 object-contain"
+            />
           </Link>
           <div className="flex items-center gap-2 sm:gap-4">
             <Link to="/blog">
@@ -283,10 +283,11 @@ const BlogPost = () => {
               />
               {/* Watermark */}
               <div className="absolute bottom-3 right-3 flex items-center gap-2 bg-white px-2 py-1.5 rounded-lg shadow-md">
-                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                  <FileText className="w-4 h-4 text-white" />
-                </div>
-                <span className="text-sm font-bold text-foreground">123Resume</span>
+                <img 
+                  src="/logoo.png" 
+                  alt="123Resume Logo" 
+                  className="h-6 w-auto object-contain"
+                />
               </div>
             </div>
           ) : (
@@ -447,10 +448,11 @@ const BlogPost = () => {
         <div className="container mx-auto max-w-6xl">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <FileText className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-semibold text-foreground">123Resume</span>
+              <img 
+                src="/logo-white.jpg" 
+                alt="123Resume Logo" 
+                className="h-10 w-auto flex-shrink-0 object-contain"
+              />
             </Link>
             <p className="text-xs sm:text-sm text-muted-foreground text-center">
               © 2025 123Resume. Build your dream career.
