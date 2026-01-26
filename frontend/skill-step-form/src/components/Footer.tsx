@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { FileText } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export const Footer = () => {
@@ -12,10 +11,11 @@ export const Footer = () => {
           {/* Brand Column */}
           <div className="col-span-2 sm:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4 hover:opacity-80 transition-opacity">
-              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-                <FileText className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-foreground">{t('common.appName')}</span>
+              <img 
+                src="/logoo.png" 
+                alt="123Resume Logo" 
+                className="h-14 sm:h-16 md:h-20 w-auto flex-shrink-0 object-contain"
+              />
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed mb-4">
               {t('footer.tagline')}
