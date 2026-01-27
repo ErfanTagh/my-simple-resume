@@ -263,7 +263,29 @@ For UI-only or styling changes, a brief summary is sufficient.
 
 ---
 
-## 14. Default Behavior
+## 14. PDF Page Layout Rules (CRITICAL)
+
+**Resume PDFs must follow these layout requirements:**
+
+- **NO HALF PAGES**: Every page must fill to full A4 height (297mm). Pages should not end with empty space at the bottom.
+- **NO EMPTY PAGES**: Do not create pages that contain only background/spacer content. The last page should end where content ends, but still fill to 297mm.
+
+**Implementation Strategy:**
+
+- Use `min-height: 297mm` on resume containers to ensure full pages
+- Use a spacer div with `flex: 1 1 0` to fill remaining space on the last page
+- Apply `page-break-before: avoid`, `page-break-after: avoid`, `orphans: 0`, `widows: 0` to prevent empty pages
+- Do NOT use `max-height` constraints on spacers that would prevent full-page filling
+- Ensure both preview (screen) and PDF (print) use consistent CSS rules
+
+**This applies to:**
+- All resume templates
+- PDF generation utilities
+- Preview rendering
+
+---
+
+## 15. Default Behavior
 
 If unsure at any point:
 

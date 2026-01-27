@@ -24,20 +24,20 @@ function sanitizeFilename(name: string): string {
     .replace(/-+/g, '-') // Replace multiple dashes with single dash
     .replace(/^-+|-+$/g, '') // Remove leading/trailing dashes
     .trim();
-  
+
   // If empty after sanitization, return default
   if (!sanitized) {
     return 'resume';
   }
-  
+
   // Ensure it doesn't end with a dot (Windows issue)
   sanitized = sanitized.replace(/\.+$/, '');
-  
+
   // Limit length to avoid filesystem issues (keep it reasonable)
   if (sanitized.length > 200) {
     sanitized = sanitized.substring(0, 200);
   }
-  
+
   return sanitized;
 }
 
@@ -47,7 +47,7 @@ function sanitizeFilename(name: string): string {
  */
 function generateDefaultResumeName(resume: Resume): string {
   const parts: string[] = [];
-  
+
   // Only add non-empty strings
   if (resume.personalInfo?.firstName?.trim()) {
     parts.push(resume.personalInfo.firstName.trim());
@@ -58,7 +58,7 @@ function generateDefaultResumeName(resume: Resume): string {
   if (resume.personalInfo?.professionalTitle?.trim()) {
     parts.push(resume.personalInfo.professionalTitle.trim());
   }
-  
+
   // Return joined parts or fallback
   return parts.length > 0 ? parts.join('-') : 'Untitled Resume';
 }
@@ -87,7 +87,7 @@ const CSS_FILES = [
  */
 function getAllStylesheets(): string {
   const stylesheets: string[] = [];
-  
+
   // Get all stylesheet links from the head
   const styleLinks = Array.from(document.querySelectorAll('head > link[rel="stylesheet"]'));
   styleLinks.forEach((link) => {
@@ -96,7 +96,7 @@ function getAllStylesheets(): string {
       stylesheets.push(`<link rel="stylesheet" href="${href}">`);
     }
   });
-  
+
   // Get all inline styles from style tags
   const styleTags = Array.from(document.querySelectorAll('head > style'));
   styleTags.forEach((style) => {
@@ -105,7 +105,7 @@ function getAllStylesheets(): string {
       stylesheets.push(`<style>${cssText}</style>`);
     }
   });
-  
+
   // Also try to extract CSS rules from document.styleSheets (for dynamically loaded styles)
   try {
     Array.from(document.styleSheets).forEach((stylesheet) => {
@@ -114,7 +114,7 @@ function getAllStylesheets(): string {
         if (stylesheet.href && styleLinks.some(link => (link as HTMLLinkElement).href === stylesheet.href)) {
           return;
         }
-        
+
         // Try to get the CSS rules
         if (stylesheet.cssRules) {
           let cssText = '';
@@ -137,7 +137,7 @@ function getAllStylesheets(): string {
     // If there's an error accessing styleSheets, continue with what we have
     console.warn('Could not access all stylesheets:', e);
   }
-  
+
   return stylesheets.join('\n');
 }
 
@@ -177,7 +177,7 @@ function generateResumeHTML(resume: Resume): string {
     if (!resume.workExperience?.length) return '';
     const validExps = resume.workExperience.filter((exp: any) => exp.position || exp.company);
     if (!validExps.length) return '';
-    
+
     return `
       <section class="resume-section">
         <h3 class="section-title">Work Experience</h3>
@@ -226,7 +226,7 @@ function generateResumeHTML(resume: Resume): string {
     if (!resume.education?.length) return '';
     const validEdu = resume.education.filter((edu: any) => edu.degree || edu.institution);
     if (!validEdu.length) return '';
-    
+
     return `
       <section class="resume-section">
         <h3 class="section-title">Education</h3>
@@ -259,7 +259,7 @@ function generateResumeHTML(resume: Resume): string {
     if (!resume.projects?.length) return '';
     const validProjects = resume.projects.filter((project: any) => project.name?.trim());
     if (!validProjects.length) return '';
-    
+
     return `
       <section class="resume-section">
         <h3 class="section-title">Projects</h3>
@@ -291,7 +291,7 @@ function generateResumeHTML(resume: Resume): string {
     if (!resume.certificates?.length) return '';
     const validCerts = resume.certificates.filter((cert: any) => cert.name?.trim());
     if (!validCerts.length) return '';
-    
+
     return `
       <section class="resume-section">
         <h3 class="section-title">Certifications</h3>
@@ -317,7 +317,7 @@ function generateResumeHTML(resume: Resume): string {
     if (!resume.skills?.length) return '';
     const validSkills = resume.skills.filter((skillObj: any) => skillObj.skill?.trim());
     if (!validSkills.length) return '';
-    
+
     return `
       <section class="resume-section">
         <h3 class="section-title">Skills</h3>
@@ -334,7 +334,7 @@ function generateResumeHTML(resume: Resume): string {
     if (!resume.languages?.length) return '';
     const validLangs = resume.languages.filter((lang: any) => lang.language?.trim());
     if (!validLangs.length) return '';
-    
+
     return `
       <section class="resume-section">
         <h3 class="section-title">Languages</h3>
@@ -354,7 +354,7 @@ function generateResumeHTML(resume: Resume): string {
     if (!personalInfo.interests?.length) return '';
     const validInterests = personalInfo.interests.filter((interest: any) => interest.interest?.trim());
     if (!validInterests.length) return '';
-    
+
     return `
       <section class="resume-section">
         <h3 class="section-title">Interests</h3>
@@ -430,23 +430,23 @@ function getComputedBackgroundColor(): string {
     tempDiv.style.visibility = 'hidden';
     tempDiv.style.pointerEvents = 'none';
     document.body.appendChild(tempDiv);
-    
+
     // Get computed style
     const computedStyle = window.getComputedStyle(tempDiv);
     const backgroundColor = computedStyle.backgroundColor;
-    
+
     // Clean up
     document.body.removeChild(tempDiv);
-    
+
     // If we got a valid color (not transparent), return it
     if (backgroundColor && backgroundColor !== 'rgba(0, 0, 0, 0)' && backgroundColor !== 'transparent') {
       return backgroundColor;
     }
-    
+
     // Fallback: try to get from root CSS variable
     const rootStyle = getComputedStyle(document.documentElement);
     const bgVar = rootStyle.getPropertyValue('--background').trim();
-    
+
     if (bgVar) {
       // If it's already an hsl() value, return it
       if (bgVar.startsWith('hsl(') || bgVar.startsWith('rgb(')) {
@@ -458,7 +458,7 @@ function getComputedBackgroundColor(): string {
         return `hsl(${hslMatch[1]}, ${hslMatch[2]}, ${hslMatch[3]})`;
       }
     }
-    
+
     // Final fallback
     return '#f5f5f5';
   } catch (error) {
@@ -477,18 +477,18 @@ async function downloadPDFFromHTML(
 ): Promise<void> {
   // Get all stylesheets from the current page (includes Tailwind CSS)
   const pageStylesheets = getAllStylesheets();
-  
+
   // Get font links
   const fontLinks = Array.from(document.querySelectorAll('head > link[rel*="font"], head > link[href*="font"], head > link[href*="fonts.googleapis"]'))
     .map(link => `<link rel="stylesheet" href="${(link as HTMLLinkElement).href}">`)
     .join('\n');
-  
+
   // Also fetch old CSS files for backward compatibility
   const cssContents = await fetchCSSFiles();
-  
+
   // Get computed background color for PDF
   const computedBackground = getComputedBackgroundColor();
-  
+
   // Get computed styles for the resume container to ensure proper styling
   const fullHTML = `
 <!DOCTYPE html>
@@ -588,28 +588,18 @@ async function downloadPDFFromHTML(
       /* Force container to extend to exactly 297mm (A4 height) */
       /* But allow it to grow if content is longer */
       .resume-page-container {
-        min-height: 297mm !important;
-        height: auto !important;
-        page-break-inside: avoid;
         background: var(--pdf-background) !important;
-        /* Ensure last page fills full height */
-        display: flex !important;
-        flex-direction: column !important;
+        display: block !important;
+        /* Remove min-height and flex - let content flow naturally */
+        /* Pages will fill based on content, not forced breaks */
       }
-      /* Content wrapper should not grow */
-      .resume-page-container > div:not([aria-hidden="true"]) {
-        flex: 0 0 auto !important;
-      }
-      /* Spacer div at end will fill remaining space */
+      /* Hide spacer div completely in PDF - it causes page breaks */
       .resume-page-container > div[aria-hidden="true"] {
-        flex: 1 1 auto !important;
-        min-height: 0 !important;
-        background: var(--pdf-background) !important;
+        display: none !important;
       }
-      /* For gradient backgrounds, ensure they extend */
+      /* Ensure gradient containers still have background */
       .resume-page-container.bg-gradient-to-br {
-        min-height: 297mm !important;
-        height: auto !important;
+        background: var(--pdf-background) !important;
       }
     }
     /* Override ALL possible Tailwind classes that could add margins/width constraints */
@@ -639,11 +629,29 @@ async function downloadPDFFromHTML(
 </body>
 </html>`;
 
+  // Debug: Log container dimensions before PDF generation
+  if (typeof window !== 'undefined') {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = resumeHTML;
+    const container = tempDiv.querySelector('.resume-page-container');
+    if (container) {
+      const spacer = tempDiv.querySelector('[aria-hidden="true"]');
+      console.log('[PDF Debug] Found resume container');
+      console.log('[PDF Debug] Spacer found:', !!spacer);
+      if (spacer) {
+        const spacerStyle = window.getComputedStyle(spacer as Element);
+        console.log('[PDF Debug] Spacer flex:', spacerStyle.flex);
+        console.log('[PDF Debug] Spacer max-height:', spacerStyle.maxHeight);
+        console.log('[PDF Debug] Spacer min-height:', spacerStyle.minHeight);
+      }
+    }
+  }
+
   const pdfBlob = await resumeAPI.generatePDF(resumeId, fullHTML);
   const blob = new Blob([pdfBlob], { type: 'application/pdf' });
   const finalFilename = filename || `resume_${resumeId}.pdf`;
   const isMobile = isMobileDevice();
-  
+
   // Try File System Access API first (Chrome/Edge, including mobile Chrome on Android)
   // This provides the most reliable download experience
   // @ts-ignore - File System Access API types may not be available
@@ -668,7 +676,7 @@ async function downloadPDFFromHTML(
       }
     }
   }
-  
+
   // Standard blob URL download method (works on all browsers, but mobile may open in viewer)
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -676,9 +684,9 @@ async function downloadPDFFromHTML(
   a.download = finalFilename;
   a.style.display = 'none';
   a.setAttribute('download', finalFilename);
-  
+
   document.body.appendChild(a);
-  
+
   // On mobile, use requestAnimationFrame for better reliability
   if (isMobile) {
     requestAnimationFrame(() => {
@@ -730,7 +738,7 @@ function renderTemplateToHTML(resume: Resume): Promise<string> {
     try {
       const formData = convertResumeToFormData(resume);
       const template = resume.template || 'modern';
-      
+
       // Create a temporary container with proper styling context
       const container = document.createElement('div');
       container.className = 'resume-container';
@@ -744,10 +752,10 @@ function renderTemplateToHTML(resume: Resume): Promise<string> {
       container.style.opacity = '0';
       // Ensure container has proper styling context by adding it to body
       document.body.appendChild(container);
-      
+
       // Create a root for React rendering
       const root = ReactDOM.createRoot(container);
-      
+
       // Render the appropriate template wrapped with LanguageProvider
       let templateComponent: React.ReactElement;
       switch (template) {
@@ -771,15 +779,15 @@ function renderTemplateToHTML(resume: Resume): Promise<string> {
           templateComponent = React.createElement(ModernTemplate, { data: formData });
           break;
       }
-      
+
       // Wrap template with LanguageProvider to provide context
       const wrappedComponent = React.createElement(
         LanguageProvider,
         { children: templateComponent }
       );
-      
+
       root.render(wrappedComponent);
-      
+
       // Wait for React to render using both requestAnimationFrame and timeout
       // This ensures we wait long enough for React to fully render
       let frameCount = 0;
@@ -787,23 +795,23 @@ function renderTemplateToHTML(resume: Resume): Promise<string> {
       const maxWaitTime = 2000; // Maximum 2 seconds wait time
       const startTime = Date.now();
       let resolved = false;
-      
+
       const checkRender = () => {
         if (resolved) return;
-        
+
         frameCount++;
         const elapsed = Date.now() - startTime;
         const html = container.innerHTML;
-        
+
         // Check if we have substantial content (more than just container/div tags)
         // Look for actual content like text nodes, not just empty divs
-        const hasSubstantialContent = html.trim().length > 500 && 
-          (html.includes('<h1') || html.includes('<h2') || html.includes('<h3') || 
-           html.includes('class="name') || html.includes('class="title') ||
-           html.includes('resume-header') || html.includes('resume-main'));
-        
+        const hasSubstantialContent = html.trim().length > 500 &&
+          (html.includes('<h1') || html.includes('<h2') || html.includes('<h3') ||
+            html.includes('class="name') || html.includes('class="title') ||
+            html.includes('resume-header') || html.includes('resume-main'));
+
         const shouldResolve = hasSubstantialContent || frameCount >= maxFrames || elapsed >= maxWaitTime;
-        
+
         if (shouldResolve) {
           try {
             const templateHtml = container.innerHTML;
@@ -833,14 +841,14 @@ function renderTemplateToHTML(resume: Resume): Promise<string> {
             try {
               root.unmount();
               document.body.removeChild(container);
-            } catch {}
+            } catch { }
             reject(error);
           }
         } else {
           requestAnimationFrame(checkRender);
         }
       };
-      
+
       // Start checking after a short delay to allow React to start rendering
       setTimeout(() => {
         requestAnimationFrame(checkRender);
@@ -891,7 +899,7 @@ export async function downloadResumePDF(
   try {
     const formData = convertResumeToFormData(resume);
     const template = resume.template || 'modern';
-    
+
     // Render the appropriate template wrapped with LanguageProvider
     let templateComponent: React.ReactElement;
     switch (template) {
@@ -915,15 +923,15 @@ export async function downloadResumePDF(
         templateComponent = React.createElement(ModernTemplate, { data: formData });
         break;
     }
-    
+
     // Wrap template with LanguageProvider to provide context
     const wrappedComponent = React.createElement(
       LanguageProvider,
       { children: templateComponent }
     );
-    
+
     root.render(wrappedComponent);
-    
+
     // Wait for React to render - use a more reliable approach
     await new Promise<void>((resolve) => {
       let frameCount = 0;
@@ -931,28 +939,28 @@ export async function downloadResumePDF(
       const maxWaitTime = 2000;
       const startTime = Date.now();
       let resolved = false;
-      
+
       const checkRender = () => {
         if (resolved) return; // Prevent multiple resolves
-        
+
         frameCount++;
         const elapsed = Date.now() - startTime;
-        
+
         // Check if innerWrapper still exists in DOM
         if (!innerWrapper.parentNode) {
           resolved = true;
           resolve();
           return;
         }
-        
+
         const html = innerWrapper.innerHTML;
-        
+
         // Check if we have substantial content
-        const hasSubstantialContent = html.trim().length > 500 && 
-          (html.includes('<h1') || html.includes('<h2') || html.includes('<h3') || 
-           html.includes('class="name') || html.includes('class="title') ||
-           html.includes('resume-header') || html.includes('resume-main'));
-        
+        const hasSubstantialContent = html.trim().length > 500 &&
+          (html.includes('<h1') || html.includes('<h2') || html.includes('<h3') ||
+            html.includes('class="name') || html.includes('class="title') ||
+            html.includes('resume-header') || html.includes('resume-main'));
+
         if (hasSubstantialContent || frameCount >= maxFrames || elapsed >= maxWaitTime) {
           resolved = true;
           resolve();
@@ -960,17 +968,17 @@ export async function downloadResumePDF(
           requestAnimationFrame(checkRender);
         }
       };
-      
+
       setTimeout(() => {
         requestAnimationFrame(checkRender);
       }, 50);
     });
-    
+
     // Get the innerHTML exactly like downloadResumePDFFromElement does
     // This is the working method - just get innerHTML and pass to downloadPDFFromHTML
     // Check if innerWrapper still exists before getting innerHTML
     let resumeHTML = innerWrapper.parentNode ? innerWrapper.innerHTML : '';
-    
+
     // Strip margin classes that create side margins (mx-auto, max-w-*, etc.)
     // Replace them to remove the margin/width constraints
     resumeHTML = resumeHTML.replace(/\s*mx-auto\s*/g, ' ');
@@ -978,7 +986,7 @@ export async function downloadResumePDF(
     resumeHTML = resumeHTML.replace(/\s*mx-\d+\s*/g, ' ');
     resumeHTML = resumeHTML.replace(/\s*ml-auto\s*/g, ' ');
     resumeHTML = resumeHTML.replace(/\s*mr-auto\s*/g, ' ');
-    
+
     // Generate filename - use resume name if available, otherwise fallback to personalInfo
     let finalFilename = filename;
     if (!finalFilename) {
@@ -991,7 +999,7 @@ export async function downloadResumePDF(
         finalFilename = `${sanitizeFilename(defaultName)}.pdf`;
       }
     }
-    
+
     // Call downloadPDFFromHTML directly - same as downloadResumePDFFromElement does
     await downloadPDFFromHTML(resume.id, resumeHTML, finalFilename);
   } finally {
@@ -1027,7 +1035,7 @@ export async function downloadResumePDFFromElement(
   // This gives clean PDFs without extra padding on the sides
   // Extract innerHTML to get just the template content, excluding the container's padding
   let resumeHTML = htmlElement.innerHTML;
-  
+
   // Strip any margin classes that could create side margins (mx-auto, max-w-*, etc.)
   // This ensures the PDF doesn't have unwanted margins like the container padding
   resumeHTML = resumeHTML.replace(/\s*mx-auto\s*/g, ' ');
@@ -1035,11 +1043,11 @@ export async function downloadResumePDFFromElement(
   resumeHTML = resumeHTML.replace(/\s*mx-\d+\s*/g, ' ');
   resumeHTML = resumeHTML.replace(/\s*ml-auto\s*/g, ' ');
   resumeHTML = resumeHTML.replace(/\s*mr-auto\s*/g, ' ');
-  
+
   // Determine if third param is Resume or filename
   let finalFilename = filename;
   let resume: Resume | undefined;
-  
+
   if (resumeOrFilename) {
     if (typeof resumeOrFilename === 'string') {
       // It's a filename string (backward compatibility)
@@ -1049,7 +1057,7 @@ export async function downloadResumePDFFromElement(
       resume = resumeOrFilename;
     }
   }
-  
+
   // Generate filename from resume if provided, otherwise use provided filename or default
   if (!finalFilename && resume) {
     if (resume.name && resume.name.trim()) {
@@ -1064,7 +1072,7 @@ export async function downloadResumePDFFromElement(
   if (!finalFilename) {
     finalFilename = `resume_${resumeId}.pdf`;
   }
-  
+
   await downloadPDFFromHTML(resumeId, resumeHTML, finalFilename);
 }
 

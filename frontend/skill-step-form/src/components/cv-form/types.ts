@@ -75,7 +75,7 @@ export const cvFormSchema = z.object({
       ).optional(),  // 🔧 Made array optional
       startDate: z.string().optional(),
       endDate: z.string().optional(),
-      link: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
+      link: z.string().optional().or(z.literal("")),
     })
   ).optional(),
   certificates: z.array(
@@ -85,7 +85,7 @@ export const cvFormSchema = z.object({
       issueDate: z.string().optional(),
       expirationDate: z.string().optional(),
       credentialId: z.string().optional(),
-      url: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
+      url: z.string().optional().or(z.literal("")),
     })
   ).optional(),
   languages: z.array(

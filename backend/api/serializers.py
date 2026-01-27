@@ -130,7 +130,7 @@ class ProjectSerializer(serializers.Serializer):
         required=False, 
         allow_blank=True
     )
-    link = serializers.URLField(required=False, allow_blank=True)
+    link = serializers.CharField(required=False, allow_blank=True, max_length=500)
 
 
 class CertificateSerializer(serializers.Serializer):
@@ -159,7 +159,7 @@ class CertificateSerializer(serializers.Serializer):
         required=False, 
         allow_blank=True
     )
-    url = serializers.URLField(required=False, allow_blank=True)
+    url = serializers.CharField(required=False, allow_blank=True, max_length=500)
 
 
 class LanguageSerializer(serializers.Serializer):
