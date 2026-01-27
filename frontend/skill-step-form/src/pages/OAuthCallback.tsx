@@ -24,34 +24,12 @@ export default function OAuthCallback() {
           return;
         }
 
-        // Get code and state from URL
-        const code = searchParams.get('code');
-        const state = searchParams.get('state');
-
-        if (!code || !state) {
-          setStatus('error');
-          setMessage('Missing OAuth parameters');
-          setTimeout(() => navigate('/login'), 3000);
-          return;
-        }
-
-        // Verify state matches what we stored
-        const storedState = sessionStorage.getItem('oauth_state');
-        const storedProvider = sessionStorage.getItem('oauth_provider');
-
-        if (state !== storedState || !storedProvider) {
-          setStatus('error');
-          setMessage('Invalid OAuth state');
-          setTimeout(() => navigate('/login'), 3000);
-          return;
-        }
-
-        // The backend callback endpoint should have already processed the OAuth
-        // and redirected here with tokens in the URL or we need to fetch them
-        // For now, let's check if tokens are in URL params
+        // Check if tokens are in URL (backend redirects with tokens after processing OAuth)
         const accessToken = searchParams.get('access_token');
         const refreshToken = searchParams.get('refresh_token');
+        const state = searchParams.get('state');
 
+        // If tokens are present, backend has already processed OAuth
         if (accessToken && refreshToken) {
           // Tokens are in URL, fetch user info from backend
           try {
@@ -87,7 +65,7 @@ export default function OAuthCallback() {
               },
             });
 
-            // Clear OAuth state
+            // Clear OAuth state if it exists
             sessionStorage.removeItem('oauth_state');
             sessionStorage.removeItem('oauth_provider');
 
@@ -103,13 +81,34 @@ export default function OAuthCallback() {
             setMessage(err.message || 'Failed to process login tokens');
             setTimeout(() => navigate('/login'), 3000);
           }
-        } else {
-          // Tokens not in URL, need to fetch from backend
-          // This shouldn't happen with our current implementation, but handle it
-          setStatus('error');
-          setMessage('OAuth callback completed but tokens not received');
-          setTimeout(() => navigate('/login'), 3000);
+          return;
         }
+
+        // If no tokens, check for code and state (shouldn't happen with current backend flow)
+        const code = searchParams.get('code');
+        if (!code || !state) {
+          setStatus('error');
+          setMessage('Missing OAuth parameters');
+          setTimeout(() => navigate('/login'), 3000);
+          return;
+        }
+
+        // Verify state matches what we stored
+        const storedState = sessionStorage.getItem('oauth_state');
+        const storedProvider = sessionStorage.getItem('oauth_provider');
+
+        if (state !== storedState || !storedProvider) {
+          setStatus('error');
+          setMessage('Invalid OAuth state');
+          setTimeout(() => navigate('/login'), 3000);
+          return;
+        }
+
+        // This code path shouldn't be reached with current backend implementation
+        // Backend redirects with tokens directly
+        setStatus('error');
+        setMessage('OAuth callback completed but tokens not received');
+        setTimeout(() => navigate('/login'), 3000);
       } catch (err: any) {
         setStatus('error');
         setMessage(err.message || 'OAuth callback failed');
@@ -131,8 +130,10 @@ export default function OAuthCallback() {
         <div className="w-full max-w-md">
           {status === 'loading' && (
             <Alert>
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent mr-2" />
-              <AlertDescription>Processing your login...</AlertDescription>
+              <div className="flex items-center">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent mr-2" />
+                <AlertDescription>Processing your login...</AlertDescription>
+              </div>
             </Alert>
           )}
 

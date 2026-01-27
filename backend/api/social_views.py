@@ -15,7 +15,7 @@ from urllib.parse import urlencode, parse_qs, urlparse
 
 logger = logging.getLogger(__name__)
 
-# OAuth state is now stored in Django sessions (persists across restarts and works with multiple workers)
+# OAuth state is stored in Django sessions (works across multiple workers)
 
 
 def get_jwt_tokens_for_user(user):
@@ -82,7 +82,7 @@ def social_login_url(request, provider):
     
     # Generate state for CSRF protection
     state = secrets.token_urlsafe(32)
-    # Store state in session (persists across restarts and works with multiple workers)
+    # Store state in session (works across multiple workers)
     request.session[f'oauth_state_{state}'] = {
         'provider': provider,
         'redirect_uri': request.GET.get('redirect_uri', ''),
@@ -185,47 +185,30 @@ def social_login_callback(request, provider):
     state = request.GET.get('state')
     error = request.GET.get('error')
     
-    # Log all query parameters for debugging (LinkedIn might not return state)
-    logger.info(f"OAuth callback query params - code: {bool(code)}, state: {bool(state)}, error: {error}, all params: {list(request.GET.keys())}")
-    
     if error:
         return Response(
             {'error': f'OAuth error: {error}'},
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    if not code:
+    if not code or not state:
         return Response(
-            {'error': 'Missing authorization code'},
+            {'error': 'Missing code or state parameter'},
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    if not state:
-        # LinkedIn sometimes doesn't return state - log this for debugging
-        logger.warning("LinkedIn callback missing state parameter - this may indicate an issue with LinkedIn's OAuth implementation")
-        # For now, we'll still require state for security, but log the issue
-        return Response(
-            {'error': 'Missing state parameter. LinkedIn did not return the state parameter in the callback. Please try again.'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    # Verify state from session
-    # Log for debugging (without exposing sensitive data)
-    logger.info(f"OAuth callback received - provider: {provider}, state present: {bool(state)}, session keys: {list(request.session.keys())[:5]}")
-    
+    # Verify state from session (works across multiple workers)
     state_key = f'oauth_state_{state}'
     if state_key not in request.session:
-        # Check if state might be in a different format or if session expired
-        available_states = [k for k in request.session.keys() if k.startswith('oauth_state_')]
-        logger.warning(f"State not found in session. Received state: {state[:10]}..., Available states: {len(available_states)}")
+        logger.error(f"State not found in session. Received state: {state[:20]}..., Available session keys: {list(request.session.keys())[:5]}")
         return Response(
-            {'error': 'Invalid state parameter - state not found in session. This may happen if the session expired or cookies are disabled.'},
+            {'error': 'Invalid state parameter - state not found in session'},
             status=status.HTTP_400_BAD_REQUEST
         )
     
     state_data = request.session.pop(state_key)
     if state_data['provider'] != provider:
-        logger.warning(f"State provider mismatch - expected: {provider}, got: {state_data.get('provider')}")
+        logger.error(f"State provider mismatch - expected: {provider}, got: {state_data.get('provider')}")
         return Response(
             {'error': 'State provider mismatch'},
             status=status.HTTP_400_BAD_REQUEST
@@ -264,6 +247,7 @@ def social_login_callback(request, provider):
             )
         
         # Get or create user
+        logger.info(f"Creating/retrieving user for {provider} - email: {user_info.get('email', 'N/A')[:20]}...")
         user = get_or_create_user_from_social(
             email=user_info['email'],
             first_name=user_info.get('first_name', ''),
@@ -271,9 +255,12 @@ def social_login_callback(request, provider):
             provider=provider,
             provider_id=user_info.get('id', ''),
         )
+        logger.info(f"User created/retrieved: {user.username}")
         
         # Generate JWT tokens
+        logger.info(f"Generating JWT tokens for user: {user.username}")
         tokens = get_jwt_tokens_for_user(user)
+        logger.info("JWT tokens generated successfully")
         
         # Redirect to frontend callback URL with tokens
         redirect_uri = state_data.get('redirect_uri', '')
@@ -289,6 +276,7 @@ def social_login_callback(request, provider):
             'state': state,  # Include state for verification
         })
         redirect_url = f"{redirect_uri}?{token_params}"
+        logger.info(f"Redirecting to frontend: {redirect_uri[:50]}...")
         
         # Redirect to frontend
         from django.shortcuts import redirect
@@ -358,11 +346,13 @@ def _handle_linkedin_callback(code, callback_url):
         'client_secret': client_secret,
     }
     
+    logger.info(f"LinkedIn token exchange: URL={token_url}, redirect_uri={callback_url}")
     token_response = requests.post(token_url, data=token_data, headers={'Content-Type': 'application/x-www-form-urlencoded'})
     
     # Better error handling for LinkedIn
     if not token_response.ok:
         error_text = token_response.text
+        logger.error(f"LinkedIn token exchange failed: status={token_response.status_code}, response={error_text}")
         try:
             error_json = token_response.json()
             error_description = error_json.get('error_description', error_text)
@@ -370,6 +360,8 @@ def _handle_linkedin_callback(code, callback_url):
             raise ValueError(f'LinkedIn token exchange failed: {error_code} - {error_description}')
         except:
             raise ValueError(f'LinkedIn token exchange failed: {token_response.status_code} - {error_text}')
+    
+    logger.info("LinkedIn token exchange successful")
     
     tokens = token_response.json()
     access_token = tokens.get('access_token')
@@ -380,16 +372,20 @@ def _handle_linkedin_callback(code, callback_url):
     # Get user info - LinkedIn uses v2/userinfo endpoint for OpenID Connect
     user_info_url = 'https://api.linkedin.com/v2/userinfo'
     headers = {'Authorization': f'Bearer {access_token}'}
+    logger.info(f"LinkedIn user info request: URL={user_info_url}")
     user_response = requests.get(user_info_url, headers=headers)
     
     if not user_response.ok:
         error_text = user_response.text
+        logger.error(f"LinkedIn user info failed: status={user_response.status_code}, response={error_text}")
         try:
             error_json = user_response.json()
             error_description = error_json.get('error_description', error_text)
             raise ValueError(f'LinkedIn user info failed: {error_description}')
         except:
             raise ValueError(f'LinkedIn user info failed: {user_response.status_code} - {error_text}')
+    
+    logger.info("LinkedIn user info retrieved successfully")
     
     user_data = user_response.json()
     
