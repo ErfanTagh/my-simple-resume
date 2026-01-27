@@ -64,6 +64,8 @@ GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID', '').strip()
 GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET', '').strip()
 LINKEDIN_CLIENT_ID = os.getenv('LINKEDIN_CLIENT_ID', '').strip()
 LINKEDIN_CLIENT_SECRET = os.getenv('LINKEDIN_CLIENT_SECRET', '').strip()
+GITHUB_CLIENT_ID = os.getenv('GITHUB_CLIENT_ID', '').strip()
+GITHUB_CLIENT_SECRET = os.getenv('GITHUB_CLIENT_SECRET', '').strip()
 XING_CLIENT_ID = os.getenv('XING_CLIENT_ID', '').strip()
 XING_CLIENT_SECRET = os.getenv('XING_CLIENT_SECRET', '').strip()
 

@@ -113,6 +113,7 @@ const mapResumeToCVFormData = (resume: Resume): CVFormData => {
   };
 };
 
+
 const CreateResume = () => {
   const [searchParams] = useSearchParams();
   const editId = searchParams.get("edit") || undefined;

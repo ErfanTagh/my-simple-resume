@@ -25,7 +25,6 @@ urlpatterns = [
     # Social authentication endpoints
     path('auth/social/<str:provider>/url/', social_views.social_login_url, name='social-login-url'),
     path('auth/social/<str:provider>/callback/', social_views.social_login_callback, name='social-login-callback'),
-    path('auth/social/xing/plugin/login/', social_views.xing_plugin_login, name='xing-plugin-login'),
     
     # Resume endpoints (protected)
     path('resumes/', views.resume_list, name='resume-list'),

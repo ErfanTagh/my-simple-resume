@@ -72,7 +72,7 @@ export default function OAuthCallback() {
             setStatus('success');
             setMessage('Login successful! Redirecting...');
 
-            // Redirect to resumes page
+            // Redirect to resumes page after successful login
             setTimeout(() => {
               navigate('/resumes');
             }, 1500);

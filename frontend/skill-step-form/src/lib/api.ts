@@ -230,6 +230,7 @@ export const authAPI = {
     });
     return handleResponse(response);
   },
+
 };
 
 // ============================================

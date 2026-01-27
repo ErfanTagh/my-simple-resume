@@ -3,7 +3,7 @@ REST API views for social authentication using OAuth 2.0
 """
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
@@ -74,7 +74,7 @@ def social_login_url(request, provider):
     
     Returns the URL the frontend should redirect to for OAuth login.
     """
-    if provider not in ['google', 'linkedin', 'xing']:
+    if provider not in ['google', 'linkedin', 'github']:
         return Response(
             {'error': f'Unsupported provider: {provider}'},
             status=status.HTTP_400_BAD_REQUEST
@@ -137,28 +137,33 @@ def social_login_url(request, provider):
             'client_id': client_id,
             'redirect_uri': callback_url,
             'response_type': 'code',
+            # LinkedIn OpenID Connect scopes
+            # Basic: 'openid profile email' - gives name, email, picture
+            # For detailed profile data (positions, education, etc.), you may need:
+            # - Partner Program access
+            # - Additional permissions in LinkedIn Developer Portal
+            # - Different API endpoints (v2/me, v2/positions, etc.)
             'scope': 'openid profile email',
             'state': state,
         }
         auth_url = f"https://www.linkedin.com/oauth/v2/authorization?{urlencode(params)}"
         
-    elif provider == 'xing':
-        client_id = settings.XING_CLIENT_ID if hasattr(settings, 'XING_CLIENT_ID') else ''
+    elif provider == 'github':
+        client_id = settings.GITHUB_CLIENT_ID if hasattr(settings, 'GITHUB_CLIENT_ID') else ''
         if not client_id:
             return Response(
-                {'error': 'Xing OAuth not configured. Please set XING_CLIENT_ID in environment variables.'},
+                {'error': 'GitHub OAuth not configured. Please set GITHUB_CLIENT_ID in environment variables.'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
         params = {
             'client_id': client_id,
             'redirect_uri': callback_url,
-            'response_type': 'code',
-            'scope': 'profile',
+            'scope': 'user:email',
             'state': state,
         }
-        auth_url = f"https://api.xing.com/auth/oauth2/authorize?{urlencode(params)}"
-    
+        auth_url = f"https://github.com/login/oauth/authorize?{urlencode(params)}"
+        
     else:
         return Response(
             {'error': f'Provider {provider} not implemented'},
@@ -238,8 +243,8 @@ def social_login_callback(request, provider):
             user_info = _handle_google_callback(code, callback_url)
         elif provider == 'linkedin':
             user_info = _handle_linkedin_callback(code, callback_url)
-        elif provider == 'xing':
-            user_info = _handle_xing_callback(code, callback_url)
+        elif provider == 'github':
+            user_info = _handle_github_callback(code, callback_url)
         else:
             return Response(
                 {'error': f'Unsupported provider: {provider}'},
@@ -414,116 +419,75 @@ def _handle_linkedin_callback(code, callback_url):
     }
 
 
-def _handle_xing_callback(code, callback_url):
-    """Handle Xing OAuth callback"""
-    client_id = settings.XING_CLIENT_ID if hasattr(settings, 'XING_CLIENT_ID') else ''
-    client_secret = settings.XING_CLIENT_SECRET if hasattr(settings, 'XING_CLIENT_SECRET') else ''
+def _handle_github_callback(code, callback_url):
+    """Handle GitHub OAuth callback"""
+    client_id = settings.GITHUB_CLIENT_ID if hasattr(settings, 'GITHUB_CLIENT_ID') else ''
+    client_secret = settings.GITHUB_CLIENT_SECRET if hasattr(settings, 'GITHUB_CLIENT_SECRET') else ''
     
     if not client_id or not client_secret:
-        raise ValueError('Xing OAuth not configured')
+        raise ValueError('GitHub OAuth not configured')
     
     # Exchange code for tokens
-    token_url = 'https://api.xing.com/auth/oauth2/token'
+    token_url = 'https://github.com/login/oauth/access_token'
     token_data = {
-        'grant_type': 'authorization_code',
-        'code': code,
-        'redirect_uri': callback_url,
         'client_id': client_id,
         'client_secret': client_secret,
+        'code': code,
+        'redirect_uri': callback_url,
     }
     
-    token_response = requests.post(token_url, data=token_data)
+    token_response = requests.post(
+        token_url,
+        data=token_data,
+        headers={'Accept': 'application/json'}
+    )
     token_response.raise_for_status()
     tokens = token_response.json()
-    access_token = tokens['access_token']
+    access_token = tokens.get('access_token')
+    
+    if not access_token:
+        raise ValueError('GitHub did not return an access token')
     
     # Get user info
-    user_info_url = 'https://api.xing.com/v1/users/me'
-    headers = {'Authorization': f'Bearer {access_token}'}
+    user_info_url = 'https://api.github.com/user'
+    headers = {
+        'Authorization': f'token {access_token}',
+        'Accept': 'application/vnd.github.v3+json'
+    }
     user_response = requests.get(user_info_url, headers=headers)
     user_response.raise_for_status()
     user_data = user_response.json()
     
-    # Xing returns user data in 'users' array
-    user = user_data.get('users', [{}])[0] if user_data.get('users') else {}
+    # GitHub API doesn't return email in user endpoint by default
+    # Need to fetch email separately
+    email = user_data.get('email', '')
+    if not email:
+        # Try to get email from email endpoint
+        email_url = 'https://api.github.com/user/emails'
+        email_response = requests.get(email_url, headers=headers)
+        if email_response.ok:
+            emails = email_response.json()
+            # Get primary email or first verified email
+            primary_email = next((e for e in emails if e.get('primary')), None)
+            if primary_email:
+                email = primary_email.get('email', '')
+            elif emails:
+                # Get first verified email
+                verified_email = next((e for e in emails if e.get('verified')), None)
+                if verified_email:
+                    email = verified_email.get('email', '')
+    
+    # GitHub name might be full name or username
+    name = user_data.get('name', '') or user_data.get('login', '')
+    name_parts = name.strip().split(' ', 1) if name else ['', '']
+    first_name = name_parts[0] if len(name_parts) > 0 else ''
+    last_name = name_parts[1] if len(name_parts) > 1 else ''
     
     return {
-        'id': user.get('id', ''),
-        'email': user.get('active_email', ''),
-        'first_name': user.get('first_name', ''),
-        'last_name': user.get('last_name', ''),
+        'id': str(user_data.get('id', '')),
+        'email': email,
+        'first_name': first_name,
+        'last_name': last_name,
     }
 
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def xing_plugin_login(request):
-    """
-    Handle XING Login Plugin authentication
-    
-    This endpoint receives user data directly from the XING Login Plugin
-    (client-side JavaScript widget) and creates/retrieves user account.
-    """
-    try:
-        data = request.data
-        user_data = data.get('user', {})
-        
-        if not user_data:
-            return Response(
-                {'error': 'No user data provided'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        # Extract user information from XING plugin response
-        # XING plugin returns data in this format:
-        # {
-        #   "user": {
-        #     "id": "...",
-        #     "first_name": "...",
-        #     "last_name": "...",
-        #     "display_name": "...",
-        #     "active_email": "...",
-        #     ...
-        #   }
-        # }
-        email = user_data.get('active_email', '')
-        if not email:
-            return Response(
-                {'error': 'Email is required for XING login'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        first_name = user_data.get('first_name', '')
-        last_name = user_data.get('last_name', '')
-        xing_id = user_data.get('id', '')
-        
-        # Get or create user
-        user = get_or_create_user_from_social(
-            email=email,
-            first_name=first_name,
-            last_name=last_name,
-            provider='xing',
-            provider_id=xing_id,
-        )
-        
-        # Generate JWT tokens
-        tokens = get_jwt_tokens_for_user(user)
-        
-        # Return tokens and user info
-        return Response({
-            'tokens': tokens,
-            'user': {
-                'id': user.id,
-                'username': user.username,
-                'email': user.email,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-            },
-        })
-        
-    except Exception as e:
-        logger.error(f"XING plugin login error: {str(e)}", exc_info=True)
-        return Response(
-            {'error': f'XING login failed: {str(e)}'},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
