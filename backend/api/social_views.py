@@ -15,8 +15,7 @@ from urllib.parse import urlencode, parse_qs, urlparse
 
 logger = logging.getLogger(__name__)
 
-# Store OAuth state temporarily (in production, use Redis or database)
-_oauth_states = {}
+# OAuth state is now stored in Django sessions (persists across restarts and works with multiple workers)
 
 
 def get_jwt_tokens_for_user(user):
@@ -83,10 +82,12 @@ def social_login_url(request, provider):
     
     # Generate state for CSRF protection
     state = secrets.token_urlsafe(32)
-    _oauth_states[state] = {
+    # Store state in session (persists across restarts and works with multiple workers)
+    request.session[f'oauth_state_{state}'] = {
         'provider': provider,
         'redirect_uri': request.GET.get('redirect_uri', ''),
     }
+    request.session.save()  # Ensure session is saved
     
     # Build callback URL - use DOMAIN from settings if available, otherwise use request
     # This ensures consistency in production when behind a reverse proxy
@@ -184,27 +185,47 @@ def social_login_callback(request, provider):
     state = request.GET.get('state')
     error = request.GET.get('error')
     
+    # Log all query parameters for debugging (LinkedIn might not return state)
+    logger.info(f"OAuth callback query params - code: {bool(code)}, state: {bool(state)}, error: {error}, all params: {list(request.GET.keys())}")
+    
     if error:
         return Response(
             {'error': f'OAuth error: {error}'},
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    if not code or not state:
+    if not code:
         return Response(
-            {'error': 'Missing code or state parameter'},
+            {'error': 'Missing authorization code'},
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    # Verify state
-    if state not in _oauth_states:
+    if not state:
+        # LinkedIn sometimes doesn't return state - log this for debugging
+        logger.warning("LinkedIn callback missing state parameter - this may indicate an issue with LinkedIn's OAuth implementation")
+        # For now, we'll still require state for security, but log the issue
         return Response(
-            {'error': 'Invalid state parameter'},
+            {'error': 'Missing state parameter. LinkedIn did not return the state parameter in the callback. Please try again.'},
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    state_data = _oauth_states.pop(state)
+    # Verify state from session
+    # Log for debugging (without exposing sensitive data)
+    logger.info(f"OAuth callback received - provider: {provider}, state present: {bool(state)}, session keys: {list(request.session.keys())[:5]}")
+    
+    state_key = f'oauth_state_{state}'
+    if state_key not in request.session:
+        # Check if state might be in a different format or if session expired
+        available_states = [k for k in request.session.keys() if k.startswith('oauth_state_')]
+        logger.warning(f"State not found in session. Received state: {state[:10]}..., Available states: {len(available_states)}")
+        return Response(
+            {'error': 'Invalid state parameter - state not found in session. This may happen if the session expired or cookies are disabled.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    state_data = request.session.pop(state_key)
     if state_data['provider'] != provider:
+        logger.warning(f"State provider mismatch - expected: {provider}, got: {state_data.get('provider')}")
         return Response(
             {'error': 'State provider mismatch'},
             status=status.HTTP_400_BAD_REQUEST
