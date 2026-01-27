@@ -184,6 +184,10 @@ export default function Login() {
     const consumerKey = import.meta.env.VITE_XING_CONSUMER_KEY || '';
     if (!consumerKey) {
       // XING not configured - plugin won't load
+      // Check if we're in development and log a helpful message
+      if (import.meta.env.DEV) {
+        console.warn('XING login not available: VITE_XING_CONSUMER_KEY is not set');
+      }
       return;
     }
 
@@ -204,6 +208,68 @@ export default function Login() {
     pluginScript.id = 'lwx';
     pluginScript.src = 'https://www.xing-share.com/plugins/login_plugin.js';
     pluginScript.async = true;
+    pluginScript.onload = () => {
+      // Plugin loaded - use MutationObserver to watch for when XING creates the button
+      const container = document.getElementById('xing-login-container');
+      if (!container) return;
+
+      // Watch for XING button creation (plugin might create it anywhere initially)
+      const observer = new MutationObserver((mutations) => {
+        // First, check if button already exists in container
+        let xingButton = container.querySelector('button, a, [class*="xing"], [id*="xing"]') as HTMLElement;
+        
+        // If not in container, search the whole document for XING button
+        if (!xingButton) {
+          xingButton = document.querySelector('[class*="xing"], [id*="xing"], [data-xing]') as HTMLElement;
+          // If found elsewhere, move it to our container
+          if (xingButton && xingButton.parentNode !== container) {
+            container.appendChild(xingButton);
+          }
+        }
+
+        // Style the button if found
+        if (xingButton && xingButton.parentNode === container) {
+          xingButton.style.width = '100%';
+          xingButton.style.height = '2.5rem';
+          xingButton.style.backgroundColor = '#00A651';
+          xingButton.style.color = 'white';
+          xingButton.style.border = '1px solid #00A651';
+          xingButton.style.borderRadius = '0.375rem';
+          xingButton.style.fontSize = '0.75rem';
+          xingButton.style.fontWeight = '600';
+          xingButton.style.display = 'flex';
+          xingButton.style.alignItems = 'center';
+          xingButton.style.justifyContent = 'center';
+          xingButton.style.cursor = 'pointer';
+          xingButton.addEventListener('mouseenter', () => {
+            xingButton.style.backgroundColor = '#008a43';
+            xingButton.style.borderColor = '#008a43';
+          });
+          xingButton.addEventListener('mouseleave', () => {
+            xingButton.style.backgroundColor = '#00A651';
+            xingButton.style.borderColor = '#00A651';
+          });
+          observer.disconnect(); // Stop observing once we've styled the button
+        }
+      });
+
+      // Start observing
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
+
+      // Also check immediately and after a delay
+      setTimeout(() => {
+        const xingButton = container.querySelector('button, a, [class*="xing"], [id*="xing"]') as HTMLElement;
+        if (xingButton) {
+          observer.disconnect();
+        }
+      }, 2000);
+    };
+    pluginScript.onerror = () => {
+      console.error('Failed to load XING Login Plugin');
+    };
     document.head.appendChild(pluginScript);
 
     xingPluginLoaded.current = true;
@@ -444,19 +510,21 @@ export default function Login() {
                 </svg>
               )}
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full bg-[#00A651] hover:bg-[#008a43] text-white border-[#00A651] hover:border-[#008a43]"
-              onClick={() => handleSocialLogin('xing')}
-              disabled={isLoading || isSocialLoading !== null}
-            >
-              {isSocialLoading === 'xing' ? (
+            {isSocialLoading === 'xing' ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full bg-[#00A651] hover:bg-[#008a43] text-white border-[#00A651] hover:border-[#008a43]"
+                disabled={true}
+              >
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-              ) : (
-                <span className="text-xs font-semibold text-white">XING</span>
-              )}
-            </Button>
+              </Button>
+            ) : (
+              <div 
+                id="xing-login-container"
+                className="w-full [&_button]:w-full [&_button]:h-10 [&_button]:bg-[#00A651] [&_button]:hover:bg-[#008a43] [&_button]:text-white [&_button]:border [&_button]:border-[#00A651] [&_button]:hover:border-[#008a43] [&_button]:rounded-md [&_button]:text-xs [&_button]:font-semibold [&_button]:flex [&_button]:items-center [&_button]:justify-center [&_button]:disabled:opacity-50 [&_button]:disabled:cursor-not-allowed"
+              />
+            )}
           </div>
 
           <div className="mt-6 text-center text-sm">

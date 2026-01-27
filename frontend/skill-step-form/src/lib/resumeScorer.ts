@@ -383,7 +383,7 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
     if (validSkills < 3) {
       suggestions.push(`Add more skills to showcase your expertise (currently ${validSkills}, aim for at least 3-5 for better scoring)`);
     } else {
-      suggestions.push("Add more skills to showcase your expertise");
+    suggestions.push("Add more skills to showcase your expertise");
     }
   }
   
@@ -404,7 +404,7 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
     if (validSkills < 5) {
       suggestions.push(`Add more relevant skills that match industry standards and your experience (currently ${validSkills}, aim for 5+ for maximum scoring)`);
     } else {
-      suggestions.push("Add more relevant skills that match industry standards and your experience");
+    suggestions.push("Add more relevant skills that match industry standards and your experience");
     }
   } else if (validSkills > 0) {
     // Already got 0.1 from organized section, just suggest adding more

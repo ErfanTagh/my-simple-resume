@@ -129,6 +129,9 @@ def social_login_url(request, provider):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
+        # Log the callback URL for debugging (without sensitive data)
+        logger.info(f"LinkedIn OAuth: Generated callback URL: {callback_url}")
+        
         params = {
             'client_id': client_id,
             'redirect_uri': callback_url,
@@ -221,6 +224,10 @@ def social_login_callback(request, provider):
         base_url = request.build_absolute_uri('/').rstrip('/')
     
     callback_url = f"{base_url}/api/auth/social/{provider}/callback/"
+    
+    # Log callback URL for debugging
+    if provider == 'linkedin':
+        logger.info(f"LinkedIn callback: Using redirect URI: {callback_url}")
     
     try:
         if provider == 'google':
@@ -331,25 +338,62 @@ def _handle_linkedin_callback(code, callback_url):
     }
     
     token_response = requests.post(token_url, data=token_data, headers={'Content-Type': 'application/x-www-form-urlencoded'})
-    token_response.raise_for_status()
-    tokens = token_response.json()
-    access_token = tokens['access_token']
     
-    # Get user info
+    # Better error handling for LinkedIn
+    if not token_response.ok:
+        error_text = token_response.text
+        try:
+            error_json = token_response.json()
+            error_description = error_json.get('error_description', error_text)
+            error_code = error_json.get('error', 'unknown')
+            raise ValueError(f'LinkedIn token exchange failed: {error_code} - {error_description}')
+        except:
+            raise ValueError(f'LinkedIn token exchange failed: {token_response.status_code} - {error_text}')
+    
+    tokens = token_response.json()
+    access_token = tokens.get('access_token')
+    
+    if not access_token:
+        raise ValueError('LinkedIn did not return an access token')
+    
+    # Get user info - LinkedIn uses v2/userinfo endpoint for OpenID Connect
     user_info_url = 'https://api.linkedin.com/v2/userinfo'
     headers = {'Authorization': f'Bearer {access_token}'}
     user_response = requests.get(user_info_url, headers=headers)
-    user_response.raise_for_status()
+    
+    if not user_response.ok:
+        error_text = user_response.text
+        try:
+            error_json = user_response.json()
+            error_description = error_json.get('error_description', error_text)
+            raise ValueError(f'LinkedIn user info failed: {error_description}')
+        except:
+            raise ValueError(f'LinkedIn user info failed: {user_response.status_code} - {error_text}')
+    
     user_data = user_response.json()
     
-    # LinkedIn returns name in sub object
+    # LinkedIn OpenID Connect returns name - could be object or string
     name = user_data.get('name', {})
+    
+    # Handle both cases: name as object with given_name/family_name, or name as string
+    if isinstance(name, dict):
+        first_name = name.get('given_name', '')
+        last_name = name.get('family_name', '')
+    elif isinstance(name, str):
+        # If name is a string, try to split it
+        name_parts = name.strip().split(' ', 1)
+        first_name = name_parts[0] if len(name_parts) > 0 else ''
+        last_name = name_parts[1] if len(name_parts) > 1 else ''
+    else:
+        # Fallback: try given_name and family_name directly from user_data
+        first_name = user_data.get('given_name', '')
+        last_name = user_data.get('family_name', '')
     
     return {
         'id': user_data.get('sub', ''),
         'email': user_data.get('email', ''),
-        'first_name': name.get('given_name', ''),
-        'last_name': name.get('family_name', ''),
+        'first_name': first_name,
+        'last_name': last_name,
     }
 
 

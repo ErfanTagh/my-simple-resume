@@ -412,7 +412,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                   lineHeight: '1.2',
                 }}
               >
-                {personalInfo.firstName} {personalInfo.lastName}
+                {personalInfo.firstName} {personalInfo.lastName}                                
               </h1>
               {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (
                 <p className="font-semibold mb-2" style={{ fontSize: sizes.base, color: textColor }}>{personalInfo.professionalTitle.trim()}</p>

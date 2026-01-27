@@ -274,11 +274,11 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                     {/* Organization (left) and Date (right) on same line */}
                     <div className="flex justify-between items-center gap-4 mb-0.5">
                       <p style={{ fontSize: sizes.xs, color: certificatesStyling.bodyColor }}>{cert.organization}</p>
-                      {(cert.issueDate || cert.expirationDate) && (
+                    {(cert.issueDate || cert.expirationDate) && (
                         <span className="whitespace-nowrap" style={{ fontSize: sizes.xs, color: certificatesStyling.bodyColor }}>
-                          {cert.issueDate} {cert.expirationDate && `- ${cert.expirationDate}`}
+                        {cert.issueDate} {cert.expirationDate && `- ${cert.expirationDate}`}
                         </span>
-                      )}
+                    )}
                     </div>
                     {cert.credentialId && (
                       <p style={{ fontSize: sizes.xs, color: certificatesStyling.bodyColor }}>ID: {cert.credentialId}</p>

@@ -135,11 +135,11 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                         <p className="font-semibold" style={{ fontSize: workExperienceBodySizes.baseText, color: workExperienceStyling.bodyColor }}>
                           {exp.company}{exp.location && ` • ${exp.location}`}
                         </p>
-                        {(exp.startDate || exp.endDate) && (
+                      {(exp.startDate || exp.endDate) && (
                           <span className="whitespace-nowrap" style={{ fontSize: workExperienceBodySizes.xs, color: workExperienceStyling.bodyColor }}>
-                            {formatDateRange(exp.startDate, exp.endDate, t('resume.fields.present'))}
+                          {formatDateRange(exp.startDate, exp.endDate, t('resume.fields.present'))}
                           </span>
-                        )}
+                      )}
                       </div>
                       {((exp.responsibilities && exp.responsibilities.length > 0) || exp.description) && (
                         <ul className="space-y-0.5 mt-1.5" style={{ fontSize: workExperienceBodySizes.baseText, color: workExperienceStyling.bodyColor }}>
@@ -295,11 +295,11 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                       {/* Organization (left) and Date (right) on same line */}
                       <div className="flex justify-between items-center gap-4 mb-0.5">
                         <p style={{ fontSize: certificatesBodySizes.baseText, color: certificatesStyling.bodyColor }}>{cert.organization}</p>
-                        {(cert.issueDate || cert.expirationDate) && (
+                      {(cert.issueDate || cert.expirationDate) && (
                           <span className="whitespace-nowrap" style={{ fontSize: sizes.xs, color: certificatesStyling.bodyColor }}>
-                            {cert.issueDate} {cert.expirationDate && `- ${cert.expirationDate}`}
+                          {cert.issueDate} {cert.expirationDate && `- ${cert.expirationDate}`}
                           </span>
-                        )}
+                      )}
                       </div>
                       {cert.credentialId && (
                         <p style={{ fontSize: sizes.xs, color: certificatesStyling.bodyColor }}>ID: {cert.credentialId}</p>
