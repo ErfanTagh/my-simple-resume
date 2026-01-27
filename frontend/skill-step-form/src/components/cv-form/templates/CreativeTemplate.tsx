@@ -135,11 +135,11 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                         <p className="font-semibold" style={{ fontSize: workExperienceBodySizes.baseText, color: workExperienceStyling.bodyColor }}>
                           {exp.company}{exp.location && ` • ${exp.location}`}
                         </p>
-                      {(exp.startDate || exp.endDate) && (
+                        {(exp.startDate || exp.endDate) && (
                           <span className="whitespace-nowrap" style={{ fontSize: workExperienceBodySizes.xs, color: workExperienceStyling.bodyColor }}>
-                          {formatDateRange(exp.startDate, exp.endDate, t('resume.fields.present'))}
+                            {formatDateRange(exp.startDate, exp.endDate, t('resume.fields.present'))}
                           </span>
-                      )}
+                        )}
                       </div>
                       {((exp.responsibilities && exp.responsibilities.length > 0) || exp.description) && (
                         <ul className="space-y-0.5 mt-1.5" style={{ fontSize: workExperienceBodySizes.baseText, color: workExperienceStyling.bodyColor }}>
@@ -295,11 +295,11 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                       {/* Organization (left) and Date (right) on same line */}
                       <div className="flex justify-between items-center gap-4 mb-0.5">
                         <p style={{ fontSize: certificatesBodySizes.baseText, color: certificatesStyling.bodyColor }}>{cert.organization}</p>
-                      {(cert.issueDate || cert.expirationDate) && (
+                        {(cert.issueDate || cert.expirationDate) && (
                           <span className="whitespace-nowrap" style={{ fontSize: sizes.xs, color: certificatesStyling.bodyColor }}>
-                          {cert.issueDate} {cert.expirationDate && `- ${cert.expirationDate}`}
+                            {cert.issueDate} {cert.expirationDate && `- ${cert.expirationDate}`}
                           </span>
-                      )}
+                        )}
                       </div>
                       {cert.credentialId && (
                         <p style={{ fontSize: sizes.xs, color: certificatesStyling.bodyColor }}>ID: {cert.credentialId}</p>
@@ -400,20 +400,27 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
             background: var(--pdf-background, hsl(var(--background))) !important;
             width: 210mm;
             margin: 0 auto;
-            /* Use flexbox to ensure last page fills */
             display: flex;
             flex-direction: column;
           }
-          /* Content wrapper should not grow */
+          /* Content sections */
           .resume-page-container > div:not([aria-hidden="true"]) {
             flex: 0 0 auto;
           }
-          /* Spacer div at end will fill remaining space */
+          /* Spacer fills remaining space but won't create new page */
           .resume-page-container > div[aria-hidden="true"] {
-            flex: 1 1 auto !important;
+            flex: 1 1 0 !important;
             min-height: 0;
+            /* Constrain spacer to prevent creating new page - only fill up to remaining space */
+            max-height: 200mm;
+            overflow: hidden;
+            page-break-inside: avoid;
+            page-break-after: avoid;
+            break-inside: avoid;
+            break-after: avoid;
             background: var(--pdf-background, hsl(var(--background))) !important;
           }
+          /* Remove spacer div styling - we'll use padding on container instead */
           /* Prevent sections from breaking awkwardly */
           div[class*="mb-"] {
             page-break-inside: avoid;
@@ -504,8 +511,8 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
           {orderedSections.map(section => renderSection(section))}
         </div>
 
-        {/* Spacer to ensure last page fills full height */}
-        <div aria-hidden="true" style={{ flex: '1 1 auto', minHeight: 0 }}></div>
+        {/* Spacer to fill last page - constrained to prevent extra pages */}
+        <div aria-hidden="true" style={{ flex: '1 1 0', minHeight: 0 }}></div>
 
         {/* Page Number Footer */}
         <style>{`
