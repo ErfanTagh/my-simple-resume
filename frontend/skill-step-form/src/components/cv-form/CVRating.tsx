@@ -238,6 +238,8 @@ if (!rating) {
                   "Consider addressing employment gaps or ensure dates are accurate": t('resume.score.feedback.gaps') || suggestion,
                   "Limit interests to 3-5 most relevant ones": t('resume.score.feedback.interests') || suggestion,
                   "Add a professional website or LinkedIn profile to strengthen your online presence": t('resume.score.feedback.onlinePresence') || suggestion,
+                  "Your resume is solid! Adding more metrics and impact-focused descriptions would make it even stronger.": t('resume.score.feedback.solid') || suggestion,
+                  "Add specific numbers to showcase impact: revenue increased (%), team size managed, cost savings ($), users reached, etc.": t('resume.score.feedback.addSpecificNumbers') || suggestion,
                 };
                 const localizedSuggestion = suggestionMap[suggestion] || suggestion;
                 

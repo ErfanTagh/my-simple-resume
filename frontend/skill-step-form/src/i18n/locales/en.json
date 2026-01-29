@@ -376,7 +376,9 @@
         "contact": "Ensure you have complete contact information (email, phone, or LinkedIn)",
         "gaps": "Consider addressing employment gaps or ensure dates are accurate",
         "interests": "Limit interests to 3-5 most relevant ones",
-        "onlinePresence": "Add a professional website or LinkedIn profile to strengthen your online presence"
+        "onlinePresence": "Add a professional website or LinkedIn profile to strengthen your online presence",
+        "solid": "Your resume is solid! Adding more metrics and impact-focused descriptions would make it even stronger.",
+        "addSpecificNumbers": "Add specific numbers to showcase impact: revenue increased (%), team size managed, cost savings ($), users reached, etc."
       },
       "categoryFeedback": {
         "contentQuality": {

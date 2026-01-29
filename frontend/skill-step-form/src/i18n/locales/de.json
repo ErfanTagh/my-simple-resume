@@ -369,7 +369,9 @@
         "contact": "Stellen Sie sicher, dass Sie vollständige Kontaktinformationen haben (E-Mail, Telefon oder LinkedIn)",
         "gaps": "Erwägen Sie, Beschäftigungslücken anzusprechen oder stellen Sie sicher, dass die Daten korrekt sind",
         "interests": "Begrenzen Sie Interessen auf die 3-5 relevantesten",
-        "onlinePresence": "Fügen Sie eine professionelle Website oder ein LinkedIn-Profil hinzu, um Ihre Online-Präsenz zu stärken"
+        "onlinePresence": "Fügen Sie eine professionelle Website oder ein LinkedIn-Profil hinzu, um Ihre Online-Präsenz zu stärken",
+        "solid": "Ihr Lebenslauf ist solide! Das Hinzufügen von mehr Metriken und wirkungsorientierten Beschreibungen würde ihn noch stärker machen.",
+        "addSpecificNumbers": "Fügen Sie konkrete Zahlen hinzu, um die Wirkung zu zeigen: Umsatzsteigerung (%), Teamgröße, Kosteneinsparungen (€), erreichte Nutzer, etc."
       },
       "categoryFeedback": {
         "contentQuality": {
