@@ -45,7 +45,7 @@ import { Input } from '@/components/ui/input';
 // Helper function to generate default resume name
 const generateDefaultResumeName = (resume: Resume): string => {
   const parts: string[] = [];
-  
+
   // Only add non-empty strings
   if (resume.personalInfo?.firstName?.trim()) {
     parts.push(resume.personalInfo.firstName.trim());
@@ -56,7 +56,7 @@ const generateDefaultResumeName = (resume: Resume): string => {
   if (resume.personalInfo?.professionalTitle?.trim()) {
     parts.push(resume.personalInfo.professionalTitle.trim());
   }
-  
+
   // Return joined parts or fallback
   return parts.length > 0 ? parts.join('-') : 'Untitled Resume';
 };
@@ -105,14 +105,14 @@ export default function Resumes() {
     // Load resumes immediately when user is available
     // Always fetch fresh data, especially important for mobile browsers
     loadResumes();
-    
+
     // Listen for resume saved event (from AuthContext after login)
     const handleResumeSaved = () => {
       loadResumes();
     };
-    
+
     window.addEventListener('resumeSaved', handleResumeSaved);
-    
+
     // Also listen for visibility change to refresh when user returns to tab
     // This helps ensure mobile browsers show fresh data
     const handleVisibilityChange = () => {
@@ -121,9 +121,9 @@ export default function Resumes() {
         loadResumes();
       }
     };
-    
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    
+
     return () => {
       window.removeEventListener('resumeSaved', handleResumeSaved);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -153,15 +153,15 @@ export default function Resumes() {
     if (!dateString) {
       return t('pages.resumes.date.noDate') || 'No date';
     }
-    
+
     try {
       const date = new Date(dateString);
-      
+
       // Check if date is valid
       if (isNaN(date.getTime())) {
         return t('pages.resumes.date.invalid') || 'Invalid date';
       }
-      
+
       // Format as DD/MM/YYYY (e.g., 10/12/2026)
       const day = String(date.getDate()).padStart(2, '0');
       const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -210,7 +210,7 @@ export default function Resumes() {
     try {
       // Get the full resume data
       const fullResume = await resumeAPI.getById(resumeId);
-      
+
       // Update only the name field
       const updateData: ResumeData = {
         name: newName.trim() || undefined, // Remove name if empty
@@ -230,15 +230,15 @@ export default function Resumes() {
         overallScore: fullResume.overallScore,
       };
       await resumeAPI.update(resumeId, updateData);
-      
+
       // Refresh the list
       loadResumes();
-      
+
       toast({
         title: t('pages.resumes.toast.updated.title') || 'Resume Updated',
         description: t('pages.resumes.toast.updated.description') || 'Resume name has been updated.',
       });
-      
+
       setEditingResumeId(null);
       setEditingName('');
     } catch (err: any) {
@@ -315,15 +315,15 @@ export default function Resumes() {
               const formattingScore = Math.round((resume.formattingScore || 0) * 10) / 10;
               const impactScore = Math.round((resume.impactScore || 0) * 10) / 10;
               const overallScore = resume.overallScore || 0;
-              
+
               // Use overall_score from backend if available, otherwise calculate average
               // Backend returns scores in 0-10 format
-              const displayScore = overallScore > 0 
+              const displayScore = overallScore > 0
                 ? Math.round(overallScore * 10) / 10
                 : Math.round(((completenessScore + clarityScore + formattingScore + impactScore) / 4) * 10) / 10;
-              
+
               const template = resume.template || 'modern';
-              
+
               return (
                 <Card key={resume.id} className="hover:shadow-lg transition-shadow relative group">
                   {/* Delete button - top right corner */}
@@ -338,7 +338,7 @@ export default function Resumes() {
                   >
                     <X className="h-4 w-4" />
                   </button>
-                  
+
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-primary mb-2 flex-shrink-0" />
@@ -387,7 +387,7 @@ export default function Resumes() {
                           </Button>
                         </div>
                       ) : (
-                        <div 
+                        <div
                           className="flex items-center gap-2 group cursor-pointer hover:text-primary transition-colors"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -437,18 +437,19 @@ export default function Resumes() {
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-2 pt-2">
-                      <Button 
-                        variant="outline" 
-                        className="flex-1" 
+                      <Button
+                        variant="outline"
+                        className="flex-1"
                         size="sm"
-                        onClick={() => navigate(`/resume/${resume.id}`)}
+                        onClick={() => navigate(`/create?edit=${resume.id}`)}
+                        title={t('pages.resumes.actions.edit') || 'Edit resume'}
                       >
-                        <Eye className="h-3 w-3 mr-1 sm:mr-1.5" />
-                        <span className="text-xs sm:text-sm">{t('pages.resumes.actions.view') || 'View'}</span>
+                        <Edit className="h-3 w-3 mr-1 sm:mr-1.5" />
+                        <span className="text-xs sm:text-sm">{t('pages.resumes.actions.edit') || 'Edit'}</span>
                       </Button>
-                      <Button 
-                        variant="outline" 
-                        className="flex-1" 
+                      <Button
+                        variant="outline"
+                        className="flex-1"
                         size="sm"
                         onClick={() => handleDownloadPDF(resume)}
                         title={t('pages.resumes.actions.downloadPDF') || 'Download PDF'}
@@ -456,15 +457,14 @@ export default function Resumes() {
                         <Download className="h-3 w-3 mr-1 sm:mr-1.5" />
                         <span className="text-xs sm:text-sm">{t('pages.resumes.actions.pdf') || 'PDF'}</span>
                       </Button>
-                      <Button 
-                        variant="outline" 
-                        className="flex-1" 
+                      <Button
+                        variant="outline"
+                        className="flex-1"
                         size="sm"
-                        onClick={() => navigate(`/create?edit=${resume.id}`)}
-                        title={t('pages.resumes.actions.edit') || 'Edit resume'}
+                        onClick={() => navigate(`/resume/${resume.id}`)}
                       >
-                        <Edit className="h-3 w-3 mr-1 sm:mr-1.5" />
-                        <span className="text-xs sm:text-sm">{t('pages.resumes.actions.edit') || 'Edit'}</span>
+                        <Eye className="h-3 w-3 mr-1 sm:mr-1.5" />
+                        <span className="text-xs sm:text-sm">{t('pages.resumes.actions.view') || 'View'}</span>
                       </Button>
                     </div>
                   </CardContent>
@@ -494,7 +494,7 @@ export default function Resumes() {
           </AlertDialogContent>
         </AlertDialog>
 
-        <Dialog open={isDownloading} onOpenChange={() => {}}>
+        <Dialog open={isDownloading} onOpenChange={() => { }}>
           <DialogContent className="sm:max-w-md [&>button]:hidden">
             <DialogHeader>
               <DialogTitle className="text-center">{t('pages.resumes.downloading.title') || 'Generating PDF'}</DialogTitle>
