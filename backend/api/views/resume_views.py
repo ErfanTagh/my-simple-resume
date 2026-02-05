@@ -85,6 +85,7 @@ def resume_list(request):
                 
                 resume_dict = {
                     'id': str(resume_doc['_id']),
+                    'name': resume_doc.get('name'),
                     'personal_info': resume_doc.get('personal_info', {}),
                     'work_experience': resume_doc.get('work_experience', []),
                     'education': resume_doc.get('education', []),
@@ -193,6 +194,7 @@ def resume_list(request):
                 # Prepare document for MongoDB
                 resume_doc = {
                     'user_id': request.user.id,
+                    'name': data.get('name'),
                     'personal_info': data.get('personal_info', {}),
                     'work_experience': data.get('work_experience', []),
                     'education': data.get('education', []),
@@ -230,6 +232,7 @@ def resume_list(request):
                 # Format response
                 resume_dict = {
                     'id': str(created_doc['_id']),
+                    'name': created_doc.get('name'),
                     'personal_info': created_doc.get('personal_info', {}),
                     'work_experience': created_doc.get('work_experience', []),
                     'education': created_doc.get('education', []),
@@ -346,6 +349,7 @@ def resume_detail(request, pk):
             
             resume_dict = {
                 'id': str(resume_doc['_id']),
+                'name': resume_doc.get('name'),
                 'personal_info': resume_doc.get('personal_info', {}),
                 'work_experience': resume_doc.get('work_experience', []),
                 'education': resume_doc.get('education', []),
@@ -398,9 +402,21 @@ def resume_detail(request, pk):
                 }
                 
                 # Update the resume in MongoDB
-                update_data = serializer.validated_data
+                # Get existing resume to preserve created_at
+                existing_doc = db.resumes.find_one({'_id': resume_id, 'user_id': request.user.id})
+                if not existing_doc:
+                    return Response(
+                        {'error': 'Resume not found'},
+                        status=status.HTTP_404_NOT_FOUND
+                    )
+                
+                # Prepare update data - preserve created_at, update everything else
+                update_data = serializer.validated_data.copy()
                 update_data.update(quality_scores)  # Add scores to update
                 update_data['updated_at'] = datetime.utcnow()  # Set updated_at timestamp
+                # Preserve created_at from existing document
+                if 'created_at' in existing_doc:
+                    update_data['created_at'] = existing_doc['created_at']
                 
                 result = db.resumes.update_one(
                     {'_id': resume_id, 'user_id': request.user.id},
@@ -417,6 +433,7 @@ def resume_detail(request, pk):
                 updated_doc = db.resumes.find_one({'_id': resume_id})
                 resume_dict = {
                     'id': str(updated_doc['_id']),
+                    'name': updated_doc.get('name'),
                     'personal_info': updated_doc.get('personal_info', {}),
                     'work_experience': updated_doc.get('work_experience', []),
                     'education': updated_doc.get('education', []),

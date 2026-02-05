@@ -229,10 +229,18 @@ export default function Resumes() {
         impactScore: fullResume.impactScore,
         overallScore: fullResume.overallScore,
       };
-      await resumeAPI.update(resumeId, updateData);
 
-      // Refresh the list
-      loadResumes();
+      // Update on backend - the response contains the updated resume
+      const updatedResume = await resumeAPI.update(resumeId, updateData);
+
+      // Update local state directly with the response - no need to fetch again!
+      setResumes(prevResumes =>
+        prevResumes.map(resume =>
+          resume.id === resumeId
+            ? { ...resume, name: updatedResume.name }
+            : resume
+        )
+      );
 
       toast({
         title: t('pages.resumes.toast.updated.title') || 'Resume Updated',
