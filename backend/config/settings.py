@@ -18,12 +18,32 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-this-in-production'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-# Allow requests from localhost, Docker service name, and any configured hosts
-# Default to localhost only - production should set ALLOWED_HOSTS env var
-# Local development (docker-compose.yml) explicitly sets ALLOWED_HOSTS to include 'backend'
-default_hosts = 'localhost,127.0.0.1'
-allowed_hosts_env = os.getenv('ALLOWED_HOSTS', default_hosts)
-ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(',')]
+# Host / security configuration
+# -----------------------------
+# In development we default to localhost/127.0.0.1.
+# In production we EXPECT ALLOWED_HOSTS to be set via environment (.env / docker-compose.prod.yml).
+# However, we ALWAYS append localhost/127.0.0.1 so that:
+# - internal health checks (curl/wget from inside containers)
+# - CI pipelines (GitHub Actions) that call the service via localhost
+# do not trip Django's Invalid HTTP_HOST safety check.
+#
+# This keeps external host checking strict (only what you define in ALLOWED_HOSTS),
+# while still allowing internal localhost-based checks.
+
+default_dev_hosts = 'localhost,127.0.0.1'
+allowed_hosts_env = os.getenv('ALLOWED_HOSTS', '')
+
+if allowed_hosts_env:
+    # Production / explicit configuration: use only what is in ALLOWED_HOSTS env
+    ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(',') if host.strip()]
+else:
+    # Development fallback: allow localhost only
+    ALLOWED_HOSTS = [host.strip() for host in default_dev_hosts.split(',')]
+
+# Always allow localhost/127.0.0.1 for internal health checks (CI, docker exec, etc.)
+for internal_host in ('localhost', '127.0.0.1'):
+    if internal_host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(internal_host)
 
 # Domain for email links
 DOMAIN = os.getenv('DOMAIN', 'localhost:5173')
