@@ -10,101 +10,181 @@ jobs:
   deploy:
     name: Deploy to Server
     runs-on: ubuntu-latest
+    timeout-minutes: 15 # Prevent hanging deployments
 
     steps:
       - name: 🚀 Deploy to Production Server
-        uses: appleboy/ssh-action@v1.0.0
+        uses: appleboy/ssh-action@v1.1.0
         with:
           host: 37.27.31.223
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
+          script_stop: true # Stop on error
           script: |
+            set -euo pipefail  # Exit on error, undefined vars, pipe failures
             echo "🔄 Starting zero-downtime deployment..."
             cd ~/my-simple-resume
 
+            # Create backup directory
+            BACKUP_DIR="~/backups/$(date +%Y%m%d_%H%M%S)"
+            mkdir -p "$BACKUP_DIR"
+
+            # Step 0: Backup database before deployment
+            echo "💾 Creating database backup..."
+            docker exec resume_mongodb mongodump --archive="$BACKUP_DIR/mongodb_backup.archive" --gzip || echo "⚠️  Backup failed, continuing..."
+
             # Update code
+            echo "📥 Updating code from repository..."
             git fetch origin
             git reset --hard origin/main
+            git clean -fd  # Remove untracked files
 
             # Step 1: Build new images FIRST (while old containers are still running)
             echo "📦 Building new images (old containers still serving traffic)..."
-            docker compose -f docker-compose.prod.yml build --no-cache backend frontend
+            # Use cache for faster builds, but ensure clean builds when needed
+            docker compose -f docker-compose.prod.yml build backend frontend
 
-            # Step 2: Update backend with health check
+            # Step 2: Run migrations BEFORE updating backend (safer)
+            echo "🔄 Running migrations on new backend image..."
+            # Create a temporary container to run migrations
+            docker compose -f docker-compose.prod.yml run --rm backend python manage.py migrate --noinput || {
+              echo "❌ Migrations failed!"
+              exit 1
+            }
+
+            # Step 3: Update backend with health check
             echo "🔄 Updating backend..."
             docker compose -f docker-compose.prod.yml up -d --no-deps backend
 
             # Wait for backend to be healthy
             echo "⏳ Waiting for backend to be healthy..."
             timeout=60
+            health_check_passed=false
             while [ $timeout -gt 0 ]; do
-              if docker exec resume_backend wget -q --spider http://localhost:8000/api/health/ 2>/dev/null || docker exec resume_backend python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health/')" 2>/dev/null; then
+              if docker exec resume_backend wget -q --spider http://localhost:8000/api/health/ 2>/dev/null || \
+                 docker exec resume_backend python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health/')" 2>/dev/null; then
                 echo "✅ Backend is healthy and ready"
+                health_check_passed=true
                 break
               fi
               sleep 2
               timeout=$((timeout - 2))
             done
 
+            # Verify backend health check passed
+            if [ "$health_check_passed" = false ]; then
+              echo "❌ Backend health check failed!"
+              docker compose -f docker-compose.prod.yml ps backend
+              docker compose -f docker-compose.prod.yml logs --tail 50 backend
+              exit 1
+            fi
+
             # Verify backend is actually running
             if ! docker ps --filter "name=resume_backend" --filter "status=running" --format "{{.Names}}" | grep -q "resume_backend"; then
               echo "❌ Backend container failed to start!"
               docker compose -f docker-compose.prod.yml ps backend
-              docker compose -f docker-compose.prod.yml logs --tail 30 backend
+              docker compose -f docker-compose.prod.yml logs --tail 50 backend
               exit 1
             fi
 
-            # Step 3: Update frontend
+            # Step 4: Update frontend
             echo "🔄 Updating frontend..."
             docker compose -f docker-compose.prod.yml up -d --no-deps frontend
 
             # Wait for frontend build to complete
             echo "⏳ Waiting for frontend build to complete..."
-            timeout=120
+            timeout=180  # Increased timeout for large builds
+            frontend_ready=false
             while [ $timeout -gt 0 ]; do
-              if docker exec resume_frontend test -f /usr/share/nginx/html/index.html 2>/dev/null; then
+              # Check if frontend container is running and has built files
+              if docker ps --filter "name=resume_frontend" --filter "status=running" --format "{{.Names}}" | grep -q "resume_frontend" && \
+                 docker exec resume_frontend test -f /usr/share/nginx/html/index.html 2>/dev/null; then
                 echo "✅ Frontend build complete"
+                frontend_ready=true
                 break
               fi
               sleep 3
               timeout=$((timeout - 3))
             done
 
-            # Step 4: Copy frontend files to nginx (atomic operation)
-            echo "📦 Copying frontend files to nginx..."
-            mkdir -p /tmp/frontend-build
-            timeout 30 docker cp resume_frontend:/usr/share/nginx/html/. /tmp/frontend-build/ 2>/dev/null || sleep 3 && timeout 30 docker cp resume_frontend:/usr/share/nginx/html/. /tmp/frontend-build/ || echo "⚠️  Frontend copy failed, continuing..."
-            timeout 30 docker cp /tmp/frontend-build/. resume_nginx:/usr/share/nginx/html/ 2>/dev/null || echo "⚠️  Nginx copy failed, continuing..."
-            rm -rf /tmp/frontend-build
+            if [ "$frontend_ready" = false ]; then
+              echo "❌ Frontend build failed or timed out!"
+              docker compose -f docker-compose.prod.yml ps frontend
+              docker compose -f docker-compose.prod.yml logs --tail 50 frontend
+              exit 1
+            fi
 
-            # Step 5: Run migrations (backend is already running)
-            echo "🔄 Running migrations..."
-            timeout 60 docker compose -f docker-compose.prod.yml exec -T backend python manage.py migrate || echo "⚠️  Migrations failed or already applied"
+            # Step 5: Frontend files should be in shared volume, but verify
+            # The docker-compose.prod.yml uses frontend_volume which is shared with nginx
+            # So files should already be available, but let's verify
+            echo "🔍 Verifying frontend files in nginx volume..."
+            if ! docker exec resume_nginx test -f /usr/share/nginx/html/index.html 2>/dev/null; then
+              echo "⚠️  Frontend files not in nginx volume, copying..."
+              # Fallback: copy files if volume mount didn't work
+              mkdir -p /tmp/frontend-build
+              if ! timeout 60 docker cp resume_frontend:/usr/share/nginx/html/. /tmp/frontend-build/ 2>/dev/null; then
+                echo "❌ Failed to copy frontend files!"
+                exit 1
+              fi
+              if ! timeout 60 docker cp /tmp/frontend-build/. resume_nginx:/usr/share/nginx/html/ 2>/dev/null; then
+                echo "❌ Failed to copy frontend files to nginx!"
+                exit 1
+              fi
+              rm -rf /tmp/frontend-build
+            else
+              echo "✅ Frontend files already in nginx volume"
+            fi
 
             # Step 6: Reload nginx (zero-downtime - just reloads config, doesn't restart)
             echo "🔄 Reloading nginx (zero-downtime)..."
-            docker compose -f docker-compose.prod.yml exec -T nginx nginx -s reload 2>/dev/null || docker compose -f docker-compose.prod.yml restart nginx
+            if ! docker compose -f docker-compose.prod.yml exec -T nginx nginx -s reload 2>/dev/null; then
+              echo "⚠️  Nginx reload failed, restarting..."
+              docker compose -f docker-compose.prod.yml restart nginx || {
+                echo "❌ Nginx restart failed!"
+                exit 1
+              }
+            fi
 
             # Step 7: Verify all critical containers are running
             echo "🔍 Verifying all containers are running..."
             if ! docker ps --filter "name=resume_backend" --filter "status=running" --format "{{.Names}}" | grep -q "resume_backend"; then
               echo "❌ Backend container is not running!"
               docker compose -f docker-compose.prod.yml ps backend
-              docker compose -f docker-compose.prod.yml logs --tail 30 backend
+              docker compose -f docker-compose.prod.yml logs --tail 50 backend
               exit 1
             fi
 
             if ! docker ps --filter "name=resume_nginx" --filter "status=running" --format "{{.Names}}" | grep -q "resume_nginx"; then
               echo "❌ Nginx container is not running!"
               docker compose -f docker-compose.prod.yml ps nginx
-              docker compose -f docker-compose.prod.yml logs --tail 30 nginx
+              docker compose -f docker-compose.prod.yml logs --tail 50 nginx
               exit 1
             fi
 
-            # Step 8: Clean up old images (optional, saves disk space)
+            if ! docker ps --filter "name=resume_mongodb" --filter "status=running" --format "{{.Names}}" | grep -q "resume_mongodb"; then
+              echo "❌ MongoDB container is not running!"
+              docker compose -f docker-compose.prod.yml ps mongodb
+              exit 1
+            fi
+
+            # Step 8: Final health check - verify API is responding
+            echo "🏥 Performing final health check..."
+            sleep 3  # Give services a moment to stabilize
+            if ! curl -f -s http://localhost/api/health/ > /dev/null 2>&1; then
+              echo "⚠️  Health check endpoint not responding, but containers are running"
+              # Don't fail deployment, just warn
+            else
+              echo "✅ Health check passed"
+            fi
+
+            # Step 9: Clean up old images (optional, saves disk space)
             echo "🧹 Cleaning up old images..."
-            docker image prune -f
+            docker image prune -f --filter "until=24h"  # Only remove images older than 24h
+
+            # Keep last 3 backups
+            echo "🧹 Cleaning up old backups (keeping last 3)..."
+            cd ~/backups && ls -t | tail -n +4 | xargs rm -rf 2>/dev/null || true
 
             echo "✅ Zero-downtime deployment complete!"
             docker compose -f docker-compose.prod.yml ps
@@ -119,3 +199,4 @@ jobs:
         if: failure()
         run: |
           echo "❌ Deployment failed! Check the logs above."
+          echo "💡 Tip: Check the server logs with: ssh root@37.27.31.223 'docker compose -f ~/my-simple-resume/docker-compose.prod.yml logs --tail 100'"

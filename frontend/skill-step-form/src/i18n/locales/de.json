@@ -284,7 +284,10 @@
     },
     "form": {
       "title": "Erstellen Sie Ihren Lebenslauf",
-      "subtitle": "Geben Sie Ihre Informationen Schritt für Schritt ein, um Ihren professionellen Lebenslauf zu erstellen"
+      "subtitle": "Geben Sie Ihre Informationen Schritt für Schritt ein, um Ihren professionellen Lebenslauf zu erstellen",
+      "sectionTitles": "Abschnittsüberschriften",
+      "sectionTitlesEnglish": "Englisch",
+      "sectionTitlesDeutsch": "Deutsch"
     },
     "templates": {
       "modern": "Modern",

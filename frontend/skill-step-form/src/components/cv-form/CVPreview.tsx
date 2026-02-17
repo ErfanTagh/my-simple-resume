@@ -13,8 +13,15 @@ import { CVRating } from "./CVRating";
 import { TemplateSelector } from "./TemplateSelector";
 import { SectionOrderManager } from "./SectionOrderManager";
 import { StylingSettings } from "./StylingSettings";
-import { FileText, TrendingUp, FileStack, Settings, Info } from "lucide-react";
+import { FileText, TrendingUp, FileStack, Settings, Info, Languages } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { calculateResumeScore } from "@/lib/resumeScorer";
 
 interface CVPreviewProps {
@@ -27,7 +34,7 @@ interface CVPreviewProps {
 }
 
 export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSectionOrderChange, onStylingChange, currentStep }: CVPreviewProps) => {
-  const { t } = useLanguage();
+  const { t, language, setLanguage } = useLanguage();
   const [activeTab, setActiveTab] = useState("design");
   const [pageCount, setPageCount] = useState(1);
   const [pageBreakPositions, setPageBreakPositions] = useState<number[]>([]);
@@ -469,7 +476,7 @@ export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSect
 
         <TabsContent value="design" className="mt-4">
           <div className="relative flex flex-col overflow-hidden" style={{ height: 'calc(100vh - 200px)' }}>
-            {/* Score indicator - sticky at top */}
+            {/* Score indicator + Page indicator - sticky at top */}
             <div className="sticky top-0 flex-shrink-0 pb-2 mb-2 z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
@@ -490,7 +497,7 @@ export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSect
                 </span>
               </div>
 
-              {/* Page indicator - sticky at top */}
+              {/* Page indicator */}
               <div className="flex items-center justify-between px-2 py-1.5 bg-muted/30 rounded-md border border-border/50">
                 <div className="flex items-center gap-2">
                   <FileText className="h-3.5 w-3.5 text-muted-foreground" />
@@ -513,6 +520,21 @@ export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSect
                     ))}
                   </div>
                 )}
+              </div>
+
+              {/* Section titles - controls language of section headings in preview */}
+              <div className="flex items-center gap-2 mt-2">
+                <Languages className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-xs font-medium text-muted-foreground">{t('resume.form.sectionTitles')}:</span>
+                <Select value={language} onValueChange={(v) => setLanguage(v as 'en' | 'de')}>
+                  <SelectTrigger className="h-8 w-[120px] text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="en">{t('resume.form.sectionTitlesEnglish')}</SelectItem>
+                    <SelectItem value="de">{t('resume.form.sectionTitlesDeutsch')}</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 

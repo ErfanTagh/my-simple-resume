@@ -422,13 +422,24 @@ export const LandingTemplatePreview = ({
   // Templates are typically A4 size, so we scale down significantly
   // Increased scale to make templates appear larger
   // Minimal template needs larger scale due to its compact design
-  const scale = templateName === "minimal" ? 0.50 : 0.40;
+  const scale = templateName === "minimal" ? 0.40 : 0.40;
 
   return (
     <div
       className="w-full h-full overflow-hidden bg-white relative"
       style={{ imageRendering: "crisp-edges", backfaceVisibility: "hidden" }}
     >
+      {/* Overlay to hide corner text (page numbers, alt text, etc.) */}
+      <div
+        className="absolute bottom-0 right-0 pointer-events-none z-10"
+        style={{
+          width: "25%",
+          height: "20%",
+          minWidth: 80,
+          minHeight: 40,
+          background: "linear-gradient(to top left, rgba(255,255,255,0.98) 35%, transparent)",
+        }}
+      />
       <div
         className="origin-top-left absolute top-0 left-0"
         style={{
@@ -441,7 +452,7 @@ export const LandingTemplatePreview = ({
         }}
       >
         <div style={{ minHeight: '1400px', height: '100%', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ flex: 1, minHeight: '100%' }}>
+          <div style={{ flex: 1, minHeight: '100%' }} data-landing-preview="">
             {templateName === "modern" && <ModernTemplate data={data} />}
             {templateName === "classic" && <ClassicTemplate data={data} />}
             {templateName === "creative" && <CreativeTemplate data={data} />}

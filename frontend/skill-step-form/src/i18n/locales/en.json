@@ -291,7 +291,10 @@
     },
     "form": {
       "title": "Build Your CV",
-      "subtitle": "Fill in your information step by step to create your professional CV"
+      "subtitle": "Fill in your information step by step to create your professional CV",
+      "sectionTitles": "Section titles",
+      "sectionTitlesEnglish": "English",
+      "sectionTitlesDeutsch": "Deutsch"
     },
     "templates": {
       "modern": "Modern",

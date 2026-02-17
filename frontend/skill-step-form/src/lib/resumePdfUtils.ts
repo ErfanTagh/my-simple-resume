@@ -9,6 +9,7 @@ import { CreativeTemplate } from '@/components/cv-form/templates/CreativeTemplat
 import { LatexTemplate } from '@/components/cv-form/templates/LatexTemplate';
 import { StarRoverTemplate } from '@/components/cv-form/templates/StarRoverTemplate';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import i18n from '@/i18n/config';
 
 /**
  * Sanitize filename for filesystem compatibility
@@ -180,7 +181,7 @@ function generateResumeHTML(resume: Resume): string {
 
     return `
       <section class="resume-section">
-        <h3 class="section-title">Work Experience</h3>
+        <h3 class="section-title">${i18n.t('resume.sections.workExperience')}</h3>
         ${validExps.map((exp: any) => `
           <div class="experience-item">
             <div class="experience-header">
@@ -229,7 +230,7 @@ function generateResumeHTML(resume: Resume): string {
 
     return `
       <section class="resume-section">
-        <h3 class="section-title">Education</h3>
+        <h3 class="section-title">${i18n.t('resume.sections.education')}</h3>
         ${validEdu.map((edu: any) => `
           <div class="education-item">
             <h4><strong>${escapeHtml(edu.degree || '')}</strong></h4>
@@ -262,7 +263,7 @@ function generateResumeHTML(resume: Resume): string {
 
     return `
       <section class="resume-section">
-        <h3 class="section-title">Projects</h3>
+        <h3 class="section-title">${i18n.t('resume.sections.projects')}</h3>
         ${validProjects.map((project: any) => `
           <div class="project-item">
             <div class="project-header">
@@ -294,7 +295,7 @@ function generateResumeHTML(resume: Resume): string {
 
     return `
       <section class="resume-section">
-        <h3 class="section-title">Certifications</h3>
+        <h3 class="section-title">${i18n.t('resume.sections.certifications')}</h3>
         ${validCerts.map((cert: any) => `
           <div class="certification-item">
             <div class="certification-header">
@@ -320,7 +321,7 @@ function generateResumeHTML(resume: Resume): string {
 
     return `
       <section class="resume-section">
-        <h3 class="section-title">Skills</h3>
+        <h3 class="section-title">${i18n.t('resume.sections.skills')}</h3>
         <div class="skill-tags">
           ${validSkills.map((skillObj: any) => `
             <span class="skill-tag">${escapeHtml(skillObj.skill)}</span>
@@ -337,7 +338,7 @@ function generateResumeHTML(resume: Resume): string {
 
     return `
       <section class="resume-section">
-        <h3 class="section-title">Languages</h3>
+        <h3 class="section-title">${i18n.t('resume.sections.languages')}</h3>
         <div class="languages-list" style="width: 100%; overflow: visible; box-sizing: border-box;">
           ${validLangs.map((lang: any) => `
             <div class="language-item" style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-right: 16px; width: 100%; box-sizing: border-box; overflow: visible;">
@@ -357,7 +358,7 @@ function generateResumeHTML(resume: Resume): string {
 
     return `
       <section class="resume-section">
-        <h3 class="section-title">Interests</h3>
+        <h3 class="section-title">${i18n.t('resume.sections.interests')}</h3>
         <div class="interests-list">
           ${validInterests.map((interest: any) => `
             <span class="interest-tag">${escapeHtml(interest.interest)}</span>
@@ -381,12 +382,12 @@ function generateResumeHTML(resume: Resume): string {
       <main class="resume-main" style="width: 100%; max-width: 100%; box-sizing: border-box; overflow: visible;">
         ${personalInfo.summary?.trim() ? `
           <section class="resume-section">
-            <h3 class="section-title">Professional Summary</h3>
+            <h3 class="section-title">${i18n.t('resume.sections.professionalSummary')}</h3>
             <p style="font-size: 0.9em; line-height: 1.5; color: #495057;">${escapeHtml(personalInfo.summary)}</p>
           </section>
         ` : ''}
         <section class="resume-section">
-          <h3 class="section-title">Contact</h3>
+          <h3 class="section-title">${i18n.t('resume.sections.contact')}</h3>
           <div class="contact-info" style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start; text-align: left; width: 100%;">
             ${personalInfo.phone ? `<div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%;"><span>Phone: ${escapeHtml(personalInfo.phone)}</span></div>` : ''}
             <div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%;"><span>Email: ${escapeHtml(personalInfo.email || '')}</span></div>
@@ -467,13 +468,59 @@ function getComputedBackgroundColor(): string {
   }
 }
 
+/** A4 height at 96dpi minus margins/padding (~1050px). Content under this fits on one page. */
+const ONE_PAGE_HEIGHT_PX = 1050;
+
+/**
+ * Measures content height by temporarily removing min-height, then restores.
+ * Returns the natural content height in pixels (used to detect single vs multi-page).
+ */
+function measureContentHeightForPDF(container: HTMLElement): number {
+  const spacer = container.querySelector('[aria-hidden="true"]') as HTMLElement | null;
+  const originalSpacerDisplay = spacer?.style.display;
+  if (spacer) spacer.style.setProperty('display', 'none', 'important');
+
+  const originalMinHeight = container.style.minHeight;
+  container.style.setProperty('min-height', '0', 'important');
+  const height = container.scrollHeight;
+  container.style.minHeight = originalMinHeight;
+  container.style.removeProperty('min-height');
+
+  if (spacer) {
+    spacer.style.removeProperty('display');
+    if (originalSpacerDisplay) spacer.style.display = originalSpacerDisplay;
+  }
+  return height;
+}
+
+/**
+ * Determines if resume content fits on a single PDF page.
+ */
+function isContentSinglePage(container: HTMLElement): boolean {
+  return measureContentHeightForPDF(container) < ONE_PAGE_HEIGHT_PX;
+}
+
+/**
+ * Adds resume-single-page class to .resume-page-container in HTML string.
+ */
+function addSinglePageClassToHTML(html: string): string {
+  return html.replace(
+    /class="resume-page-container\s/,
+    'class="resume-page-container resume-single-page '
+  ).replace(
+    /class="resume-page-container"/,
+    'class="resume-page-container resume-single-page"'
+  );
+}
+
 /**
  * Download PDF from resume HTML (from DOM element)
  */
 async function downloadPDFFromHTML(
   resumeId: string,
   resumeHTML: string,
-  filename?: string
+  filename?: string,
+  options?: { isSinglePage?: boolean }
 ): Promise<void> {
   // Get all stylesheets from the current page (includes Tailwind CSS)
   const pageStylesheets = getAllStylesheets();
@@ -561,10 +608,7 @@ async function downloadPDFFromHTML(
       min-height: 100vh !important;
       box-sizing: border-box;
     }
-    /* Ensure last page background covers full page */
-    .resume-page-container {
-      min-height: 297mm !important;
-    }
+    /* Base: min-height controlled by smart single-page override (appended below) */
     /* In print, ensure container fills each page */
     @media print {
       @page {
@@ -625,7 +669,24 @@ async function downloadPDFFromHTML(
   </style>
 </head>
 <body>
-  ${resumeHTML}
+  ${options?.isSinglePage ? addSinglePageClassToHTML(resumeHTML) : resumeHTML}
+  <style id="pdf-single-page-override">
+    /* Smart min-height: only fill page when content fits on one page */
+    @media print {
+      .resume-page-container.resume-single-page {
+        min-height: 297mm !important;
+      }
+      .resume-page-container:not(.resume-single-page) {
+        min-height: auto !important;
+      }
+    }
+    .resume-page-container.resume-single-page {
+      min-height: 297mm !important;
+    }
+    .resume-page-container:not(.resume-single-page) {
+      min-height: auto !important;
+    }
+  </style>
 </body>
 </html>`;
 
@@ -715,6 +776,7 @@ async function downloadPDFFromHTML(
 
 /**
  * Convert Resume to CVFormData format for template rendering
+ * Includes styling (fontSize, colors, etc.) so PDF matches Einstellungen
  */
 function convertResumeToFormData(resume: Resume): CVFormData {
   return {
@@ -726,7 +788,8 @@ function convertResumeToFormData(resume: Resume): CVFormData {
     certificates: resume.certificates || [],
     skills: resume.skills || [],
     languages: resume.languages || [],
-    sectionOrder: resume.sectionOrder || []
+    sectionOrder: resume.sectionOrder || [],
+    styling: resume.styling || {}
   };
 }
 
@@ -979,6 +1042,13 @@ export async function downloadResumePDF(
     // Check if innerWrapper still exists before getting innerHTML
     let resumeHTML = innerWrapper.parentNode ? innerWrapper.innerHTML : '';
 
+    // Measure content height to determine if single-page (for smart min-height)
+    let isSinglePage = false;
+    const resumeContainer = innerWrapper.querySelector('.resume-page-container') as HTMLElement | null;
+    if (resumeContainer) {
+      isSinglePage = isContentSinglePage(resumeContainer);
+    }
+
     // Strip margin classes that create side margins (mx-auto, max-w-*, etc.)
     // Replace them to remove the margin/width constraints
     resumeHTML = resumeHTML.replace(/\s*mx-auto\s*/g, ' ');
@@ -1001,7 +1071,7 @@ export async function downloadResumePDF(
     }
 
     // Call downloadPDFFromHTML directly - same as downloadResumePDFFromElement does
-    await downloadPDFFromHTML(resume.id, resumeHTML, finalFilename);
+    await downloadPDFFromHTML(resume.id, resumeHTML, finalFilename, { isSinglePage });
   } finally {
     // Cleanup - ensure everything is always removed
     try {
@@ -1029,6 +1099,13 @@ export async function downloadResumePDFFromElement(
   resumeOrFilename?: Resume | string,
   filename?: string
 ): Promise<void> {
+  // Measure content height to determine if single-page (for smart min-height)
+  let isSinglePage = false;
+  const resumeContainer = htmlElement.querySelector('.resume-page-container') as HTMLElement | null;
+  if (resumeContainer) {
+    isSinglePage = isContentSinglePage(resumeContainer);
+  }
+
   // Get the innerHTML (template content)
   // The templates already have their own padding built in (p-8, p-12, etc.)
   // We use the template HTML as-is without adding container padding
@@ -1073,6 +1150,6 @@ export async function downloadResumePDFFromElement(
     finalFilename = `resume_${resumeId}.pdf`;
   }
 
-  await downloadPDFFromHTML(resumeId, resumeHTML, finalFilename);
+  await downloadPDFFromHTML(resumeId, resumeHTML, finalFilename, { isSinglePage });
 }
 

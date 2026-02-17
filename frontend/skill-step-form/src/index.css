@@ -182,3 +182,61 @@ All colors MUST be HSL.
 .animate-pulse-dot {
   animation: pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
+/* ============================================================
+   LANDING PAGE TEMPLATE PREVIEWS ONLY
+   Scoped to [data-landing-preview] - does NOT affect actual
+   resume templates (CVPreview, ResumeView, PDF export).
+   ============================================================ */
+
+/* All templates: default rectangular photo (base rule) */
+[data-landing-preview] .resume-page-container .flex-shrink-0 > div:has(> img),
+[data-landing-preview] .resume-page-container .flex.justify-center.mb-4 > div:has(> img),
+[data-landing-preview] .resume-page-container div.overflow-hidden:has(> img) {
+  width: 7rem !important;
+  height: 7rem !important;
+  min-width: 7rem !important;
+  min-height: 7rem !important;
+  border: 2px solid hsl(var(--primary)) !important;
+  border-radius: 0.375rem !important;
+  overflow: hidden !important;
+}
+
+/* Classic template: rectangular photo (overrides default, but keeps rectangular) */
+[data-landing-preview] .resume-page-container.font-classic .flex.justify-center.mb-4 > div:has(> img),
+[data-landing-preview] .resume-page-container.font-classic div.overflow-hidden.rounded-full:has(> img) {
+  border-radius: 0.375rem !important;
+}
+
+/* Minimal template: circular photo in Landing preview only */
+[data-landing-preview] .resume-page-container.font-minimal .flex-shrink-0 > div:has(> img),
+[data-landing-preview] .resume-page-container.font-minimal div.overflow-hidden.rounded-sm:has(> img) {
+  border-radius: 50% !important;
+}
+
+/* Modern template: circular photo in Landing preview only */
+[data-landing-preview] .resume-page-container .flex-shrink-0 > div.overflow-hidden.rounded-md:has(> img) {
+  border-radius: 50% !important;
+}
+
+/* Creative template: circular photo in Landing preview only */
+[data-landing-preview] .resume-page-container.font-creative .flex-shrink-0 > div:has(> img),
+[data-landing-preview] .resume-page-container.font-creative div.overflow-hidden.rounded-lg:has(> img) {
+  border-radius: 50% !important;
+}
+
+/* Latex outer wrapper: match size, no extra border */
+[data-landing-preview] .resume-page-container div:has(> div.overflow-hidden.rounded-sm > img) {
+  width: 7rem !important;
+  min-width: 7rem !important;
+  height: auto !important;
+  min-height: unset !important;
+  border: none !important;
+}
+
+/* Hide page numbers and placeholders in previews */
+[data-landing-preview] .page-number-footer,
+[data-landing-preview] .photo-placeholder,
+[data-landing-preview] .page-number-indicator {
+  display: none !important;
+}
