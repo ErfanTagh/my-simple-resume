@@ -170,9 +170,53 @@ function escapeHtml(text: string): string {
 
 /**
  * Generate resume HTML from resume data
+ *
+ * Note: This function is used for PDF generation and runs outside React.
+ * We need to re-implement a *simplified* version of the font-size handling
+ * that's used in the React templates so that the user's global font size
+ * choice also affects the exported PDF (especially the summary text).
  */
 function generateResumeHTML(resume: Resume): string {
   const personalInfo = resume.personalInfo;
+
+  // ============================================
+  // Font sizing based on resume.styling font size
+  // (support both camelCase and snake_case from backend)
+  // ============================================
+  const rawFontSize =
+    // Frontend / CVFormData format
+    (resume as any).styling?.fontSize ??
+    // Backend / MongoDB format
+    (resume as any).styling?.font_size;
+  const fontSizeInput = rawFontSize || 'medium';
+  const normalizedFontSize: 'small' | 'medium' | 'large' =
+    fontSizeInput === 'small' || fontSizeInput === 'large' ? fontSizeInput : 'medium';
+
+  // Keep this mapping simple and consistent with templates,
+  // but we don't need the full matrix here – just a few base sizes.
+  const pdfFontSizeMap: Record<'small' | 'medium' | 'large', {
+    baseText: string;
+    heading: string;
+    contact: string;
+  }> = {
+    small: {
+      baseText: '0.7rem',    // ~11px
+      heading: '0.85rem',    // ~14px
+      contact: '0.7rem',
+    },
+    medium: {
+      baseText: '0.9rem',    // ~14px
+      heading: '1.05rem',    // ~17px
+      contact: '0.85rem',
+    },
+    large: {
+      baseText: '1.05rem',   // ~17px
+      heading: '1.25rem',    // ~20px
+      contact: '1rem',
+    },
+  };
+
+  const pdfSizes = pdfFontSizeMap[normalizedFontSize];
 
   const renderWorkExperience = () => {
     if (!resume.workExperience?.length) return '';
@@ -379,22 +423,22 @@ function generateResumeHTML(resume: Resume): string {
           ${personalInfo.profileImage ? `<img src="${escapeHtml(personalInfo.profileImage)}" alt="Professional profile photo of ${escapeHtml(personalInfo.firstName)} ${escapeHtml(personalInfo.lastName)}${personalInfo.professionalTitle ? `, ${escapeHtml(personalInfo.professionalTitle)}` : ''}${personalInfo.location ? ` from ${escapeHtml(personalInfo.location)}` : ''}" class="profile-image" />` : ''}
         </div>
       </header>
-      <main class="resume-main" style="width: 100%; max-width: 100%; box-sizing: border-box; overflow: visible;">
+      <main class="resume-main" style="width: 100%; max-width: 100%; box-sizing: border-box; overflow: visible; font-size: ${pdfSizes.baseText};">
         ${personalInfo.summary?.trim() ? `
           <section class="resume-section">
-            <h3 class="section-title">${i18n.t('resume.sections.professionalSummary')}</h3>
-            <p style="font-size: 0.9em; line-height: 1.5; color: #495057;">${escapeHtml(personalInfo.summary)}</p>
+            <h3 class="section-title" style="font-size: ${pdfSizes.heading};">${i18n.t('resume.sections.professionalSummary')}</h3>
+            <p style="font-size: ${pdfSizes.baseText}; line-height: 1.5; color: #495057;">${escapeHtml(personalInfo.summary)}</p>
           </section>
         ` : ''}
         <section class="resume-section">
-          <h3 class="section-title">${i18n.t('resume.sections.contact')}</h3>
+          <h3 class="section-title" style="font-size: ${pdfSizes.heading};">${i18n.t('resume.sections.contact')}</h3>
           <div class="contact-info" style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start; text-align: left; width: 100%;">
-            ${personalInfo.phone ? `<div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%;"><span>Phone: ${escapeHtml(personalInfo.phone)}</span></div>` : ''}
-            <div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%;"><span>Email: ${escapeHtml(personalInfo.email || '')}</span></div>
-            ${personalInfo.location ? `<div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%;"><span>Location: ${escapeHtml(personalInfo.location)}</span></div>` : ''}
-            ${personalInfo.github ? `<div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%;"><span>GitHub: <a href="${escapeHtml(personalInfo.github)}" target="_blank" rel="noopener noreferrer" class="contact-link">${escapeHtml(personalInfo.github)}</a></span></div>` : ''}
-            ${personalInfo.linkedin ? `<div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%;"><span>LinkedIn: <a href="${escapeHtml(personalInfo.linkedin)}" target="_blank" rel="noopener noreferrer" class="contact-link">${escapeHtml(personalInfo.linkedin)}</a></span></div>` : ''}
-            ${personalInfo.website ? `<div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%;"><span>Website: <a href="${escapeHtml(personalInfo.website)}" target="_blank" rel="noopener noreferrer" class="contact-link">${escapeHtml(personalInfo.website)}</a></span></div>` : ''}
+            ${personalInfo.phone ? `<div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%; font-size: ${pdfSizes.contact};"><span>Phone: ${escapeHtml(personalInfo.phone)}</span></div>` : ''}
+            <div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%; font-size: ${pdfSizes.contact};"><span>Email: ${escapeHtml(personalInfo.email || '')}</span></div>
+            ${personalInfo.location ? `<div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%; font-size: ${pdfSizes.contact};"><span>Location: ${escapeHtml(personalInfo.location)}</span></div>` : ''}
+            ${personalInfo.github ? `<div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%; font-size: ${pdfSizes.contact};"><span>GitHub: <a href="${escapeHtml(personalInfo.github)}" target="_blank" rel="noopener noreferrer" class="contact-link">${escapeHtml(personalInfo.github)}</a></span></div>` : ''}
+            ${personalInfo.linkedin ? `<div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%; font-size: ${pdfSizes.contact};"><span>LinkedIn: <a href="${escapeHtml(personalInfo.linkedin)}" target="_blank" rel="noopener noreferrer" class="contact-link">${escapeHtml(personalInfo.linkedin)}</a></span></div>` : ''}
+            ${personalInfo.website ? `<div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%; font-size: ${pdfSizes.contact};"><span>Website: <a href="${escapeHtml(personalInfo.website)}" target="_blank" rel="noopener noreferrer" class="contact-link">${escapeHtml(personalInfo.website)}</a></span></div>` : ''}
           </div>
         </section>
         ${renderEducation()}

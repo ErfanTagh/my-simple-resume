@@ -12,6 +12,7 @@ from .serializers import ResumeSerializer, BlogPostSerializer
 from bson import ObjectId
 from datetime import datetime
 import os
+import sys
 from pymongo import MongoClient
 
 
@@ -165,7 +166,6 @@ def resume_list(request):
                 }
                 resumes_data.append(resume_dict)
             
-            logger.error(f"Found {len(resumes_data)} resumes")
             return Response(resumes_data)
         except Exception as e:
             logger.error(f"Error listing resumes: {str(e)}")
@@ -181,14 +181,7 @@ def resume_list(request):
         import sys
         logger = logging.getLogger(__name__)
         
-        # Log to both logger and stdout/stderr
-        print("=" * 50, file=sys.stderr)
-        print("POST REQUEST RECEIVED", file=sys.stderr)
-        print(f"User: {request.user}", file=sys.stderr)
-        print(f"Data: {request.data}", file=sys.stderr)
-        print("=" * 50, file=sys.stderr)
-        
-        logger.error(f"Received POST data: {request.data}")
+        # Verbose request logging removed - only styling-specific logs remain
         
         # Debug: Log raw request data to see what's being sent
         print(f"DEBUG: Raw request.data personal_info: {request.data.get('personal_info', {})}", file=sys.stderr)
@@ -280,6 +273,10 @@ def resume_list(request):
                     'interests': personal_info_validated.get('interests', personal_info_raw.get('interests', [])),
                 }
                 
+                # Minimal logging of styling when creating resume
+                styling_from_request = data.get('styling', {})
+                print(f"[STYLING LOG] resume_list POST (create): has_styling_in_request={'styling' in request.data}, has_styling_in_validated={'styling' in data}, styling_keys={list(styling_from_request.keys()) if isinstance(styling_from_request, dict) else None}, font_size={styling_from_request.get('font_size') if isinstance(styling_from_request, dict) else None}", file=sys.stderr)
+                
                 resume_doc = {
                     'user_id': request.user.id,
                     'name': data.get('name', ''),  # Include resume name
@@ -317,6 +314,10 @@ def resume_list(request):
                 
                 # Retrieve the created resume
                 created_doc = db.resumes.find_one({'_id': resume_id})
+                
+                # Minimal logging of styling after creation
+                created_styling = created_doc.get('styling')
+                print(f"[STYLING LOG] resume_list POST (after create): resume_id={resume_id}, has_styling={created_styling is not None}, styling_keys={list(created_styling.keys()) if isinstance(created_styling, dict) else None}, font_size={(created_styling or {}).get('font_size') if isinstance(created_styling, dict) else None}", file=sys.stderr)
                 
                 # Format response
                 resume_dict = {
@@ -442,6 +443,10 @@ def resume_detail(request, pk):
                     status=status.HTTP_404_NOT_FOUND
                 )
             
+            # Minimal logging to trace styling presence without PII
+            styling_from_db = resume_doc.get('styling')
+            print(f"[STYLING LOG] resume_detail GET: resume_id={resume_doc.get('_id')}, has_styling={styling_from_db is not None}, styling_keys={list(styling_from_db.keys()) if isinstance(styling_from_db, dict) else None}, font_size={(styling_from_db or {}).get('font_size') if isinstance(styling_from_db, dict) else None}", file=sys.stderr)
+
             resume_dict = {
                 'id': str(resume_doc['_id']),
                 'name': resume_doc.get('name', ''),  # Include resume name
@@ -483,6 +488,9 @@ def resume_detail(request, pk):
             )
     
     elif request.method == 'PUT':
+        import logging
+        logger = logging.getLogger(__name__)
+
         serializer = ResumeSerializer(data=request.data)
         if serializer.is_valid():
             try:
@@ -517,6 +525,9 @@ def resume_detail(request, pk):
                     'interests': personal_info_validated.get('interests', personal_info_raw.get('interests', [])),
                 }
                 
+                # Minimal logging of styling coming from frontend / serializer (no PII)
+                print(f"[STYLING LOG] resume_detail PUT (before update): resume_id={resume_id}, has_styling_in_request={'styling' in request.data}, has_styling_in_validated={'styling' in data}, validated_styling_keys={list((data.get('styling') or {}).keys()) if isinstance(data.get('styling'), dict) else None}", file=sys.stderr)
+
                 # Update the resume in MongoDB
                 update_data = serializer.validated_data.copy()
                 update_data['personal_info'] = personal_info_final  # Use merged personal_info
@@ -536,6 +547,11 @@ def resume_detail(request, pk):
                 
                 # Return updated resume
                 updated_doc = db.resumes.find_one({'_id': resume_id})
+
+                # Minimal logging of styling after update (to compare with request)
+                updated_styling = updated_doc.get('styling')
+                print(f"[STYLING LOG] resume_detail PUT (after update): resume_id={updated_doc.get('_id')}, has_styling={updated_styling is not None}, styling_keys={list(updated_styling.keys()) if isinstance(updated_styling, dict) else None}, font_size={(updated_styling or {}).get('font_size') if isinstance(updated_styling, dict) else None}", file=sys.stderr)
+
                 resume_dict = {
                     'id': str(updated_doc['_id']),
                     'name': updated_doc.get('name', ''),  # Include resume name

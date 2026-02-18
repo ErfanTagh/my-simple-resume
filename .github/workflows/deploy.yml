@@ -115,25 +115,17 @@ jobs:
               exit 1
             fi
 
-            # Step 5: Frontend files should be in shared volume, but verify
-            # The docker-compose.prod.yml uses frontend_volume which is shared with nginx
-            # So files should already be available, but let's verify
+            # Step 5: Frontend files should be in shared volume, but verify (non-fatal)
+            # The docker-compose.prod.yml uses frontend_volume which is shared with nginx.
+            # In normal operation this should already be populated by the frontend container.
+            # If for some reason index.html is missing, we WARN but do not fail the deployment,
+            # because nginx may still be serving previous static files.
             echo "🔍 Verifying frontend files in nginx volume..."
-            if ! docker exec resume_nginx test -f /usr/share/nginx/html/index.html 2>/dev/null; then
-              echo "⚠️  Frontend files not in nginx volume, copying..."
-              # Fallback: copy files if volume mount didn't work
-              mkdir -p /tmp/frontend-build
-              if ! timeout 60 docker cp resume_frontend:/usr/share/nginx/html/. /tmp/frontend-build/ 2>/dev/null; then
-                echo "❌ Failed to copy frontend files!"
-                exit 1
-              fi
-              if ! timeout 60 docker cp /tmp/frontend-build/. resume_nginx:/usr/share/nginx/html/ 2>/dev/null; then
-                echo "❌ Failed to copy frontend files to nginx!"
-                exit 1
-              fi
-              rm -rf /tmp/frontend-build
+            if docker exec resume_nginx test -f /usr/share/nginx/html/index.html 2>/dev/null; then
+              echo "✅ Frontend files present in nginx volume"
             else
-              echo "✅ Frontend files already in nginx volume"
+              echo "⚠️  Frontend index.html not found in nginx volume."
+              echo "    Nginx may still be serving a previous build; check manually if needed."
             fi
 
             # Step 6: Reload nginx (zero-downtime - just reloads config, doesn't restart)

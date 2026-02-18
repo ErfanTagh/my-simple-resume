@@ -84,6 +84,17 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
   const personalInfoBodyColor = personalInfoSectionStyling?.bodyColor || textColor;
   const personalInfoBodySize = personalInfoSectionStyling?.bodySize || fontSize;
 
+  // LOG: What font sizes are being used for personalInfo (summary)
+  console.log('🔴 [MINIMAL TEMPLATE] Font size resolution for personalInfo:', {
+    globalFontSize: fontSize,
+    personalInfoSectionStyling: personalInfoSectionStyling,
+    personalInfoTitleSize: personalInfoTitleSize,
+    personalInfoBodySize: personalInfoBodySize,
+    hasSectionSpecificTitleSize: !!personalInfoSectionStyling?.titleSize,
+    hasSectionSpecificBodySize: !!personalInfoSectionStyling?.bodySize,
+    note: 'If titleSize/bodySize are undefined in sectionStyling, should fall back to global fontSize',
+  });
+
   // Extract section-specific styling for all sections
   const workExperienceStyling = getSectionStyling('workExperience');
   const projectsStyling = getSectionStyling('projects');

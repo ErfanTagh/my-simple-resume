@@ -88,6 +88,16 @@ export default function ResumeView() {
     setError('');
     try {
       const data = await resumeAPI.getById(resumeId);
+      
+      // LOG: What styling data is received from the API
+      console.log('🟢 [RESUME VIEW] Resume loaded from API - Raw styling data:', {
+        resumeId,
+        rawStyling: (data as any).styling,
+        fontSize: (data as any).styling?.fontSize ?? (data as any).styling?.font_size,
+        sectionStyling: (data as any).styling?.sectionStyling ?? (data as any).styling?.section_styling,
+        personalInfoSectionStyling: (data as any).styling?.sectionStyling?.personalInfo ?? (data as any).styling?.section_styling?.personalInfo,
+      });
+      
       setResume(data);
     } catch (err: any) {
       setError(err.message || 'Failed to load resume');
@@ -151,6 +161,83 @@ export default function ResumeView() {
     );
   }
 
+  // Helper: convert backend styling (snake_case) to frontend CVFormData styling (camelCase)
+  const convertStyling = (styling: any | undefined): CVFormData['styling'] => {
+    if (!styling) {
+      console.log('🟡 [RESUME VIEW] convertStyling: No styling object provided');
+      return {};
+    }
+
+    // Support both camelCase (already in CVFormData) and snake_case (from backend)
+    const fontFamily = styling.fontFamily ?? styling.font_family;
+    const fontSize = styling.fontSize ?? styling.font_size;
+    const titleColor = styling.titleColor ?? styling.title_color;
+    const titleBold = styling.titleBold ?? styling.title_bold;
+    const headingColor = styling.headingColor ?? styling.heading_color;
+    const headingBold = styling.headingBold ?? styling.heading_bold;
+    const textColor = styling.textColor ?? styling.text_color;
+    const linkColor = styling.linkColor ?? styling.link_color;
+
+    let sectionStyling: CVFormData['styling'] extends { sectionStyling?: infer T } ? T : any = undefined;
+
+    const rawSectionStyling = styling.sectionStyling ?? styling.section_styling;
+    if (rawSectionStyling && typeof rawSectionStyling === 'object') {
+      sectionStyling = {};
+      Object.keys(rawSectionStyling).forEach((key) => {
+        const section = rawSectionStyling[key] || {};
+        // IMPORTANT:
+        // For personalInfo (summary/about me), do NOT carry over per-section
+        // font sizes from old data. Those historical values were created
+        // before global font-size controls existed and effectively "lock"
+        // the summary at medium size. Let templates fall back to the
+        // global styling.fontSize instead, while still honoring colors.
+        if (key === 'personalInfo') {
+          sectionStyling![key] = {
+            titleColor: section.titleColor ?? section.title_color,
+            bodyColor: section.bodyColor ?? section.body_color,
+          };
+          
+          // LOG: personalInfo section styling conversion
+          console.log('🟡 [RESUME VIEW] convertStyling: personalInfo section - DROPPING font sizes, keeping colors:', {
+            originalSection: section,
+            convertedSection: sectionStyling![key],
+            note: 'titleSize and bodySize removed to allow global fontSize to apply',
+          });
+        } else {
+          sectionStyling![key] = {
+            titleColor: section.titleColor ?? section.title_color,
+            titleSize: section.titleSize ?? section.title_size,
+            bodyColor: section.bodyColor ?? section.body_color,
+            bodySize: section.bodySize ?? section.body_size,
+          };
+        }
+      });
+    }
+
+    const convertedStyling = {
+      fontFamily,
+      fontSize,
+      titleColor,
+      titleBold,
+      headingColor,
+      headingBold,
+      textColor,
+      linkColor,
+      sectionStyling,
+    };
+
+    // LOG: Final converted styling
+    console.log('🟢 [RESUME VIEW] convertStyling: Final converted styling:', {
+      globalFontSize: convertedStyling.fontSize,
+      globalFontFamily: convertedStyling.fontFamily,
+      sectionStyling: convertedStyling.sectionStyling,
+      personalInfoSectionStyling: convertedStyling.sectionStyling?.personalInfo,
+      note: 'personalInfo should NOT have titleSize/bodySize - templates will use global fontSize',
+    });
+
+    return convertedStyling;
+  };
+
   // Convert Resume to CVFormData format for template rendering
   const convertResumeToFormData = (resume: Resume): CVFormData => {
     return {
@@ -163,7 +250,7 @@ export default function ResumeView() {
       skills: resume.skills || [],
       languages: resume.languages || [],
       sectionOrder: resume.sectionOrder || [],
-      styling: resume.styling || {}  // Include styling field
+      styling: convertStyling((resume as any).styling),  // Normalize styling for templates
     };
   };
 
@@ -171,6 +258,16 @@ export default function ResumeView() {
   const renderTemplate = () => {
     const formData = convertResumeToFormData(resume);
     const template = resume.template || 'modern';
+    
+    // LOG: What styling data is passed to the template
+    console.log('🟣 [RESUME VIEW] renderTemplate: Styling data passed to template:', {
+      template,
+      globalFontSize: formData.styling?.fontSize,
+      globalFontFamily: formData.styling?.fontFamily,
+      sectionStyling: formData.styling?.sectionStyling,
+      personalInfoSectionStyling: formData.styling?.sectionStyling?.personalInfo,
+      note: 'Template should use global fontSize if personalInfo.titleSize/bodySize are undefined',
+    });
 
     switch (template) {
       case 'classic':

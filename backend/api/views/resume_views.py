@@ -22,12 +22,7 @@ def resume_list(request):
     import sys
     logger = logging.getLogger(__name__)
     
-    # Log all requests for debugging
-    print("=" * 50, file=sys.stderr)
-    print(f"REQUEST RECEIVED: {request.method} /api/resumes/", file=sys.stderr)
-    print(f"User: {request.user} (authenticated: {request.user.is_authenticated})", file=sys.stderr)
-    print(f"Headers: {dict(request.headers)}", file=sys.stderr)
-    print("=" * 50, file=sys.stderr)
+    # Verbose request logging removed - only styling-specific logs remain
     
     if request.method == 'GET':
         try:
@@ -114,7 +109,6 @@ def resume_list(request):
                 }
                 resumes_data.append(resume_dict)
             
-            logger.error(f"Found {len(resumes_data)} resumes")
             return Response(resumes_data)
         except Exception as e:
             logger.error(f"Error listing resumes: {str(e)}")
@@ -130,11 +124,7 @@ def resume_list(request):
         import sys
         logger = logging.getLogger(__name__)
         
-        # Log to both logger and stdout/stderr
-        print("=" * 50, file=sys.stderr)
-        print("POST REQUEST RECEIVED", file=sys.stderr)
-        print(f"User: {request.user}", file=sys.stderr)
-        print(f"Data: {request.data}", file=sys.stderr)
+        # Verbose request logging removed - only styling-specific logs remain
         print("=" * 50, file=sys.stderr)
         
         logger.error(f"Received POST data: {request.data}")
@@ -191,6 +181,10 @@ def resume_list(request):
                     'overall_score': data.get('overall_score', 0.0),
                 }
                 
+                # Minimal logging of styling when creating resume
+                styling_from_request = data.get('styling', {})
+                print(f"[STYLING LOG] resume_list POST (create): has_styling_in_request={'styling' in request.data}, has_styling_in_validated={'styling' in data}, styling_keys={list(styling_from_request.keys()) if isinstance(styling_from_request, dict) else None}, font_size={styling_from_request.get('font_size') if isinstance(styling_from_request, dict) else None}", file=sys.stderr)
+                
                 # Prepare document for MongoDB
                 resume_doc = {
                     'user_id': request.user.id,
@@ -213,6 +207,7 @@ def resume_list(request):
                         'languages',
                         'interests',
                     ]),
+                    'styling': data.get('styling', {}),  # Include styling field
                     'completeness_score': quality_scores.get('completeness_score', 0.0),
                     'clarity_score': quality_scores.get('clarity_score', 0.0),
                     'formatting_score': quality_scores.get('formatting_score', 0.0),
@@ -228,6 +223,10 @@ def resume_list(request):
                 
                 # Retrieve the created resume
                 created_doc = db.resumes.find_one({'_id': resume_id})
+                
+                # Minimal logging of styling after creation
+                created_styling = created_doc.get('styling')
+                print(f"[STYLING LOG] resume_list POST (after create): resume_id={resume_id}, has_styling={created_styling is not None}, styling_keys={list(created_styling.keys()) if isinstance(created_styling, dict) else None}, font_size={(created_styling or {}).get('font_size') if isinstance(created_styling, dict) else None}", file=sys.stderr)
                 
                 # Format response
                 resume_dict = {
@@ -335,6 +334,7 @@ def resume_detail(request, pk):
     
     if request.method == 'GET':
         import logging
+        import sys
         logger = logging.getLogger(__name__)
         
         try:
@@ -346,6 +346,10 @@ def resume_detail(request, pk):
                     {'error': 'Resume not found'},
                     status=status.HTTP_404_NOT_FOUND
                 )
+            
+            # Minimal logging to trace styling presence without PII
+            styling_from_db = resume_doc.get('styling')
+            print(f"[STYLING LOG] resume_detail GET: resume_id={resume_doc.get('_id')}, has_styling={styling_from_db is not None}, styling_keys={list(styling_from_db.keys()) if isinstance(styling_from_db, dict) else None}, font_size={(styling_from_db or {}).get('font_size') if isinstance(styling_from_db, dict) else None}", file=sys.stderr)
             
             resume_dict = {
                 'id': str(resume_doc['_id']),
@@ -368,6 +372,7 @@ def resume_detail(request, pk):
                     'languages',
                     'interests',
                 ]),
+                'styling': resume_doc.get('styling', {}),  # Include styling field
                 'completeness_score': resume_doc.get('completeness_score', 0.0),
                 'clarity_score': resume_doc.get('clarity_score', 0.0),
                 'formatting_score': resume_doc.get('formatting_score', 0.0),
@@ -387,6 +392,7 @@ def resume_detail(request, pk):
             )
     
     elif request.method == 'PUT':
+        import sys
         serializer = ResumeSerializer(data=request.data)
         if serializer.is_valid():
             try:
@@ -410,6 +416,9 @@ def resume_detail(request, pk):
                         status=status.HTTP_404_NOT_FOUND
                     )
                 
+                # Minimal logging of styling coming from frontend / serializer (no PII)
+                print(f"[STYLING LOG] resume_detail PUT (before update): resume_id={resume_id}, has_styling_in_request={'styling' in request.data}, has_styling_in_validated={'styling' in data}, validated_styling_keys={list((data.get('styling') or {}).keys()) if isinstance(data.get('styling'), dict) else None}", file=sys.stderr)
+                
                 # Prepare update data - preserve created_at, update everything else
                 update_data = serializer.validated_data.copy()
                 update_data.update(quality_scores)  # Add scores to update
@@ -431,6 +440,11 @@ def resume_detail(request, pk):
                 
                 # Return updated resume
                 updated_doc = db.resumes.find_one({'_id': resume_id})
+                
+                # Minimal logging of styling after update (to compare with request)
+                updated_styling = updated_doc.get('styling')
+                print(f"[STYLING LOG] resume_detail PUT (after update): resume_id={updated_doc.get('_id')}, has_styling={updated_styling is not None}, styling_keys={list(updated_styling.keys()) if isinstance(updated_styling, dict) else None}, font_size={(updated_styling or {}).get('font_size') if isinstance(updated_styling, dict) else None}", file=sys.stderr)
+                
                 resume_dict = {
                     'id': str(updated_doc['_id']),
                     'name': updated_doc.get('name'),
@@ -452,6 +466,7 @@ def resume_detail(request, pk):
                         'languages',
                         'interests',
                     ]),
+                    'styling': updated_doc.get('styling', {}),  # Include styling field
                     'completeness_score': updated_doc.get('completeness_score', 0.0),
                     'clarity_score': updated_doc.get('clarity_score', 0.0),
                     'formatting_score': updated_doc.get('formatting_score', 0.0),

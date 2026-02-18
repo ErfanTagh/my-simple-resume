@@ -151,17 +151,13 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
       skills: [],
       sectionOrder: ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"],
       template: "modern" as const,
+      // IMPORTANT: do NOT pre-populate sectionStyling for personalInfo.
+      // If we set personalInfo.titleSize/bodySize here, it will "lock" the summary
+      // to that size and prevent the global fontSize from having any effect.
+      // Instead, let templates fall back to global styling.fontSize unless the
+      // user explicitly customizes per-section sizes.
       styling: {
         ...defaultStyling,
-        // Set personalInfo section styling with template-specific default
-        sectionStyling: {
-          personalInfo: {
-            titleColor: templateDefaultPersonalInfoTitleColor,
-            bodyColor: defaultStyling.textColor,
-            titleSize: defaultStyling.fontSize,
-            bodySize: defaultStyling.fontSize,
-          },
-        },
       },
     };
 
@@ -200,13 +196,15 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
         // Ensure headingColor matches template if not explicitly set
         headingColor: initialData.styling?.headingColor || dataTemplateDefaultHeadingColor,
         // Ensure personalInfo section styling has template-specific default if not set
+        // IMPORTANT: Only set colors as defaults, NOT font sizes (titleSize/bodySize).
+        // If we set font size defaults here, they will override the global fontSize
+        // setting from the third tab. Let templates fall back to global styling.fontSize.
         sectionStyling: {
           ...initialData.styling?.sectionStyling,
           personalInfo: initialData.styling?.sectionStyling?.personalInfo || {
             titleColor: dataTemplateDefaultPersonalInfoTitleColor,
             bodyColor: dataDefaultStyling.textColor,
-            titleSize: dataDefaultStyling.fontSize,
-            bodySize: dataDefaultStyling.fontSize,
+            // Do NOT set titleSize/bodySize here - let global fontSize apply
           },
         },
       },
@@ -640,8 +638,22 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
 
       const { resumeAPI } = await import('@/lib/api');
 
+      // LOG: What styling data is being sent when Complete CV is clicked
+      console.log('🔵 [FORM SUBMIT] Complete CV button clicked - Styling data being sent:', {
+        globalFontSize: data.styling?.fontSize,
+        globalFontFamily: data.styling?.fontFamily,
+        sectionStyling: data.styling?.sectionStyling,
+        personalInfoSectionStyling: data.styling?.sectionStyling?.personalInfo,
+        fullStylingObject: JSON.parse(JSON.stringify(data.styling)), // Deep clone to avoid reference issues
+      });
+
       if (editId) {
         const updatedResume = await resumeAPI.update(editId, resumeDataWithScores as any);
+        
+        console.log('🔵 [FORM SUBMIT] Resume updated - Response:', {
+          id: updatedResume.id,
+          styling: (updatedResume as any).styling,
+        });
 
         toast({
           title: "CV Updated Successfully!",
@@ -654,6 +666,11 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
         }, 800);
       } else {
         const savedResume = await resumeAPI.create(resumeDataWithScores as any);
+        
+        console.log('🔵 [FORM SUBMIT] Resume created - Response:', {
+          id: savedResume.id,
+          styling: (savedResume as any).styling,
+        });
 
         toast({
           title: "CV Saved Successfully!",
