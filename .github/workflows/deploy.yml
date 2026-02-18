@@ -160,26 +160,27 @@ jobs:
               exit 1
             fi
 
-            # Step 8: Final health check - verify API is responding
+            # Step 8: Final health check - verify API is responding (must not trigger set -e)
             echo "🏥 Performing final health check..."
             sleep 3  # Give services a moment to stabilize
-            if ! curl -f -s http://localhost/api/health/ > /dev/null 2>&1; then
-              echo "⚠️  Health check endpoint not responding, but containers are running"
-              # Don't fail deployment, just warn
-            else
+            health_ok=0
+            curl -f -s http://localhost/api/health/ > /dev/null 2>&1 && health_ok=1 || true
+            if [ "$health_ok" = 1 ]; then
               echo "✅ Health check passed"
+            else
+              echo "⚠️  Health check endpoint not responding, but containers are running"
             fi
 
             # Step 9: Clean up old images (optional, saves disk space)
             echo "🧹 Cleaning up old images..."
-            docker image prune -f --filter "until=24h"  # Only remove images older than 24h
+            docker image prune -f --filter "until=24h" || true
 
             # Keep last 3 backups
             echo "🧹 Cleaning up old backups (keeping last 3)..."
-            cd ~/backups && ls -t | tail -n +4 | xargs rm -rf 2>/dev/null || true
+            (cd ~/backups && ls -t 2>/dev/null | tail -n +4 | xargs rm -rf 2>/dev/null) || true
 
             echo "✅ Zero-downtime deployment complete!"
-            docker compose -f docker-compose.prod.yml ps
+            docker compose -f docker-compose.prod.yml ps || true
 
       - name: ✅ Deployment Status
         if: success()
