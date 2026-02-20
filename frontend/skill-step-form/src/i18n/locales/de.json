@@ -546,6 +546,9 @@
         "downloadPDF": "PDF herunterladen"
       },
       "delete": "Lebenslauf löschen",
+      "duplicate": "Duplizieren",
+      "menu": "Lebenslauf-Optionen",
+      "editName": "Klicken Sie, um den Lebenslauf-Namen zu bearbeiten",
       "deleteDialog": {
         "title": "Lebenslauf löschen?",
         "description": "Diese Aktion kann nicht rückgängig gemacht werden. Dies wird Ihren Lebenslauf dauerhaft löschen.",
@@ -569,10 +572,20 @@
           "title": "PDF wird erstellt",
           "description": "Bitte warten Sie, während wir Ihr Lebenslauf-PDF erstellen..."
         },
+        "duplicated": {
+          "title": "Lebenslauf dupliziert",
+          "description": "Ihr Lebenslauf wurde erfolgreich dupliziert."
+        },
+        "updated": {
+          "title": "Lebenslauf aktualisiert",
+          "description": "Der Lebenslauf-Name wurde aktualisiert."
+        },
         "error": {
           "title": "Fehler",
           "deleteFailed": "Lebenslauf konnte nicht gelöscht werden",
-          "pdfFailed": "PDF konnte nicht generiert werden"
+          "pdfFailed": "PDF konnte nicht generiert werden",
+          "duplicateFailed": "Lebenslauf konnte nicht dupliziert werden",
+          "updateFailed": "Lebenslauf-Name konnte nicht aktualisiert werden"
         }
       }
     },

@@ -836,6 +836,7 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
                           <option value="withProfileImage">With Profile Image</option>
                           <option value="allOptionalEmpty">All Optional Fields Empty</option>
                           <option value="erfanTaghvaei">Erfan Taghvaei (Real Resume Data)</option>
+                          <option value="frontendDeveloper">Frontend Developer (Sample Resume)</option>
                         </select>
                         <p className="text-xs text-amber-700 dark:text-amber-300 mt-2">
                           💡 Instantly fill the form with test data to preview different resume layouts

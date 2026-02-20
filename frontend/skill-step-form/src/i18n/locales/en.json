@@ -553,6 +553,9 @@
         "downloadPDF": "Download PDF"
       },
       "delete": "Delete resume",
+      "duplicate": "Duplicate",
+      "menu": "Resume options",
+      "editName": "Click to edit resume name",
       "deleteDialog": {
         "title": "Delete Resume?",
         "description": "This action cannot be undone. This will permanently delete your resume.",
@@ -576,10 +579,20 @@
           "title": "Generating PDF",
           "description": "Please wait while we generate your resume PDF..."
         },
+        "duplicated": {
+          "title": "Resume Duplicated",
+          "description": "Your resume has been duplicated successfully."
+        },
+        "updated": {
+          "title": "Resume Updated",
+          "description": "Resume name has been updated."
+        },
         "error": {
           "title": "Error",
           "deleteFailed": "Failed to delete resume",
-          "pdfFailed": "Failed to generate PDF"
+          "pdfFailed": "Failed to generate PDF",
+          "duplicateFailed": "Failed to duplicate resume",
+          "updateFailed": "Failed to update resume name"
         }
       }
     },

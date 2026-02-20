@@ -18,6 +18,8 @@ import {
   Download,
   Pencil,
   Check,
+  MoreVertical,
+  Copy,
 } from 'lucide-react';
 import { downloadResumePDF } from '@/lib/resumePdfUtils';
 import {
@@ -41,6 +43,12 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Input } from '@/components/ui/input';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 // Helper function to generate default resume name
 const generateDefaultResumeName = (resume: Resume): string => {
@@ -271,13 +279,58 @@ export default function Resumes() {
     setEditingName('');
   };
 
+  // Handle duplicate resume
+  const handleDuplicate = async (resume: Resume) => {
+    try {
+      // Get the full resume data
+      const fullResume = await resumeAPI.getById(resume.id);
+      
+      // Create a copy without the id and with a modified name
+      const originalName = fullResume.name || generateDefaultResumeName(fullResume);
+      const duplicateData: ResumeData = {
+        name: `${originalName} (Copy)`,
+        personalInfo: fullResume.personalInfo,
+        workExperience: fullResume.workExperience,
+        education: fullResume.education,
+        projects: fullResume.projects,
+        certificates: fullResume.certificates,
+        languages: fullResume.languages,
+        skills: fullResume.skills,
+        template: fullResume.template,
+        sectionOrder: fullResume.sectionOrder,
+        completenessScore: fullResume.completenessScore,
+        clarityScore: fullResume.clarityScore,
+        formattingScore: fullResume.formattingScore,
+        impactScore: fullResume.impactScore,
+        overallScore: fullResume.overallScore,
+      };
+
+      // Create the duplicate
+      const duplicatedResume = await resumeAPI.create(duplicateData);
+      
+      // Reload resumes to show the new duplicate
+      await loadResumes();
+      
+      toast({
+        title: t('pages.resumes.toast.duplicated.title') || 'Resume Duplicated',
+        description: t('pages.resumes.toast.duplicated.description') || 'Your resume has been duplicated successfully.',
+      });
+    } catch (err: any) {
+      toast({
+        title: t('pages.resumes.toast.error.title') || 'Error',
+        description: err.message || t('pages.resumes.toast.error.duplicateFailed') || 'Failed to duplicate resume',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      <div className="w-full px-4 py-6 sm:py-8">
+      <div className="w-full max-w-7xl mx-auto px-4 py-6 sm:py-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">{t('pages.resumes.title') || 'My Resumes'}</h1>
-            <p className="text-sm sm:text-base text-muted-foreground">{t('pages.resumes.subtitle') || 'View and manage your created CVs'}</p>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-primary mb-2">{t('pages.resumes.title') || 'My Resumes'}</h1>
+            <p className="text-sm sm:text-base text-muted-foreground/80">{t('pages.resumes.subtitle') || 'View and manage your created CVs'}</p>
           </div>
           <Button onClick={() => navigate('/create')} size="lg" className="w-full sm:w-auto">
             <Plus className="mr-2 h-4 w-4" />
@@ -302,9 +355,9 @@ export default function Resumes() {
         ) : resumes.length === 0 ? (
           <Card className="text-center py-8 sm:py-12">
             <CardContent>
-              <FileText className="h-12 w-12 sm:h-16 sm:w-16 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg sm:text-xl font-semibold mb-2">{t('pages.resumes.empty.title') || 'No resumes yet'}</h3>
-              <p className="text-sm sm:text-base text-muted-foreground mb-4 px-4">
+              <FileText className="h-12 w-12 sm:h-16 sm:w-16 mx-auto text-primary/60 mb-4" />
+              <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">{t('pages.resumes.empty.title') || 'No resumes yet'}</h3>
+              <p className="text-sm sm:text-base text-muted-foreground/80 mb-4 px-4">
                 {t('pages.resumes.empty.description') || 'Create your first CV to get started'}
               </p>
               <Button onClick={() => navigate('/create')} className="text-sm sm:text-base">
@@ -333,19 +386,44 @@ export default function Resumes() {
               const template = resume.template || 'modern';
 
               return (
-                <Card key={resume.id} className="hover:shadow-lg transition-shadow relative group">
-                  {/* Delete button - top right corner */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setDeleteId(resume.id);
-                    }}
-                    className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-red-50 text-red-600 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 hover:bg-red-100 hover:text-red-700 transition-all touch-manipulation"
-                    title={t('pages.resumes.delete') || 'Delete resume'}
-                    aria-label={t('pages.resumes.delete') || 'Delete resume'}
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
+                <Card key={resume.id} className="hover:shadow-lg transition-shadow relative group flex flex-col">
+                  {/* Burger menu - top right corner */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                        className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-muted text-muted-foreground opacity-100 sm:opacity-0 sm:group-hover:opacity-100 hover:bg-muted/80 transition-all touch-manipulation"
+                        title={t('pages.resumes.menu') || 'Resume options'}
+                        aria-label={t('pages.resumes.menu') || 'Resume options'}
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDuplicate(resume);
+                        }}
+                        className="cursor-pointer"
+                      >
+                        <Copy className="mr-2 h-4 w-4" />
+                        <span>{t('pages.resumes.duplicate') || 'Duplicate'}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleteId(resume.id);
+                        }}
+                        className="cursor-pointer text-destructive focus:text-destructive"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        <span>{t('pages.resumes.delete') || 'Delete'}</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
 
                   <CardHeader>
                     <div className="flex items-start justify-between">
@@ -413,7 +491,7 @@ export default function Resumes() {
                       {formatDate((resume as any).updatedAt || (resume as any).updated_at)}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="flex-1 flex flex-col gap-4">
                     <div className="flex items-center justify-between flex-wrap gap-2">
                       <div className="flex items-center gap-2">
                         <Star className={`h-4 w-4 sm:h-5 sm:w-5 fill-current ${getRatingColor(displayScore)} flex-shrink-0`} />
@@ -444,7 +522,7 @@ export default function Resumes() {
                       </div>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-2 pt-2">
+                    <div className="flex flex-col sm:flex-row gap-2 pt-2 mt-auto">
                       <Button
                         variant="outline"
                         className="flex-1"

@@ -1,4 +1,4 @@
-import { CVFormData } from "@/components/cv-form/types";
+  import { CVFormData } from "@/components/cv-form/types";
 
 /**
  * Test Data Profiles for Resume Builder
@@ -12,7 +12,7 @@ import { CVFormData } from "@/components/cv-form/types";
 export const testProfiles: Record<string, CVFormData> = {
   // ============================================
   // Profile 1: Minimal Data (Edge Case Testing)
-  // ============================================
+  // ============================================ 
   minimal: {
     personalInfo: {
       firstName: "John",
@@ -1027,6 +1027,183 @@ export const testProfiles: Record<string, CVFormData> = {
       { skill: "React Native" },
       { skill: "Docker" },
       { skill: "Jetpack" },
+    ],
+  },
+
+  // ============================================
+  // Profile: Frontend Developer (Sample Resume)
+  // ============================================
+  frontendDeveloper: {
+    personalInfo: {
+      firstName: "Alex",
+      lastName: "Martinez",
+      professionalTitle: "Senior Frontend Developer",
+      profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+      email: "alex.martinez@example.com",
+      phone: "+1 (555) 234-5678",
+      location: "New York, NY, USA",
+      linkedin: "https://linkedin.com/in/alexmartinez",
+      github: "https://github.com/alexmartinez",
+      website: "https://alexmartinez.dev",
+      summary: "Passionate frontend developer with 5+ years of experience building modern, responsive web applications.",
+      interests: [
+        { interest: "Web Performance" },
+        { interest: "UI/UX Design" },
+        { interest: "Open Source" },
+        { interest: "Photography" },
+      ],
+    },
+    workExperience: [
+      {
+        position: "Senior Frontend Developer",
+        company: "TechCorp Solutions",
+        location: "New York, NY",
+        startDate: "2021-03",
+        endDate: "Present",
+        description: "Lead frontend development for enterprise SaaS platform serving 50,000+ users. Architected component library used across 10+ products. Reduced bundle size by 40% through code splitting and optimization. Implemented design system with Storybook, improving development velocity by 30%.",
+        technologies: [
+          { technology: "React" },
+          { technology: "TypeScript" },
+          { technology: "Next.js" },
+          { technology: "Tailwind CSS" },
+          { technology: "Storybook" },
+          { technology: "Jest" },
+          { technology: "Cypress" },
+        ],
+        competencies: [
+          { competency: "Frontend Architecture" },
+          { competency: "Performance Optimization" },
+          { competency: "Team Leadership" },
+        ],
+      },
+      {
+        position: "Frontend Developer",
+        company: "StartupHub",
+        location: "Remote",
+        startDate: "2019-06",
+        endDate: "2021-02",
+        description: "Built responsive web applications from scratch using React and Redux. Collaborated with designers to implement pixel-perfect UI components. Improved page load times by 50% through lazy loading and code optimization. Participated in code reviews and mentored 2 junior developers.",
+        technologies: [
+          { technology: "React" },
+          { technology: "Redux" },
+          { technology: "JavaScript" },
+          { technology: "SCSS" },
+          { technology: "Webpack" },
+        ],
+        competencies: [
+          { competency: "Component Development" },
+          { competency: "State Management" },
+        ],
+      },
+      {
+        position: "Junior Frontend Developer",
+        company: "Digital Agency",
+        location: "Boston, MA",
+        startDate: "2018-08",
+        endDate: "2019-05",
+        description: "Developed client websites using HTML, CSS, and JavaScript. Converted design mockups into responsive web pages. Maintained and updated existing websites. Collaborated with backend developers to integrate APIs.",
+        technologies: [
+          { technology: "HTML5" },
+          { technology: "CSS3" },
+          { technology: "JavaScript" },
+          { technology: "jQuery" },
+          { technology: "Bootstrap" },
+        ],
+        competencies: [
+          { competency: "Responsive Design" },
+          { competency: "Cross-browser Compatibility" },
+        ],
+      },
+    ],
+    education: [
+      {
+        degree: "Bachelor of Science in Computer Science",
+        institution: "New York University",
+        location: "New York, NY",
+        startDate: "2014",
+        endDate: "2018",
+        field: "Computer Science",
+        keyCourses: [
+          { course: "Web Development" },
+          { course: "User Interface Design" },
+          { course: "Data Structures" },
+          { course: "Software Engineering" },
+        ],
+      },
+    ],
+    projects: [
+      {
+        name: "Component Library & Design System",
+        description: "Built comprehensive React component library with 50+ reusable components. Created documentation site with interactive examples. Used by 5+ teams across the organization.",
+        technologies: [
+          { technology: "React" },
+          { technology: "TypeScript" },
+          { technology: "Storybook" },
+          { technology: "Tailwind CSS" },
+        ],
+        startDate: "2022-01",
+        endDate: "2022-06",
+        link: "https://github.com/alexmartinez/component-library",
+      },
+      {
+        name: "E-commerce Dashboard",
+        description: "Developed admin dashboard for e-commerce platform with real-time analytics, order management, and inventory tracking. Implemented data visualization using D3.js and Chart.js.",
+        technologies: [
+          { technology: "React" },
+          { technology: "TypeScript" },
+          { technology: "D3.js" },
+          { technology: "Chart.js" },
+          { technology: "Material-UI" },
+        ],
+        startDate: "2020-09",
+        endDate: "2021-02",
+        link: "https://github.com/alexmartinez/ecommerce-dashboard",
+      },
+      {
+        name: "Personal Portfolio Website",
+        description: "Designed and developed responsive portfolio website with dark mode, animations, and blog functionality. Built with Next.js and deployed on Vercel.",
+        technologies: [
+          { technology: "Next.js" },
+          { technology: "React" },
+          { technology: "Tailwind CSS" },
+          { technology: "Framer Motion" },
+        ],
+        startDate: "2023-03",
+        endDate: "2023-05",
+        link: "https://alexmartinez.dev",
+      },
+    ],
+    certificates: [
+      {
+        name: "Advanced React and Redux",
+        organization: "Udemy",
+        issueDate: "2020-05",
+        expirationDate: "",
+        credentialId: "",
+        url: "",
+      },
+      {
+        name: "TypeScript Fundamentals",
+        organization: "Pluralsight",
+        issueDate: "2021-08",
+        expirationDate: "",
+        credentialId: "",
+        url: "",
+      },
+    ],
+    languages: [
+      { language: "English", proficiency: "Native" },
+      { language: "Spanish", proficiency: "Fluent" },
+    ],
+    skills: [
+      { skill: "React" },
+      { skill: "TypeScript" },
+      { skill: "JavaScript" },
+      { skill: "Next.js" },
+      { skill: "Tailwind CSS" },
+      { skill: "Git" },
+      { skill: "Jest" },
+      { skill: "Figma" },
     ],
   },
 };
