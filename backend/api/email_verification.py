@@ -547,10 +547,9 @@ def send_feedback_email(support_email, reply_to_email, subject, plain_message):
     - reply_to: reply_to_email
     """
     try:
-        from_email = settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER
-        if not from_email:
-            print("Error: EMAIL_HOST_USER or DEFAULT_FROM_EMAIL not configured (feedback)")
-            return False
+        # For feedback, always send FROM the dedicated contact address
+        # (must be a verified sender in SendGrid).
+        from_email = "contact@123resume.de"
 
         # Prefer SendGrid API when available
         if SENDGRID_AVAILABLE and settings.SENDGRID_API_KEY:
@@ -566,8 +565,6 @@ def send_feedback_email(support_email, reply_to_email, subject, plain_message):
                 message.tracking_settings = TrackingSettings(
                     click_tracking=ClickTracking(enable=False),
                 )
-                if reply_to_email:
-                    message.reply_to = Email(reply_to_email)
                 sg.send(message)
                 return True
             except Exception as sg_error:
@@ -580,7 +577,6 @@ def send_feedback_email(support_email, reply_to_email, subject, plain_message):
             body=plain_message,
             from_email=from_email_display,
             to=[support_email],
-            reply_to=[reply_to_email] if reply_to_email else None,
         )
         email.extra_headers = {
             "Message-ID": f"<{uuid.uuid4()}@123resume.de>",
