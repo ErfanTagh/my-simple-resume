@@ -9,6 +9,12 @@ import { CVFormData } from "./types";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageAutocomplete } from "@/components/LanguageAutocomplete";
 import { SectionStylingControls } from "./SectionStylingControls";
+import {
+  KNOWN_PROFICIENCY_KEYS,
+  ProficiencyKey,
+  normalizeProficiencyKey,
+  formatProficiency,
+} from "@/lib/languageProficiency";
 
 interface SkillsStepProps {
   form: UseFormReturn<CVFormData>;
@@ -26,12 +32,7 @@ export const SkillsStep = ({ form }: SkillsStepProps) => {
     name: "languages",
   });
 
-  const proficiencyLevels = ["Native", "Fluent", "Advanced", "Intermediate", "Basic"];
-  const getProficiencyTranslation = (level: string) => {
-    const key = level.toLowerCase();
-    const translation = t(`resume.proficiency.${key}`);
-    return translation !== `resume.proficiency.${key}` ? translation : level;
-  };
+  const proficiencyLevels = [...KNOWN_PROFICIENCY_KEYS] as ProficiencyKey[];
 
   return (
     <div className="space-y-4 sm:space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -122,23 +123,26 @@ export const SkillsStep = ({ form }: SkillsStepProps) => {
                 <Controller
                   control={form.control}
                   name={`languages.${index}.proficiency`}
-                  render={({ field: proficiencyField }) => (
-                    <Select
-                      onValueChange={proficiencyField.onChange}
-                      value={proficiencyField.value || ""}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder={t('resume.placeholders.selectLevel')} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {proficiencyLevels.map((level) => (
-                          <SelectItem key={level} value={level}>
-                            {getProficiencyTranslation(level)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
+                  render={({ field: proficiencyField }) => {
+                    const normalizedValue = normalizeProficiencyKey(proficiencyField.value);
+                    return (
+                      <Select
+                        onValueChange={proficiencyField.onChange}
+                        value={normalizedValue || ""}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={t('resume.placeholders.selectLevel')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {proficiencyLevels.map((key) => (
+                            <SelectItem key={key} value={key}>
+                              {formatProficiency(t, key)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    );
+                  }}
                 />
               </div>
             </div>

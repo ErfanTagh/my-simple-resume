@@ -3,6 +3,7 @@ import { CVFormData } from "../types";
 import { Mail, Phone, MapPin, Linkedin, Github, Globe } from "lucide-react";
 import { formatDateRange } from "@/lib/dateFormatter";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { formatProficiency } from "@/lib/languageProficiency";
 
 interface CreativeTemplateProps {
   data: CVFormData;
@@ -414,7 +415,11 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                   lang.language && (
                     <div key={index} className="p-2 rounded-lg" style={{ backgroundColor: `${languagesStyling.bodyColor}15` }}>
                       <p className="font-bold" style={{ color: languagesStyling.bodyColor }}>{lang.language}</p>
-                      <p style={{ fontSize: languagesBodySizes.xs, color: languagesStyling.bodyColor }}>{lang.proficiency}</p>
+                      {lang.proficiency && (
+                        <p style={{ fontSize: languagesBodySizes.xs, color: languagesStyling.bodyColor }}>
+                          {formatProficiency(t, lang.proficiency)}
+                        </p>
+                      )}
                     </div>
                   )
                 ))}

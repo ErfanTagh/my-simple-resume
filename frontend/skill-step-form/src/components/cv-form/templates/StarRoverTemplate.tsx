@@ -2,6 +2,7 @@ import { CVFormData } from "../types";
 import { Mail, Phone, MapPin, Linkedin, Github, Globe } from "lucide-react";
 import { formatDateRange } from "@/lib/dateFormatter";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { formatProficiency } from "@/lib/languageProficiency";
 
 interface StarRoverTemplateProps {
   data: CVFormData;
@@ -437,7 +438,8 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                 .filter(lang => lang.language)
                 .map((lang, index, arr) => (
                   <span key={index}>
-                    {lang.language}{lang.proficiency ? ` - ${lang.proficiency}` : ''}
+                    {lang.language}
+                    {lang.proficiency ? ` - ${formatProficiency(t, lang.proficiency)}` : ''}
                     {index < arr.length - 1 && ', '}
                   </span>
                 ))}

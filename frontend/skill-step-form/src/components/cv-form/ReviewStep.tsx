@@ -6,6 +6,8 @@ import { Separator } from "@/components/ui/separator";
 import { Mail, Phone, MapPin, Linkedin, Github, Globe, Calendar, Edit } from "lucide-react";
 import { SectionOrderManager } from "./SectionOrderManager";
 import { CVRating } from "./CVRating";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { formatProficiency } from "@/lib/languageProficiency";
 
 interface ReviewStepProps {
   form: UseFormReturn<CVFormData>;
@@ -13,6 +15,7 @@ interface ReviewStepProps {
 }
 
 export const ReviewStep = ({ form, onEditStep }: ReviewStepProps) => {
+  const { t } = useLanguage();
   const data = form.watch();
 
   const handleSectionReorder = (newOrder: string[]) => {
@@ -266,7 +269,12 @@ export const ReviewStep = ({ form, onEditStep }: ReviewStepProps) => {
                   lang.language && (
                     <div key={index}>
                       <span className="font-medium text-foreground">{lang.language}</span>
-                      {lang.proficiency && <span className="text-muted-foreground"> - {lang.proficiency}</span>}
+                      {lang.proficiency && (
+                        <span className="text-muted-foreground">
+                          {" "}
+                          - {formatProficiency(t, lang.proficiency)}
+                        </span>
+                      )}
                     </div>
                   )
                 ))}

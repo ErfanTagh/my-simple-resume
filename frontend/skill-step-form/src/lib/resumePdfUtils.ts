@@ -10,6 +10,7 @@ import { LatexTemplate } from '@/components/cv-form/templates/LatexTemplate';
 import { StarRoverTemplate } from '@/components/cv-form/templates/StarRoverTemplate';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import i18n from '@/i18n/config';
+import { formatProficiency as formatProficiencyShared } from '@/lib/languageProficiency';
 
 /**
  * Sanitize filename for filesystem compatibility
@@ -387,7 +388,7 @@ function generateResumeHTML(resume: Resume): string {
           ${validLangs.map((lang: any) => `
             <div class="language-item" style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-right: 16px; width: 100%; box-sizing: border-box; overflow: visible;">
               <span class="language-name" style="flex: 1 1 auto; min-width: 0; overflow: visible;">${escapeHtml(lang.language)}</span>
-              ${lang.proficiency ? `<span class="language-level" style="flex-shrink: 0; white-space: nowrap; overflow: visible; min-width: fit-content; text-align: right; padding-left: 8px;">${escapeHtml(lang.proficiency)}</span>` : ''}
+              ${lang.proficiency ? `<span class="language-level" style="flex-shrink: 0; white-space: nowrap; overflow: visible; min-width: fit-content; text-align: right; padding-left: 8px;">${escapeHtml(formatProficiencyShared(i18n.t.bind(i18n), lang.proficiency))}</span>` : ''}
             </div>
           `).join('')}
         </div>

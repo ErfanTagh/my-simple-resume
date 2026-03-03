@@ -1,6 +1,7 @@
 import { CVFormData } from "../types";
 import { formatDateRange } from "@/lib/dateFormatter";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { formatProficiency } from "@/lib/languageProficiency";
 
 interface MinimalTemplateProps {
   data: CVFormData;
@@ -325,7 +326,11 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                 lang.language && (
                   <div key={index} className="flex justify-between items-center gap-4 pr-2" style={{ fontSize: sizes.xs, color: languagesStyling.bodyColor }}>
                     <span>{lang.language}</span>
-                    <span className="whitespace-nowrap flex-shrink-0" style={{ opacity: 0.7 }}>— {lang.proficiency}</span>
+                    {lang.proficiency && (
+                      <span className="whitespace-nowrap flex-shrink-0" style={{ opacity: 0.7 }}>
+                        — {formatProficiency(t, lang.proficiency)}
+                      </span>
+                    )}
                   </div>
                 )
               ))}

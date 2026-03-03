@@ -1,6 +1,7 @@
 import { CVFormData } from "../types";
 import { Mail, Phone, MapPin, Linkedin, Github, Globe } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { formatProficiency } from "@/lib/languageProficiency";
 
 interface LatexTemplateProps {
   data: CVFormData;
@@ -427,7 +428,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                 .map((lang, index, arr) => (
                   <span key={index}>
                     <span className="font-bold">{lang.language}</span>
-                    {lang.proficiency && ` - ${lang.proficiency}`}
+                    {lang.proficiency && ` - ${formatProficiency(t, lang.proficiency)}`}
                     {index < arr.length - 1 && ', '}
                   </span>
                 ))}

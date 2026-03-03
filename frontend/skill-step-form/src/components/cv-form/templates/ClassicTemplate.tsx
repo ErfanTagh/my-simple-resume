@@ -2,6 +2,7 @@ import { CVFormData } from "../types";
 import { Mail, Phone, MapPin, Linkedin, Github, Globe, Calendar } from "lucide-react";
 import { formatDateRange } from "@/lib/dateFormatter";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { formatProficiency } from "@/lib/languageProficiency";
 
 interface ClassicTemplateProps {
   data: CVFormData;
@@ -301,7 +302,14 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
                 lang.language && (
                   <div key={index} className="flex justify-between items-center gap-4 pr-2" style={{ fontSize: languagesBodySizes.xs, color: languagesStyling.bodyColor }}>
                     <span className="font-semibold">{lang.language}</span>
-                    <span className="whitespace-nowrap flex-shrink-0" style={{ color: languagesStyling.bodyColor, opacity: 0.7 }}>- {lang.proficiency}</span>
+                    {lang.proficiency && (
+                      <span
+                        className="whitespace-nowrap flex-shrink-0"
+                        style={{ color: languagesStyling.bodyColor, opacity: 0.7 }}
+                      >
+                        - {formatProficiency(t, lang.proficiency)}
+                      </span>
+                    )}
                   </div>
                 )
               ))}

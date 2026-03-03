@@ -2,6 +2,7 @@ import { CVFormData } from "../types";
 import { Mail, Phone, MapPin, Linkedin, Github, Globe, Calendar, ExternalLink } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatDateRange } from "@/lib/dateFormatter";
+import { formatProficiency } from "@/lib/languageProficiency";
 
 interface ModernTemplateProps {
   data: CVFormData;
@@ -147,9 +148,34 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                   <div key={index}>
                     <div className="flex justify-between items-start mb-1">
                       <div>
-                        <h3 className="font-bold" style={{ fontSize: workExperienceBodySizes.baseText, color: workExperienceStyling.bodyColor }}>{exp.position}</h3>
-                        <p className="font-semibold" style={{ fontSize: workExperienceBodySizes.baseText, color: workExperienceStyling.bodyColor }}>{exp.company}</p>
-                        {exp.location && <p style={{ fontSize: workExperienceBodySizes.xs, color: workExperienceStyling.bodyColor }}>{exp.location}</p>}
+                        {/* Position: primary, bolder and slightly larger */}
+                        <h3
+                          className="font-bold"
+                          style={{ fontSize: workExperienceBodySizes.baseText, color: workExperienceStyling.bodyColor }}
+                        >
+                          {exp.position}
+                        </h3>
+                        {/* Company: secondary, smaller and lighter */}
+                        <p
+                          className="italic"
+                          style={{
+                            fontSize: workExperienceBodySizes.xs,
+                            color: workExperienceStyling.bodyColor,
+                            opacity: 0.8,
+                          }}
+                        >
+                          {exp.company}
+                        </p>
+                        {exp.location && (
+                          <p
+                            style={{
+                              fontSize: workExperienceBodySizes.xs,
+                              color: workExperienceStyling.bodyColor,
+                            }}
+                          >
+                            {exp.location}
+                          </p>
+                        )}
                       </div>
                       {(exp.startDate || exp.endDate) && (
                         <div className="flex items-center gap-1" style={{ fontSize: workExperienceBodySizes.xs, color: workExperienceStyling.bodyColor }}>
@@ -322,7 +348,14 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                 lang.language && (
                   <div key={index} className="flex justify-between items-center gap-4 pr-2" style={{ fontSize: languagesBodySizes.xs, color: languagesStyling.bodyColor }}>
                     <span className="font-semibold">{lang.language}</span>
-                    <span className="whitespace-nowrap flex-shrink-0" style={{ color: languagesStyling.bodyColor, opacity: 0.7 }}>{lang.proficiency}</span>
+                    {lang.proficiency && (
+                      <span
+                        className="whitespace-nowrap flex-shrink-0"
+                        style={{ color: languagesStyling.bodyColor, opacity: 0.7 }}
+                      >
+                        {formatProficiency(t, lang.proficiency)}
+                      </span>
+                    )}
                   </div>
                 )
               ))}
