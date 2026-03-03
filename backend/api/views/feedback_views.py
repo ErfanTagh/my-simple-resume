@@ -13,6 +13,7 @@ from rest_framework import status
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
+import logging
 
 
 @api_view(["POST"])
@@ -86,8 +87,17 @@ def send_feedback(request):
         )
         email_msg.send(fail_silently=False)
         return Response({"success": True}, status=status.HTTP_200_OK)
-    except Exception:
-        # Avoid logging PII (email/message) here; just indicate failure
+    except Exception as e:
+        # Avoid logging PII (email/message). Log only technical details.
+        logger = logging.getLogger(__name__)
+        logger.error(
+            "Feedback email send failed: %s (type=%s, host=%s, backend=%s)",
+            str(e),
+            e.__class__.__name__,
+            getattr(settings, "EMAIL_HOST", None),
+            getattr(settings, "EMAIL_BACKEND", None),
+            exc_info=True,
+        )
         return Response(
             {"error": "Failed to send feedback. Please try again later."},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,

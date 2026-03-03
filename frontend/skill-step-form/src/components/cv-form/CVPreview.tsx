@@ -15,6 +15,7 @@ import { SectionOrderManager } from "./SectionOrderManager";
 import { StylingSettings } from "./StylingSettings";
 import { FileText, TrendingUp, FileStack, Settings, Info, Languages, MessageSquare } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Select,
   SelectContent,
@@ -41,6 +42,7 @@ interface CVPreviewProps {
 
 export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSectionOrderChange, onStylingChange, currentStep }: CVPreviewProps) => {
   const { t, language, setLanguage } = useLanguage();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("design");
   const [pageCount, setPageCount] = useState(1);
   const [pageBreakPositions, setPageBreakPositions] = useState<number[]>([]);
@@ -56,12 +58,14 @@ export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSect
   // Feedback dialog state (preview-side, so it’s near section titles)
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [feedbackName, setFeedbackName] = useState("");
-  const [feedbackEmail, setFeedbackEmail] = useState("");
+  const [feedbackEmail, setFeedbackEmail] = useState(user?.email || "");
   const [feedbackMessage, setFeedbackMessage] = useState("");
   const [isSendingFeedback, setIsSendingFeedback] = useState(false);
 
   const handleSendFeedback = async () => {
-    if (!feedbackEmail.trim() || !feedbackMessage.trim()) {
+    const resolvedEmail = (user?.email || feedbackEmail).trim();
+
+    if (!resolvedEmail || !feedbackMessage.trim()) {
       toast({
         title: t("common.error") || "Error",
         description:
@@ -77,7 +81,7 @@ export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSect
       const context = `Template: ${template}, SectionTitlesLang: ${language}`;
       await feedbackAPI.sendFeedback({
         name: feedbackName || undefined,
-        email: feedbackEmail.trim(),
+        email: resolvedEmail,
         message: feedbackMessage.trim(),
         context,
       });
@@ -638,17 +642,19 @@ export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSect
                             }
                           />
                         </div>
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium text-foreground">
-                            {t("resume.feedback.email") || "Email"}
-                          </label>
-                          <Input
-                            type="email"
-                            value={feedbackEmail}
-                            onChange={(e) => setFeedbackEmail(e.target.value)}
-                            placeholder="you@example.com"
-                          />
-                        </div>
+                        {!user?.email && (
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-foreground">
+                              {t("resume.feedback.email") || "Email"}
+                            </label>
+                            <Input
+                              type="email"
+                              value={feedbackEmail}
+                              onChange={(e) => setFeedbackEmail(e.target.value)}
+                              placeholder="you@example.com"
+                            />
+                          </div>
+                        )}
                         <div className="space-y-2">
                           <label className="text-sm font-medium text-foreground">
                             {t("resume.feedback.message") || "Your feedback"}
