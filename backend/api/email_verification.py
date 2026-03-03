@@ -536,3 +536,59 @@ https://123resume.de
         print(f"Error sending password changed email: {e}")
         return False
 
+
+def send_feedback_email(support_email, reply_to_email, subject, plain_message):
+    """
+    Send a simple feedback/support email to the support inbox.
+
+    Uses the same SendGrid-then-SMTP strategy as other emails, but with:
+    - Plain text only (no HTML)
+    - To: support_email
+    - reply_to: reply_to_email
+    """
+    try:
+        from_email = settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER
+        if not from_email:
+            print("Error: EMAIL_HOST_USER or DEFAULT_FROM_EMAIL not configured (feedback)")
+            return False
+
+        # Prefer SendGrid API when available
+        if SENDGRID_AVAILABLE and settings.SENDGRID_API_KEY:
+            try:
+                sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+                message = Mail(
+                    from_email=Email(from_email, "123Resume"),
+                    to_emails=support_email,
+                    subject=subject,
+                    plain_text_content=plain_message,
+                )
+                # Disable click tracking (safer / less likely to trigger issues)
+                message.tracking_settings = TrackingSettings(
+                    click_tracking=ClickTracking(enable=False),
+                )
+                if reply_to_email:
+                    message.reply_to = Email(reply_to_email)
+                sg.send(message)
+                return True
+            except Exception as sg_error:
+                print(f"SendGrid API error (feedback): {sg_error}, falling back to SMTP")
+
+        # Fallback to SMTP using Django's email backend
+        from_email_display = f"123Resume <{from_email}>"
+        email = EmailMultiAlternatives(
+            subject=subject,
+            body=plain_message,
+            from_email=from_email_display,
+            to=[support_email],
+            reply_to=[reply_to_email] if reply_to_email else None,
+        )
+        email.extra_headers = {
+            "Message-ID": f"<{uuid.uuid4()}@123resume.de>",
+            "X-Mailer": "123Resume Email System",
+        }
+        email.send(fail_silently=False)
+        return True
+    except Exception as e:
+        print(f"Error sending feedback email: {e}")
+        return False
+

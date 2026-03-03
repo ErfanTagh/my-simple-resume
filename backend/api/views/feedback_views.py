@@ -13,6 +13,7 @@ from rest_framework import status
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
+from api import email_verification
 import logging
 
 
@@ -49,16 +50,6 @@ def send_feedback(request):
 
     support_email = "contact@123resume.de"
 
-    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", None) or getattr(
-        settings, "EMAIL_HOST_USER", None
-    )
-    if not from_email:
-        # Do not expose configuration details to the client
-        return Response(
-            {"error": "Email service is not configured."},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
-
     subject_parts = ["New feedback from 123Resume"]
     if name:
         subject_parts.append(f"- {name}")
@@ -77,29 +68,26 @@ def send_feedback(request):
 
     body = "\n".join(lines)
 
-    try:
-        email_msg = EmailMultiAlternatives(
-            subject=subject,
-            body=body,
-            from_email=from_email,
-            to=[support_email],
-            reply_to=[email],
-        )
-        email_msg.send(fail_silently=False)
+    # Use shared email helper so we follow the same SendGrid/API logic
+    success = email_verification.send_feedback_email(
+        support_email=support_email,
+        reply_to_email=email,
+        subject=subject,
+        plain_message=body,
+    )
+
+    if success:
         return Response({"success": True}, status=status.HTTP_200_OK)
-    except Exception as e:
-        # Avoid logging PII (email/message). Log only technical details.
-        logger = logging.getLogger(__name__)
-        logger.error(
-            "Feedback email send failed: %s (type=%s, host=%s, backend=%s)",
-            str(e),
-            e.__class__.__name__,
-            getattr(settings, "EMAIL_HOST", None),
-            getattr(settings, "EMAIL_BACKEND", None),
-            exc_info=True,
-        )
-        return Response(
-            {"error": "Failed to send feedback. Please try again later."},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
+
+    # Avoid logging PII (email/message). Log only technical details.
+    logger = logging.getLogger(__name__)
+    logger.error(
+        "Feedback email send failed (helper returned False) - host=%s backend=%s",
+        getattr(settings, "EMAIL_HOST", None),
+        getattr(settings, "EMAIL_BACKEND", None),
+    )
+    return Response(
+        {"error": "Failed to send feedback. Please try again later."},
+        status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+    )
 
