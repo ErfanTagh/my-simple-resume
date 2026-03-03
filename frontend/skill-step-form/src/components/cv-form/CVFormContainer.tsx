@@ -14,12 +14,16 @@ import { ReviewStep } from "./ReviewStep";
 import { CVPreview } from "./CVPreview";
 import { SignupOverlay } from "./SignupOverlay";
 import { cvFormSchema, CVFormData } from "./types";
-import { ChevronLeft, ChevronRight, FileCheck, Beaker, CheckCircle2, ArrowRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, FileCheck, Beaker, CheckCircle2, ArrowRight, MessageSquare } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { getTestProfile, getTestProfileNames } from "@/lib/testData";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { calculateResumeScore } from "@/lib/resumeScorer";
+import { feedbackAPI } from "@/lib/api";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 interface CVFormContainerProps {
   initialData?: CVFormData;
@@ -516,6 +520,51 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
 
   const [isSaving, setIsSaving] = useState(false);
 
+  // Feedback dialog state
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const [feedbackName, setFeedbackName] = useState("");
+  const [feedbackEmail, setFeedbackEmail] = useState("");
+  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [isSendingFeedback, setIsSendingFeedback] = useState(false);
+
+  const handleSendFeedback = async () => {
+    if (!feedbackEmail.trim() || !feedbackMessage.trim()) {
+      toast({
+        title: t('common.error') || "Error",
+        description: t('resume.feedback.validation') || "Please provide your email and a short message.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsSendingFeedback(true);
+      const context = `Step: ${steps[currentStep]?.label || currentStep}, Template: ${form.watch("template")}`;
+      await feedbackAPI.sendFeedback({
+        name: feedbackName || undefined,
+        email: feedbackEmail.trim(),
+        message: feedbackMessage.trim(),
+        context,
+      });
+
+      setIsFeedbackOpen(false);
+      setFeedbackMessage("");
+
+      toast({
+        title: t('resume.feedback.thankYouTitle') || "Thank you for your feedback!",
+        description: t('resume.feedback.thankYouDesc') || "We have received your message and will review it soon.",
+      });
+    } catch (error: any) {
+      toast({
+        title: t('common.error') || "Error",
+        description: error?.message || t('resume.feedback.error') || "We could not send your feedback. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSendingFeedback(false);
+    }
+  };
+
   const onSubmit = async (data: CVFormData) => {
     setIsSaving(true);
 
@@ -862,18 +911,20 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
                         <CurrentStepComponent form={form} />
                       )}
 
-                      <div className="flex justify-between mt-8 pt-6 border-t">
-                        {currentStep > 0 && (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={handlePrevious}
-                          >
-                            <ChevronLeft className="mr-2 h-4 w-4" />
-                            Previous
-                          </Button>
-                        )}
-                        {currentStep === 0 && <div />}
+                      <div className="flex items-center justify-between mt-8 pt-6 border-t gap-4">
+                        <div className="flex items-center gap-2">
+                          {currentStep > 0 && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={handlePrevious}
+                            >
+                              <ChevronLeft className="mr-2 h-4 w-4" />
+                              Previous
+                            </Button>
+                          )}
+                          {currentStep === 0 && <div />}
+                        </div>
 
                         {currentStep === steps.length - 1 ? (
                           <Button

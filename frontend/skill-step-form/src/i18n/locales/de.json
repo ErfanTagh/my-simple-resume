@@ -128,6 +128,7 @@
       "startDate": "Startdatum",
       "endDate": "Enddatum",
       "description": "Beschreibung",
+      "experienceDescription": "Rollenbeschreibung / Zusammenfassung",
       "degree": "Abschluss",
       "institution": "Institution",
       "field": "Studienfach",
@@ -164,6 +165,7 @@
       "selectEndDate": "Enddatum auswählen",
       "searchArticles": "Artikel suchen...",
       "summary": "Recent Computer Science graduate with strong foundation in JavaScript, React, and Python. Quick learner with excellent problem-solving skills.",
+      "experienceDescription": "z.B. Leitung der Frontend-Entwicklung einer SaaS-Plattform mit über 50.000 Nutzern",
       "interests": "z.B. Laufen, Radfahren, Sprachen lernen",
       "position": "Software Engineering Intern",
       "company": "Tech Startup Inc.",
@@ -179,13 +181,7 @@
       "projectDescription": "Built responsive portfolio website showcasing projects and skills",
       "skill": "JavaScript",
       "selectIssueDate": "Ausstellungsdatum auswählen",
-      "noExpiration": "Kein Ablaufdatum",
-      "projectName": "z.B. E-Commerce-Plattform",
-      "projectDescription": "Kurze Beschreibung des Projekts...",
-      "projectLink": "https://projekt-url.de",
-      "certificateName": "z.B. AWS Certified Developer",
-      "certOrg": "z.B. Amazon Web Services",
-      "skill": "z.B. JavaScript, Projektmanagement"
+      "noExpiration": "Kein Ablaufdatum"
     },
     "labels": {
       "profileImage": "Profilbild",
@@ -194,6 +190,7 @@
       "personalWebsite": "Persönliche Website",
       "morePersonalLinks": "Weitere persönliche Links",
       "keyResponsibilities": "Schlüsselverantwortlichkeiten & Erfolge",
+      "experienceDescription": "Rollenbeschreibung / Zusammenfassung",
       "technologies": "Verwendete Technologien",
       "technologiesHint": "Fügen Sie in diesem Projekt verwendete Technologien hinzu",
       "technologiesHintWork": "Fügen Sie in dieser Rolle verwendete Technologien hinzu",
@@ -412,6 +409,21 @@
         }
       }
     },
+    "feedback": {
+      "button": "Feedback geben",
+      "title": "Feedback senden",
+      "description": "Teilen Sie Ihre Ideen, Probleme oder Feature-Wünsche mit dem 123Resume‑Team. Ihr Feedback hilft uns, den Builder zu verbessern.",
+      "name": "Name (optional)",
+      "namePlaceholder": "Ihr Name",
+      "email": "E-Mail",
+      "message": "Ihr Feedback",
+      "messagePlaceholder": "Sagen Sie uns, was gut funktioniert, was unklar ist oder was Sie sich wünschen.",
+      "submit": "Feedback senden",
+      "thankYouTitle": "Vielen Dank für Ihr Feedback!",
+      "thankYouDesc": "Wir haben Ihre Nachricht erhalten und werden sie zeitnah prüfen.",
+      "error": "Ihr Feedback konnte nicht gesendet werden. Bitte versuchen Sie es später erneut.",
+      "validation": "Bitte geben Sie Ihre E-Mail-Adresse und eine kurze Nachricht ein."
+    },
     "settings": {
       "stylingTitle": "Gestaltung & Typografie",
       "stylingDesc": "Schriftarten, Farben und Textstile anpassen",
@@ -433,8 +445,6 @@
       "textColor": "Text-Farbe",
       "linkColor": "Link-Farbe",
       "resetAll": "Alle Einstellungen zurücksetzen",
-      "sectionOrderTitle": "Abschnittsreihenfolge anpassen",
-      "sectionOrderDesc": "Ziehen Sie Abschnitte zum Neuordnen oder verwenden Sie die Pfeiltasten",
       "sectionOrderTitle": "Abschnittsreihenfolge anpassen",
       "sectionOrderDesc": "Ziehen Sie Abschnitte, um sie neu anzuordnen, oder verwenden Sie die Pfeiltasten"
     }

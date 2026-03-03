@@ -234,6 +234,34 @@ export const authAPI = {
 };
 
 // ============================================
+// Feedback / Contact APIs
+// ============================================
+
+export const feedbackAPI = {
+  /**
+   * Send feedback or support request to 123Resume support inbox.
+   * Authentication is optional; we send without auth headers so guests can contact us.
+   */
+  sendFeedback: async (data: {
+    name?: string;
+    email: string;
+    message: string;
+    context?: string;
+  }) => {
+    const payload = camelToSnakeObject(data);
+    const doFetch = () =>
+      fetch(`${API_BASE_URL}/feedback/`, {
+        method: "POST",
+        headers: createHeaders(false, true),
+        body: JSON.stringify(payload),
+      });
+
+    const response = await doFetch();
+    return handleResponse(response);
+  },
+};
+
+// ============================================
 // Resume APIs
 // ============================================
 

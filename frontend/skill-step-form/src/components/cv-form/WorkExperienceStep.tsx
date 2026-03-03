@@ -100,6 +100,18 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
         </div>
       </div>
 
+      {/* Role summary / free-text description */}
+      <div className="space-y-2">
+        <Label htmlFor={`workExperience.${index}.description`}>
+          {t('resume.fields.experienceDescription') || t('resume.fields.summary')}
+        </Label>
+        <Textarea
+          {...form.register(`workExperience.${index}.description`)}
+          placeholder={t('resume.placeholders.experienceDescription') || t('resume.placeholders.summary')}
+          rows={3}
+        />
+      </div>
+
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label>{t('resume.labels.keyResponsibilities')}</Label>
@@ -117,10 +129,16 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
         <div className="space-y-2">
           {respFields.map((field, respIndex) => (
             <div key={field.id} className="flex gap-2">
-              <Input
+              <Textarea
                 {...form.register(`workExperience.${index}.responsibilities.${respIndex}.responsibility`)}
                 placeholder={t('resume.placeholders.responsibility')}
-                className="flex-1"
+                rows={1}
+                className="flex-1 resize-none h-9 min-h-0 leading-5 py-1.5"
+                onInput={(e) => {
+                  const el = e.currentTarget;
+                  el.style.height = "auto";
+                  el.style.height = `${el.scrollHeight}px`;
+                }}
               />
               <Button
                 type="button"

@@ -145,6 +145,18 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
         </div>
       </div>
 
+      {/* Role summary / free-text description */}
+      <div className="space-y-2">
+        <Label htmlFor={`workExperience.${index}.description`}>
+          {t('resume.fields.experienceDescription') || t('resume.fields.summary')}
+        </Label>
+        <Textarea
+          {...form.register(`workExperience.${index}.description`)}
+          placeholder={t('resume.placeholders.experienceDescription') || t('resume.placeholders.summary')}
+          rows={3}
+        />
+      </div>
+
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label>{t('resume.labels.keyResponsibilities')}</Label>
@@ -162,10 +174,16 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
         <div className="space-y-2">
           {respFields.map((field, respIndex) => (
             <div key={field.id} className="flex gap-2">
-              <Input
+              <Textarea
                 {...form.register(`workExperience.${index}.responsibilities.${respIndex}.responsibility`)}
                 placeholder={t('resume.placeholders.responsibility')}
-                className="flex-1"
+                rows={1}
+                className="flex-1 resize-none h-9 min-h-0 leading-5 py-1.5"
+                onInput={(e) => {
+                  const el = e.currentTarget;
+                  el.style.height = "auto";
+                  el.style.height = `${el.scrollHeight}px`;
+                }}
               />
               <Button
                 type="button"
@@ -438,13 +456,8 @@ const ProjectItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index: 
   );
 };
 
-export const ExperienceStep = ({ form }: ExperienceStepProps) => {
+export const ProjectsStep = ({ form }: ExperienceStepProps) => {
   const { t } = useLanguage();
-  const { fields: workFields, append: appendWork, remove: removeWork } = useFieldArray({
-    control: form.control,
-    name: "workExperience",
-  });
-
   const { fields: projectFields, append: appendProject, remove: removeProject } = useFieldArray({
     control: form.control,
     name: "projects",
@@ -452,61 +465,6 @@ export const ExperienceStep = ({ form }: ExperienceStepProps) => {
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
-      {/* Work Experience Section */}
-      <div>
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold mb-2">{t('resume.steps.workExperience')}</h2>
-          <p className="text-muted-foreground">{t('resume.steps.workExperienceDesc')}</p>
-        </div>
-
-        {/* Section Styling Controls */}
-        <SectionStylingControls
-          form={form}
-          sectionName="workExperience"
-          sectionLabel={t('resume.steps.workExperience') || 'Work Experience'}
-        />
-
-        {workFields.map((field, index) => (
-          <div key={field.id} className="p-6 border rounded-lg bg-card space-y-4 relative mb-4">
-            {workFields.length > 1 && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="absolute top-2 right-2"
-                onClick={() => removeWork(index)}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            )}
-
-            <WorkExperienceItem form={form} index={index} />
-          </div>
-        ))}
-
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => appendWork({
-            position: "",
-            company: "",
-            location: "",
-            startDate: "",
-            endDate: "",
-            description: "",
-            responsibilities: [],
-            technologies: [],
-            competencies: []
-          })}
-          className="w-full"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          {t('resume.actions.addExperience')}
-        </Button>
-      </div>
-
-      <Separator />
-
       {/* Projects Section */}
       <div>
         <div className="mb-6">
@@ -577,6 +535,76 @@ export const ExperienceStep = ({ form }: ExperienceStepProps) => {
           </Button>
         )}
       </div>
+    </div>
+  );
+};
+
+export const ExperienceStep = ({ form }: ExperienceStepProps) => {
+  const { t } = useLanguage();
+  const { fields: workFields, append: appendWork, remove: removeWork } = useFieldArray({
+    control: form.control,
+    name: "workExperience",
+  });
+
+  return (
+    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+      {/* Work Experience Section */}
+      <div>
+        <div className="mb-6">
+          <h2 className="text-2xl font-semibold mb-2">{t('resume.steps.workExperience')}</h2>
+          <p className="text-muted-foreground">{t('resume.steps.workExperienceDesc')}</p>
+        </div>
+
+        {/* Section Styling Controls */}
+        <SectionStylingControls
+          form={form}
+          sectionName="workExperience"
+          sectionLabel={t('resume.steps.workExperience') || 'Work Experience'}
+        />
+
+        {workFields.map((field, index) => (
+          <div key={field.id} className="p-6 border rounded-lg bg-card space-y-4 relative mb-4">
+            {workFields.length > 1 && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute top-2 right-2"
+                onClick={() => removeWork(index)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
+
+            <WorkExperienceItem form={form} index={index} />
+          </div>
+        ))}
+
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => appendWork({
+            position: "",
+            company: "",
+            location: "",
+            startDate: "",
+            endDate: "",
+            description: "",
+            responsibilities: [],
+            technologies: [],
+            competencies: []
+          })}
+          className="w-full"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          {t('resume.actions.addExperience')}
+        </Button>
+      </div>
+
+      <Separator />
+
+      {/* Projects Section (reused wrapper) */}
+      <ProjectsStep form={form} />
     </div>
   );
 };

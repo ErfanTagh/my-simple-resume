@@ -128,6 +128,7 @@
       "startDate": "Start Date",
       "endDate": "End Date",
       "description": "Description",
+      "experienceDescription": "Role summary / impact description",
       "degree": "Degree",
       "institution": "Institution",
       "field": "Field of Study",
@@ -174,25 +175,8 @@
       "selectEndDate": "Select end date",
       "searchArticles": "Search articles...",
       "summary": "Recent Computer Science graduate with strong foundation in JavaScript, React, and Python. Quick learner with excellent problem-solving skills.",
-      "interests": "e.g., Running, Cycling, Language Learning",
-      "position": "Software Engineer",
-      "company": "Tech Corp",
-      "jobLocation": "San Francisco, USA",
-      "responsibility": "e.g., Led development of microservices architecture",
-      "technology": "e.g., React, Node.js",
-      "competency": "e.g., Teamwork",
-      "degree": "e.g., Bachelor of Science",
-      "institution": "e.g., University Name",
-      "fieldOfStudy": "e.g., Computer Science",
-      "course": "e.g., Data Structures",
-      "selectIssueDate": "Select issue date",
-      "noExpiration": "No expiration",
-      "projectName": "e.g., E-commerce Platform",
-      "projectDescription": "Brief description of the project...",
-      "projectLink": "https://project-url.com",
-      "certificateName": "e.g., AWS Certified Developer",
-      "certOrg": "e.g., Amazon Web Services",
-      "skill": "e.g., JavaScript, Project Management"
+      "experienceDescription": "e.g., Led frontend development for enterprise SaaS platform serving 50,000+ users",
+      "interests": "e.g., Running, Cycling, Language Learning"
     },
     "labels": {
       "profileImage": "Profile Image",
@@ -201,6 +185,7 @@
       "personalWebsite": "Personal Website",
       "morePersonalLinks": "More Personal Links",
       "keyResponsibilities": "Key Responsibilities & Achievements",
+      "experienceDescription": "Role summary / impact description",
       "technologies": "Technologies Used",
       "technologiesHint": "Add technologies used in this project",
       "technologiesHintWork": "Add technologies used in this role",
@@ -419,6 +404,21 @@
         }
       }
     },
+    "feedback": {
+      "button": "Give Feedback",
+      "title": "Send Feedback",
+      "description": "Share your ideas, issues, or feature requests with the 123Resume team. Your feedback helps us improve the builder.",
+      "name": "Name (optional)",
+      "namePlaceholder": "Your name",
+      "email": "Email",
+      "message": "Your feedback",
+      "messagePlaceholder": "Tell us what works well, what’s confusing, or what you’d like to see improved.",
+      "submit": "Send Feedback",
+      "thankYouTitle": "Thank you for your feedback!",
+      "thankYouDesc": "We’ve received your message and will review it soon.",
+      "error": "We couldn’t send your feedback. Please try again later.",
+      "validation": "Please provide your email and a short message."
+    },
     "settings": {
       "stylingTitle": "Styling & Typography",
       "stylingDesc": "Customize fonts, colors, and text styles",
@@ -440,8 +440,6 @@
       "textColor": "Text Color",
       "linkColor": "Link Color",
       "resetAll": "Reset All Settings",
-      "sectionOrderTitle": "Customize Section Order",
-      "sectionOrderDesc": "Drag sections to reorder or use the arrow buttons",
       "sectionOrderTitle": "Customize Section Order",
       "sectionOrderDesc": "Drag sections to reorder or use the arrow buttons"
     }

@@ -39,5 +39,8 @@ urlpatterns = [
     
     # Sitemap endpoint
     path('sitemap.xml', views.generate_sitemap, name='sitemap'),
+
+    # Feedback / contact endpoint
+    path('feedback/', views.send_feedback, name='send-feedback'),
 ]
 

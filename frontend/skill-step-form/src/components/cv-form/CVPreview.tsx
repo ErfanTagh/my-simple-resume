@@ -13,7 +13,7 @@ import { CVRating } from "./CVRating";
 import { TemplateSelector } from "./TemplateSelector";
 import { SectionOrderManager } from "./SectionOrderManager";
 import { StylingSettings } from "./StylingSettings";
-import { FileText, TrendingUp, FileStack, Settings, Info, Languages } from "lucide-react";
+import { FileText, TrendingUp, FileStack, Settings, Info, Languages, MessageSquare } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Select,
@@ -23,6 +23,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { calculateResumeScore } from "@/lib/resumeScorer";
+import { feedbackAPI } from "@/lib/api";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/hooks/use-toast";
 
 interface CVPreviewProps {
   data: CVFormData;
@@ -46,6 +52,58 @@ export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSect
   const template = data.template || "modern";
   const defaultSectionOrder = ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"];
   const sectionOrder = data.sectionOrder || defaultSectionOrder;
+
+  // Feedback dialog state (preview-side, so it’s near section titles)
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const [feedbackName, setFeedbackName] = useState("");
+  const [feedbackEmail, setFeedbackEmail] = useState("");
+  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [isSendingFeedback, setIsSendingFeedback] = useState(false);
+
+  const handleSendFeedback = async () => {
+    if (!feedbackEmail.trim() || !feedbackMessage.trim()) {
+      toast({
+        title: t("common.error") || "Error",
+        description:
+          t("resume.feedback.validation") ||
+          "Please provide your email and a short message.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsSendingFeedback(true);
+      const context = `Template: ${template}, SectionTitlesLang: ${language}`;
+      await feedbackAPI.sendFeedback({
+        name: feedbackName || undefined,
+        email: feedbackEmail.trim(),
+        message: feedbackMessage.trim(),
+        context,
+      });
+
+      setIsFeedbackOpen(false);
+      setFeedbackMessage("");
+
+      toast({
+        title: t("resume.feedback.thankYouTitle") || "Thank you for your feedback!",
+        description:
+          t("resume.feedback.thankYouDesc") ||
+          "We have received your message and will review it soon.",
+      });
+    } catch (error: any) {
+      toast({
+        title: t("common.error") || "Error",
+        description:
+          error?.message ||
+          t("resume.feedback.error") ||
+          "We could not send your feedback. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSendingFeedback(false);
+    }
+  };
 
   // Track template changes and force rerender
   const prevTemplateRef = useRef(template);
@@ -525,16 +583,110 @@ export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSect
               {/* Section titles - controls language of section headings in preview */}
               <div className="flex items-center gap-2 mt-2">
                 <Languages className="h-3.5 w-3.5 text-muted-foreground" />
-                <span className="text-xs font-medium text-muted-foreground">{t('resume.form.sectionTitles')}:</span>
-                <Select value={language} onValueChange={(v) => setLanguage(v as 'en' | 'de')}>
+                <span className="text-xs font-medium text-muted-foreground">
+                  {t("resume.form.sectionTitles")}:
+                </span>
+                <Select
+                  value={language}
+                  onValueChange={(v) => setLanguage(v as "en" | "de")}
+                >
                   <SelectTrigger className="h-8 w-[120px] text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="en">{t('resume.form.sectionTitlesEnglish')}</SelectItem>
-                    <SelectItem value="de">{t('resume.form.sectionTitlesDeutsch')}</SelectItem>
+                    <SelectItem value="en">
+                      {t("resume.form.sectionTitlesEnglish")}
+                    </SelectItem>
+                    <SelectItem value="de">
+                      {t("resume.form.sectionTitlesDeutsch")}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
+                <div className="ml-auto">
+                  <Dialog open={isFeedbackOpen} onOpenChange={setIsFeedbackOpen}>
+                    <DialogTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="gap-1 text-xs text-muted-foreground hover:text-primary"
+                      >
+                        <MessageSquare className="h-3.5 w-3.5" />
+                        {t("resume.feedback.button") || "Feedback"}
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>
+                          {t("resume.feedback.title") || "Send Feedback"}
+                        </DialogTitle>
+                        <DialogDescription>
+                          {t("resume.feedback.description") ||
+                            "Share your ideas, issues, or feature requests with the 123Resume team."}
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-foreground">
+                            {t("resume.feedback.name") || "Name (optional)"}
+                          </label>
+                          <Input
+                            value={feedbackName}
+                            onChange={(e) => setFeedbackName(e.target.value)}
+                            placeholder={
+                              t("resume.feedback.namePlaceholder") || "Your name"
+                            }
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-foreground">
+                            {t("resume.feedback.email") || "Email"}
+                          </label>
+                          <Input
+                            type="email"
+                            value={feedbackEmail}
+                            onChange={(e) => setFeedbackEmail(e.target.value)}
+                            placeholder="you@example.com"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-foreground">
+                            {t("resume.feedback.message") || "Your feedback"}
+                          </label>
+                          <Textarea
+                            value={feedbackMessage}
+                            onChange={(e) => setFeedbackMessage(e.target.value)}
+                            placeholder={
+                              t("resume.feedback.messagePlaceholder") ||
+                              "Tell us what works well, what’s confusing, or what you’d like to see improved."
+                            }
+                            rows={4}
+                          />
+                        </div>
+                      </div>
+                      <DialogFooter className="mt-4">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setIsFeedbackOpen(false)}
+                        >
+                          {t("common.cancel") || "Cancel"}
+                        </Button>
+                        <Button
+                          type="button"
+                          className="gap-2"
+                          disabled={isSendingFeedback}
+                          onClick={handleSendFeedback}
+                        >
+                          {isSendingFeedback && (
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
+                          )}
+                          {t("resume.feedback.submit") || "Send Feedback"}
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </div>
             </div>
 
