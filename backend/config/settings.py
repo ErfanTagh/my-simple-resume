@@ -217,32 +217,24 @@ SIMPLE_JWT = {
 # Email Configuration
 # Priority: SendGrid (if API key is set) > SMTP (fallback)
 # SendGrid provides better deliverability and is recommended for production
-SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY', '').strip()
-
 # Email Configuration
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 
-# Use SendGrid SMTP if API key is provided, otherwise use configured SMTP settings
-if SENDGRID_API_KEY:
-    # SendGrid SMTP configuration
-    EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.sendgrid.net')
-    EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
-    EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
-    EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'False') == 'True'
-    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'apikey')
-    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', SENDGRID_API_KEY)
-else:
-    # Fallback to configured SMTP (Gmail, etc.)
-    EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
-    EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
-    EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
-    EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'False') == 'True'
-    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '').strip()
-    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '').strip()
+# Generic SMTP configuration (can be used as Mailgun SMTP or any other provider)
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.mailgun.org')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'False') == 'True'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '').strip()
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '').strip()
+
+# Mailgun API configuration (used by custom helpers in email_verification.py)
+MAILGUN_API_KEY = os.getenv('MAILGUN_API_KEY', '').strip()
+MAILGUN_DOMAIN = os.getenv('MAILGUN_DOMAIN', '').strip()
+MAILGUN_BASE_URL = os.getenv('MAILGUN_BASE_URL', 'https://api.mailgun.net').strip()
 
 # Email FROM address configuration
-# For SendGrid: Use a verified sender email (e.g., noreply@123resume.de)
-# For SMTP: Should match authenticated email to avoid blocking
+# Should match a verified sender address for the configured provider
 default_from = os.getenv('DEFAULT_FROM_EMAIL', '').strip()
 if default_from:
     # Extract email from "Display Name <email@domain.com>" format if present
@@ -253,11 +245,8 @@ if default_from:
     else:
         DEFAULT_FROM_EMAIL = default_from
 else:
-    # Fallback: Use verified sender for SendGrid, or authenticated email for SMTP
-    if SENDGRID_API_KEY:
-        DEFAULT_FROM_EMAIL = 'noreply@123resume.de'  # Should be verified in SendGrid
-    else:
-        DEFAULT_FROM_EMAIL = EMAIL_HOST_USER or 'registration@123resume.de'
+    # Fallback: use authenticated email for SMTP, or a sensible default
+    DEFAULT_FROM_EMAIL = EMAIL_HOST_USER or 'noreply@123resume.de'
 
 # Set SERVER_EMAIL to match for error reporting
 SERVER_EMAIL = DEFAULT_FROM_EMAIL

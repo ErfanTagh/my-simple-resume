@@ -6,17 +6,10 @@ import hashlib
 import uuid
 import json
 from datetime import datetime, timedelta
-from django.core.mail import EmailMessage, EmailMultiAlternatives, send_mail
+
+import requests
 from django.conf import settings
 from django.template.loader import render_to_string
-
-# Try to import SendGrid SDK (optional - falls back to SMTP if not available)
-try:
-    from sendgrid import SendGridAPIClient
-    from sendgrid.helpers.mail import Mail, Email, TrackingSettings, ClickTracking
-    SENDGRID_AVAILABLE = True
-except ImportError:
-    SENDGRID_AVAILABLE = False
 
 
 def generate_verification_token():
@@ -109,80 +102,14 @@ https://123resume.de
 </html>
 """
     
-    try:
-        # Ensure FROM email matches the authenticated email to avoid blocking
-        from_email = settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER
-        if not from_email:
-            print("Error: EMAIL_HOST_USER or DEFAULT_FROM_EMAIL not configured")
-            return False
-        
-        # Use SendGrid SDK if available and API key is set (allows disabling click tracking)
-        if SENDGRID_AVAILABLE and settings.SENDGRID_API_KEY:
-            try:
-                sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
-                
-                # Create email with tracking disabled
-                message = Mail(
-                    from_email=Email(from_email, "123Resume"),
-                    to_emails=user_email,
-                    subject=subject,
-                    plain_text_content=plain_message,
-                    html_content=html_message
-                )
-                
-                # Disable click tracking to avoid SSL certificate issues
-                message.tracking_settings = TrackingSettings(
-                    click_tracking=ClickTracking(enable=False),
-                )
-                
-                # Set reply-to
-                message.reply_to = Email('contact@123resume.de')
-                
-                # Send via SendGrid API
-                response = sg.send(message)
-                return True
-            except Exception as sg_error:
-                print(f"SendGrid API error: {sg_error}, falling back to SMTP")
-                # Fall through to SMTP fallback
-        
-        # Fallback to SMTP (Django's email backend)
-        from_email_display = f"123Resume <{from_email}>"
-        
-        email = EmailMultiAlternatives(
-            subject=subject,
-            body=plain_message,
-            from_email=from_email_display,
-            to=[user_email],
-            reply_to=['contact@123resume.de'],
-        )
-        
-        email.attach_alternative(html_message, "text/html")
-        
-        email.extra_headers = {
-            'Message-ID': f'<{uuid.uuid4()}@123resume.de>',
-            'X-Mailer': '123Resume Email System',
-        }
-        
-        email.send(fail_silently=False)
-        return True
-    except Exception as e:
-        error_msg = str(e)
-        print(f"Error sending email: {error_msg}")
-        
-        # Provide helpful error messages
-        if "blocked" in error_msg.lower() or "550" in error_msg:
-            print("⚠️  Email blocked. Common causes:")
-            print("   1. FROM email doesn't match authenticated email")
-            print("   2. Gmail requires App Password (not regular password)")
-            print("   3. Missing SPF/DKIM records for custom domain")
-            print("   4. Email flagged as spam")
-        elif "authentication" in error_msg.lower() or "535" in error_msg:
-            print("⚠️  Authentication failed. Check:")
-            print("   1. EMAIL_HOST_USER is correct")
-            print("   2. EMAIL_HOST_PASSWORD is an App Password (for Gmail)")
-            print("   3. Less secure app access is enabled (if using regular password)")
-        
-        return False
+    # Send via Mailgun
+    return _send_with_mailgun(
+        subject=subject,
+        plain_message=plain_message,
+        html_message=html_message,
+        to_email=user_email,
+        reply_to="contact@123resume.de",
+    )
 
 
 def send_welcome_email(user_email, username):
@@ -229,51 +156,13 @@ Ready to get started? Visit https://123resume.de
 </html>
 """
     
-    try:
-        from_email = settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER
-        if not from_email:
-            print("Error: EMAIL_HOST_USER or DEFAULT_FROM_EMAIL not configured")
-            return False
-        
-        # Use SendGrid SDK if available and API key is set
-        if SENDGRID_AVAILABLE and settings.SENDGRID_API_KEY:
-            try:
-                sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
-                message = Mail(
-                    from_email=Email(from_email, "123Resume"),
-                    to_emails=user_email,
-                    subject=subject,
-                    plain_text_content=plain_message,
-                    html_content=html_message
-                )
-                message.tracking_settings = TrackingSettings(
-                    click_tracking=ClickTracking(enable=False),
-                )
-                message.reply_to = Email('contact@123resume.de')
-                sg.send(message)
-                return True
-            except Exception as sg_error:
-                print(f"SendGrid API error: {sg_error}, falling back to SMTP")
-        
-        # Fallback to SMTP
-        from_email_display = f"123Resume <{from_email}>"
-        email = EmailMultiAlternatives(
-            subject=subject,
-            body=plain_message,
-            from_email=from_email_display,
-            to=[user_email],
-            reply_to=['contact@123resume.de'],
-        )
-        email.attach_alternative(html_message, "text/html")
-        email.extra_headers = {
-            'Message-ID': f'<{uuid.uuid4()}@123resume.de>',
-            'X-Mailer': '123Resume Email System',
-        }
-        email.send(fail_silently=False)
-        return True
-    except Exception as e:
-        print(f"Error sending welcome email: {e}")
-        return False
+    return _send_with_mailgun(
+        subject=subject,
+        plain_message=plain_message,
+        html_message=html_message,
+        to_email=user_email,
+        reply_to="contact@123resume.de",
+    )
 
 
 def send_password_reset_email(user_email, username, reset_link):
@@ -366,51 +255,13 @@ https://123resume.de
 </html>
 """
     
-    try:
-        from_email = settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER
-        if not from_email:
-            print("Error: EMAIL_HOST_USER or DEFAULT_FROM_EMAIL not configured")
-            return False
-        
-        # Use SendGrid SDK if available and API key is set
-        if SENDGRID_AVAILABLE and settings.SENDGRID_API_KEY:
-            try:
-                sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
-                message = Mail(
-                    from_email=Email(from_email, "123Resume"),
-                    to_emails=user_email,
-                    subject=subject,
-                    plain_text_content=plain_message,
-                    html_content=html_message
-                )
-                message.tracking_settings = TrackingSettings(
-                    click_tracking=ClickTracking(enable=False),
-                )
-                message.reply_to = Email('contact@123resume.de')
-                sg.send(message)
-                return True
-            except Exception as sg_error:
-                print(f"SendGrid API error: {sg_error}, falling back to SMTP")
-        
-        # Fallback to SMTP
-        from_email_display = f"123Resume <{from_email}>"
-        email = EmailMultiAlternatives(
-            subject=subject,
-            body=plain_message,
-            from_email=from_email_display,
-            to=[user_email],
-            reply_to=['contact@123resume.de'],
-        )
-        email.attach_alternative(html_message, "text/html")
-        email.extra_headers = {
-            'Message-ID': f'<{uuid.uuid4()}@123resume.de>',
-            'X-Mailer': '123Resume Email System',
-        }
-        email.send(fail_silently=False)
-        return True
-    except Exception as e:
-        print(f"Error sending password reset email: {e}")
-        return False
+    return _send_with_mailgun(
+        subject=subject,
+        plain_message=plain_message,
+        html_message=html_message,
+        to_email=user_email,
+        reply_to="contact@123resume.de",
+    )
 
 
 def send_password_changed_email(user_email, username):
@@ -490,101 +341,64 @@ https://123resume.de
 </html>
 """
     
-    try:
-        from_email = settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER
-        if not from_email:
-            print("Error: EMAIL_HOST_USER or DEFAULT_FROM_EMAIL not configured")
-            return False
-        
-        # Use SendGrid SDK if available and API key is set
-        if SENDGRID_AVAILABLE and settings.SENDGRID_API_KEY:
-            try:
-                sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
-                message = Mail(
-                    from_email=Email(from_email, "123Resume"),
-                    to_emails=user_email,
-                    subject=subject,
-                    plain_text_content=plain_message,
-                    html_content=html_message
-                )
-                message.tracking_settings = TrackingSettings(
-                    click_tracking=ClickTracking(enable=False),
-                )
-                message.reply_to = Email('contact@123resume.de')
-                sg.send(message)
-                return True
-            except Exception as sg_error:
-                print(f"SendGrid API error: {sg_error}, falling back to SMTP")
-        
-        # Fallback to SMTP
-        from_email_display = f"123Resume <{from_email}>"
-        email = EmailMultiAlternatives(
-            subject=subject,
-            body=plain_message,
-            from_email=from_email_display,
-            to=[user_email],
-            reply_to=['contact@123resume.de'],
-        )
-        email.attach_alternative(html_message, "text/html")
-        email.extra_headers = {
-            'Message-ID': f'<{uuid.uuid4()}@123resume.de>',
-            'X-Mailer': '123Resume Email System',
-        }
-        email.send(fail_silently=False)
-        return True
-    except Exception as e:
-        print(f"Error sending password changed email: {e}")
-        return False
+    return _send_with_mailgun(
+        subject=subject,
+        plain_message=plain_message,
+        html_message=html_message,
+        to_email=user_email,
+        reply_to="contact@123resume.de",
+    )
 
 
 def send_feedback_email(support_email, reply_to_email, subject, plain_message):
     """
-    Send a simple feedback/support email to the support inbox.
-
-    Uses the same SendGrid-then-SMTP strategy as other emails, but with:
-    - Plain text only (no HTML)
-    - To: support_email
-    - reply_to: reply_to_email
+    Send a simple feedback/support email to the support inbox (plain text only).
     """
+    return _send_with_mailgun(
+        subject=subject,
+        plain_message=plain_message,
+        html_message=None,
+        to_email=support_email,
+        reply_to=None,  # we include user email in the body, not as reply-to
+    )
+
+
+def _send_with_mailgun(subject, plain_message, html_message, to_email, reply_to=None):
+    """
+    Internal helper to send email via Mailgun HTTP API using configuration from settings.
+    """
+    api_key = getattr(settings, "MAILGUN_API_KEY", "")
+    domain = getattr(settings, "MAILGUN_DOMAIN", "")
+    base_url = getattr(settings, "MAILGUN_BASE_URL", "https://api.mailgun.net")
+
+    if not api_key or not domain:
+        print("Mailgun not configured: missing MAILGUN_API_KEY or MAILGUN_DOMAIN")
+        return False
+
+    url = f"{base_url}/v3/{domain}/messages"
+
+    # Use a consistent from address; must be a verified sender in Mailgun.
+    from_address = getattr(settings, "DEFAULT_FROM_EMAIL", "contact@123resume.de")
+    from_formatted = f"123Resume <{from_address}>"
+
+    data = {
+        "from": from_formatted,
+        "to": [to_email],
+        "subject": subject,
+        "text": plain_message,
+    }
+
+    if html_message:
+        data["html"] = html_message
+
+    if reply_to:
+        data["h:Reply-To"] = reply_to
+
     try:
-        # For feedback, always send FROM the dedicated contact address
-        # (must be a verified sender in SendGrid).
-        from_email = "contact@123resume.de"
-
-        # Prefer SendGrid API when available
-        if SENDGRID_AVAILABLE and settings.SENDGRID_API_KEY:
-            try:
-                sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
-                message = Mail(
-                    from_email=Email(from_email, "123Resume"),
-                    to_emails=support_email,
-                    subject=subject,
-                    plain_text_content=plain_message,
-                )
-                # Disable click tracking (safer / less likely to trigger issues)
-                message.tracking_settings = TrackingSettings(
-                    click_tracking=ClickTracking(enable=False),
-                )
-                sg.send(message)
-                return True
-            except Exception as sg_error:
-                print(f"SendGrid API error (feedback): {sg_error}, falling back to SMTP")
-
-        # Fallback to SMTP using Django's email backend
-        from_email_display = f"123Resume <{from_email}>"
-        email = EmailMultiAlternatives(
-            subject=subject,
-            body=plain_message,
-            from_email=from_email_display,
-            to=[support_email],
-        )
-        email.extra_headers = {
-            "Message-ID": f"<{uuid.uuid4()}@123resume.de>",
-            "X-Mailer": "123Resume Email System",
-        }
-        email.send(fail_silently=False)
+        resp = requests.post(url, auth=("api", api_key), data=data, timeout=10)
+        resp.raise_for_status()
         return True
-    except Exception as e:
-        print(f"Error sending feedback email: {e}")
+    except requests.RequestException as e:
+        print(f"Mailgun send failed: {e}")
         return False
 
