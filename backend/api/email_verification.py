@@ -377,8 +377,8 @@ def _send_with_mailgun(subject, plain_message, html_message, to_email, reply_to=
 
     url = f"{base_url}/v3/{domain}/messages"
 
-    # Use a consistent from address; must be a verified sender in Mailgun.
-    from_address = getattr(settings, "DEFAULT_FROM_EMAIL", "contact@123resume.de")
+    # From must be on the Mailgun sending domain (e.g. mg.123resume.de) to avoid 403.
+    from_address = f"noreply@{domain}"
     from_formatted = f"123Resume <{from_address}>"
 
     data = {
