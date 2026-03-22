@@ -1206,6 +1206,116 @@ export const testProfiles: Record<string, CVFormData> = {
       { skill: "Figma" },
     ],
   },
+
+  // ============================================
+  // Marketing Resume — mirrors repo marketing_resume.json (layout/PDF tests)
+  // Profile image omitted here to avoid huge base64; use a sample headshot locally if needed.
+  // ============================================
+  marketingResume: {
+    template: 'modern',
+    sectionOrder: [
+      'summary',
+      'workExperience',
+      'education',
+      'projects',
+      'certificates',
+      'skills',
+      'languages',
+      'interests',
+    ],
+    personalInfo: {
+      firstName: 'Erfan',
+      lastName: 'Taghvaei',
+      professionalTitle: 'Marketing Expert',
+      profileImage: '',
+      email: 'marketing.test@example.com',
+      phone: '+4915735338285',
+      location: 'Kaiserslautern',
+      linkedin: '',
+      github: '',
+      website: '',
+      summary:
+        "Results-driven Master’s student with hands-on experience in digital marketing, content creation, and brand communication. Experienced in managing social media channels, creating SEO-oriented blog content, and leading marketing activities for large-scale university events. As Marketing Leader of Treffpunkt Kaiserslautern, responsible for social media strategy and website communication for one of the main company contact fairs at TU Kaiserslautern. Creative yet structured, with a strong interest in D2C growth, branding, and performance marketing.",
+      interests: [],
+    },
+    workExperience: [
+      {
+        position: 'Marketing Manager',
+        company: 'Treffpunkt GmbH',
+        location: 'Kaiserslautern, DE',
+        startDate: '2025-09',
+        endDate: '',
+        description: '',
+        responsibilities: [
+          { responsibility: 'Contacting various companies through email and introducing our offers to them' },
+          { responsibility: 'Managing social media posts with the aim to get more followers' },
+          { responsibility: 'Writing Blog posts for the website' },
+        ],
+        technologies: [],
+        competencies: [
+          { competency: 'Marketing' },
+          { competency: 'Teamwork' },
+          { competency: 'Communication' },
+        ],
+      },
+      {
+        position: 'Marketing Leader',
+        company: '123resume',
+        location: 'Kaiserslautern, DE',
+        startDate: '2025-09',
+        endDate: '',
+        description: '',
+        responsibilities: [
+          {
+            responsibility:
+              'Write blog posts with SEO standards such as linking blog pages together',
+          },
+          {
+            responsibility:
+              'Managing the Linkedin page and writing posts on Linkedin and get more followers in short amount of time',
+          },
+        ],
+        technologies: [{ technology: 'Figma' }],
+        competencies: [],
+      },
+    ],
+    education: [
+      {
+        degree: "Master's Degree",
+        institution: 'TU Kaiserslautern',
+        location: 'Kaiserslautern, DE',
+        startDate: '2022-11',
+        endDate: '',
+        field: 'Computer Science',
+        keyCourses: [],
+      },
+    ],
+    projects: [],
+    certificates: [],
+    languages: [
+      { language: 'English', proficiency: 'Fluent' },
+      { language: 'German', proficiency: 'Advanced' },
+    ],
+    skills: [{ skill: 'Marketing' }, { skill: 'Copy Writing' }],
+    styling: {
+      fontFamily: 'Inter',
+      fontSize: 'small',
+      titleColor: '#1f2937',
+      titleBold: true,
+      headingColor: '#2563eb',
+      headingBold: true,
+      textColor: '#1f2937',
+      linkColor: '#2563eb',
+      sectionStyling: {
+        personalInfo: {
+          titleColor: '#2563eb',
+          titleSize: 'medium',
+          bodyColor: '#1f2937',
+          bodySize: 'medium',
+        },
+      },
+    },
+  },
 };
 
 /**

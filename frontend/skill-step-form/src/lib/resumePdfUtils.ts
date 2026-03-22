@@ -614,7 +614,9 @@ async function applyDynamicSpacerForPDF(container: HTMLElement): Promise<() => v
   const noop = () => {};
   ensureOffscreenPrintParityStyles();
   const spacer = container.querySelector('.resume-spacer') as HTMLElement | null;
-  if (!spacer) return noop;
+  if (!spacer) {
+    return noop;
+  }
 
   await waitForFontsAndTwoFrames();
 
@@ -655,11 +657,8 @@ async function applyDynamicSpacerForPDF(container: HTMLElement): Promise<() => v
   if (savedDisplay) spacer.style.display = savedDisplay;
   if (savedMinHeight) spacer.style.minHeight = savedMinHeight;
 
-  spacer.style.setProperty(
-    'max-height',
-    maxSafeSpacerMm > 0 ? `${maxSafeSpacerMm}mm` : '0mm',
-    'important'
-  );
+  const maxHeightApplied = maxSafeSpacerMm > 0 ? `${maxSafeSpacerMm}mm` : '0mm';
+  spacer.style.setProperty('max-height', maxHeightApplied, 'important');
 
   return () => {
     spacer.style.removeProperty('max-height');
@@ -852,17 +851,19 @@ async function downloadPDFFromHTML(
 <body>
   ${options?.isSinglePage ? addSinglePageClassToHTML(resumeHTML) : resumeHTML}
   <style id="pdf-single-page-override">
-    /* Smart min-height: only fill page when content fits on one page */
+    /* Fill one sheet without exceeding the page content box: @page uses 20mm bottom (and 15mm top on
+       continuation pages), so 297mm here overflows and Chromium adds a blank page. Use same usable
+       height as spacer math (A4_USABLE_HEIGHT_MM). */
     @media print {
       .resume-page-container.resume-single-page {
-        min-height: 297mm !important;
+        min-height: ${A4_USABLE_HEIGHT_MM}mm !important;
       }
       .resume-page-container:not(.resume-single-page) {
         min-height: auto !important;
       }
     }
     .resume-page-container.resume-single-page {
-      min-height: 297mm !important;
+      min-height: ${A4_USABLE_HEIGHT_MM}mm !important;
     }
     .resume-page-container:not(.resume-single-page) {
       min-height: auto !important;
@@ -870,7 +871,6 @@ async function downloadPDFFromHTML(
   </style>
 </body>
 </html>`;
-
 
   const pdfBlob = await resumeAPI.generatePDF(resumeId, fullHTML);
   const blob = new Blob([pdfBlob], { type: 'application/pdf' });

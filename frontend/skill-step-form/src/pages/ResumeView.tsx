@@ -88,16 +88,6 @@ export default function ResumeView() {
     setError('');
     try {
       const data = await resumeAPI.getById(resumeId);
-      
-      // LOG: What styling data is received from the API
-      console.log('🟢 [RESUME VIEW] Resume loaded from API - Raw styling data:', {
-        resumeId,
-        rawStyling: (data as any).styling,
-        fontSize: (data as any).styling?.fontSize ?? (data as any).styling?.font_size,
-        sectionStyling: (data as any).styling?.sectionStyling ?? (data as any).styling?.section_styling,
-        personalInfoSectionStyling: (data as any).styling?.sectionStyling?.personalInfo ?? (data as any).styling?.section_styling?.personalInfo,
-      });
-      
       setResume(data);
     } catch (err: any) {
       setError(err.message || 'Failed to load resume');
@@ -164,7 +154,6 @@ export default function ResumeView() {
   // Helper: convert backend styling (snake_case) to frontend CVFormData styling (camelCase)
   const convertStyling = (styling: any | undefined): CVFormData['styling'] => {
     if (!styling) {
-      console.log('🟡 [RESUME VIEW] convertStyling: No styling object provided');
       return {};
     }
 
@@ -196,13 +185,6 @@ export default function ResumeView() {
             titleColor: section.titleColor ?? section.title_color,
             bodyColor: section.bodyColor ?? section.body_color,
           };
-          
-          // LOG: personalInfo section styling conversion
-          console.log('🟡 [RESUME VIEW] convertStyling: personalInfo section - DROPPING font sizes, keeping colors:', {
-            originalSection: section,
-            convertedSection: sectionStyling![key],
-            note: 'titleSize and bodySize removed to allow global fontSize to apply',
-          });
         } else {
           sectionStyling![key] = {
             titleColor: section.titleColor ?? section.title_color,
@@ -225,15 +207,6 @@ export default function ResumeView() {
       linkColor,
       sectionStyling,
     };
-
-    // LOG: Final converted styling
-    console.log('🟢 [RESUME VIEW] convertStyling: Final converted styling:', {
-      globalFontSize: convertedStyling.fontSize,
-      globalFontFamily: convertedStyling.fontFamily,
-      sectionStyling: convertedStyling.sectionStyling,
-      personalInfoSectionStyling: convertedStyling.sectionStyling?.personalInfo,
-      note: 'personalInfo should NOT have titleSize/bodySize - templates will use global fontSize',
-    });
 
     return convertedStyling;
   };
@@ -258,16 +231,6 @@ export default function ResumeView() {
   const renderTemplate = () => {
     const formData = convertResumeToFormData(resume);
     const template = resume.template || 'modern';
-    
-    // LOG: What styling data is passed to the template
-    console.log('🟣 [RESUME VIEW] renderTemplate: Styling data passed to template:', {
-      template,
-      globalFontSize: formData.styling?.fontSize,
-      globalFontFamily: formData.styling?.fontFamily,
-      sectionStyling: formData.styling?.sectionStyling,
-      personalInfoSectionStyling: formData.styling?.sectionStyling?.personalInfo,
-      note: 'Template should use global fontSize if personalInfo.titleSize/bodySize are undefined',
-    });
 
     switch (template) {
       case 'classic':

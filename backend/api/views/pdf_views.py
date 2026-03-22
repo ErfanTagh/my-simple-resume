@@ -38,7 +38,7 @@ def generate_pdf_from_html(html_content: str) -> bytes:
             print_background=True,
             prefer_css_page_size=True,  # Important for @page rules and margin boxes
         )
-        
+
         browser.close()
         return pdf_bytes
 
