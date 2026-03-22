@@ -19,6 +19,8 @@ def generate_pdf_from_html(html_content: str) -> bytes:
     with sync_playwright() as p:
         browser = p.chromium.launch()
         page = browser.new_page()
+        # Match browser PDF output: layout uses print CSS (same as page.pdf default)
+        page.emulate_media(media='print')
         
         # Set content and wait for it to load
         page.set_content(html_content, wait_until='networkidle')

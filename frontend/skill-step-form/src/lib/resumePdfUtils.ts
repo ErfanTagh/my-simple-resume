@@ -527,6 +527,58 @@ const MM_TO_PX = 96 / 25.4;
 const A4_USABLE_HEIGHT_PX = A4_USABLE_HEIGHT_MM * MM_TO_PX;
 const SPACER_SAFETY_MARGIN_MM = 7;
 
+const OFFSCREEN_PRINT_CSS_ID = 'resume-pdf-offscreen-print-parity';
+
+/**
+ * Injects CSS so offscreen / preview DOM uses the same flex column layout as @media print.
+ * Without this, templates only apply display:flex inside print media — measurement used screen
+ * layout while Playwright renders PDF with print layout, so spacer math was wrong.
+ */
+function ensureOffscreenPrintParityStyles(): void {
+  if (document.getElementById(OFFSCREEN_PRINT_CSS_ID)) return;
+  const style = document.createElement('style');
+  style.id = OFFSCREEN_PRINT_CSS_ID;
+  style.textContent = `
+    .resume-pdf-offscreen .photo-placeholder {
+      display: none !important;
+    }
+    .resume-pdf-offscreen .resume-page-container {
+      min-height: 0 !important;
+      width: 210mm !important;
+      max-width: 210mm !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+      display: flex !important;
+      flex-direction: column !important;
+      box-sizing: border-box !important;
+    }
+    .resume-pdf-offscreen .resume-page-container > div:not([aria-hidden="true"]) {
+      flex: 0 0 auto !important;
+    }
+    .resume-pdf-offscreen .resume-page-container > div[aria-hidden="true"],
+    .resume-pdf-offscreen .resume-spacer {
+      flex: 1 1 auto !important;
+      min-height: 0 !important;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+async function waitForFontsAndTwoFrames(): Promise<void> {
+  try {
+    if (document.fonts?.ready) {
+      await document.fonts.ready;
+    }
+  } catch {
+    /* ignore */
+  }
+  await new Promise<void>((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => resolve());
+    });
+  });
+}
+
 /**
  * Measures content height by temporarily removing min-height, then restores.
  * Returns the natural content height in pixels (used to detect single vs multi-page).
@@ -552,62 +604,70 @@ function measureContentHeightForPDF(container: HTMLElement): number {
 /**
  * Dynamically calculates and applies the optimal spacer max-height in the PDF export DOM.
  *
- * Strategy: measure the actual bottom edge of content (excluding spacer) relative to the
- * container top, compute how much space remains on the current A4 page, then cap the
- * spacer to exactly that remaining space minus a safety margin.
+ * Requires an ancestor with class `resume-pdf-offscreen` so layout matches print (flex column).
+ * Uses container scrollHeight with spacer hidden — aligned with measureContentHeightForPDF.
  *
- * This runs inside the same offscreen container that is later serialized to PDF, so the
- * measurement and the exported HTML share the exact same layout context.
+ * @returns Cleanup to restore spacer inline styles (call after serializing HTML when the DOM
+ *          stays on screen, e.g. ResumeView download).
  */
-function applyDynamicSpacerForPDF(container: HTMLElement): void {
+async function applyDynamicSpacerForPDF(container: HTMLElement): Promise<() => void> {
+  const noop = () => {};
+  ensureOffscreenPrintParityStyles();
   const spacer = container.querySelector('.resume-spacer') as HTMLElement | null;
-  if (!spacer) return;
+  if (!spacer) return noop;
 
-  // Temporarily hide spacer so it doesn't influence content measurement
+  await waitForFontsAndTwoFrames();
+
   const savedMaxHeight = spacer.style.maxHeight;
   const savedMinHeight = spacer.style.minHeight;
   const savedDisplay = spacer.style.display;
-  spacer.style.maxHeight = '0px';
-  spacer.style.minHeight = '0px';
-  spacer.style.display = 'none';
 
-  // Force synchronous reflow
+  spacer.style.setProperty('max-height', '0', 'important');
+  spacer.style.setProperty('min-height', '0', 'important');
+  spacer.style.setProperty('display', 'none', 'important');
+
+  const originalContainerMinHeight = container.style.minHeight;
+  container.style.setProperty('min-height', '0', 'important');
   void container.offsetHeight;
 
-  // Find the actual bottom edge of content, relative to container top.
-  // Using bottom-position of the last visible child rather than summing heights
-  // correctly handles collapsed margins between siblings.
-  const containerRect = container.getBoundingClientRect();
-  const children = Array.from(container.children) as HTMLElement[];
+  const totalContentHeight = container.scrollHeight;
 
-  let maxBottom = 0;
-  children.forEach((child) => {
-    if (child === spacer) return;
-    if (child.hasAttribute('aria-hidden')) return;
-    if (child.classList.contains('page-number-footer')) return;
+  container.style.minHeight = originalContainerMinHeight;
+  if (!originalContainerMinHeight) {
+    container.style.removeProperty('min-height');
+  }
 
-    const rect = child.getBoundingClientRect();
-    const bottomRelativeToContainer = rect.bottom - containerRect.top;
-    if (bottomRelativeToContainer > maxBottom) {
-      maxBottom = bottomRelativeToContainer;
-    }
-  });
-
-  const totalContentHeight = maxBottom;
-
-  // Determine remaining space on the current (last) A4 page
+  const EPS = 2;
   const heightOnCurrentPage = totalContentHeight % A4_USABLE_HEIGHT_PX;
-  const remainingOnCurrentPage = A4_USABLE_HEIGHT_PX - heightOnCurrentPage;
+  const nearFullPage = heightOnCurrentPage > A4_USABLE_HEIGHT_PX - EPS;
+  const nearZero = heightOnCurrentPage < EPS;
+  // If content ends exactly on a page break, do not add a full-page spacer (would force page 2).
+  const remainingOnCurrentPage =
+    nearZero || nearFullPage ? 0 : A4_USABLE_HEIGHT_PX - heightOnCurrentPage;
 
-  // Safe spacer = remaining space minus safety margin
   const safetyMarginPx = SPACER_SAFETY_MARGIN_MM * MM_TO_PX;
   const maxSafeSpacerPx = Math.max(0, remainingOnCurrentPage - safetyMarginPx);
   const maxSafeSpacerMm = Math.min(maxSafeSpacerPx / MM_TO_PX, 270);
 
-  // Restore spacer and apply the calculated cap
-  spacer.style.display = savedDisplay;
-  spacer.style.minHeight = savedMinHeight;
-  spacer.style.maxHeight = maxSafeSpacerMm > 0 ? `${maxSafeSpacerMm}mm` : '0mm';
+  spacer.style.removeProperty('display');
+  spacer.style.removeProperty('max-height');
+  spacer.style.removeProperty('min-height');
+  if (savedDisplay) spacer.style.display = savedDisplay;
+  if (savedMinHeight) spacer.style.minHeight = savedMinHeight;
+
+  spacer.style.setProperty(
+    'max-height',
+    maxSafeSpacerMm > 0 ? `${maxSafeSpacerMm}mm` : '0mm',
+    'important'
+  );
+
+  return () => {
+    spacer.style.removeProperty('max-height');
+    if (savedMaxHeight) spacer.style.maxHeight = savedMaxHeight;
+    if (!savedMaxHeight) spacer.style.removeProperty('max-height');
+    if (savedMinHeight) spacer.style.minHeight = savedMinHeight;
+    if (savedDisplay) spacer.style.display = savedDisplay;
+  };
 }
 
 /**
@@ -1050,6 +1110,7 @@ export async function downloadResumePDF(
   outerContainer.style.visibility = 'hidden';
   outerContainer.style.opacity = '0';
   outerContainer.style.zIndex = '-9999';
+  outerContainer.classList.add('resume-pdf-offscreen');
   document.body.appendChild(outerContainer);
 
   // Create inner wrapper div where template will render (matches ResumeView structure)
@@ -1146,7 +1207,7 @@ export async function downloadResumePDF(
     // and export share the exact same layout context.
     const resumeContainer = innerWrapper.querySelector('.resume-page-container') as HTMLElement | null;
     if (resumeContainer) {
-      applyDynamicSpacerForPDF(resumeContainer);
+      await applyDynamicSpacerForPDF(resumeContainer);
     }
 
     // Get the innerHTML exactly like downloadResumePDFFromElement does
@@ -1209,62 +1270,55 @@ export async function downloadResumePDFFromElement(
   resumeOrFilename?: Resume | string,
   filename?: string
 ): Promise<void> {
-  // Dynamically calculate and apply spacer height before serializing HTML
   const resumeContainer = htmlElement.querySelector('.resume-page-container') as HTMLElement | null;
-  if (resumeContainer) {
-    applyDynamicSpacerForPDF(resumeContainer);
-  }
+  let restoreSpacerStyles: (() => void) | undefined;
 
-  // Measure content height to determine if single-page (for smart min-height)
-  let isSinglePage = false;
-  if (resumeContainer) {
-    isSinglePage = isContentSinglePage(resumeContainer);
-  }
-
-  // Get the innerHTML (template content)
-  // The templates already have their own padding built in (p-8, p-12, etc.)
-  // We use the template HTML as-is without adding container padding
-  // This gives clean PDFs without extra padding on the sides
-  // Extract innerHTML to get just the template content, excluding the container's padding
-  let resumeHTML = htmlElement.innerHTML;
-
-  // Strip any margin classes that could create side margins (mx-auto, max-w-*, etc.)
-  // This ensures the PDF doesn't have unwanted margins like the container padding
-  resumeHTML = resumeHTML.replace(/\s*mx-auto\s*/g, ' ');
-  resumeHTML = resumeHTML.replace(/\s*max-w-[^\s"]+\s*/g, ' ');
-  resumeHTML = resumeHTML.replace(/\s*mx-\d+\s*/g, ' ');
-  resumeHTML = resumeHTML.replace(/\s*ml-auto\s*/g, ' ');
-  resumeHTML = resumeHTML.replace(/\s*mr-auto\s*/g, ' ');
-
-  // Determine if third param is Resume or filename
-  let finalFilename = filename;
-  let resume: Resume | undefined;
-
-  if (resumeOrFilename) {
-    if (typeof resumeOrFilename === 'string') {
-      // It's a filename string (backward compatibility)
-      finalFilename = resumeOrFilename;
-    } else {
-      // It's a Resume object
-      resume = resumeOrFilename;
+  htmlElement.classList.add('resume-pdf-offscreen');
+  try {
+    if (resumeContainer) {
+      restoreSpacerStyles = await applyDynamicSpacerForPDF(resumeContainer);
     }
-  }
 
-  // Generate filename from resume if provided, otherwise use provided filename or default
-  if (!finalFilename && resume) {
-    if (resume.name && resume.name.trim()) {
-      // Use resume name, sanitize it, and add .pdf extension
-      finalFilename = `${sanitizeFilename(resume.name)}.pdf`;
-    } else {
-      // Fallback to FirstName-LastName-ProfessionalTitle format
-      const defaultName = generateDefaultResumeName(resume);
-      finalFilename = `${sanitizeFilename(defaultName)}.pdf`;
+    let isSinglePage = false;
+    if (resumeContainer) {
+      isSinglePage = isContentSinglePage(resumeContainer);
     }
-  }
-  if (!finalFilename) {
-    finalFilename = `resume_${resumeId}.pdf`;
-  }
 
-  await downloadPDFFromHTML(resumeId, resumeHTML, finalFilename, { isSinglePage });
+    let resumeHTML = htmlElement.innerHTML;
+
+    resumeHTML = resumeHTML.replace(/\s*mx-auto\s*/g, ' ');
+    resumeHTML = resumeHTML.replace(/\s*max-w-[^\s"]+\s*/g, ' ');
+    resumeHTML = resumeHTML.replace(/\s*mx-\d+\s*/g, ' ');
+    resumeHTML = resumeHTML.replace(/\s*ml-auto\s*/g, ' ');
+    resumeHTML = resumeHTML.replace(/\s*mr-auto\s*/g, ' ');
+
+    let finalFilename = filename;
+    let resume: Resume | undefined;
+
+    if (resumeOrFilename) {
+      if (typeof resumeOrFilename === 'string') {
+        finalFilename = resumeOrFilename;
+      } else {
+        resume = resumeOrFilename;
+      }
+    }
+
+    if (!finalFilename && resume) {
+      if (resume.name && resume.name.trim()) {
+        finalFilename = `${sanitizeFilename(resume.name)}.pdf`;
+      } else {
+        const defaultName = generateDefaultResumeName(resume);
+        finalFilename = `${sanitizeFilename(defaultName)}.pdf`;
+      }
+    }
+    if (!finalFilename) {
+      finalFilename = `resume_${resumeId}.pdf`;
+    }
+
+    await downloadPDFFromHTML(resumeId, resumeHTML, finalFilename, { isSinglePage });
+  } finally {
+    htmlElement.classList.remove('resume-pdf-offscreen');
+    restoreSpacerStyles?.();
+  }
 }
 
