@@ -386,12 +386,11 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
           display: flex;
           flex-direction: column;
         }
-        /* Constrain spacer in preview mode */
+        /* Spacer fills remaining space in preview; max-height set dynamically by JS for PDF */
         .resume-page-container > div[aria-hidden="true"],
         .resume-spacer {
           flex: 1 1 0;
           min-height: 0;
-          max-height: 200mm;
           overflow: hidden;
         }
         @media print {
@@ -422,12 +421,11 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
           .resume-page-container > div:not([aria-hidden="true"]) {
             flex: 0 0 auto;
           }
-          /* Cap spacer to prevent creating extra pages; fills partial pages up to 200mm */
+          /* Spacer fills remaining page space; max-height set dynamically by JS */
           .resume-page-container > div[aria-hidden="true"],
           .resume-spacer {
             flex: 1 1 auto !important;
             min-height: 0 !important;
-            max-height: 200mm !important;
             background: var(--pdf-background, hsl(var(--background))) !important;
           }
           div[class*="mb-"] {

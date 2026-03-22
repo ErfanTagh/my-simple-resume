@@ -519,6 +519,14 @@ function getComputedBackgroundColor(): string {
 /** A4 height at 96dpi minus margins/padding (~1050px). Content under this fits on one page. */
 const ONE_PAGE_HEIGHT_PX = 1050;
 
+/** A4 page constants */
+const A4_TOTAL_HEIGHT_MM = 297;
+const A4_PAGE_BOTTOM_MARGIN_MM = 20; // matches @page margin-bottom in templates
+const A4_USABLE_HEIGHT_MM = A4_TOTAL_HEIGHT_MM - A4_PAGE_BOTTOM_MARGIN_MM;
+const MM_TO_PX = 96 / 25.4;
+const A4_USABLE_HEIGHT_PX = A4_USABLE_HEIGHT_MM * MM_TO_PX;
+const SPACER_SAFETY_MARGIN_MM = 7;
+
 /**
  * Measures content height by temporarily removing min-height, then restores.
  * Returns the natural content height in pixels (used to detect single vs multi-page).
@@ -539,6 +547,67 @@ function measureContentHeightForPDF(container: HTMLElement): number {
     if (originalSpacerDisplay) spacer.style.display = originalSpacerDisplay;
   }
   return height;
+}
+
+/**
+ * Dynamically calculates and applies the optimal spacer max-height in the PDF export DOM.
+ *
+ * Strategy: measure the actual bottom edge of content (excluding spacer) relative to the
+ * container top, compute how much space remains on the current A4 page, then cap the
+ * spacer to exactly that remaining space minus a safety margin.
+ *
+ * This runs inside the same offscreen container that is later serialized to PDF, so the
+ * measurement and the exported HTML share the exact same layout context.
+ */
+function applyDynamicSpacerForPDF(container: HTMLElement): void {
+  const spacer = container.querySelector('.resume-spacer') as HTMLElement | null;
+  if (!spacer) return;
+
+  // Temporarily hide spacer so it doesn't influence content measurement
+  const savedMaxHeight = spacer.style.maxHeight;
+  const savedMinHeight = spacer.style.minHeight;
+  const savedDisplay = spacer.style.display;
+  spacer.style.maxHeight = '0px';
+  spacer.style.minHeight = '0px';
+  spacer.style.display = 'none';
+
+  // Force synchronous reflow
+  void container.offsetHeight;
+
+  // Find the actual bottom edge of content, relative to container top.
+  // Using bottom-position of the last visible child rather than summing heights
+  // correctly handles collapsed margins between siblings.
+  const containerRect = container.getBoundingClientRect();
+  const children = Array.from(container.children) as HTMLElement[];
+
+  let maxBottom = 0;
+  children.forEach((child) => {
+    if (child === spacer) return;
+    if (child.hasAttribute('aria-hidden')) return;
+    if (child.classList.contains('page-number-footer')) return;
+
+    const rect = child.getBoundingClientRect();
+    const bottomRelativeToContainer = rect.bottom - containerRect.top;
+    if (bottomRelativeToContainer > maxBottom) {
+      maxBottom = bottomRelativeToContainer;
+    }
+  });
+
+  const totalContentHeight = maxBottom;
+
+  // Determine remaining space on the current (last) A4 page
+  const heightOnCurrentPage = totalContentHeight % A4_USABLE_HEIGHT_PX;
+  const remainingOnCurrentPage = A4_USABLE_HEIGHT_PX - heightOnCurrentPage;
+
+  // Safe spacer = remaining space minus safety margin
+  const safetyMarginPx = SPACER_SAFETY_MARGIN_MM * MM_TO_PX;
+  const maxSafeSpacerPx = Math.max(0, remainingOnCurrentPage - safetyMarginPx);
+  const maxSafeSpacerMm = Math.min(maxSafeSpacerPx / MM_TO_PX, 270);
+
+  // Restore spacer and apply the calculated cap
+  spacer.style.display = savedDisplay;
+  spacer.style.minHeight = savedMinHeight;
+  spacer.style.maxHeight = maxSafeSpacerMm > 0 ? `${maxSafeSpacerMm}mm` : '0mm';
 }
 
 /**
@@ -686,12 +755,11 @@ async function downloadPDFFromHTML(
       .resume-page-container > div:not([aria-hidden="true"]) {
         flex: 0 0 auto !important;
       }
-      /* Cap spacer to prevent extra pages; fills partial pages up to 200mm */
+      /* Spacer fills remaining page space; max-height set dynamically by JS */
       .resume-page-container > div[aria-hidden="true"],
       .resume-spacer {
         flex: 1 1 auto !important;
         min-height: 0 !important;
-        max-height: 200mm !important;
         background: var(--pdf-background) !important;
       }
       /* Ensure gradient containers still have background */
@@ -1073,14 +1141,20 @@ export async function downloadResumePDF(
       }, 50);
     });
 
+    // Dynamically calculate and apply spacer height before serializing HTML.
+    // This runs in the same offscreen DOM that becomes the PDF, so measurement
+    // and export share the exact same layout context.
+    const resumeContainer = innerWrapper.querySelector('.resume-page-container') as HTMLElement | null;
+    if (resumeContainer) {
+      applyDynamicSpacerForPDF(resumeContainer);
+    }
+
     // Get the innerHTML exactly like downloadResumePDFFromElement does
-    // This is the working method - just get innerHTML and pass to downloadPDFFromHTML
     // Check if innerWrapper still exists before getting innerHTML
     let resumeHTML = innerWrapper.parentNode ? innerWrapper.innerHTML : '';
 
     // Measure content height to determine if single-page (for smart min-height)
     let isSinglePage = false;
-    const resumeContainer = innerWrapper.querySelector('.resume-page-container') as HTMLElement | null;
     if (resumeContainer) {
       isSinglePage = isContentSinglePage(resumeContainer);
     }
@@ -1135,9 +1209,14 @@ export async function downloadResumePDFFromElement(
   resumeOrFilename?: Resume | string,
   filename?: string
 ): Promise<void> {
+  // Dynamically calculate and apply spacer height before serializing HTML
+  const resumeContainer = htmlElement.querySelector('.resume-page-container') as HTMLElement | null;
+  if (resumeContainer) {
+    applyDynamicSpacerForPDF(resumeContainer);
+  }
+
   // Measure content height to determine if single-page (for smart min-height)
   let isSinglePage = false;
-  const resumeContainer = htmlElement.querySelector('.resume-page-container') as HTMLElement | null;
   if (resumeContainer) {
     isSinglePage = isContentSinglePage(resumeContainer);
   }
