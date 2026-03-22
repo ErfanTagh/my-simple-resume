@@ -490,24 +490,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
             background: var(--pdf-background, hsl(var(--background))) !important;
             width: 210mm;
             margin: 0 auto;
-            /* Use flexbox to ensure last page fills */
-            display: flex;
-            flex-direction: column;
-          }
-          /* Content wrapper should not grow */
-          .resume-page-container > div:not([aria-hidden="true"]) {
-            flex: 0 0 auto;
-          }
-          /* Spacer div at end will fill remaining space */
-          .resume-page-container > div[aria-hidden="true"] {
-            flex: 1 1 auto !important;
-            min-height: 0;
-            background: var(--pdf-background, hsl(var(--background))) !important;
-          }
-          /* Prevent sections from breaking awkwardly */
-          div[class*="mb-"] {
-            page-break-inside: avoid;
-            break-inside: avoid;
+
           }
         }
       `}</style>
@@ -619,9 +602,6 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
             .filter(section => section !== 'summary' && section !== 'skills')
             .map(section => renderSection(section))}
         </div>
-
-        {/* Spacer to ensure last page fills full height */}
-        <div aria-hidden="true" style={{ flex: '1 1 auto', minHeight: 0 }}></div>
 
         {/* Page Number Footer */}
         <style>{`

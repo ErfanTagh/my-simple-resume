@@ -63,7 +63,6 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   const categories: ScoreCategory[] = [];
   const suggestions: string[] = [];
   let totalScore = 0;
-  let deductions = 0;
   let bonuses = 0;
 
   // Extract data sections early for use throughout
@@ -140,19 +139,6 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   if (impactFocusedCount >= Math.min(workExp.length, 2)) contentScore += 1;
   // Removed duplicate suggestion - similar message is in Experience Section
   
-  // Apply penalty to Content Quality if there's excessive text
-  // This ensures completeness score (Content Quality + Education + Skills) is capped at 7.2 when normalized
-  const hasLongWorkDesc = workDescriptions.some(d => d.length > 400) || avgLength > 350;
-  const hasLongSummary = summaryLength > 250;
-  const hasLongProjects = projectDescriptions.some(len => len > 400) || avgProjectLength > 350;
-  const hasExcessiveText = hasLongWorkDesc || hasLongSummary || hasLongProjects;
-  
-  if (hasExcessiveText) {
-    // Reduced penalty - only apply small reduction instead of large cap
-    // Being more lenient with longer descriptions
-    contentScore = Math.max(0, contentScore - 0.5);
-  }
-  
   categories.push({
     name: "Content Quality",
     score: Math.round(contentScore * 10) / 10,
@@ -163,104 +149,11 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   });
   totalScore += contentScore;
 
-  // ============================================
-  // 2. STRUCTURE & FORMAT (2 points)
-  // ============================================
-  let structureScore = 0;
-  
-  // Clear hierarchy (0.5 pts) - template selected and sections organized
-  // Only give points if there's substantial content, not just name/email
-  const hasSubstantialContent = (workExp.length > 0 && workExp.some(exp => exp.position || exp.company)) ||
-                                (education.length > 0 && education.some(edu => edu.degree || edu.institution)) ||
-                                (summary && summary.trim().length >= 50) ||
-                                validSkills >= 3;
-  if (data.template && data.sectionOrder && data.sectionOrder.length >= 4 && hasSubstantialContent) {
-    structureScore += 0.5;
-  } else if (data.template || data.sectionOrder) {
-    suggestions.push("Organize your resume sections in a clear, logical order");
-  }
-  
-  // Concise (0.5 pts) - check if descriptions are reasonable length
-  // workDescriptions and avgLength are already calculated above
-  const maxLength = workDescriptions.length > 0
-    ? Math.max(...workDescriptions.map(d => d.length))
-    : 0;
-  const isConcise = avgLength > 0 && avgLength < 800 && maxLength < 1200; // Average less than 800 chars, max less than 1200 chars per description
-  // Only give credit if there are actual descriptions that are concise - empty should not get bonus
-  if (isConcise) structureScore += 0.5;
-  else if (workDescriptions.length > 0) suggestions.push("Keep bullet points concise - aim for 1-2 lines maximum");
-  
-  // Appropriate length (0.5 pts) - estimate pages based on content
+  // Estimate length once for global red-flag checks (not tied to formatting criteria)
   const estimatedLength = estimateResumeLength(data);
-  const yearsOfExperience = calculateYearsOfExperience(data);
-  const isAppropriateLength = (yearsOfExperience < 5 && estimatedLength <= 1.2) || 
-                              (yearsOfExperience >= 5 && estimatedLength <= 2.5);
-  if (isAppropriateLength) structureScore += 0.5;
-  else if (estimatedLength > 2.5) suggestions.push("Resume may be too long - aim for 1 page (under 5 years experience) or 2 pages (senior roles)");
-  
-  // Penalize excessive text - recruiters spend 6-7 seconds scanning resumes
-  // Brevity is power: keep descriptions concise for optimal readability
-  let lengthDeductions = 0;
-  
-  // Work experience descriptions - reduced penalties (being more lenient)
-  if (avgLength > 1200) {
-    lengthDeductions += 0.8; // Reduced penalty for very long (avg > 1200 chars)
-    suggestions.push("Consider making your descriptions more concise (1-2 lines maximum) for better readability");
-  } else if (avgLength > 900) {
-    lengthDeductions += 0.5; // Reduced penalty for long (avg > 900 chars)
-    suggestions.push("Consider keeping descriptions concise (1-2 lines maximum) for better readability");
-  } else if (avgLength > 700) {
-    lengthDeductions += 0.2; // Small penalty (avg > 700 chars)
-    // No suggestion for this level - it's acceptable
-  }
-  
-  // Check for individual extremely long descriptions (> 1000 chars each) - higher threshold
-  const extremelyLongDescriptions = workDescriptions.filter(d => d.length > 1000).length;
-  if (extremelyLongDescriptions > 2) {
-    lengthDeductions += extremelyLongDescriptions * 0.15; // Reduced penalty
-  }
-  
-  // Summary should be brief (elevator pitch) - more lenient
-  // summaryLength is already calculated above
-  if (summaryLength > 500) {
-    lengthDeductions += 0.3; // Reduced penalty for verbose summary
-    suggestions.push("Consider keeping your summary brief (2-3 sentences) for better impact");
-  } else if (summaryLength > 400) {
-    lengthDeductions += 0.1; // Very small penalty
-    // No suggestion for this level
-  }
-  
-  // Project descriptions should be punchy - more lenient
-  // projects, projectDescriptions, and avgProjectLength are already calculated above
-  if (avgProjectLength > 700) {
-    lengthDeductions += 0.2; // Reduced penalty
-    suggestions.push("Consider keeping project descriptions concise for better readability");
-  }
-  
-  // Don't penalize education field length - it's usually short
-  
-  // Deduct from structure score (can't go below 0)
-  structureScore = Math.max(0, structureScore - lengthDeductions);
-  
-  // Easy to scan (0.5 pts) - good use of bullet points and structure
-  const hasBulletPoints = workDescriptions.some(desc => desc.includes('\n') || desc.includes('•'));
-  const hasStructure = workExp.every(exp => exp.position && exp.company);
-  // Only give credit if there are actual descriptions with good structure - empty should not get bonus
-  if (hasBulletPoints && hasStructure && workDescriptions.length > 0) structureScore += 0.5;
-  else if (workExp.length > 0) suggestions.push("Use bullet points and clear structure to make your resume easy to scan");
-  
-  categories.push({
-    name: "Structure & Format",
-    score: Math.round(structureScore * 10) / 10,
-    maxScore: 2,
-    feedback: structureScore >= 1.8 ? "Well-structured and easy to scan" :
-              structureScore >= 1.5 ? "Good structure, could improve formatting" :
-              "Needs better organization and formatting"
-  });
-  totalScore += structureScore;
 
   // ============================================
-  // 3. PROFESSIONAL SUMMARY (1 point)
+  // 2. PROFESSIONAL SUMMARY (1 point)
   // ============================================
   let summaryScore = 0;
   
@@ -294,7 +187,7 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   totalScore += summaryScore;
 
   // ============================================
-  // 4. EXPERIENCE SECTION (2 points)
+  // 3. EXPERIENCE SECTION (2 points)
   // ============================================
   let experienceScore = 0;
   
@@ -368,7 +261,7 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   totalScore += experienceScore;
 
   // ============================================
-  // 5. SKILLS & TECHNICAL PROFICIENCY (1 point)
+  // 4. SKILLS & TECHNICAL PROFICIENCY (1 point)
   // ============================================
   let skillsScore = 0;
   
@@ -427,7 +320,7 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   totalScore += skillsScore;
 
   // ============================================
-  // 6. EDUCATION & CERTIFICATIONS (0.5 points)
+  // 5. EDUCATION & CERTIFICATIONS (0.5 points)
   // ============================================
   let educationScore = 0;
   
@@ -463,7 +356,7 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   totalScore += educationScore;
 
   // ============================================
-  // 7. ATS OPTIMIZATION (0.5 points)
+  // 6. ATS OPTIMIZATION (0.5 points)
   // ============================================
   let atsScore = 0;
   
@@ -489,77 +382,9 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
     score: Math.round(atsScore * 10) / 10,
     maxScore: 0.5,
     feedback: atsScore >= 0.45 ? "Well-optimized for ATS systems" :
-              "Add more keywords and ensure standard formatting"
+              "Add more keywords and ensure ATS-friendly section content"
   });
   totalScore += atsScore;
-
-  // ============================================
-  // RED FLAGS (Deductions)
-  // ============================================
-  
-  // Typos or grammar errors - basic check for common issues
-  const hasTypoIndicators = checkForCommonTypos(allText);
-  if (hasTypoIndicators > 0) {
-    deductions += Math.min(hasTypoIndicators * 0.5, 1.5);
-    suggestions.push("Review your resume for typos and grammar errors - consider using a spell checker");
-  }
-  
-  // Unprofessional email
-  const email = data.personalInfo.email || '';
-  const isUnprofessionalEmail = UNPROFESSIONAL_EMAIL_PATTERNS.some(pattern => pattern.test(email));
-  if (isUnprofessionalEmail) {
-    deductions += 0.3;
-    suggestions.push("Use a professional email address (e.g., firstname.lastname@email.com)");
-  }
-  
-  // Vague or generic descriptions - only penalize if descriptions are actually generic, not just short
-  // Short descriptions are okay - they're better than no descriptions at all
-  const vagueDescriptions = workDescriptions.filter(desc => {
-    // Don't penalize short descriptions - that's fine
-    const hasGeneric = genericPhrases.some(phrase => desc.toLowerCase().includes(phrase));
-    // Only penalize if it's generic AND has enough length to be meaningful
-    return hasGeneric && desc.length >= 30;
-  }).length;
-  
-  if (vagueDescriptions > 0 && workDescriptions.length > 0) {
-    deductions += Math.min(vagueDescriptions * 0.15, 0.3); // Reduced penalty - having generic is better than nothing
-    if (vagueDescriptions > 0) suggestions.push("Replace vague or generic descriptions with specific, achievement-focused statements");
-  }
-  
-  // Excessive length - reduced penalties (only penalize truly excessive length)
-  if (estimatedLength > 4.0) {
-    deductions += 1.5; // Penalty for extremely long resume (> 4 pages)
-    suggestions.push("Your resume is far too long - focus on quality over quantity, aim for 1-2 pages");
-  } else if (estimatedLength > 3.5) {
-    deductions += 1.0; // Penalty for very long resume (> 3.5 pages)
-    suggestions.push("Your resume is too long - focus on quality over quantity, aim for 1-2 pages");
-  } else if (estimatedLength > 3.0) {
-    deductions += 0.5; // Small penalty for long resume (> 3 pages)
-    suggestions.push("Your resume is long but lacks substance - focus on quality over quantity");
-  }
-  // Don't penalize resumes between 2-3 pages - that's acceptable
-  
-  // Missing contact information - only penalize if email is missing (required field)
-  // Phone and LinkedIn are optional, so missing them shouldn't be penalized
-  const hasEmail = data.personalInfo.email && data.personalInfo.email.length > 0;
-  if (!hasEmail) {
-    deductions += 0.5;
-    suggestions.push("Ensure you have complete contact information (email is required)");
-  }
-  
-  // Unexplained gaps (check for large gaps in employment)
-  const hasGaps = checkForEmploymentGaps(workExp);
-  if (hasGaps) {
-    deductions += 0.3;
-    suggestions.push("Consider addressing employment gaps or ensure dates are accurate");
-  }
-  
-  // Irrelevant information - excessive interests or personal info
-  const interests = data.personalInfo.interests || [];
-  if (interests.length > 5) {
-    deductions += 0.3;
-    suggestions.push("Limit interests to 3-5 most relevant ones");
-  }
 
   // ============================================
   // BONUS POINTS (Max +1)
@@ -618,8 +443,10 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   if (!hasActualResumeContent) {
     totalScore = 0;
   } else {
-    // Apply deductions and bonuses
-    totalScore = Math.max(0, Math.min(10, totalScore - deductions + bonuses));
+    // Structure/format criterion was removed. Normalize remaining base score (8 max) to 10.
+    // Scoring is additive-only: no deductions are applied.
+    const normalizedBaseScore = (totalScore / 8) * 10;
+    totalScore = Math.max(0, Math.min(10, normalizedBaseScore + bonuses));
   }
   
   // Round to 1 decimal place for 0-10 scale

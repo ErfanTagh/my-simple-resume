@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { CVFormData } from "../types";
 import { Mail, Phone, MapPin, Linkedin, Github, Globe } from "lucide-react";
 import { formatDateRange } from "@/lib/dateFormatter";
@@ -10,76 +10,8 @@ interface CreativeTemplateProps {
 }
 
 export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { personalInfo, workExperience, education, projects, certificates, languages, skills, sectionOrder, styling } = data;
-  const spacerRef = useRef<HTMLDivElement>(null);
-
-  // Debug logging for page issues
-  useEffect(() => {
-    const container = document.querySelector('.resume-page-container');
-    if (container) {
-      const containerHeight = container.getBoundingClientRect().height;
-      const computedStyle = window.getComputedStyle(container);
-      const minHeight = computedStyle.minHeight;
-
-      // Calculate content height (excluding spacer)
-      const contentDivs = container.querySelectorAll(':scope > div:not([aria-hidden="true"])');
-      let contentHeight = 0;
-      contentDivs.forEach(div => {
-        contentHeight += div.getBoundingClientRect().height;
-      });
-
-      // Convert px to mm (1mm ≈ 3.779527559px at 96dpi)
-      const pxToMm = (px: number) => px / 3.779527559;
-
-      console.log('[CreativeTemplate Debug] ===== PAGE DEBUG INFO =====');
-      console.log('[CreativeTemplate Debug] Container height:', containerHeight.toFixed(2), 'px (', pxToMm(containerHeight).toFixed(2), 'mm)');
-      console.log('[CreativeTemplate Debug] Container min-height:', minHeight);
-      console.log('[CreativeTemplate Debug] Content height (without spacer):', contentHeight.toFixed(2), 'px (', pxToMm(contentHeight).toFixed(2), 'mm)');
-      console.log('[CreativeTemplate Debug] Estimated pages from content:', Math.ceil(pxToMm(contentHeight) / 297));
-      console.log('[CreativeTemplate Debug] Remaining space for spacer:', (containerHeight - contentHeight).toFixed(2), 'px (', pxToMm(containerHeight - contentHeight).toFixed(2), 'mm)');
-
-      if (spacerRef.current) {
-        const spacerHeight = spacerRef.current.getBoundingClientRect().height;
-        const spacerStyle = window.getComputedStyle(spacerRef.current);
-        console.log('[CreativeTemplate Debug] Spacer actual height:', spacerHeight.toFixed(2), 'px (', pxToMm(spacerHeight).toFixed(2), 'mm)');
-        console.log('[CreativeTemplate Debug] Spacer max-height:', spacerStyle.maxHeight);
-        console.log('[CreativeTemplate Debug] Spacer flex:', spacerStyle.flex);
-        console.log('[CreativeTemplate Debug] Spacer computed height:', spacerStyle.height);
-
-        // Check if spacer might cause page break
-        const estimatedTotalHeight = contentHeight + spacerHeight;
-        const contentPages = Math.ceil(pxToMm(contentHeight) / 297);
-        const estimatedPages = Math.ceil(pxToMm(estimatedTotalHeight) / 297);
-        const remainingOnLastPage = (contentPages * 297) - pxToMm(contentHeight);
-
-        console.log('[CreativeTemplate Debug] Content pages:', contentPages);
-        console.log('[CreativeTemplate Debug] Remaining space on last page:', remainingOnLastPage.toFixed(2), 'mm');
-        console.log('[CreativeTemplate Debug] Estimated total height:', estimatedTotalHeight.toFixed(2), 'px (', pxToMm(estimatedTotalHeight).toFixed(2), 'mm)');
-        console.log('[CreativeTemplate Debug] Estimated total pages:', estimatedPages);
-
-        if (estimatedPages > contentPages) {
-          console.warn('[CreativeTemplate Debug] ⚠️ WARNING: Spacer is creating extra page!');
-          console.warn('[CreativeTemplate Debug] Content pages:', contentPages, ', Total pages:', estimatedPages);
-          console.warn('[CreativeTemplate Debug] Spacer height:', pxToMm(spacerHeight).toFixed(2), 'mm, Remaining on last page:', remainingOnLastPage.toFixed(2), 'mm');
-
-          // Dynamically adjust spacer if it would create new page
-          if (spacerRef.current && pxToMm(spacerHeight) > remainingOnLastPage) {
-            const safeSpacerHeight = Math.max(0, remainingOnLastPage - 10); // Leave 10mm buffer
-            spacerRef.current.style.maxHeight = `${safeSpacerHeight}mm`;
-            console.log('[CreativeTemplate Debug] ✅ Adjusted spacer max-height to:', safeSpacerHeight.toFixed(2), 'mm to prevent extra page');
-          }
-        } else {
-          console.log('[CreativeTemplate Debug] ✅ Spacer is within safe limits');
-        }
-      }
-
-      // Check for page breaks in print preview
-      const printMedia = window.matchMedia('print');
-      console.log('[CreativeTemplate Debug] Print media active:', printMedia.matches);
-      console.log('[CreativeTemplate Debug] ============================');
-    }
-  }, [data]);
 
   const defaultOrder = ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"];
   const orderedSections = sectionOrder || defaultOrder;
@@ -207,7 +139,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                         </p>
                         {(exp.startDate || exp.endDate) && (
                           <span className="whitespace-nowrap" style={{ fontSize: workExperienceBodySizes.xs, color: workExperienceStyling.bodyColor }}>
-                            {formatDateRange(exp.startDate, exp.endDate, t('resume.fields.present'))}
+                            {formatDateRange(exp.startDate, exp.endDate, t('resume.fields.present'), language)}
                           </span>
                         )}
                       </div>
@@ -274,7 +206,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                         </p>
                         {(edu.startDate || edu.endDate) && (
                           <span className="whitespace-nowrap" style={{ fontSize: educationBodySizes.xs, color: educationStyling.bodyColor }}>
-                            {formatDateRange(edu.startDate, edu.endDate, t('resume.fields.present'))}
+                            {formatDateRange(edu.startDate, edu.endDate, t('resume.fields.present'), language)}
                           </span>
                         )}
                       </div>
@@ -307,7 +239,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                         <h3 className="font-bold flex-1" style={{ fontSize: projectsBodySizes.baseText, color: projectsStyling.bodyColor }}>{proj.name}</h3>
                         {(proj.startDate || proj.endDate) && (
                           <span className="whitespace-nowrap" style={{ fontSize: projectsBodySizes.xs, color: projectsStyling.bodyColor }}>
-                            {formatDateRange(proj.startDate, proj.endDate, t('resume.fields.present'))}
+                            {formatDateRange(proj.startDate, proj.endDate, t('resume.fields.present'), language)}
                           </span>
                         )}
                       </div>
@@ -450,17 +382,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
         .resume-page-container {
           padding-top: 20px !important;
           padding-bottom: 20px !important;
-          /* Ensure pages fill to A4 height in preview too */
           min-height: 297mm;
-          display: flex;
-          flex-direction: column;
-        }
-        /* Constrain spacer in preview mode too */
-        .resume-page-container > div[aria-hidden="true"] {
-          flex: 1 1 0;
-          min-height: 0;
-          max-height: 50mm;
-          overflow: hidden;
         }
         @media print {
           /* Hide photo placeholders in print/PDF */
@@ -484,22 +406,10 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
             background: var(--pdf-background, hsl(var(--background))) !important;
             width: 210mm;
             margin: 0 auto;
-            display: block;
-            /* Remove min-height - let content flow naturally */
-          }
-          /* Hide spacer div in PDF - it causes empty pages */
-          .resume-page-container > div[aria-hidden="true"] {
-            display: none !important;
           }
           @page {
             size: A4;
             margin: 0;
-          }
-          /* Remove spacer div styling - we'll use padding on container instead */
-          /* Prevent sections from breaking awkwardly */
-          div[class*="mb-"] {
-            page-break-inside: avoid;
-            break-inside: avoid;
           }
         }
       `}</style>
@@ -585,8 +495,6 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
         <div>
           {orderedSections.map(section => renderSection(section))}
         </div>
-
-        {/* Removed spacer div - using padding-bottom approach instead */}
 
         {/* Page Number Footer */}
         <style>{`

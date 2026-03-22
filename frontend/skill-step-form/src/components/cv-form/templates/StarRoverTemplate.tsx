@@ -1,6 +1,6 @@
 import { CVFormData } from "../types";
 import { Mail, Phone, MapPin, Linkedin, Github, Globe } from "lucide-react";
-import { formatDateRange } from "@/lib/dateFormatter";
+import { formatMonthYear } from "@/lib/dateFormatter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatProficiency } from "@/lib/languageProficiency";
 
@@ -11,7 +11,7 @@ interface StarRoverTemplateProps {
 const ACCENT_COLOR = "#141E61"; // Navy blue accent
 
 export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { personalInfo, workExperience, education, projects, certificates, languages, skills, sectionOrder, styling } = data;
 
   const defaultOrder = ["summary", "education", "workExperience", "projects", "certificates", "skills", "languages", "interests"];
@@ -103,23 +103,12 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
   const languagesTitleSizes = fontSizeMap[languagesStyling.titleSize];
   const languagesBodySizes = fontSizeMap[languagesStyling.bodySize];
 
-  // Helper to format date range for Star Rover style (MMM YYYY format)
+  // Helper to format date range for Star Rover style (MMM YYYY format, locale-aware)
   const formatDateRangeStar = (startDate: string | undefined, endDate: string | undefined): string => {
     if (!startDate && !endDate) return '';
 
-    const formatDate = (dateStr: string | undefined): string => {
-      if (!dateStr) return '';
-      const match = dateStr.match(/^(\d{4})-(\d{2})$/);
-      if (!match) return dateStr;
-      const [, year, month] = match;
-      const monthNum = parseInt(month, 10);
-      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      if (monthNum < 1 || monthNum > 12) return dateStr;
-      return `${monthNames[monthNum - 1]} ${year}`;
-    };
-
-    const start = formatDate(startDate);
-    const end = endDate ? formatDate(endDate) : t('resume.fields.present');
+    const start = formatMonthYear(startDate, language);
+    const end = endDate ? formatMonthYear(endDate, language) : t('resume.fields.present');
 
     if (!start && !end) return '';
     if (!start) return end;
@@ -504,24 +493,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
             background: var(--pdf-background, hsl(var(--background))) !important;
             width: 210mm;
             margin: 0 auto;
-            /* Use flexbox to ensure last page fills */
-            display: flex;
-            flex-direction: column;
-          }
-          /* Content wrapper should not grow */
-          .resume-page-container > div:not([aria-hidden="true"]) {
-            flex: 0 0 auto;
-          }
-          /* Spacer div at end will fill remaining space */
-          .resume-page-container > div[aria-hidden="true"] {
-            flex: 1 1 auto !important;
-            min-height: 0;
-            background: var(--pdf-background, hsl(var(--background))) !important;
-          }
-          /* Prevent sections from breaking awkwardly */
-          div[class*="mb-"] {
-            page-break-inside: avoid;
-            break-inside: avoid;
+
           }
         }
       `}</style>
@@ -581,9 +553,6 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
         <div className="space-y-1">
           {orderedSections.map(section => renderSection(section))}
         </div>
-
-        {/* Spacer to ensure last page fills full height */}
-        <div aria-hidden="true" style={{ flex: '1 1 auto', minHeight: 0 }}></div>
 
         {/* Page Number Footer */}
         <style>{`

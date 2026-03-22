@@ -61,10 +61,6 @@
     color-adjust: exact !important;
     padding: 0 0 10px 0 !important;
     margin-bottom: 0 !important;
-    /* Page break - old and new syntax for compatibility */
-    page-break-after: avoid;
-    break-after: avoid;
-    -webkit-column-break-after: avoid;
   }
   
   .profile-image {
@@ -77,9 +73,6 @@
   }
   
   .contact-info {
-    page-break-inside: avoid;
-    break-inside: avoid;
-    -webkit-column-break-inside: avoid;
     display: flex !important;
     flex-direction: column !important;
     align-items: flex-start !important;
@@ -120,66 +113,29 @@
     margin-bottom: 10px !important;
     margin-top: 0 !important;
     padding-top: 12px !important;
-    /* Prevent text cutoff */
     overflow: visible !important;
     max-width: 100% !important;
     width: 100% !important;
     box-sizing: border-box !important;
-    /* Triple declaration for cross-browser support */
-    page-break-inside: avoid;
-    break-inside: avoid;
-    -webkit-column-break-inside: avoid;
-    /* Orphans/widows - not supported in all browsers but doesn't hurt */
-    orphans: 3;
-    widows: 3;
   }
-  
+
   .resume-section:first-of-type {
     padding-top: 0 !important;
-    page-break-before: avoid;
-    break-before: avoid;
-    -webkit-column-break-before: avoid;
   }
-  
+
   .section-title {
     margin-bottom: 6px !important;
     padding-bottom: 3px !important;
-    page-break-after: avoid;
-    break-after: avoid;
-    -webkit-column-break-after: avoid;
-    orphans: 3;
   }
   
   /* ==================== WORK EXPERIENCE ==================== */
   
   .experience-item {
     margin-bottom: 10px !important;
-    page-break-inside: avoid;
-    break-inside: avoid;
-    -webkit-column-break-inside: avoid;
-    orphans: 3;
-    widows: 3;
   }
-  
-  .experience-header {
-    page-break-after: avoid;
-    break-after: avoid;
-    -webkit-column-break-after: avoid;
-  }
-  
-  .experience-details {
-    page-break-before: avoid;
-    break-before: avoid;
-    -webkit-column-break-before: avoid;
-  }
-  
+
   .experience-details li {
-    page-break-inside: avoid;
-    break-inside: avoid;
-    -webkit-column-break-inside: avoid;
     margin-bottom: 4px !important;
-    orphans: 2;
-    widows: 2;
   }
   
   /* ==================== EDUCATION ==================== */
@@ -187,30 +143,14 @@
   .education-item {
     margin-bottom: 8px !important;
     padding-bottom: 8px !important;
-    page-break-inside: avoid;
-    break-inside: avoid;
-    -webkit-column-break-inside: avoid;
-    orphans: 2;
-    widows: 2;
   }
-  
-  .key-courses {
-    page-break-inside: avoid;
-    break-inside: avoid;
-    -webkit-column-break-inside: avoid;
-  }
-  
+
   /* ==================== PROJECTS & CERTIFICATIONS ==================== */
   
   .project-item,
   .certification-item {
     margin-bottom: 8px !important;
     padding-bottom: 8px !important;
-    page-break-inside: avoid;
-    break-inside: avoid;
-    -webkit-column-break-inside: avoid;
-    orphans: 2;
-    widows: 2;
   }
   
   /* ==================== SKILLS & COMPETENCIES ==================== */
@@ -318,10 +258,6 @@
     margin-right: 8px !important;
     margin-bottom: 8px !important;
     vertical-align: top;
-    /* Prevent breaks inside tags */
-    page-break-inside: avoid;
-    break-inside: avoid;
-    -webkit-column-break-inside: avoid;
   }
   
   .skill-tags,
@@ -336,9 +272,6 @@
   .job-competencies {
     display: block !important;
     margin-top: 6px !important;
-    page-break-before: avoid;
-    break-before: avoid;
-    -webkit-column-break-before: avoid;
   }
   
   .project-tech .skill-tag,
@@ -373,21 +306,6 @@
   .skill-tag a::after,
   .interest-tag a::after {
     content: none !important;
-  }
-  
-  /* ==================== TYPOGRAPHY ==================== */
-  
-  h1, h2, h3, h4, h5, h6 {
-    page-break-after: avoid;
-    break-after: avoid;
-    -webkit-column-break-after: avoid;
-    orphans: 3;
-    widows: 3;
-  }
-  
-  p, li {
-    orphans: 3;
-    widows: 3;
   }
   
   /* ==================== REMOVE INTERACTIVE ELEMENTS ==================== */
@@ -444,7 +362,6 @@
   img {
     max-width: 100% !important;
     height: auto !important;
-    page-break-inside: avoid;
     display: block;
   }
   

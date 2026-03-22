@@ -605,41 +605,13 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
         ? Math.min(10, Math.round(((contentQuality + education + skills) / totalCompletenessMax) * 10 * 10) / 10)
         : 0;
 
-      // Penalize for excessive text - cap completeness score at 7.2
-      // Check for excessive text in work experience descriptions
-      const workExp = data.workExperience || [];
-      const workDescriptions = workExp.map(exp => exp.description || '').filter(Boolean);
-      const avgLength = workDescriptions.length > 0
-        ? workDescriptions.reduce((sum, d) => sum + d.length, 0) / workDescriptions.length
-        : 0;
-      const summaryLength = (data.personalInfo.summary || '').length;
-      const projects = data.projects || [];
-      const projectDescriptions = projects.map(p => (p.description || '').length);
-      const avgProjectLength = projectDescriptions.length > 0
-        ? projectDescriptions.reduce((sum, len) => sum + len, 0) / projectDescriptions.length
-        : 0;
-
-      // Apply penalty if there's too much text in any area - cap at 7.2
-      // More aggressive thresholds to catch excessive text
-      // Check if any work description exceeds 400 chars, or average exceeds 350
-      const hasLongWorkDesc = workDescriptions.some(d => d.length > 400) || avgLength > 350;
-      const hasLongSummary = summaryLength > 250;
-      const hasLongProjects = projectDescriptions.some(len => len > 400) || avgProjectLength > 350;
-      const hasExcessiveText = hasLongWorkDesc || hasLongSummary || hasLongProjects;
-
-      if (hasExcessiveText && completenessScore > 7.2) {
-        completenessScore = 7.2; // Always cap at 7.2 when there's excessive text
-      }
-
-      // Clarity: Structure & Format (2 max) + Professional Summary (1 max) = 3 max
-      const structure = getCategoryScore("Structure & Format");
-      const structureMax = getCategoryMaxScore("Structure & Format");
+      // Clarity: Professional Summary only (Structure & Format criterion removed)
       const summary = getCategoryScore("Professional Summary");
       const summaryMax = getCategoryMaxScore("Professional Summary");
 
-      const totalClarityMax = structureMax + summaryMax;
+      const totalClarityMax = summaryMax;
       const clarityScore = totalClarityMax > 0
-        ? Math.min(10, Math.round(((structure + summary) / totalClarityMax) * 10 * 10) / 10)
+        ? Math.min(10, Math.round((summary / totalClarityMax) * 10 * 10) / 10)
         : 0;
 
       // Formatting: ATS Optimization (0.5 max) -> normalize to 0-10

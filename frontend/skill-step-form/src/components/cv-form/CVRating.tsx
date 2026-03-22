@@ -183,6 +183,7 @@ if (!rating) {
                     "Add more education or certification details": t('resume.score.categoryFeedback.education.needsImprovement') || category.feedback,
                     "Well-optimized for ATS systems": t('resume.score.categoryFeedback.ats.excellent') || category.feedback,
                     "Add more keywords and ensure standard formatting": t('resume.score.categoryFeedback.ats.needsImprovement') || category.feedback,
+                    "Add more keywords and ensure ATS-friendly section content": t('resume.score.categoryFeedback.ats.needsImprovement') || category.feedback,
                   };
                   return feedbackMap[category.feedback] || category.feedback;
                 })()}

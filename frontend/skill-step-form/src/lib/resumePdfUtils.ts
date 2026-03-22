@@ -11,6 +11,7 @@ import { StarRoverTemplate } from '@/components/cv-form/templates/StarRoverTempl
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import i18n from '@/i18n/config';
 import { formatProficiency as formatProficiencyShared } from '@/lib/languageProficiency';
+import { formatDateRange, formatMonthYear } from '@/lib/dateFormatter';
 
 /**
  * Sanitize filename for filesystem compatibility
@@ -179,6 +180,8 @@ function escapeHtml(text: string): string {
  */
 function generateResumeHTML(resume: Resume): string {
   const personalInfo = resume.personalInfo;
+  const locale = (i18n.language || 'en').split('-')[0] as string;
+  const presentText = i18n.t('resume.fields.present');
 
   // ============================================
   // Font sizing based on resume.styling font size
@@ -236,7 +239,7 @@ function generateResumeHTML(resume: Resume): string {
               <span class="company"><strong>${escapeHtml(exp.company || '')}</strong></span>
               ${exp.startDate || exp.endDate ? `
                 <span class="period">
-                  ${escapeHtml(exp.startDate || '')} - ${escapeHtml(exp.endDate || 'Present')}
+                  ${escapeHtml(formatDateRange(exp.startDate, exp.endDate, presentText, locale))}
                 </span>
               ` : ''}
             </div>
@@ -283,7 +286,7 @@ function generateResumeHTML(resume: Resume): string {
               <p class="institution"><strong>${escapeHtml(edu.institution || '')}</strong></p>
               ${edu.startDate || edu.endDate ? `
                 <p class="period">
-                  ${escapeHtml(edu.startDate || '')} - ${escapeHtml(edu.endDate || 'Present')}
+                  ${escapeHtml(formatDateRange(edu.startDate, edu.endDate, presentText, locale))}
                 </p>
               ` : ''}
             </div>
@@ -347,7 +350,7 @@ function generateResumeHTML(resume: Resume): string {
               <h4><strong>${escapeHtml(cert.name)}</strong></h4>
               ${cert.organization ? `<span class="certification-issuer">${escapeHtml(cert.organization)}</span>` : ''}
             </div>
-            ${cert.issueDate ? `<p class="certification-date">${escapeHtml(cert.issueDate)}</p>` : ''}
+            ${cert.issueDate ? `<p class="certification-date">${escapeHtml(formatMonthYear(cert.issueDate, locale) || cert.issueDate)}</p>` : ''}
             ${cert.url ? `
               <a href="${escapeHtml(cert.url)}" target="_blank" rel="noopener noreferrer" class="certification-link">
                 View Certificate

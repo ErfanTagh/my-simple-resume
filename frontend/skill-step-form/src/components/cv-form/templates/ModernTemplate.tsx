@@ -9,7 +9,7 @@ interface ModernTemplateProps {
 }
 
 export const ModernTemplate = ({ data }: ModernTemplateProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { personalInfo, workExperience, education, projects, certificates, languages, skills, sectionOrder, styling } = data;
 
   const defaultOrder = ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"];
@@ -180,7 +180,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                       {(exp.startDate || exp.endDate) && (
                         <div className="flex items-center gap-1" style={{ fontSize: workExperienceBodySizes.xs, color: workExperienceStyling.bodyColor }}>
                           <Calendar className="h-3 w-3" />
-                          <span>{formatDateRange(exp.startDate, exp.endDate, t('resume.fields.present'))}</span>
+                          <span>{formatDateRange(exp.startDate, exp.endDate, t('resume.fields.present'), language)}</span>
                         </div>
                       )}
                     </div>
@@ -235,7 +235,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                         )}
                       </div>
                       {(edu.startDate || edu.endDate) && (
-                        <span style={{ fontSize: educationBodySizes.xs, color: educationStyling.bodyColor }}>{formatDateRange(edu.startDate, edu.endDate, t('resume.fields.present'))}</span>
+                        <span style={{ fontSize: educationBodySizes.xs, color: educationStyling.bodyColor }}>{formatDateRange(edu.startDate, edu.endDate, t('resume.fields.present'), language)}</span>
                       )}
                     </div>
                   </div>
@@ -256,7 +256,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                     <div className="flex justify-between items-start mb-1">
                       <h3 className="font-bold" style={{ fontSize: projectsBodySizes.baseText, color: projectsStyling.bodyColor }}>{proj.name}</h3>
                       {(proj.startDate || proj.endDate) && (
-                        <span style={{ fontSize: projectsBodySizes.xs, color: projectsStyling.bodyColor }}>{formatDateRange(proj.startDate, proj.endDate, t('resume.fields.present'))}</span>
+                        <span style={{ fontSize: projectsBodySizes.xs, color: projectsStyling.bodyColor }}>{formatDateRange(proj.startDate, proj.endDate, t('resume.fields.present'), language)}</span>
                       )}
                     </div>
                     {proj.description && <p className="mb-2" style={{ fontSize: projectsBodySizes.baseText, color: projectsStyling.bodyColor }}>{proj.description}</p>}
@@ -407,24 +407,6 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
             background: var(--pdf-background, hsl(var(--background))) !important;
             width: 210mm;
             margin: 0 auto;
-            /* Use flexbox to ensure last page fills */
-            display: flex;
-            flex-direction: column;
-          }
-          /* Content wrapper should not grow */
-          .resume-page-container > div:not([aria-hidden="true"]) {
-            flex: 0 0 auto;
-          }
-          /* Spacer div at end will fill remaining space */
-          .resume-page-container > div[aria-hidden="true"] {
-            flex: 1 1 auto !important;
-            min-height: 0;
-            background: var(--pdf-background, hsl(var(--background))) !important;
-          }
-          /* Prevent sections from breaking awkwardly */
-          div[class*="mb-"] {
-            page-break-inside: avoid;
-            break-inside: avoid;
           }
         }
       `}</style>
@@ -518,9 +500,6 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
         <div className="space-y-2">
           {orderedSections.map(section => renderSection(section))}
         </div>
-
-        {/* Spacer to ensure last page fills full height */}
-        <div aria-hidden="true" style={{ flex: '1 1 auto', minHeight: 0 }}></div>
 
         {/* Page Number Footer */}
         <style>{`

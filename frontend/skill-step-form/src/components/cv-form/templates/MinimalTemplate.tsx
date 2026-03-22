@@ -19,7 +19,7 @@ const SectionHeading = ({ title, fontSize, color }: { title: string; fontSize: s
 );
 
 export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { personalInfo, workExperience, education, projects, certificates, languages, skills, sectionOrder, styling } = data;
 
   const defaultOrder = ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"];
@@ -149,7 +149,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                       </p>
                       {(exp.startDate || exp.endDate) && (
                         <span className="whitespace-nowrap" style={{ fontSize: sizes.xs, color: workExperienceStyling.bodyColor }}>
-                          {formatDateRange(exp.startDate, exp.endDate, t('resume.fields.present'))}
+                          {formatDateRange(exp.startDate, exp.endDate, t('resume.fields.present'), language)}
                         </span>
                       )}
                     </div>
@@ -207,7 +207,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                       </p>
                       {(edu.startDate || edu.endDate) && (
                         <span className="whitespace-nowrap" style={{ fontSize: sizes.xs, color: educationStyling.bodyColor }}>
-                          {formatDateRange(edu.startDate, edu.endDate, t('resume.fields.present'))}
+                          {formatDateRange(edu.startDate, edu.endDate, t('resume.fields.present'), language)}
                         </span>
                       )}
                     </div>
@@ -237,7 +237,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                       <h3 className="font-semibold flex-1" style={{ fontSize: projectsBodySizes.baseText, color: projectsStyling.bodyColor }}>{proj.name}</h3>
                       {(proj.startDate || proj.endDate) && (
                         <span className="text-xs whitespace-nowrap" style={{ color: projectsStyling.bodyColor }}>
-                          {formatDateRange(proj.startDate, proj.endDate, t('resume.fields.present'))}
+                          {formatDateRange(proj.startDate, proj.endDate, t('resume.fields.present'), language)}
                         </span>
                       )}
                     </div>
@@ -391,24 +391,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
             background: var(--pdf-background, hsl(var(--background))) !important;
             width: 210mm;
             margin: 0 auto;
-            /* Use flexbox to ensure last page fills */
-            display: flex;
-            flex-direction: column;
-          }
-          /* Content wrapper should not grow */
-          .resume-page-container > div:not([aria-hidden="true"]) {
-            flex: 0 0 auto;
-          }
-          /* Spacer div at end will fill remaining space */
-          .resume-page-container > div[aria-hidden="true"] {
-            flex: 1 1 auto !important;
-            min-height: 0;
-            background: var(--pdf-background, hsl(var(--background))) !important;
-          }
-          /* Prevent sections from breaking awkwardly */
-          div[class*="mb-"] {
-            page-break-inside: avoid;
-            break-inside: avoid;
+
           }
         }
       `}</style>
@@ -459,9 +442,6 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
         <div>
           {orderedSections.map(section => renderSection(section))}
         </div>
-
-        {/* Spacer to ensure last page fills full height */}
-        <div aria-hidden="true" style={{ flex: '1 1 auto', minHeight: 0 }}></div>
 
         {/* Page Number Footer */}
         <style>{`
