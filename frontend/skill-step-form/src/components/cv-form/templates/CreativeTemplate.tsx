@@ -25,10 +25,10 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
       : "medium";
   const titleColor = styling?.titleColor || "#1e293b";
   const titleBold = styling?.titleBold ?? true;
-  const headingColor = styling?.headingColor || "#7c3aed"; // Vibrant purple
+  const headingColor = styling?.headingColor || "#2563eb"; // Blue - matches form default
   const headingBold = styling?.headingBold ?? true;
   const textColor = styling?.textColor || "#475569";
-  const linkColor = styling?.linkColor || "#7c3aed";
+  const linkColor = styling?.linkColor || "#2563eb";
 
   // Subtle accent color - one primary color for elegance
   const accentColor = headingColor;
@@ -238,7 +238,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                             ))
                             : exp.description?.split('\n').filter(line => line.trim()).map((line, i) => (
                               <li key={i} className="flex gap-2.5">
-                                <span style={{ color: accentColors.primary }}>▸</span>
+                                <span style={{ color: accentColor }}>▸</span>
                                 <span className="flex-1" style={{ opacity: 0.9 }}>{line.trim()}</span>
                               </li>
                             ))

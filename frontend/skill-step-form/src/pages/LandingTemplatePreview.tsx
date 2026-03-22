@@ -452,7 +452,7 @@ export const LandingTemplatePreview = ({
         }}
       >
         <div style={{ minHeight: '1400px', height: '100%', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ flex: 1, minHeight: '100%' }} data-landing-preview="">
+          <div style={{ flex: 1, minHeight: '100%' }} data-landing-preview="" data-template={templateName}>
             {templateName === "modern" && <ModernTemplate data={data} />}
             {templateName === "classic" && <ClassicTemplate data={data} />}
             {templateName === "creative" && <CreativeTemplate data={data} />}
