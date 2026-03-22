@@ -27,34 +27,37 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
   const titleBold = styling?.titleBold ?? true;
   const headingColor = styling?.headingColor || "#1f2937";
   const headingBold = styling?.headingBold ?? true;
-  const textColor = styling?.textColor || "#1f2937";
+  const textColor = styling?.textColor || "#4b5563";
   const linkColor = styling?.linkColor || "#2563eb";
 
-  // Font size mappings - Increased differences for more noticeable size changes
+  // Enhanced font size mappings with better hierarchy
   const fontSizeMap = {
     small: {
-      base: '0.8125rem',   // 13px
-      sm: '0.6875rem',     // 11px
-      xs: '0.5625rem',     // 9px
-      heading: '0.75rem',   // 12px (reduced from 13px)
-      body: '0.625rem',    // 10px (reduced from 13px, renamed to baseText for consistency)
-      baseText: '0.625rem', // 10px (reduced from 13px)
+      xs: '0.625rem',        // 10px - metadata
+      sm: '0.75rem',         // 12px - body text
+      base: '0.875rem',      // 14px - section items
+      baseText: '0.6875rem', // 11px - paragraph text
+      heading: '0.8125rem',  // 13px - section headings
+      body: '0.6875rem',     // 11px - legacy
+      name: '1.5rem',        // 24px - header name
     },
     medium: {
-      base: '1rem',        // 16px (+3px from small)
-      sm: '0.875rem',      // 14px (+3px from small)
-      xs: '0.75rem',       // 12px (+3px from small)
-      heading: '1rem',     // 16px (reduced from 18px)
-      body: '0.8125rem',   // 13px (reduced from 15px, kept for backward compatibility)
-      baseText: '0.8125rem', // 13px (reduced from 15px)
+      xs: '0.75rem',         // 12px - metadata
+      sm: '0.875rem',        // 14px - body text
+      base: '1rem',          // 16px - section items
+      baseText: '0.8125rem', // 13px - paragraph text
+      heading: '0.9375rem',  // 15px - section headings
+      body: '0.8125rem',     // 13px - legacy
+      name: '1.75rem',       // 28px - header name
     },
     large: {
-      base: '1.1875rem',   // 19px (+3px from medium)
-      sm: '1.0625rem',     // 17px (+3px from medium)
-      xs: '0.9375rem',     // 15px (+3px from medium)
-      heading: '1.25rem',   // 20px (reduced from 23px)
-      body: '1rem',        // 16px (reduced from 19px, kept for backward compatibility)
-      baseText: '1rem',    // 16px (reduced from 19px)
+      xs: '0.875rem',        // 14px - metadata
+      sm: '1rem',            // 16px - body text
+      base: '1.125rem',      // 18px - section items
+      baseText: '0.9375rem', // 15px - paragraph text
+      heading: '1.0625rem',  // 17px - section headings
+      body: '0.9375rem',     // 15px - legacy
+      name: '2rem',          // 32px - header name
     },
   };
 
@@ -109,46 +112,46 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
     switch (sectionKey) {
       case "summary":
         return personalInfo.summary && personalInfo.summary.trim() ? (
-          <div key="summary" className="mb-5">
+          <div key="summary">
             <h2 className="font-bold mb-2 uppercase tracking-wide" style={{ fontSize: personalInfoTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: personalInfoTitleColor }}>{t('resume.sections.summary').toUpperCase()}</h2>
-            <p className="leading-relaxed whitespace-pre-wrap" style={{ fontSize: personalInfoBodySizes.baseText, color: personalInfoBodyColor }}>{personalInfo.summary.trim()}</p>
+            <p className="leading-relaxed whitespace-pre-wrap" style={{ fontSize: personalInfoBodySizes.baseText, color: personalInfoBodyColor, lineHeight: '1.7' }}>{personalInfo.summary.trim()}</p>
           </div>
         ) : null;
 
       case "workExperience":
         return workExperience.some(exp => exp.position || exp.company) ? (
-          <div key="workExperience" className="mb-5">
+          <div key="workExperience">
             <h2 className="font-bold mb-2 uppercase tracking-wide" style={{ fontSize: workExperienceTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: workExperienceStyling.titleColor }}>{t('resume.sections.workExperience').toUpperCase()}</h2>
             <div className="space-y-3">
               {workExperience.map((exp, index) => (
                 (exp.position || exp.company) && (
-                  <div key={index}>
-                    <h3 className="font-semibold" style={{ color: workExperienceStyling.bodyColor }}>{exp.position}</h3>
-                    <div className="flex justify-between items-center" style={{ fontSize: workExperienceBodySizes.baseText, color: workExperienceStyling.bodyColor }}>
+                  <div key={index} className="space-y-1.5">
+                    <h3 className="font-semibold" style={{ fontSize: workExperienceBodySizes.base, color: workExperienceStyling.bodyColor, letterSpacing: '0.01em' }}>{exp.position}</h3>
+                    <div className="flex justify-between items-baseline" style={{ fontSize: workExperienceBodySizes.xs, color: workExperienceStyling.bodyColor }}>
                       <div>
-                        <span className="italic" style={{ color: workExperienceStyling.bodyColor }}>{exp.company}</span>
-                        {exp.location && <span className="ml-2" style={{ fontSize: workExperienceBodySizes.xs, color: workExperienceStyling.bodyColor }}>• {exp.location}</span>}
+                        <span className="italic" style={{ opacity: 0.9 }}>{exp.company}</span>
+                        {exp.location && <span className="ml-2">• {exp.location}</span>}
                       </div>
                       {(exp.startDate || exp.endDate) && (
-                        <span style={{ fontSize: workExperienceBodySizes.xs, color: workExperienceStyling.bodyColor }}>
+                        <span style={{ opacity: 0.7, fontStyle: 'italic' }}>
                           {formatDateRange(exp.startDate, exp.endDate, t('resume.fields.present'), language)}
                         </span>
                       )}
                     </div>
                     {((exp.responsibilities && exp.responsibilities.length > 0) || exp.description) && (
-                      <ul className="space-y-1 mt-2" style={{ fontSize: workExperienceBodySizes.baseText, color: workExperienceStyling.bodyColor }}>
+                      <ul className="space-y-1 mt-1.5" style={{ fontSize: workExperienceBodySizes.sm, color: workExperienceStyling.bodyColor, lineHeight: '1.6' }}>
                         {exp.responsibilities && exp.responsibilities.length > 0
                           ? exp.responsibilities.map((resp, i) => (
                             resp.responsibility && (
-                              <li key={i} className="flex gap-2">
-                                <span style={{ color: workExperienceStyling.bodyColor }}>•</span>
+                              <li key={i} className="flex gap-3">
+                                <span style={{ color: workExperienceStyling.bodyColor, opacity: 0.5 }}>•</span>
                                 <span className="flex-1">{resp.responsibility}</span>
                               </li>
                             )
                           ))
                           : exp.description?.split('\n').filter(line => line.trim()).map((line, i) => (
-                            <li key={i} className="flex gap-2">
-                              <span style={{ color: workExperienceStyling.bodyColor }}>•</span>
+                            <li key={i} className="flex gap-3">
+                              <span style={{ color: workExperienceStyling.bodyColor, opacity: 0.5 }}>•</span>
                               <span className="flex-1">{line.trim()}</span>
                             </li>
                           ))
@@ -174,7 +177,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
 
       case "education":
         return education.some(edu => edu.degree || edu.institution) ? (
-          <div key="education" className="mb-5">
+          <div key="education">
             <h2 className="font-bold mb-2 uppercase tracking-wide" style={{ fontSize: educationTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: educationStyling.titleColor }}>{t('resume.sections.education').toUpperCase()}</h2>
             <div className="space-y-3">
               {education.map((edu, index) => (
@@ -187,7 +190,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
                         {edu.location && <span className="ml-2" style={{ fontSize: educationBodySizes.xs, color: educationStyling.bodyColor }}>• {edu.location}</span>}
                       </div>
                       {(edu.startDate || edu.endDate) && (
-                        <span style={{ fontSize: educationBodySizes.xs, color: educationStyling.bodyColor }}>
+                        <span style={{ fontSize: educationBodySizes.xs, color: educationStyling.bodyColor, opacity: 0.7, fontStyle: 'italic' }}>
                           {formatDateRange(edu.startDate, edu.endDate, t('resume.fields.present'), language)}
                         </span>
                       )}
@@ -207,7 +210,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
 
       case "projects":
         return projects.some(proj => proj.name) ? (
-          <div key="projects" className="mb-5">
+          <div key="projects">
             <h2 className="font-bold mb-2 uppercase tracking-wide" style={{ fontSize: projectsTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: projectsStyling.titleColor }}>{t('resume.sections.projects').toUpperCase()}</h2>
             <div className="space-y-3">
               {projects.map((proj, index) => (
@@ -215,8 +218,8 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
                   <div key={index}>
                     <div className="flex justify-between items-center">
                       <h3 className="font-semibold" style={{ color: projectsStyling.bodyColor }}>{proj.name}</h3>
-                      {(proj.startDate || proj.endDate) && (
-                        <span style={{ fontSize: projectsBodySizes.xs, color: projectsStyling.bodyColor }}>
+                        {(proj.startDate || proj.endDate) && (
+                        <span style={{ fontSize: projectsBodySizes.xs, color: projectsStyling.bodyColor, opacity: 0.7, fontStyle: 'italic' }}>
                           {formatDateRange(proj.startDate, proj.endDate, t('resume.fields.present'), language)}
                         </span>
                       )}
@@ -228,8 +231,8 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
                       <ul className="space-y-1 mt-1" style={{ fontSize: projectsBodySizes.baseText, color: projectsStyling.bodyColor }}>
                         {proj.highlights.map((highlight, i) => (
                           highlight.highlight && (
-                            <li key={i} className="flex gap-2">
-                              <span style={{ color: projectsStyling.bodyColor }}>•</span>
+                            <li key={i} className="flex gap-3">
+                              <span style={{ color: projectsStyling.bodyColor, opacity: 0.5 }}>•</span>
                               <span className="flex-1">{highlight.highlight}</span>
                             </li>
                           )
@@ -255,7 +258,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
 
       case "certificates":
         return certificates.some(cert => cert.name) ? (
-          <div key="certificates" className="mb-5">
+          <div key="certificates">
             <h2 className="font-bold mb-2 uppercase tracking-wide" style={{ fontSize: certificatesTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: certificatesStyling.titleColor }}>{t('resume.sections.certifications').toUpperCase()}</h2>
             <div className="space-y-2">
               {certificates.map((cert, index) => (
@@ -285,9 +288,9 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
 
       case "skills":
         return skills.some(s => s.skill) ? (
-          <div key="skills" className="mb-5">
+          <div key="skills">
             <h2 className="font-bold mb-2 uppercase tracking-wide" style={{ fontSize: skillsTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: skillsStyling.titleColor }}>{t('resume.sections.skills').toUpperCase()}</h2>
-            <p style={{ fontSize: skillsBodySizes.xs, color: skillsStyling.bodyColor }}>
+            <p style={{ fontSize: skillsBodySizes.sm, color: skillsStyling.bodyColor, lineHeight: '1.7' }}>
               {skills.filter(s => s.skill).map(s => s.skill).join(" • ")}
             </p>
           </div>
@@ -295,19 +298,16 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
 
       case "languages":
         return languages.some(lang => lang.language) ? (
-          <div key="languages" className="mb-5">
+          <div key="languages">
             <h2 className="font-bold mb-2 uppercase tracking-wide" style={{ fontSize: languagesTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: languagesStyling.titleColor }}>{t('resume.sections.languages').toUpperCase()}</h2>
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               {languages.map((lang, index) => (
                 lang.language && (
-                  <div key={index} className="flex justify-between items-center gap-4 pr-2" style={{ fontSize: languagesBodySizes.xs, color: languagesStyling.bodyColor }}>
-                    <span className="font-semibold">{lang.language}</span>
+                  <div key={index} className="flex justify-between items-center gap-4" style={{ fontSize: languagesBodySizes.sm, color: languagesStyling.bodyColor }}>
+                    <span style={{ fontWeight: 500 }}>{lang.language}</span>
                     {lang.proficiency && (
-                      <span
-                        className="whitespace-nowrap flex-shrink-0"
-                        style={{ color: languagesStyling.bodyColor, opacity: 0.7 }}
-                      >
-                        - {formatProficiency(t, lang.proficiency)}
+                      <span className="whitespace-nowrap" style={{ opacity: 0.7, fontStyle: 'italic', fontSize: languagesBodySizes.xs }}>
+                        {formatProficiency(t, lang.proficiency)}
                       </span>
                     )}
                   </div>
@@ -319,9 +319,9 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
 
       case "interests":
         return personalInfo.interests && personalInfo.interests.length > 0 && personalInfo.interests.some(i => i.interest) ? (
-          <div key="interests" className="mb-5">
+          <div key="interests">
             <h2 className="font-bold mb-2 uppercase tracking-wide" style={{ fontSize: personalInfoTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: personalInfoTitleColor }}>{t('resume.sections.interests').toUpperCase()}</h2>
-            <p style={{ fontSize: personalInfoBodySizes.baseText, color: personalInfoBodyColor }}>{personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}</p>
+            <p style={{ fontSize: personalInfoBodySizes.sm, color: personalInfoBodyColor, lineHeight: '1.7' }}>{personalInfo.interests.map(i => i.interest).filter(Boolean).join(" • ")}</p>
           </div>
         ) : null;
 
@@ -335,8 +335,8 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
       <style>{`
         /* Apply padding for both screen (preview) and print */
         .resume-page-container {
-          padding-top: 32px !important;
-          padding-bottom: 32px !important;
+          padding-top: 24px !important;
+          padding-bottom: 24px !important;
         }
         @media print {
           /* Hide photo placeholders in print/PDF */
@@ -391,11 +391,11 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
                 <img
                   src={personalInfo.profileImage}
                   alt={`Professional profile photo of ${personalInfo.firstName} ${personalInfo.lastName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
-                  className="w-full h-full object-cover"
-                  style={{ objectPosition: '50% 40%' }}
+                  className="h-full w-full object-cover"
+                  style={{ objectPosition: '50% 40%', WebkitBackfaceVisibility: 'hidden', backfaceVisibility: 'hidden' }}
+                  sizes="(min-width: 768px) 112px, 96px"
                   loading="lazy"
                   decoding="async"
-                  fetchPriority="low"
                 />
               </div>
             </div>
@@ -407,7 +407,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
             </div>
           )}
 
-          <h1 className="font-bold mb-2 uppercase tracking-wide" style={{ fontSize: '1.5rem', fontWeight: titleBold ? 'bold' : 'normal', color: linkColor }}>
+          <h1 className="font-bold mb-2 uppercase tracking-wide" style={{ fontSize: sizes.name, fontWeight: titleBold ? '700' : '400', color: linkColor, letterSpacing: '0.02em' }}>
             {personalInfo.firstName} {personalInfo.lastName}
           </h1>
           {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (

@@ -15,73 +15,68 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
   const orderedSections = sectionOrder || defaultOrder;
 
   // Extract styling options with defaults
-  const fontFamily = styling?.fontFamily || "sans-serif";
+  const fontFamily = styling?.fontFamily || "'DM Sans', 'Segoe UI', sans-serif";
   const fontSizeInput = styling?.fontSize || "medium";
-  // Ensure fontSize is valid to prevent crashes
   const fontSize: "small" | "medium" | "large" =
     (fontSizeInput === "small" || fontSizeInput === "medium" || fontSizeInput === "large")
       ? fontSizeInput
       : "medium";
-  const titleColor = styling?.titleColor || "#1f2937";
+  const titleColor = styling?.titleColor || "#111827";
   const titleBold = styling?.titleBold ?? true;
-  const headingColor = styling?.headingColor || "#1f2937";
+  const headingColor = styling?.headingColor || "#111827";
   const headingBold = styling?.headingBold ?? true;
-  const textColor = styling?.textColor || "#1f2937";
+  const textColor = styling?.textColor || "#374151";
   const linkColor = styling?.linkColor || "#2563eb";
+  const sectionHeadingColor = linkColor;
 
-  // Extract section-specific styling for personalInfo
   const personalInfoSectionStyling = styling?.sectionStyling?.personalInfo;
-  // Use headingColor as fallback (blue) instead of titleColor (black) to match template defaults
-  const personalInfoTitleColor = personalInfoSectionStyling?.titleColor || headingColor;
+  const personalInfoTitleColor = personalInfoSectionStyling?.titleColor ?? titleColor;
   const personalInfoTitleSize = personalInfoSectionStyling?.titleSize || fontSize;
   const personalInfoBodyColor = personalInfoSectionStyling?.bodyColor || textColor;
   const personalInfoBodySize = personalInfoSectionStyling?.bodySize || fontSize;
 
-  // Font size mappings - Increased differences for more noticeable size changes
   const fontSizeMap = {
     small: {
-      base: '12px',        // Main text
-      name: '20px',        // Name in header
-      title: '13px',       // Professional title
-      heading: '10px',     // Section headings
-      body: '12px',        // Body text in sections
-      small: '10px',       // Small text (dates, links)
-      xs: '8px',           // Extra small (technologies, courses)
+      base: '11.5px',
+      name: '22px',
+      title: '12px',
+      heading: '9.5px',
+      body: '11px',
+      small: '10px',
+      xs: '9px',
     },
     medium: {
-      base: '16px',        // Main text (+4px from small)
-      name: '24px',        // Name in header (+4px from small)
-      title: '16px',       // Professional title (+3px from small)
-      heading: '11px',     // Section headings (+1px from small)
-      body: '14px',        // Body text in sections (+2px from small)
-      small: '12px',       // Small text (dates, links) (+2px from small)
-      xs: '10px',          // Extra small (technologies, courses) (+2px from small)
+      base: '13px',
+      name: '26px',
+      title: '13.5px',
+      heading: '10px',
+      body: '12.5px',
+      small: '11px',
+      xs: '10px',
     },
     large: {
-      base: '20px',        // Main text (+4px from medium)
-      name: '28px',        // Name in header (+4px from medium)
-      title: '19px',       // Professional title (+3px from medium)
-      heading: '12px',     // Section headings (+1px from medium)
-      body: '16px',        // Body text in sections (+2px from medium)
-      small: '14px',       // Small text (dates, links) (+2px from medium)
-      xs: '12px',          // Extra small (technologies, courses) (+2px from medium)
+      base: '15px',
+      name: '30px',
+      title: '15.5px',
+      heading: '11px',
+      body: '14.5px',
+      small: '13px',
+      xs: '11.5px',
     },
   };
 
   const sizes = fontSizeMap[fontSize];
 
-  // Helper function to get section-specific styling
   const getSectionStyling = (sectionName: string) => {
     const sectionStyling = styling?.sectionStyling?.[sectionName];
     return {
-      titleColor: sectionStyling?.titleColor || headingColor,
+      titleColor: sectionStyling?.titleColor ?? sectionHeadingColor,
       titleSize: sectionStyling?.titleSize || fontSize,
       bodyColor: sectionStyling?.bodyColor || textColor,
       bodySize: sectionStyling?.bodySize || fontSize,
     };
   };
 
-  // Extract section-specific styling for all sections
   const workExperienceStyling = getSectionStyling('workExperience');
   const projectsStyling = getSectionStyling('projects');
   const educationStyling = getSectionStyling('education');
@@ -89,11 +84,8 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
   const skillsStyling = getSectionStyling('skills');
   const languagesStyling = getSectionStyling('languages');
 
-  // Size mappings for personalInfo section-specific sizes
   const personalInfoTitleSizes = fontSizeMap[personalInfoTitleSize];
   const personalInfoBodySizes = fontSizeMap[personalInfoBodySize];
-
-  // Create size mappings for each section
   const workExperienceTitleSizes = fontSizeMap[workExperienceStyling.titleSize];
   const workExperienceBodySizes = fontSizeMap[workExperienceStyling.bodySize];
   const projectsTitleSizes = fontSizeMap[projectsStyling.titleSize];
@@ -107,10 +99,8 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
   const languagesTitleSizes = fontSizeMap[languagesStyling.titleSize];
   const languagesBodySizes = fontSizeMap[languagesStyling.bodySize];
 
-  // Helper to format date range for LaTeX style (MM/YYYY format)
   const formatDateRangeLatex = (startDate: string | undefined, endDate: string | undefined): string => {
     if (!startDate && !endDate) return '';
-
     const formatDate = (dateStr: string | undefined): string => {
       if (!dateStr) return '';
       const match = dateStr.match(/^(\d{4})-(\d{2})$/);
@@ -118,42 +108,39 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
       const [, year, month] = match;
       return `${month}/${year}`;
     };
-
     const start = formatDate(startDate);
     const end = endDate ? formatDate(endDate) : t('resume.fields.present');
-
     if (!start && !end) return '';
     if (!start) return end;
-
-    return `${start} -- ${end}`;
+    return `${start} – ${end}`;
   };
 
-  // Render icon with text - more compact version
+  // ── Refined icon+text renderer ──────────────────────────────────────────
   const renderIconText = (Icon: any, text: string | undefined, url?: string) => {
     if (!text) return null;
 
-    // Format text for display - shorten long URLs
     let displayText = text;
     if (url) {
-      // For LinkedIn, show just the path or shortened version
       if (text.includes('linkedin.com')) {
         const match = text.match(/linkedin\.com\/in\/(.+)/i);
-        if (match) {
-          displayText = `linkedin.com/in/${match[1]}`;
-        } else {
-          displayText = text.replace(/^https?:\/\/(www\.)?/i, '').replace(/\/$/, '');
-        }
-      } else if (text.includes('github.com')) {
-        displayText = text.replace(/^https?:\/\/(www\.)?/i, '').replace(/\/$/, '');
+        displayText = match ? `linkedin.com/in/${match[1]}` : text.replace(/^https?:\/\/(www\.)?/i, '').replace(/\/$/, '');
       } else if (text.startsWith('http')) {
         displayText = text.replace(/^https?:\/\/(www\.)?/i, '').replace(/\/$/, '');
       }
     }
 
     const content = (
-      <div className="flex items-center gap-1 mb-0.5 min-w-0">
-        <Icon className="h-3 w-3 flex-shrink-0" style={{ color: textColor }} />
-        <span className="break-words min-w-0 flex-1" style={{ fontSize: personalInfoBodySizes.small, color: textColor, lineHeight: '1.3', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+      <div className="flex items-center gap-1.5" style={{ marginBottom: '3px' }}>
+        <Icon
+          className="flex-shrink-0"
+          style={{ width: '11px', height: '11px', color: sectionHeadingColor, opacity: 0.85 }}
+        />
+        <span style={{
+          fontSize: personalInfoBodySizes.small,
+          color: textColor,
+          lineHeight: '1.35',
+          letterSpacing: '0.01em',
+        }}>
           {displayText}
         </span>
       </div>
@@ -161,15 +148,95 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
 
     if (url && (url.startsWith('http') || url.startsWith('mailto'))) {
       return (
-        <a href={url} target="_blank" rel="noopener noreferrer" className="hover:opacity-80 block min-w-0">
+        <a href={url} target="_blank" rel="noopener noreferrer" className="hover:opacity-70 block transition-opacity">
           {content}
         </a>
       );
     }
-
     return content;
   };
 
+  // ── Section heading ─────────────────────────────────────────────────────
+  const SectionHeading = ({ label, color, sizes: headingSizes }: { label: string; color: string; sizes: typeof fontSizeMap['medium'] }) => (
+    <div className="flex items-center gap-2.5 mb-2" style={{ marginTop: '2px' }}>
+      {/* Accent square */}
+      <span style={{
+        display: 'inline-block',
+        width: '7px',
+        height: '7px',
+        backgroundColor: color,
+        borderRadius: '1px',
+        flexShrink: 0,
+      }} />
+      <h2 style={{
+        fontSize: headingSizes.heading,
+        fontWeight: 700,
+        letterSpacing: '0.12em',
+        color: color,
+        textTransform: 'uppercase',
+        flexShrink: 0,
+        lineHeight: 1,
+        margin: 0,
+      }}>
+        {label}
+      </h2>
+      <div style={{
+        flex: 1,
+        height: '0.5px',
+        backgroundColor: color,
+        opacity: 0.3,
+        marginTop: '1px',
+      }} />
+    </div>
+  );
+
+  // ── Date column ─────────────────────────────────────────────────────────
+  const DateCol = ({ text, color, sizePx }: { text: string; color: string; sizePx: string }) => (
+    <div style={{
+      width: '14%',
+      flexShrink: 0,
+      fontSize: sizePx,
+      color: color,
+      opacity: 0.65,
+      lineHeight: 1.4,
+      paddingTop: '1px',
+      letterSpacing: '0.01em',
+    }}>
+      {text}
+    </div>
+  );
+
+  // ── Bullet list ─────────────────────────────────────────────────────────
+  const BulletList = ({ items, color, sizePx }: { items: string[]; color: string; sizePx: string }) => (
+    <ul style={{ listStyle: 'none', padding: 0, margin: '4px 0 4px 0' }}>
+      {items.map((item, i) => (
+        <li key={i} style={{ display: 'flex', gap: '6px', marginBottom: '2px' }}>
+          <span style={{ color: sectionHeadingColor, fontSize: sizePx, lineHeight: 1.55, flexShrink: 0 }}>▸</span>
+          <span style={{ fontSize: sizePx, color: color, lineHeight: 1.55, flex: 1, wordBreak: 'break-word' }}>{item}</span>
+        </li>
+      ))}
+    </ul>
+  );
+
+  // ── Tech tag ────────────────────────────────────────────────────────────
+  const TechTag = ({ label }: { label: string }) => (
+    <span style={{
+      display: 'inline-block',
+      padding: '1px 6px',
+      borderRadius: '3px',
+      fontSize: sizes.xs,
+      fontFamily: "'JetBrains Mono', 'Fira Mono', 'Cascadia Code', monospace",
+      color: sectionHeadingColor,
+      backgroundColor: `${sectionHeadingColor}12`,
+      border: `0.5px solid ${sectionHeadingColor}30`,
+      lineHeight: 1.6,
+      letterSpacing: '0.02em',
+    }}>
+      {label}
+    </span>
+  );
+
+  // ── Render sections ─────────────────────────────────────────────────────
   const renderSection = (sectionKey: string) => {
     switch (sectionKey) {
       case "summary":
@@ -177,67 +244,57 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
         return null;
 
       case "projects":
-        return projects && projects.length > 0 && projects.some(proj => proj.name) ? (
-          <div key="projects" className="mb-3">
-            <div className="flex items-center gap-2 mb-1">
-              <h2 className="uppercase tracking-wide flex-shrink-0" style={{ fontSize: projectsTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: projectsStyling.titleColor }}>
-                {t('resume.sections.projects').toUpperCase()}
-              </h2>
-              <div className="flex-1 border-t" style={{ borderColor: projectsStyling.titleColor }}></div>
-            </div>
-            <div className="space-y-1.5">
+        return projects && projects.length > 0 && projects.some(p => p.name) ? (
+          <div key="projects" style={{ marginBottom: '18px' }}>
+            <SectionHeading label={t('resume.sections.projects').toUpperCase()} color={sectionHeadingColor} sizes={projectsTitleSizes} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {projects.map((proj, index) => {
                 if (!proj.name) return null;
-
                 const dateRange = formatDateRangeLatex(proj.startDate, proj.endDate);
                 const technologies = proj.technologies
-                  ? proj.technologies
-                    .map(t => typeof t === 'string' ? t : t.technology)
-                    .filter(Boolean)
-                    .join(', ')
-                  : '';
+                  ? proj.technologies.map(t => typeof t === 'string' ? t : t.technology).filter(Boolean)
+                  : [];
 
                 return (
-                  <div key={index} className="flex gap-2" style={{ fontSize: projectsBodySizes.body }}>
-                    <div className="w-[13%] flex-shrink-0" style={{ fontSize: projectsBodySizes.small, color: projectsStyling.bodyColor }}>
-                      {dateRange}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-start gap-2 mb-0.5">
-                        <h3 className="font-bold" style={{ fontSize: projectsBodySizes.body, color: projectsStyling.bodyColor }}>{proj.name}</h3>
+                  <div key={index} style={{ display: 'flex', gap: '10px' }}>
+                    <DateCol text={dateRange} color={projectsStyling.bodyColor} sizePx={projectsBodySizes.small} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '8px', marginBottom: '2px' }}>
+                        <span style={{ fontSize: projectsBodySizes.body, fontWeight: 700, color: projectsStyling.bodyColor }}>
+                          {proj.name}
+                        </span>
                         {proj.link && (
-                          <a
-                            href={proj.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="hover:underline flex-shrink-0 truncate max-w-[120px]"
-                            style={{ fontSize: projectsBodySizes.small, color: linkColor }}
-                          >
-                            {proj.link.replace(/^https?:\/\//, '').substring(0, 25)}
+                          <a href={proj.link} target="_blank" rel="noopener noreferrer" style={{
+                            fontSize: projectsBodySizes.xs,
+                            color: linkColor,
+                            flexShrink: 0,
+                            maxWidth: '130px',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            textDecoration: 'none',
+                            borderBottom: `0.5px solid ${linkColor}60`,
+                          }}>
+                            {proj.link.replace(/^https?:\/\//, '').substring(0, 28)}
                           </a>
                         )}
                       </div>
                       {proj.description && (
-                        <p className="mb-0.5 leading-snug break-words" style={{ fontSize: projectsBodySizes.body, color: projectsStyling.bodyColor }}>
+                        <p style={{ fontSize: projectsBodySizes.body, color: projectsStyling.bodyColor, lineHeight: 1.55, marginBottom: '2px', wordBreak: 'break-word' }}>
                           {proj.description}
                         </p>
                       )}
                       {proj.highlights && proj.highlights.length > 0 && (
-                        <ul className="space-y-0.5 mt-0.5 mb-0.5 list-none pl-0">
-                          {proj.highlights.map((highlight, i) => (
-                            highlight.highlight && (
-                              <li key={i} className="flex gap-1">
-                                <span className="flex-shrink-0" style={{ fontSize: projectsBodySizes.body, color: projectsStyling.bodyColor }}>•</span>
-                                <span className="flex-1 break-words leading-snug" style={{ fontSize: projectsBodySizes.body, color: projectsStyling.bodyColor }}>{highlight.highlight}</span>
-                              </li>
-                            )
-                          ))}
-                        </ul>
+                        <BulletList
+                          items={proj.highlights.filter(h => h.highlight).map(h => h.highlight!)}
+                          color={projectsStyling.bodyColor}
+                          sizePx={projectsBodySizes.body}
+                        />
                       )}
-                      {technologies && (
-                        <p className="font-mono" style={{ fontSize: projectsBodySizes.xs, color: projectsStyling.bodyColor }}>
-                          {technologies}
-                        </p>
+                      {technologies.length > 0 && (
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '5px' }}>
+                          {technologies.map((tech, i) => <TechTag key={i} label={tech} />)}
+                        </div>
                       )}
                     </div>
                   </div>
@@ -248,43 +305,41 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
         ) : null;
 
       case "education":
-        return education && education.length > 0 && education.some(edu => edu.degree || edu.institution) ? (
-          <div key="education" className="mb-3">
-            <div className="flex items-center gap-2 mb-1">
-              <h2 className="uppercase tracking-wide flex-shrink-0" style={{ fontSize: educationTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: educationStyling.titleColor }}>
-                {t('resume.sections.education').toUpperCase()}
-              </h2>
-              <div className="flex-1 border-t" style={{ borderColor: educationStyling.titleColor }}></div>
-            </div>
-            <div className="space-y-1.5">
+        return education && education.length > 0 && education.some(e => e.degree || e.institution) ? (
+          <div key="education" style={{ marginBottom: '18px' }}>
+            <SectionHeading label={t('resume.sections.education').toUpperCase()} color={sectionHeadingColor} sizes={educationTitleSizes} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {education.map((edu, index) => {
                 if (!edu.degree && !edu.institution) return null;
-
                 const dateRange = formatDateRangeLatex(edu.startDate, edu.endDate);
-
                 return (
-                  <div key={index} className="flex gap-2" style={{ fontSize: educationBodySizes.body }}>
-                    <div className="w-[13%] flex-shrink-0" style={{ fontSize: educationBodySizes.small, color: educationStyling.bodyColor }}>
-                      {dateRange}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-start gap-2 mb-0.5">
-                        <h3 className="font-bold" style={{ fontSize: educationBodySizes.body, color: educationStyling.bodyColor }}>{edu.degree || ''}</h3>
-                        <div className="text-right">
-                          <span className="font-bold flex-shrink-0" style={{ fontSize: educationBodySizes.body, color: educationStyling.bodyColor }}>
+                  <div key={index} style={{ display: 'flex', gap: '10px' }}>
+                    <DateCol text={dateRange} color={educationStyling.bodyColor} sizePx={educationBodySizes.small} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '8px', marginBottom: '1px' }}>
+                        <span style={{ fontSize: educationBodySizes.body, fontWeight: 700, color: educationStyling.bodyColor }}>
+                          {edu.degree || ''}
+                        </span>
+                        <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                          <span style={{ fontSize: educationBodySizes.body, fontWeight: 600, color: educationStyling.bodyColor }}>
                             {edu.institution || ''}
                           </span>
                           {edu.location && (
-                            <span className="block" style={{ fontSize: educationBodySizes.small, color: educationStyling.bodyColor }}>{edu.location}</span>
+                            <span style={{ display: 'block', fontSize: educationBodySizes.xs, color: educationStyling.bodyColor, opacity: 0.65 }}>
+                              {edu.location}
+                            </span>
                           )}
                         </div>
                       </div>
                       {edu.field && (
-                        <p className="leading-snug break-words" style={{ fontSize: educationBodySizes.body, color: educationStyling.bodyColor }}>{edu.field}</p>
+                        <p style={{ fontSize: educationBodySizes.body, color: educationStyling.bodyColor, lineHeight: 1.5, marginBottom: '2px', fontStyle: 'italic', opacity: 0.85 }}>
+                          {edu.field}
+                        </p>
                       )}
                       {edu.keyCourses && edu.keyCourses.length > 0 && (
-                        <p className="mt-0.5" style={{ fontSize: educationBodySizes.xs, color: educationStyling.bodyColor }}>
-                          {t('resume.labels.keyCourses')}: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(', ')}
+                        <p style={{ fontSize: educationBodySizes.xs, color: educationStyling.bodyColor, opacity: 0.75, marginTop: '3px' }}>
+                          <span style={{ fontWeight: 600 }}>{t('resume.labels.keyCourses')}:</span>{' '}
+                          {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(' · ')}
                         </p>
                       )}
                     </div>
@@ -296,70 +351,53 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
         ) : null;
 
       case "workExperience":
-        return workExperience && workExperience.length > 0 && workExperience.some(exp => exp.position || exp.company) ? (
-          <div key="workExperience" className="mb-3">
-            <div className="flex items-center gap-2 mb-1">
-              <h2 className="uppercase tracking-wide flex-shrink-0" style={{ fontSize: workExperienceTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: workExperienceStyling.titleColor }}>
-                {t('resume.sections.experience').toUpperCase()}
-              </h2>
-              <div className="flex-1 border-t" style={{ borderColor: workExperienceStyling.titleColor }}></div>
-            </div>
-            <div className="space-y-2">
+        return workExperience && workExperience.length > 0 && workExperience.some(e => e.position || e.company) ? (
+          <div key="workExperience" style={{ marginBottom: '18px' }}>
+            <SectionHeading label={t('resume.sections.experience').toUpperCase()} color={sectionHeadingColor} sizes={workExperienceTitleSizes} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               {workExperience.map((exp, index) => {
                 if (!exp.position && !exp.company) return null;
-
                 const dateRange = formatDateRangeLatex(exp.startDate, exp.endDate);
                 const responsibilities = exp.responsibilities
                   ? exp.responsibilities.filter(r => r.responsibility).map(r => r.responsibility!)
                   : exp.description
                     ? exp.description.split('\n').filter(line => line.trim())
                     : [];
-
                 const technologies = exp.technologies
-                  ? exp.technologies
-                    .map(t => typeof t === 'string' ? t : t.technology)
-                    .filter(Boolean)
+                  ? exp.technologies.map(t => typeof t === 'string' ? t : t.technology).filter(Boolean)
                   : [];
 
                 return (
-                  <div key={index} className="flex gap-2" style={{ fontSize: workExperienceBodySizes.body }}>
-                    <div className="w-[13%] flex-shrink-0" style={{ fontSize: workExperienceBodySizes.small, color: workExperienceStyling.bodyColor }}>
-                      {dateRange}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-start gap-2 mb-0.5">
-                        <h3 className="font-bold" style={{ fontSize: workExperienceBodySizes.body, color: workExperienceStyling.bodyColor }}>{exp.position || ''}</h3>
-                        <div className="text-right">
-                          <span className="font-bold flex-shrink-0" style={{ fontSize: workExperienceBodySizes.body, color: workExperienceStyling.bodyColor }}>
+                  <div key={index} style={{ display: 'flex', gap: '10px' }}>
+                    <DateCol text={dateRange} color={workExperienceStyling.bodyColor} sizePx={workExperienceBodySizes.small} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '8px', marginBottom: '2px' }}>
+                        <span style={{ fontSize: workExperienceBodySizes.body, fontWeight: 700, color: workExperienceStyling.bodyColor }}>
+                          {exp.position || ''}
+                        </span>
+                        <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                          <span style={{ fontSize: workExperienceBodySizes.body, fontWeight: 600, color: workExperienceStyling.bodyColor }}>
                             {exp.company || ''}
                           </span>
                           {exp.location && (
-                            <span className="block" style={{ fontSize: workExperienceBodySizes.small, color: workExperienceStyling.bodyColor }}>{exp.location}</span>
+                            <span style={{ display: 'block', fontSize: workExperienceBodySizes.xs, color: workExperienceStyling.bodyColor, opacity: 0.65 }}>
+                              {exp.location}
+                            </span>
                           )}
                         </div>
                       </div>
                       {responsibilities.length > 0 && (
-                        <ul className="space-y-0.5 mt-0.5 mb-0.5 list-none pl-0">
-                          {responsibilities.map((resp, i) => (
-                            <li key={i} className="flex gap-1">
-                              <span className="flex-shrink-0" style={{ fontSize: workExperienceBodySizes.body, color: workExperienceStyling.bodyColor }}>•</span>
-                              <span className="flex-1 break-words leading-snug" style={{ fontSize: workExperienceBodySizes.body, color: workExperienceStyling.bodyColor }}>{resp}</span>
-                            </li>
-                          ))}
-                        </ul>
+                        <BulletList items={responsibilities} color={workExperienceStyling.bodyColor} sizePx={workExperienceBodySizes.body} />
                       )}
                       {technologies.length > 0 && (
-                        <div className="flex flex-wrap gap-0.5 mt-0.5">
-                          {technologies.map((tech, i) => (
-                            <span key={i} className="font-mono px-1 py-0.5 rounded" style={{ fontSize: sizes.xs, color: workExperienceStyling.bodyColor, backgroundColor: `${workExperienceStyling.bodyColor}15` }}>
-                              {tech}
-                            </span>
-                          ))}
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '5px' }}>
+                          {technologies.map((tech, i) => <TechTag key={i} label={tech} />)}
                         </div>
                       )}
                       {exp.competencies && exp.competencies.length > 0 && (
-                        <p className="mt-0.5" style={{ fontSize: sizes.xs, color: workExperienceStyling.bodyColor }}>
-                          {t('resume.labels.keyCompetencies')}: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(', ')}
+                        <p style={{ fontSize: sizes.xs, color: workExperienceStyling.bodyColor, opacity: 0.8, marginTop: '4px' }}>
+                          <span style={{ fontWeight: 600 }}>{t('resume.labels.keyCompetencies')}:</span>{' '}
+                          {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(' · ')}
                         </p>
                       )}
                     </div>
@@ -371,37 +409,38 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
         ) : null;
 
       case "certificates":
-        return certificates && certificates.length > 0 && certificates.some(cert => cert.name) ? (
-          <div key="certificates" className="mb-3">
-            <div className="flex items-center gap-2 mb-1">
-              <h2 className="uppercase tracking-wide flex-shrink-0" style={{ fontSize: certificatesTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: certificatesStyling.titleColor }}>
-                {t('resume.sections.certifications').toUpperCase()}
-              </h2>
-              <div className="flex-1 border-t" style={{ borderColor: certificatesStyling.titleColor }}></div>
-            </div>
-            <div className="space-y-1.5">
+        return certificates && certificates.length > 0 && certificates.some(c => c.name) ? (
+          <div key="certificates" style={{ marginBottom: '18px' }}>
+            <SectionHeading label={t('resume.sections.certifications').toUpperCase()} color={sectionHeadingColor} sizes={certificatesTitleSizes} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {certificates.map((cert, index) => {
                 if (!cert.name) return null;
-
                 const dateRange = formatDateRangeLatex(cert.issueDate, cert.expirationDate);
-
                 return (
-                  <div key={index} className="flex gap-2" style={{ fontSize: certificatesBodySizes.body }}>
-                    <div className="w-[13%] flex-shrink-0 text-muted-foreground" style={{ fontSize: certificatesBodySizes.small }}>
-                      {dateRange || cert.issueDate || ''}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-start gap-2 mb-0.5">
-                        <h3 className="font-bold" style={{ fontSize: certificatesBodySizes.body, color: certificatesStyling.bodyColor }}>{cert.name}</h3>
-                        <span className="font-bold flex-shrink-0" style={{ fontSize: certificatesBodySizes.body, color: certificatesStyling.bodyColor }}>
-                          {cert.organization || ''}
-                        </span>
+                  <div key={index} style={{ display: 'flex', gap: '10px' }}>
+                    <DateCol text={dateRange || cert.issueDate || ''} color={certificatesStyling.bodyColor} sizePx={certificatesBodySizes.small} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '8px' }}>
+                        <span style={{ fontSize: certificatesBodySizes.body, fontWeight: 700, color: certificatesStyling.bodyColor }}>{cert.name}</span>
+                        <span style={{ fontSize: certificatesBodySizes.small, fontWeight: 600, color: certificatesStyling.bodyColor, flexShrink: 0 }}>{cert.organization || ''}</span>
                       </div>
                       {cert.credentialId && (
-                        <p className="text-muted-foreground" style={{ fontSize: certificatesBodySizes.xs }}>{t('resume.fields.credentialId')}: {cert.credentialId}</p>
+                        <p style={{ fontSize: certificatesBodySizes.xs, color: certificatesStyling.bodyColor, opacity: 0.65, marginTop: '1px' }}>
+                          {t('resume.fields.credentialId')}: {cert.credentialId}
+                        </p>
                       )}
                       {cert.url && (
-                        <a href={cert.url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:underline block truncate max-w-[200px]" style={{ fontSize: certificatesBodySizes.xs }}>
+                        <a href={cert.url} target="_blank" rel="noopener noreferrer" style={{
+                          fontSize: certificatesBodySizes.xs,
+                          color: linkColor,
+                          display: 'block',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                          maxWidth: '200px',
+                          textDecoration: 'none',
+                          borderBottom: `0.5px solid ${linkColor}50`,
+                        }}>
                           {cert.url.replace(/^https?:\/\/(www\.)?/, '')}
                         </a>
                       )}
@@ -414,39 +453,28 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
         ) : null;
 
       case "languages":
-        return languages && languages.length > 0 && languages.some(lang => lang.language) ? (
-          <div key="languages" className="mb-3">
-            <div className="flex items-center gap-2 mb-1">
-              <h2 className="uppercase tracking-wide flex-shrink-0" style={{ fontSize: languagesTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: languagesStyling.titleColor }}>
-                {t('resume.sections.languages').toUpperCase()}
-              </h2>
-              <div className="flex-1 border-t" style={{ borderColor: languagesStyling.titleColor }}></div>
-            </div>
-            <div className="pl-[15%]" style={{ fontSize: languagesBodySizes.body, color: languagesStyling.bodyColor }}>
-              {languages
-                .filter(lang => lang.language)
-                .map((lang, index, arr) => (
-                  <span key={index}>
-                    <span className="font-bold">{lang.language}</span>
-                    {lang.proficiency && ` - ${formatProficiency(t, lang.proficiency)}`}
-                    {index < arr.length - 1 && ', '}
-                  </span>
-                ))}
+        return languages && languages.length > 0 && languages.some(l => l.language) ? (
+          <div key="languages" style={{ marginBottom: '18px' }}>
+            <SectionHeading label={t('resume.sections.languages').toUpperCase()} color={sectionHeadingColor} sizes={languagesTitleSizes} />
+            <div style={{ paddingLeft: '14%', display: 'flex', flexWrap: 'wrap', gap: '6px 18px' }}>
+              {languages.filter(l => l.language).map((lang, index) => (
+                <span key={index} style={{ fontSize: languagesBodySizes.body, color: languagesStyling.bodyColor, lineHeight: 1.7 }}>
+                  <span style={{ fontWeight: 700 }}>{lang.language}</span>
+                  {lang.proficiency && (
+                    <span style={{ opacity: 0.65, fontStyle: 'italic' }}> — {formatProficiency(t, lang.proficiency)}</span>
+                  )}
+                </span>
+              ))}
             </div>
           </div>
         ) : null;
 
       case "interests":
         return personalInfo.interests && personalInfo.interests.length > 0 && personalInfo.interests.some(i => i.interest) ? (
-          <div key="interests" className="mb-3">
-            <div className="flex items-center gap-2 mb-1">
-              <h2 className="uppercase tracking-wide flex-shrink-0" style={{ fontSize: personalInfoTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: personalInfoTitleColor }}>
-                {t('resume.sections.interests').toUpperCase()}
-              </h2>
-              <div className="flex-1 border-t" style={{ borderColor: personalInfoTitleColor }}></div>
-            </div>
-            <p className="pl-[15%]" style={{ fontSize: personalInfoBodySizes.body, color: personalInfoBodyColor }}>
-              {personalInfo.interests.filter(i => i.interest).map(i => i.interest).join(', ')}
+          <div key="interests" style={{ marginBottom: '18px' }}>
+            <SectionHeading label={t('resume.sections.interests').toUpperCase()} color={sectionHeadingColor} sizes={personalInfoTitleSizes} />
+            <p style={{ paddingLeft: '14%', fontSize: personalInfoBodySizes.body, color: personalInfoBodyColor, lineHeight: 1.7, margin: 0 }}>
+              {personalInfo.interests.filter(i => i.interest).map(i => i.interest).join(' · ')}
             </p>
           </div>
         ) : null;
@@ -457,198 +485,242 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
   };
 
   const fullName = `${personalInfo.firstName || ''} ${personalInfo.lastName || ''}`.trim();
-  const professionalTitle = (personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0) ? personalInfo.professionalTitle.trim() : '';
+  const professionalTitle = personalInfo.professionalTitle?.trim() || '';
 
   return (
     <>
       <style>{`
-        /* Apply padding for both screen (preview) and print */
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:wght@600;700&display=swap');
+
         .resume-page-container {
-          padding-top: 32px !important;
+          padding-top: 0 !important;
           padding-bottom: 32px !important;
         }
+
         @media print {
-          /* Hide photo placeholders in print/PDF */
-          .photo-placeholder {
-            display: none !important;
-          }
+          .photo-placeholder { display: none !important; }
           @page {
             size: A4;
-            margin: 15mm 0 0 0;
-            background: var(--pdf-background, hsl(var(--background))) !important;
-          }
-          @page :first {
-            margin-top: 0;
+            margin: 0;
+            background: white !important;
           }
           html, body {
-            background: var(--pdf-background, hsl(var(--background))) !important;
-            min-height: 100%;
-            height: 100%;
+            background: white !important;
           }
           .resume-page-container {
-            min-height: 0 !important;
-            background: var(--pdf-background, hsl(var(--background))) !important;
+            background: white !important;
             width: 210mm;
             margin: 0 auto;
-            display: flex;
-            flex-direction: column;
           }
-          .resume-page-container > div:not([aria-hidden="true"]) {
-            flex: 0 0 auto;
-          }
-          /* Spacer fills remaining page space; max-height set dynamically by JS */
-          .resume-page-container > div[aria-hidden="true"],
-          .resume-spacer {
-            flex: 1 1 auto !important;
-            min-height: 0 !important;
-            background: var(--pdf-background, hsl(var(--background))) !important;
-          }
-          /* Prevent sections from breaking awkwardly */
-          div[class*="mb-"] {
+          div[style*="margin-bottom"] {
             page-break-inside: avoid;
             break-inside: avoid;
           }
+          .resume-spacer {
+            flex: 1 1 auto !important;
+            min-height: 0 !important;
+          }
         }
       `}</style>
-      <div className="resume-page-container bg-background text-foreground p-8 max-w-4xl mx-auto" style={{ fontFamily: fontFamily, fontSize: sizes.base, overflow: 'visible' }}>
-        {/* Header: Side-by-side layout with flexible contact info container */}
-        <div className="-mx-8 px-8 pt-8 mb-6 border-b-2 border-foreground/30" style={{ overflow: 'visible' }}>
-          <div className="flex items-start mb-6 gap-6" style={{ minWidth: 0, overflow: 'visible' }}>
-            {/* Name and professional title container - fixed size with max-width */}
-            <div className="flex items-start gap-4 flex-shrink-0" style={{ maxWidth: '50%', minWidth: 0 }}>
-              {/* Profile image - can shrink with minimum size constraint */}
+
+      <div
+        className="resume-page-container bg-background text-foreground mx-auto"
+        style={{
+          fontFamily: fontFamily,
+          fontSize: sizes.base,
+          maxWidth: '820px',
+          overflow: 'visible',
+        }}
+      >
+        {/* ── HEADER ──────────────────────────────────────────────────── */}
+        <div style={{
+          background: `linear-gradient(135deg, ${sectionHeadingColor}0a 0%, ${sectionHeadingColor}05 100%)`,
+          borderBottom: `2px solid ${sectionHeadingColor}`,
+          padding: '28px 32px 22px 32px',
+          marginBottom: '22px',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '20px' }}>
+
+            {/* Profile image */}
+            <div style={{ flexShrink: 0 }}>
               {personalInfo.profileImage ? (
-                <div style={{ flexShrink: 1, minWidth: '90px', width: '112px' }}>
-                  <div className="overflow-hidden rounded-sm border-2 border-foreground/40" style={{ width: '100%', aspectRatio: '1', minWidth: '90px' }}>
-                    <img
-                      src={personalInfo.profileImage}
-                      alt={`Professional profile photo of ${fullName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
-                      className="w-full h-full object-cover"
-                      style={{ objectPosition: '50% 40%' }}
-                      loading="lazy"
-                      decoding="async"
-                      fetchPriority="low"
-                    />
-                  </div>
+                <div style={{
+                  width: '90px',
+                  height: '90px',
+                  borderRadius: '4px',
+                  overflow: 'hidden',
+                  border: `2px solid ${sectionHeadingColor}30`,
+                  boxShadow: `0 2px 12px ${sectionHeadingColor}20`,
+                }}>
+                  <img
+                    src={personalInfo.profileImage}
+                    alt={`${fullName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}`}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 40%' }}
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
               ) : (
-                <div className="bg-muted border-2 border-foreground/40 rounded-sm flex items-center justify-center photo-placeholder" style={{ flexShrink: 1, minWidth: '90px', width: '112px', aspectRatio: '1' }}>
-                  <span className="text-xs text-muted-foreground">Photo</span>
+                <div
+                  className="photo-placeholder"
+                  style={{
+                    width: '90px',
+                    height: '90px',
+                    borderRadius: '4px',
+                    border: `1.5px dashed ${sectionHeadingColor}40`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: `${sectionHeadingColor}06`,
+                  }}
+                >
+                  <span style={{ fontSize: '10px', color: `${sectionHeadingColor}70` }}>Photo</span>
+                </div>
+              )}
+            </div>
+
+            {/* Name + title */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <h1 style={{
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: personalInfoTitleSizes.name,
+                fontWeight: titleBold ? 700 : 600,
+                color: titleColor,
+                letterSpacing: '0.02em',
+                lineHeight: 1.1,
+                margin: '0 0 5px 0',
+                textTransform: 'uppercase',
+              }}>
+                {fullName || 'YOUR NAME HERE'}
+              </h1>
+              <p style={{
+                fontSize: personalInfoBodySizes.title,
+                color: sectionHeadingColor,
+                fontWeight: 500,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                margin: 0,
+                opacity: 0.9,
+              }}>
+                {professionalTitle || 'Your Professional Title'}
+              </p>
+            </div>
+
+            {/* Contact info — two column */}
+            <div style={{
+              flexShrink: 0,
+              display: 'flex',
+              gap: '18px',
+              alignItems: 'flex-start',
+              paddingTop: '4px',
+            }}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {personalInfo.website
+                  ? renderIconText(Globe, personalInfo.website, personalInfo.website)
+                  : renderIconText(Globe, "yourwebsite.com", "#")}
+                {personalInfo.phone
+                  ? renderIconText(Phone, personalInfo.phone)
+                  : renderIconText(Phone, "+1 (555) 123-4567")}
+                {personalInfo.location
+                  ? renderIconText(MapPin, personalInfo.location)
+                  : renderIconText(MapPin, "City, Country")}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {personalInfo.email
+                  ? renderIconText(Mail, personalInfo.email, `mailto:${personalInfo.email}`)
+                  : renderIconText(Mail, "your.email@example.com", "#")}
+                {personalInfo.github
+                  ? renderIconText(Github, personalInfo.github, personalInfo.github)
+                  : renderIconText(Github, "github.com/username", "#")}
+                {personalInfo.linkedin
+                  ? renderIconText(Linkedin, personalInfo.linkedin, personalInfo.linkedin)
+                  : renderIconText(Linkedin, "linkedin.com/in/username", "#")}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── BODY ────────────────────────────────────────────────────── */}
+        <div style={{ padding: '0 32px' }}>
+
+          {/* Summary + Skills */}
+          {(personalInfo.summary || (skills && skills.length > 0 && skills.some(s => s.skill))) && (
+            <div style={{ marginBottom: '22px' }}>
+              {personalInfo.summary && personalInfo.summary.trim() && (
+                <div style={{ marginBottom: '14px' }}>
+                  <SectionHeading label={t('resume.sections.summary').toUpperCase()} color={sectionHeadingColor} sizes={personalInfoTitleSizes} />
+                  <p style={{
+                    fontSize: personalInfoBodySizes.base,
+                    color: personalInfoBodyColor,
+                    lineHeight: 1.75,
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-word',
+                    paddingLeft: '14%',
+                    margin: 0,
+                  }}>
+                    {personalInfo.summary.trim()}
+                  </p>
                 </div>
               )}
 
-              <div className="pt-0 flex flex-col gap-2 flex-shrink-0 min-w-0 flex-1">
-                {fullName ? (
-                  <h1 className="uppercase mb-0 leading-tight break-words" style={{ fontSize: personalInfoTitleSizes.name, fontWeight: titleBold ? 'bold' : 'normal', color: titleColor }}>
-                    {fullName}
-                  </h1>
-                ) : (
-                  <h1 className="uppercase mb-0 leading-tight break-words" style={{ fontSize: personalInfoTitleSizes.name, fontWeight: titleBold ? 'bold' : 'normal', color: titleColor }}>
-                    YOUR NAME HERE
-                  </h1>
-                )}
-                {professionalTitle ? (
-                  <p className="mt-0 leading-tight font-medium break-words" style={{ fontSize: personalInfoBodySizes.title, color: textColor }}>{professionalTitle}</p>
-                ) : (
-                  <p className="mt-0 leading-tight font-medium break-words" style={{ fontSize: personalInfoBodySizes.title, color: textColor }}>Your Professional Title</p>
-                )}
-              </div>
-            </div>
-
-            {/* Contact info - can shrink when needed */}
-            <div className="flex gap-2 flex-1 min-w-0 pt-2 justify-end" style={{ minWidth: '280px', maxWidth: '50%', overflow: 'visible' }}>
-              <div className="flex-shrink-0 min-w-0" style={{ maxWidth: '160px' }}>
-                {personalInfo.website ? renderIconText(Globe, personalInfo.website, personalInfo.website) : renderIconText(Globe, "yourwebsite.com", "#")}
-                {personalInfo.phone ? renderIconText(Phone, personalInfo.phone) : renderIconText(Phone, "+1 (555) 123-4567")}
-                {personalInfo.location ? renderIconText(MapPin, personalInfo.location) : renderIconText(MapPin, "City, Country")}
-              </div>
-
-              <div className="flex-shrink-0 min-w-0" style={{ maxWidth: '180px' }}>
-                {personalInfo.email ? renderIconText(Mail, personalInfo.email, `mailto:${personalInfo.email}`) : renderIconText(Mail, "your.email@example.com", "#")}
-                {personalInfo.github ? renderIconText(Github, personalInfo.github, personalInfo.github) : renderIconText(Github, "github.com/username", "#")}
-                {personalInfo.linkedin ? renderIconText(Linkedin, personalInfo.linkedin, personalInfo.linkedin) : renderIconText(Linkedin, "linkedin.com/in/username", "#")}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Summary and Skills - better responsive layout */}
-        {(personalInfo.summary || (skills && skills.length > 0 && skills.some(s => s.skill))) && (
-          <div className="mb-4">
-            {/* Summary - full width if both exist, otherwise keep as is */}
-            {personalInfo.summary && personalInfo.summary.trim() && (
-              <div className="mb-3">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <h2 className="uppercase tracking-wide flex-shrink-0" style={{ fontSize: personalInfoTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: personalInfoTitleColor }}>
-                    {t('resume.sections.summary').toUpperCase()}
-                  </h2>
-                  <div className="flex-1 border-t" style={{ borderColor: personalInfoTitleColor }}></div>
-                </div>
-                <p className="leading-relaxed break-words whitespace-pre-wrap" style={{ fontSize: personalInfoBodySizes.base, color: personalInfoBodyColor, lineHeight: '1.5' }}>
-                  {personalInfo.summary.trim()}
-                </p>
-              </div>
-            )}
-
-            {/* Skills - full width */}
-            {skills && skills.length > 0 && skills.some(s => s.skill) && (
-              <div className="mb-2">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <h2 className="uppercase tracking-wide flex-shrink-0" style={{ fontSize: skillsTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: skillsStyling.titleColor }}>
-                    {t('resume.sections.skills').toUpperCase()}
-                  </h2>
-                  <div className="flex-1 border-t" style={{ borderColor: skillsStyling.titleColor }}></div>
-                </div>
+              {skills && skills.length > 0 && skills.some(s => s.skill) && (
                 <div>
-                  <div className="flex gap-2">
-                    <span className="font-bold flex-shrink-0" style={{ fontSize: skillsBodySizes.xs, color: skillsStyling.bodyColor, minWidth: '50px' }}>{t('resume.sections.skills')}:</span>
-                    <span className="flex-1 break-words" style={{ fontSize: skillsBodySizes.xs, color: skillsStyling.bodyColor, lineHeight: '1.5' }}>
-                      {skills.filter(s => s.skill).map(s => s.skill).join(', ')}
+                  <SectionHeading label={t('resume.sections.skills').toUpperCase()} color={sectionHeadingColor} sizes={skillsTitleSizes} />
+                  <div style={{ paddingLeft: '14%', display: 'flex', gap: '8px', alignItems: 'baseline', flexWrap: 'wrap' }}>
+                    <span style={{
+                      fontSize: skillsBodySizes.xs,
+                      fontWeight: 700,
+                      color: skillsStyling.bodyColor,
+                      flexShrink: 0,
+                      opacity: 0.7,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                    }}>
+                      {t('resume.sections.skills')}:
+                    </span>
+                    <span style={{ fontSize: skillsBodySizes.xs, color: skillsStyling.bodyColor, lineHeight: 1.8 }}>
+                      {skills.filter(s => s.skill).map((s, i, arr) => (
+                        <span key={i}>
+                          {s.skill}
+                          {i < arr.length - 1 && (
+                            <span style={{ color: sectionHeadingColor, padding: '0 5px', opacity: 0.5 }}>·</span>
+                          )}
+                        </span>
+                      ))}
                     </span>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
-        )}
+              )}
+            </div>
+          )}
 
-        {/* Other sections */}
-        <div className="space-y-0">
-          {orderedSections
-            .filter(section => section !== 'summary' && section !== 'skills')
-            .map(section => renderSection(section))}
+          {/* Ordered sections */}
+          <div>
+            {orderedSections
+              .filter(s => s !== 'summary' && s !== 'skills')
+              .map(section => renderSection(section))}
+          </div>
         </div>
 
-        {/* Capped spacer - fills partial pages, won't create extra pages */}
-        <div aria-hidden="true" className="resume-spacer" style={{ flex: '1 1 auto', minHeight: 0 }}></div>
+        {/* Spacer */}
+        <div aria-hidden="true" className="resume-spacer" style={{ flex: '1 1 auto', minHeight: 0 }} />
 
-        {/* Page Number Footer */}
+        {/* Print page numbers */}
         <style>{`
-        /* Hide page numbers in preview (screen) */
-        .page-number-footer {
-          display: none;
-        }
-        @media print {
-          @page {
-            margin-bottom: 20mm;
-            margin-top: 15mm;
-            @bottom-center {
-              content: counter(page);
-              font-size: 10px;
-              color: #6b7280;
-              opacity: 0.6;
+          .page-number-footer { display: none; }
+          @media print {
+            @page {
+              margin-bottom: 18mm;
+              @bottom-center {
+                content: counter(page);
+                font-size: 9px;
+                color: #9ca3af;
+              }
             }
+            .page-number-footer { display: none !important; }
           }
-          @page :first {
-            margin-top: 0;
-          }
-          /* Ensure our footer is hidden in print */
-          .page-number-footer {
-            display: none !important;
-          }
-        }
-      `}</style>
-        <div className="page-number-footer"></div>
+        `}</style>
+        <div className="page-number-footer" />
       </div>
     </>
   );

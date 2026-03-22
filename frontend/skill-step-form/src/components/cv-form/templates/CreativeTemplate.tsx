@@ -1,6 +1,6 @@
 import React from "react";
 import { CVFormData } from "../types";
-import { Mail, Phone, MapPin, Linkedin, Github, Globe } from "lucide-react";
+import { Mail, Phone, MapPin, Linkedin, Github, Globe, Briefcase, GraduationCap, Code, Award, Languages, Heart, User } from "lucide-react";
 import { formatDateRange } from "@/lib/dateFormatter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatProficiency } from "@/lib/languageProficiency";
@@ -16,48 +16,54 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
   const defaultOrder = ["summary", "workExperience", "education", "projects", "certificates", "skills", "languages", "interests"];
   const orderedSections = sectionOrder || defaultOrder;
 
-  // Extract styling options with defaults
+  // Extract styling options with vibrant defaults
   const fontFamily = styling?.fontFamily || "Inter";
   const fontSizeInput = styling?.fontSize || "medium";
   const fontSize: "small" | "medium" | "large" =
     (fontSizeInput === "small" || fontSizeInput === "medium" || fontSizeInput === "large")
       ? fontSizeInput
       : "medium";
-  const titleColor = styling?.titleColor || "#1f2937";
+  const titleColor = styling?.titleColor || "#1e293b";
   const titleBold = styling?.titleBold ?? true;
-  const headingColor = styling?.headingColor || "#2563eb";
+  const headingColor = styling?.headingColor || "#7c3aed"; // Vibrant purple
   const headingBold = styling?.headingBold ?? true;
-  const textColor = styling?.textColor || "#1f2937";
-  const linkColor = styling?.linkColor || "#2563eb";
+  const textColor = styling?.textColor || "#475569";
+  const linkColor = styling?.linkColor || "#7c3aed";
 
-  // Font size mappings - Increased differences for more noticeable size changes
+  // Subtle accent color - one primary color for elegance
+  const accentColor = headingColor;
+
+  // Font size mappings - compact for resume
   const fontSizeMap = {
     small: {
-      heading: '0.875rem',    // 14px
-      base: '0.6875rem',      // 11px
-      sm: '0.625rem',         // 10px
-      xs: '0.5rem',           // 8px
-      sectionHeading: '1rem', // 16px
-      lg: '0.8125rem',        // 13px
-      baseText: '0.625rem',   // 10px (reduced from 11px)
+      heading: '0.875rem',     // 14px
+      base: '0.6875rem',       // 11px
+      sm: '0.625rem',          // 10px
+      xs: '0.5625rem',         // 9px
+      sectionHeading: '0.9375rem', // 15px
+      lg: '0.8125rem',         // 13px
+      baseText: '0.625rem',    // 10px
+      name: '1.5rem',          // 24px
     },
     medium: {
-      heading: '1.25rem',     // 20px (+6px from small)
-      base: '0.9375rem',      // 15px (+4px from small)
-      sm: '0.8125rem',        // 13px (+3px from small)
-      xs: '0.6875rem',        // 11px (+3px from small)
-      sectionHeading: '1.5rem', // 24px (+8px from small)
-      lg: '1.125rem',         // 18px (+5px from small)
-      baseText: '0.8125rem',  // 13px (reduced from 15px)
+      heading: '1rem',         // 16px
+      base: '0.8125rem',       // 13px
+      sm: '0.75rem',           // 12px
+      xs: '0.6875rem',         // 11px
+      sectionHeading: '1.125rem', // 18px
+      lg: '0.9375rem',         // 15px
+      baseText: '0.75rem',     // 12px
+      name: '1.875rem',        // 30px
     },
     large: {
-      heading: '1.625rem',    // 26px (+6px from medium)
-      base: '1.1875rem',      // 19px (+4px from medium)
-      sm: '1rem',             // 16px (+3px from medium)
-      xs: '0.875rem',         // 14px (+3px from medium)
-      sectionHeading: '2rem', // 32px (+8px from medium)
-      lg: '1.4375rem',        // 23px (+5px from medium)
-      baseText: '1rem',       // 16px (reduced from 19px)
+      heading: '1.125rem',     // 18px
+      base: '0.9375rem',       // 15px
+      sm: '0.875rem',          // 14px
+      xs: '0.8125rem',         // 13px
+      sectionHeading: '1.25rem', // 20px
+      lg: '1.0625rem',         // 17px
+      baseText: '0.875rem',    // 14px
+      name: '2.125rem',        // 34px
     },
   };
 
@@ -76,7 +82,6 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
 
   // Extract section-specific styling for personalInfo
   const personalInfoSectionStyling = styling?.sectionStyling?.personalInfo;
-  // Use headingColor as fallback (blue) instead of titleColor (black) to match template defaults
   const personalInfoTitleColor = personalInfoSectionStyling?.titleColor || headingColor;
   const personalInfoTitleSize = personalInfoSectionStyling?.titleSize || fontSize;
   const personalInfoBodyColor = personalInfoSectionStyling?.bodyColor || textColor;
@@ -90,11 +95,9 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
   const skillsStyling = getSectionStyling('skills');
   const languagesStyling = getSectionStyling('languages');
 
-  // Size mappings for personalInfo section-specific sizes
+  // Size mappings
   const personalInfoTitleSizes = fontSizeMap[personalInfoTitleSize];
   const personalInfoBodySizes = fontSizeMap[personalInfoBodySize];
-
-  // Create size mappings for each section
   const workExperienceTitleSizes = fontSizeMap[workExperienceStyling.titleSize];
   const workExperienceBodySizes = fontSizeMap[workExperienceStyling.bodySize];
   const projectsTitleSizes = fontSizeMap[projectsStyling.titleSize];
@@ -108,56 +111,135 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
   const languagesTitleSizes = fontSizeMap[languagesStyling.titleSize];
   const languagesBodySizes = fontSizeMap[languagesStyling.bodySize];
 
+  // Section icon mapping
+  const sectionIcons = {
+    summary: User, // User icon for about me/summary
+    workExperience: Briefcase,
+    education: GraduationCap,
+    projects: Code,
+    certificates: Award,
+    skills: Code,
+    languages: Languages,
+    interests: Heart,
+  };
+
   const renderSection = (sectionKey: string) => {
+    const Icon = sectionIcons[sectionKey as keyof typeof sectionIcons];
+
     switch (sectionKey) {
       case "summary":
         return personalInfo.summary && personalInfo.summary.trim() ? (
-          <div key="summary" className="mb-3">
-            <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="font-black mb-2 italic" style={{ fontSize: `calc(${personalInfoTitleSizes.sectionHeading} * 0.8)`, fontWeight: headingBold ? '900' : 'bold', color: personalInfoTitleColor }}>{t('resume.sections.aboutMe')}</h2>
-              <p className="text-foreground leading-relaxed whitespace-pre-wrap" style={{ fontSize: personalInfoBodySizes.baseText, color: personalInfoBodyColor }}>{personalInfo.summary.trim()}</p>
+          <div key="summary">
+            <div className="relative pl-5 border-l-[3px]" style={{ borderColor: accentColor }}>
+              <div className="flex items-center gap-2 mb-2.5">
+                {Icon && <Icon className="h-4 w-4" style={{ color: personalInfoTitleColor }} />}
+                <h2 
+                  className="font-black italic uppercase tracking-wide" 
+                  style={{ 
+                    fontSize: personalInfoTitleSizes.sectionHeading, 
+                    fontWeight: headingBold ? '900' : 'bold', 
+                    color: personalInfoTitleColor 
+                  }}
+                >
+                  {t('resume.sections.aboutMe')}
+                </h2>
+              </div>
+              <p 
+                className="leading-relaxed whitespace-pre-wrap" 
+                style={{ 
+                  fontSize: personalInfoBodySizes.baseText, 
+                  color: personalInfoBodyColor, 
+                  lineHeight: '1.7',
+                  opacity: 0.95
+                }}
+              >
+                {personalInfo.summary.trim()}
+              </p>
             </div>
           </div>
         ) : null;
 
       case "workExperience":
         return workExperience.some(exp => exp.position || exp.company) ? (
-          <div key="workExperience" className="mb-3">
-            <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="font-black mb-2 italic" style={{ fontSize: `calc(${workExperienceTitleSizes.sectionHeading} * 0.8)`, fontWeight: headingBold ? '900' : 'bold', color: workExperienceStyling.titleColor }}>{t('resume.sections.experience')}</h2>
-              <div className="space-y-2">
+          <div key="workExperience">
+            <div className="relative pl-5 border-l-[3px]" style={{ borderColor: accentColor }}>
+              <div className="flex items-center gap-2 mb-2.5">
+                <Briefcase className="h-4 w-4" style={{ color: workExperienceStyling.titleColor }} />
+                <h2 
+                  className="font-black italic uppercase tracking-wide" 
+                  style={{ 
+                    fontSize: workExperienceTitleSizes.sectionHeading, 
+                    fontWeight: headingBold ? '900' : 'bold', 
+                    color: workExperienceStyling.titleColor 
+                  }}
+                >
+                  {t('resume.sections.experience')}
+                </h2>
+              </div>
+              <div className="space-y-3">
                 {workExperience.map((exp, index) => (
                   (exp.position || exp.company) && (
                     <div key={index} className="relative">
-                      <div className="absolute -left-[26px] w-3 h-3 rounded-full bg-primary"></div>
-                      {/* Position title on its own line */}
-                      <h3 className="font-bold mb-0.5" style={{ fontSize: workExperienceBodySizes.baseText, color: workExperienceStyling.bodyColor }}>{exp.position}</h3>
-                      {/* Company/Location (left) and Date (right) on same line */}
-                      <div className="flex justify-between items-center gap-4 mb-0.5">
-                        <p className="font-semibold" style={{ fontSize: workExperienceBodySizes.baseText, color: workExperienceStyling.bodyColor }}>
+                      <div 
+                        className="absolute -left-[29px] w-2.5 h-2.5 rounded-full border-2 border-background" 
+                        style={{ backgroundColor: accentColor }}
+                      />
+                      <h3 
+                        className="font-bold mb-0.5" 
+                        style={{ 
+                          fontSize: workExperienceBodySizes.base, 
+                          color: workExperienceStyling.bodyColor,
+                          letterSpacing: '0.01em'
+                        }}
+                      >
+                        {exp.position}
+                      </h3>
+                      <div className="flex justify-between items-center gap-4 mb-1">
+                        <p 
+                          className="font-medium" 
+                          style={{ 
+                            fontSize: workExperienceBodySizes.sm, 
+                            color: workExperienceStyling.bodyColor,
+                            opacity: 0.85
+                          }}
+                        >
                           {exp.company}{exp.location && ` • ${exp.location}`}
                         </p>
                         {(exp.startDate || exp.endDate) && (
-                          <span className="whitespace-nowrap" style={{ fontSize: workExperienceBodySizes.xs, color: workExperienceStyling.bodyColor }}>
+                          <span 
+                            className="whitespace-nowrap italic" 
+                            style={{ 
+                              fontSize: workExperienceBodySizes.xs, 
+                              color: workExperienceStyling.bodyColor, 
+                              opacity: 0.7 
+                            }}
+                          >
                             {formatDateRange(exp.startDate, exp.endDate, t('resume.fields.present'), language)}
                           </span>
                         )}
                       </div>
                       {((exp.responsibilities && exp.responsibilities.length > 0) || exp.description) && (
-                        <ul className="space-y-0.5 mt-1.5" style={{ fontSize: workExperienceBodySizes.baseText, color: workExperienceStyling.bodyColor }}>
+                        <ul 
+                          className="space-y-1 mt-1.5" 
+                          style={{ 
+                            fontSize: workExperienceBodySizes.sm, 
+                            color: workExperienceStyling.bodyColor, 
+                            lineHeight: '1.6' 
+                          }}
+                        >
                           {exp.responsibilities && exp.responsibilities.length > 0
                             ? exp.responsibilities.map((resp, i) => (
                               resp.responsibility && (
-                                <li key={i} className="flex gap-2">
-                                  <span className="font-bold" style={{ color: workExperienceStyling.bodyColor }}>•</span>
-                                  <span className="flex-1">{resp.responsibility}</span>
+                                <li key={i} className="flex gap-2.5">
+                                  <span style={{ color: accentColor }}>▸</span>
+                                  <span className="flex-1" style={{ opacity: 0.9 }}>{resp.responsibility}</span>
                                 </li>
                               )
                             ))
                             : exp.description?.split('\n').filter(line => line.trim()).map((line, i) => (
-                              <li key={i} className="flex gap-2">
-                                <span className="font-bold" style={{ color: workExperienceStyling.bodyColor }}>•</span>
-                                <span className="flex-1">{line.trim()}</span>
+                              <li key={i} className="flex gap-2.5">
+                                <span style={{ color: accentColors.primary }}>▸</span>
+                                <span className="flex-1" style={{ opacity: 0.9 }}>{line.trim()}</span>
                               </li>
                             ))
                           }
@@ -167,7 +249,15 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                         <div className="flex flex-wrap gap-1 mt-1.5">
                           {exp.technologies.map((tech, i) => (
                             tech.technology && (
-                              <span key={i} className="px-2 py-0.5 rounded" style={{ fontSize: sizes.xs, color: workExperienceStyling.bodyColor, backgroundColor: `${workExperienceStyling.bodyColor}20` }}>
+                              <span 
+                                key={i} 
+                                className="px-2 py-0.5 rounded-md text-xs font-medium" 
+                                style={{ 
+                                  color: accentColor, 
+                                  backgroundColor: `${accentColor}15`,
+                                  fontSize: sizes.xs
+                                }}
+                              >
                                 {typeof tech === 'string' ? tech : tech.technology}
                               </span>
                             )
@@ -175,8 +265,16 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                         </div>
                       )}
                       {exp.competencies && exp.competencies.length > 0 && (
-                        <p className="mt-1.5" style={{ fontSize: sizes.xs, color: workExperienceStyling.bodyColor }}>
-                          {t('resume.labels.keyCompetencies')}: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(", ")}
+                        <p 
+                          className="mt-1.5" 
+                          style={{ 
+                            fontSize: sizes.xs, 
+                            color: workExperienceStyling.bodyColor,
+                            opacity: 0.85
+                          }}
+                        >
+                          <span style={{ fontWeight: 600 }}>{t('resume.labels.keyCompetencies')}:</span>{' '}
+                          {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(" • ")}
                         </p>
                       )}
                     </div>
@@ -189,31 +287,85 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
 
       case "education":
         return education.some(edu => edu.degree || edu.institution) ? (
-          <div key="education" className="mb-3">
-            <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="font-black mb-2 italic" style={{ fontSize: `calc(${educationTitleSizes.sectionHeading} * 0.8)`, fontWeight: headingBold ? '900' : 'bold', color: educationStyling.titleColor }}>{t('resume.sections.education')}</h2>
-              <div className="space-y-2">
+          <div key="education">
+            <div className="relative pl-5 border-l-[3px]" style={{ borderColor: accentColor }}>
+              <div className="flex items-center gap-2 mb-2.5">
+                <GraduationCap className="h-4 w-4" style={{ color: educationStyling.titleColor }} />
+                <h2 
+                  className="font-black italic uppercase tracking-wide" 
+                  style={{ 
+                    fontSize: educationTitleSizes.sectionHeading, 
+                    fontWeight: headingBold ? '900' : 'bold', 
+                    color: educationStyling.titleColor 
+                  }}
+                >
+                  {t('resume.sections.education')}
+                </h2>
+              </div>
+              <div className="space-y-2.5">
                 {education.map((edu, index) => (
                   (edu.degree || edu.institution) && (
                     <div key={index} className="relative">
-                      <div className="absolute -left-[26px] w-3 h-3 rounded-full bg-primary"></div>
-                      {/* Degree on its own line */}
-                      <h3 className="font-bold mb-0.5" style={{ fontSize: educationBodySizes.baseText, color: educationStyling.bodyColor }}>{edu.degree}</h3>
-                      {/* Institution/Location (left) and Date (right) on same line */}
+                      <div 
+                        className="absolute -left-[29px] w-2.5 h-2.5 rounded-full border-2 border-background" 
+                        style={{ backgroundColor: accentColor }}
+                      />
+                      <h3 
+                        className="font-bold mb-0.5" 
+                        style={{ 
+                          fontSize: educationBodySizes.base, 
+                          color: educationStyling.bodyColor,
+                          letterSpacing: '0.01em'
+                        }}
+                      >
+                        {edu.degree}
+                      </h3>
                       <div className="flex justify-between items-center gap-4 mb-0.5">
-                        <p style={{ fontSize: educationBodySizes.baseText, color: educationStyling.bodyColor }}>
+                        <p 
+                          style={{ 
+                            fontSize: educationBodySizes.sm, 
+                            color: educationStyling.bodyColor,
+                            opacity: 0.85
+                          }}
+                        >
                           {edu.institution}{edu.location && ` • ${edu.location}`}
                         </p>
                         {(edu.startDate || edu.endDate) && (
-                          <span className="whitespace-nowrap" style={{ fontSize: educationBodySizes.xs, color: educationStyling.bodyColor }}>
+                          <span 
+                            className="whitespace-nowrap italic" 
+                            style={{ 
+                              fontSize: educationBodySizes.xs, 
+                              color: educationStyling.bodyColor, 
+                              opacity: 0.7 
+                            }}
+                          >
                             {formatDateRange(edu.startDate, edu.endDate, t('resume.fields.present'), language)}
                           </span>
                         )}
                       </div>
-                      {edu.field && <p className="italic" style={{ fontSize: educationBodySizes.baseText, color: educationStyling.bodyColor }}>{edu.field}</p>}
+                      {edu.field && (
+                        <p 
+                          className="italic" 
+                          style={{ 
+                            fontSize: educationBodySizes.sm, 
+                            color: educationStyling.bodyColor,
+                            opacity: 0.8
+                          }}
+                        >
+                          {edu.field}
+                        </p>
+                      )}
                       {edu.keyCourses && edu.keyCourses.length > 0 && (
-                        <p className="mt-0.5" style={{ fontSize: sizes.xs, color: educationStyling.bodyColor }}>
-                          {t('resume.labels.keyCourses')}: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(", ")}
+                        <p 
+                          className="mt-1" 
+                          style={{ 
+                            fontSize: sizes.xs, 
+                            color: educationStyling.bodyColor,
+                            opacity: 0.85
+                          }}
+                        >
+                          <span style={{ fontWeight: 600 }}>{t('resume.labels.keyCourses')}:</span>{' '}
+                          {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(" • ")}
                         </p>
                       )}
                     </div>
@@ -226,33 +378,80 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
 
       case "projects":
         return projects.some(proj => proj.name) ? (
-          <div key="projects" className="mb-3">
-            <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="font-black mb-2 italic" style={{ fontSize: `calc(${projectsTitleSizes.sectionHeading} * 0.8)`, fontWeight: headingBold ? '900' : 'bold', color: projectsStyling.titleColor }}>{t('resume.sections.projects')}</h2>
-              <div className="space-y-2">
+          <div key="projects">
+            <div className="relative pl-5 border-l-[3px]" style={{ borderColor: accentColor }}>
+              <div className="flex items-center gap-2 mb-2.5">
+                <Code className="h-4 w-4" style={{ color: projectsStyling.titleColor }} />
+                <h2 
+                  className="font-black italic uppercase tracking-wide" 
+                  style={{ 
+                    fontSize: projectsTitleSizes.sectionHeading, 
+                    fontWeight: headingBold ? '900' : 'bold', 
+                    color: projectsStyling.titleColor 
+                  }}
+                >
+                  {t('resume.sections.projects')}
+                </h2>
+              </div>
+              <div className="space-y-2.5">
                 {projects.map((proj, index) => (
                   proj.name && (
                     <div key={index} className="relative">
-                      <div className="absolute -left-[26px] w-3 h-3 rounded-full bg-primary"></div>
-                      {/* Project name (left) and Date (right) on same line */}
+                      <div 
+                        className="absolute -left-[29px] w-2.5 h-2.5 rounded-full border-2 border-background" 
+                        style={{ backgroundColor: accentColor }}
+                      />
                       <div className="flex justify-between items-start gap-4 mb-0.5">
-                        <h3 className="font-bold flex-1" style={{ fontSize: projectsBodySizes.baseText, color: projectsStyling.bodyColor }}>{proj.name}</h3>
+                        <h3 
+                          className="font-bold flex-1" 
+                          style={{ 
+                            fontSize: projectsBodySizes.base, 
+                            color: projectsStyling.bodyColor,
+                            letterSpacing: '0.01em'
+                          }}
+                        >
+                          {proj.name}
+                        </h3>
                         {(proj.startDate || proj.endDate) && (
-                          <span className="whitespace-nowrap" style={{ fontSize: projectsBodySizes.xs, color: projectsStyling.bodyColor }}>
+                          <span 
+                            className="whitespace-nowrap italic" 
+                            style={{ 
+                              fontSize: projectsBodySizes.xs, 
+                              color: projectsStyling.bodyColor, 
+                              opacity: 0.7 
+                            }}
+                          >
                             {formatDateRange(proj.startDate, proj.endDate, t('resume.fields.present'), language)}
                           </span>
                         )}
                       </div>
                       {proj.description && (
-                        <p className="mt-0.5" style={{ fontSize: projectsBodySizes.baseText, color: projectsStyling.bodyColor }}>{proj.description}</p>
+                        <p 
+                          className="mt-0.5" 
+                          style={{ 
+                            fontSize: projectsBodySizes.sm, 
+                            color: projectsStyling.bodyColor,
+                            lineHeight: '1.6',
+                            opacity: 0.9
+                          }}
+                        >
+                          {proj.description}
+                        </p>
                       )}
                       {proj.highlights && proj.highlights.length > 0 && (
-                        <ul className="space-y-0.5 mt-1" style={{ fontSize: projectsBodySizes.baseText, color: projectsStyling.bodyColor }}>
+                        <ul 
+                          className="space-y-0.5 mt-1" 
+                          style={{ 
+                            fontSize: projectsBodySizes.sm, 
+                            color: projectsStyling.bodyColor,
+                            lineHeight: '1.6'
+                          }}
+                        >
                           {proj.highlights.map((highlight, i) => (
                             highlight.highlight && (
-                              <li key={i} className="flex gap-2">
-                                <span className="font-bold" style={{ color: projectsStyling.bodyColor }}>•</span>
-                                <span className="flex-1">{highlight.highlight}</span>
+                              <li key={i} className="flex gap-2.5">
+                                <span style={{ color: accentColor }}>▸</span>
+                                <span className="flex-1" style={{ opacity: 0.9 }}>{highlight.highlight}</span>
                               </li>
                             )
                           ))}
@@ -262,7 +461,15 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                         <div className="flex flex-wrap gap-1 mt-1.5">
                           {proj.technologies.map((tech, i) => (
                             tech.technology && (
-                              <span key={i} className="px-2 py-0.5 rounded" style={{ fontSize: sizes.xs, color: projectsStyling.bodyColor, backgroundColor: `${projectsStyling.bodyColor}20` }}>
+                              <span 
+                                key={i} 
+                                className="px-2 py-0.5 rounded-md text-xs font-medium" 
+                                style={{ 
+                                  color: accentColor, 
+                                  backgroundColor: `${accentColor}15`,
+                                  fontSize: sizes.xs
+                                }}
+                              >
                                 {tech.technology}
                               </span>
                             )
@@ -270,7 +477,17 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                         </div>
                       )}
                       {proj.link && (
-                        <a href={proj.link} target="_blank" rel="noopener noreferrer" className="hover:underline mt-1.5 block" style={{ fontSize: sizes.xs, color: linkColor }}>
+                        <a 
+                          href={proj.link} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="hover:underline mt-1 block transition-opacity" 
+                          style={{ 
+                            fontSize: sizes.xs, 
+                            color: linkColor,
+                            opacity: 0.8
+                          }}
+                        >
                           {proj.link.replace(/^https?:\/\/(www\.)?/, '')}
                         </a>
                       )}
@@ -284,30 +501,85 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
 
       case "certificates":
         return certificates.some(cert => cert.name) ? (
-          <div key="certificates" className="mb-3">
-            <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="font-black mb-2 italic" style={{ fontSize: `calc(${certificatesTitleSizes.sectionHeading} * 0.8)`, fontWeight: headingBold ? '900' : 'bold', color: certificatesStyling.titleColor }}>{t('resume.sections.certifications')}</h2>
-              <div className="space-y-1.5">
+          <div key="certificates">
+            <div className="relative pl-5 border-l-[3px]" style={{ borderColor: accentColor }}>
+              <div className="flex items-center gap-2 mb-2.5">
+                <Award className="h-4 w-4" style={{ color: certificatesStyling.titleColor }} />
+                <h2 
+                  className="font-black italic uppercase tracking-wide" 
+                  style={{ 
+                    fontSize: certificatesTitleSizes.sectionHeading, 
+                    fontWeight: headingBold ? '900' : 'bold', 
+                    color: certificatesStyling.titleColor 
+                  }}
+                >
+                  {t('resume.sections.certifications')}
+                </h2>
+              </div>
+              <div className="space-y-2">
                 {certificates.map((cert, index) => (
                   cert.name && (
                     <div key={index} className="relative">
-                      <div className="absolute -left-[26px] w-3 h-3 rounded-full bg-primary"></div>
-                      {/* Certificate name on its own line */}
-                      <h3 className="font-bold mb-0.5" style={{ color: certificatesStyling.bodyColor }}>{cert.name}</h3>
-                      {/* Organization (left) and Date (right) on same line */}
-                      <div className="flex justify-between items-center gap-4 mb-0.5">
-                        <p style={{ fontSize: certificatesBodySizes.baseText, color: certificatesStyling.bodyColor }}>{cert.organization}</p>
+                      <div 
+                        className="absolute -left-[29px] w-2.5 h-2.5 rounded-full border-2 border-background" 
+                        style={{ backgroundColor: accentColor }}
+                      />
+                      <h3 
+                        className="font-bold mb-0.5" 
+                        style={{ 
+                          fontSize: certificatesBodySizes.base, 
+                          color: certificatesStyling.bodyColor,
+                          letterSpacing: '0.01em'
+                        }}
+                      >
+                        {cert.name}
+                      </h3>
+                      <div className="flex justify-between items-center gap-4">
+                        <p 
+                          style={{ 
+                            fontSize: certificatesBodySizes.sm, 
+                            color: certificatesStyling.bodyColor,
+                            opacity: 0.85
+                          }}
+                        >
+                          {cert.organization}
+                        </p>
                         {(cert.issueDate || cert.expirationDate) && (
-                          <span className="whitespace-nowrap" style={{ fontSize: sizes.xs, color: certificatesStyling.bodyColor }}>
+                          <span 
+                            className="whitespace-nowrap italic" 
+                            style={{ 
+                              fontSize: sizes.xs, 
+                              color: certificatesStyling.bodyColor, 
+                              opacity: 0.7 
+                            }}
+                          >
                             {cert.issueDate} {cert.expirationDate && `- ${cert.expirationDate}`}
                           </span>
                         )}
                       </div>
                       {cert.credentialId && (
-                        <p style={{ fontSize: sizes.xs, color: certificatesStyling.bodyColor }}>ID: {cert.credentialId}</p>
+                        <p 
+                          style={{ 
+                            fontSize: sizes.xs, 
+                            color: certificatesStyling.bodyColor,
+                            opacity: 0.7
+                          }}
+                        >
+                          ID: {cert.credentialId}
+                        </p>
                       )}
                       {cert.url && (
-                        <a href={cert.url} target="_blank" rel="noopener noreferrer" className="hover:underline mt-0.5 block" style={{ fontSize: sizes.xs, color: linkColor }}>
+                        <a 
+                          href={cert.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="hover:underline mt-0.5 block transition-opacity" 
+                          style={{ 
+                            fontSize: sizes.xs, 
+                            color: linkColor,
+                            opacity: 0.8
+                          }}
+                        >
                           {cert.url.replace(/^https?:\/\/(www\.)?/, '')}
                         </a>
                       )}
@@ -321,13 +593,34 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
 
       case "skills":
         return skills.some(s => s.skill) ? (
-          <div key="skills" className="mb-3">
-            <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="font-black mb-2 italic" style={{ fontSize: `calc(${skillsTitleSizes.sectionHeading} * 0.8)`, fontWeight: headingBold ? '900' : 'bold', color: skillsStyling.titleColor }}>{t('resume.sections.skills')}</h2>
+          <div key="skills">
+            <div className="relative pl-5 border-l-[3px]" style={{ borderColor: accentColor }}>
+              <div className="flex items-center gap-2 mb-2.5">
+                <Code className="h-4 w-4" style={{ color: skillsStyling.titleColor }} />
+                <h2 
+                  className="font-black italic uppercase tracking-wide" 
+                  style={{ 
+                    fontSize: skillsTitleSizes.sectionHeading, 
+                    fontWeight: headingBold ? '900' : 'bold', 
+                    color: skillsStyling.titleColor 
+                  }}
+                >
+                  {t('resume.sections.skills')}
+                </h2>
+              </div>
               <div className="flex flex-wrap gap-1.5">
                 {skills.map((s, index) => (
                   s.skill && (
-                    <span key={index} className="px-2 py-1 rounded font-bold" style={{ fontSize: skillsBodySizes.xs, color: skillsStyling.bodyColor, backgroundColor: `${skillsStyling.bodyColor}15` }}>
+                    <span 
+                      key={index} 
+                      className="px-2.5 py-1 rounded-lg font-semibold" 
+                      style={{ 
+                        fontSize: skillsBodySizes.xs, 
+                        color: skillsStyling.bodyColor, 
+                        backgroundColor: `${skillsStyling.bodyColor}12`,
+                        letterSpacing: '0.01em'
+                      }}
+                    >
                       {s.skill}
                     </span>
                   )
@@ -339,16 +632,47 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
 
       case "languages":
         return languages.some(lang => lang.language) ? (
-          <div key="languages" className="mb-3">
-            <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="font-black mb-2 italic" style={{ fontSize: `calc(${languagesTitleSizes.sectionHeading} * 0.8)`, fontWeight: headingBold ? '900' : 'bold', color: languagesStyling.titleColor }}>{t('resume.sections.languages')}</h2>
+          <div key="languages">
+            <div className="relative pl-5 border-l-[3px]" style={{ borderColor: accentColor }}>
+              <div className="flex items-center gap-2 mb-2.5">
+                <Languages className="h-4 w-4" style={{ color: languagesStyling.titleColor }} />
+                <h2 
+                  className="font-black italic uppercase tracking-wide" 
+                  style={{ 
+                    fontSize: languagesTitleSizes.sectionHeading, 
+                    fontWeight: headingBold ? '900' : 'bold', 
+                    color: languagesStyling.titleColor 
+                  }}
+                >
+                  {t('resume.sections.languages')}
+                </h2>
+              </div>
               <div className="grid grid-cols-2 gap-2">
                 {languages.map((lang, index) => (
                   lang.language && (
-                    <div key={index} className="p-2 rounded-lg" style={{ backgroundColor: `${languagesStyling.bodyColor}15` }}>
-                      <p className="font-bold" style={{ color: languagesStyling.bodyColor }}>{lang.language}</p>
+                    <div 
+                      key={index} 
+                      className="p-2 rounded-lg" 
+                      style={{ backgroundColor: `${languagesStyling.bodyColor}10` }}
+                    >
+                      <p 
+                        className="font-semibold" 
+                        style={{ 
+                          color: languagesStyling.bodyColor,
+                          fontSize: languagesBodySizes.sm
+                        }}
+                      >
+                        {lang.language}
+                      </p>
                       {lang.proficiency && (
-                        <p style={{ fontSize: languagesBodySizes.xs, color: languagesStyling.bodyColor }}>
+                        <p 
+                          className="italic" 
+                          style={{ 
+                            fontSize: languagesBodySizes.xs, 
+                            color: languagesStyling.bodyColor, 
+                            opacity: 0.75 
+                          }}
+                        >
                           {formatProficiency(t, lang.proficiency)}
                         </p>
                       )}
@@ -362,10 +686,31 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
 
       case "interests":
         return personalInfo.interests && personalInfo.interests.length > 0 && personalInfo.interests.some(i => i.interest) ? (
-          <div key="interests" className="mb-3">
-            <div className="relative pl-6 border-l-4 border-primary">
-              <h2 className="font-black mb-2 italic" style={{ fontSize: `calc(${personalInfoTitleSizes.sectionHeading} * 0.8)`, fontWeight: headingBold ? '900' : 'bold', color: personalInfoTitleColor }}>{t('resume.sections.interests')}</h2>
-              <p className="text-foreground" style={{ fontSize: personalInfoBodySizes.baseText, color: personalInfoBodyColor }}>{personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}</p>
+          <div key="interests">
+            <div className="relative pl-5 border-l-[3px]" style={{ borderColor: accentColor }}>
+              <div className="flex items-center gap-2 mb-2.5">
+                <Heart className="h-4 w-4" style={{ color: personalInfoTitleColor }} />
+                <h2 
+                  className="font-black italic uppercase tracking-wide" 
+                  style={{ 
+                    fontSize: personalInfoTitleSizes.sectionHeading, 
+                    fontWeight: headingBold ? '900' : 'bold', 
+                    color: personalInfoTitleColor 
+                  }}
+                >
+                  {t('resume.sections.interests')}
+                </h2>
+              </div>
+              <p 
+                style={{ 
+                  fontSize: personalInfoBodySizes.sm, 
+                  color: personalInfoBodyColor, 
+                  lineHeight: '1.7',
+                  opacity: 0.9
+                }}
+              >
+                {personalInfo.interests.map(i => i.interest).filter(Boolean).join(" • ")}
+              </p>
             </div>
           </div>
         ) : null;
@@ -378,15 +723,13 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
   return (
     <>
       <style>{`
-        /* Apply padding for both screen (preview) and print */
         .resume-page-container {
-          padding-top: 20px !important;
-          padding-bottom: 20px !important;
+          padding-top: 24px !important;
+          padding-bottom: 24px !important;
           min-height: 0;
           display: flex;
           flex-direction: column;
         }
-        /* Spacer fills remaining space in preview; max-height set dynamically by JS for PDF */
         .resume-page-container > div[aria-hidden="true"],
         .resume-spacer {
           flex: 1 1 0;
@@ -401,9 +744,6 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
             size: A4;
             margin: 0;
             background: var(--pdf-background, hsl(var(--background))) !important;
-          }
-          @page :first {
-            margin-top: 0;
           }
           html, body {
             background: var(--pdf-background, hsl(var(--background))) !important;
@@ -421,111 +761,174 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
           .resume-page-container > div:not([aria-hidden="true"]) {
             flex: 0 0 auto;
           }
-          /* Spacer fills remaining page space; max-height set dynamically by JS */
           .resume-page-container > div[aria-hidden="true"],
           .resume-spacer {
             flex: 1 1 auto !important;
             min-height: 0 !important;
             background: var(--pdf-background, hsl(var(--background))) !important;
           }
-          div[class*="mb-"] {
-            page-break-inside: avoid;
-            break-inside: avoid;
-          }
         }
       `}</style>
-      <div className="resume-page-container bg-gradient-to-br from-background to-primary/5 text-foreground p-4 max-w-4xl mx-auto font-creative" style={{ fontFamily: `"${fontFamily}", ui-sans-serif, system-ui, sans-serif` }}>
-        {/* Bold creative header */}
-        <div className="mb-4">
-          <div className="flex items-start gap-6 mb-4">
+      <div 
+        className="resume-page-container bg-gradient-to-br from-background to-primary/5 text-foreground p-6 max-w-4xl mx-auto" 
+        style={{ fontFamily: `"${fontFamily}", ui-sans-serif, system-ui, sans-serif` }}
+      >
+        {/* Elegant header with single accent color */}
+        <div className="mb-4 relative">
+          <div 
+            className="absolute top-0 left-0 w-1 h-full rounded-r-full" 
+            style={{ backgroundColor: accentColor, opacity: 0.3 }}
+          />
+          <div className="flex items-start gap-6 mb-3 pl-4">
             <div className="flex-1">
-              <h1 className="font-black mb-0 italic tracking-tight" style={{ fontSize: '1.75rem', fontWeight: titleBold ? '900' : 'bold', color: titleColor, lineHeight: '1.1' }}>
-                {personalInfo.firstName}
-              </h1>
-              <h1 className="font-black mb-1 italic tracking-tight" style={{ fontSize: '1.75rem', fontWeight: titleBold ? '900' : 'bold', color: headingColor, lineHeight: '1.1' }}>
-                {personalInfo.lastName}
-              </h1>
+              <div className="mb-2">
+                <h1 
+                  className="font-black italic tracking-tight leading-none" 
+                  style={{ 
+                    fontSize: sizes.name, 
+                    fontWeight: titleBold ? '900' : 'bold', 
+                    color: titleColor,
+                    lineHeight: '1.1'
+                  }}
+                >
+                  {personalInfo.firstName}
+                </h1>
+                <h1 
+                  className="font-black italic tracking-tight leading-none" 
+                  style={{ 
+                    fontSize: sizes.name, 
+                    fontWeight: titleBold ? '900' : 'bold', 
+                    color: headingColor,
+                    lineHeight: '1.1'
+                  }}
+                >
+                  {personalInfo.lastName}
+                </h1>
+              </div>
               {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (
-                <p className="font-bold mb-2 italic" style={{ fontSize: '0.9375rem', color: headingColor }}>{personalInfo.professionalTitle.trim()}</p>
+                <p 
+                  className="font-bold italic mb-2" 
+                  style={{ 
+                    fontSize: sizes.base, 
+                    color: headingColor,
+                    letterSpacing: '0.02em'
+                  }}
+                >
+                  {personalInfo.professionalTitle.trim()}
+                </p>
               )}
 
-              <div className="flex flex-wrap gap-1 text-muted-foreground mt-2" style={{ fontSize: sizes.xs }}>
+              <div className="flex flex-wrap gap-1.5 mt-2.5" style={{ fontSize: sizes.xs }}>
                 {personalInfo.email && (
-                  <div className="flex items-center gap-1 bg-background/50 px-2 py-0.5 rounded-full">
-                    <Mail className="h-3 w-3 text-primary" />
-                    <span>{personalInfo.email}</span>
+                  <div 
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full" 
+                    style={{ backgroundColor: 'hsl(var(--muted))', opacity: 0.8 }}
+                  >
+                    <Mail className="h-3 w-3" style={{ color: accentColor }} />
+                    <span style={{ color: textColor }}>{personalInfo.email}</span>
                   </div>
                 )}
                 {personalInfo.phone && (
-                  <div className="flex items-center gap-1 bg-background/50 px-2 py-0.5 rounded-full">
-                    <Phone className="h-3 w-3 text-primary" />
-                    <span>{personalInfo.phone}</span>
+                  <div 
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full" 
+                    style={{ backgroundColor: 'hsl(var(--muted))', opacity: 0.8 }}
+                  >
+                    <Phone className="h-3 w-3" style={{ color: accentColor }} />
+                    <span style={{ color: textColor }}>{personalInfo.phone}</span>
                   </div>
                 )}
                 {personalInfo.location && (
-                  <div className="flex items-center gap-1 bg-background/50 px-2 py-0.5 rounded-full">
-                    <MapPin className="h-3 w-3 text-primary" />
-                    <span>{personalInfo.location}</span>
+                  <div 
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full" 
+                    style={{ backgroundColor: 'hsl(var(--muted))', opacity: 0.8 }}
+                  >
+                    <MapPin className="h-3 w-3" style={{ color: accentColor }} />
+                    <span style={{ color: textColor }}>{personalInfo.location}</span>
                   </div>
                 )}
                 {personalInfo.linkedin && (
-                  <div className="flex items-center gap-1 bg-background/50 px-2 py-0.5 rounded-full min-w-0 max-w-fit">
-                    <Linkedin className="h-3 w-3 text-primary flex-shrink-0" />
-                    <span className="truncate" style={{ fontSize: sizes.xs }}>{personalInfo.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span>
+                  <div 
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full min-w-0" 
+                    style={{ backgroundColor: 'hsl(var(--muted))', opacity: 0.8 }}
+                  >
+                    <Linkedin className="h-3 w-3 flex-shrink-0" style={{ color: accentColor }} />
+                    <span className="truncate" style={{ color: textColor }}>
+                      {personalInfo.linkedin.replace(/^https?:\/\/(www\.)?/, '')}
+                    </span>
                   </div>
                 )}
                 {personalInfo.github && (
-                  <div className="flex items-center gap-1 bg-background/50 px-2 py-0.5 rounded-full min-w-0 max-w-fit">
-                    <Github className="h-3 w-3 text-primary flex-shrink-0" />
-                    <span className="truncate" style={{ fontSize: sizes.xs }}>{personalInfo.github.replace(/^https?:\/\/(www\.)?/, '')}</span>
+                  <div 
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full min-w-0" 
+                    style={{ backgroundColor: 'hsl(var(--muted))', opacity: 0.8 }}
+                  >
+                    <Github className="h-3 w-3 flex-shrink-0" style={{ color: accentColor }} />
+                    <span className="truncate" style={{ color: textColor }}>
+                      {personalInfo.github.replace(/^https?:\/\/(www\.)?/, '')}
+                    </span>
                   </div>
                 )}
                 {personalInfo.website && (
-                  <div className="flex items-center gap-1 bg-background/50 px-2 py-0.5 rounded-full min-w-0 max-w-fit">
-                    <Globe className="h-3 w-3 text-primary flex-shrink-0" />
-                    <span className="truncate" style={{ fontSize: sizes.xs }}>{personalInfo.website.replace(/^https?:\/\/(www\.)?/, '')}</span>
+                  <div 
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full min-w-0" 
+                    style={{ backgroundColor: 'hsl(var(--muted))', opacity: 0.8 }}
+                  >
+                    <Globe className="h-3 w-3 flex-shrink-0" style={{ color: accentColor }} />
+                    <span className="truncate" style={{ color: textColor }}>
+                      {personalInfo.website.replace(/^https?:\/\/(www\.)?/, '')}
+                    </span>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Profile image */}
+            {/* Profile image with subtle border */}
             {personalInfo.profileImage ? (
               <div className="flex-shrink-0">
-                <div className="w-16 h-16 rounded-lg border-4 border-primary shadow-lg overflow-hidden">
+                <div 
+                  className="w-20 h-20 rounded-xl overflow-hidden shadow-lg border-[3px]" 
+                  style={{ borderColor: accentColor }}
+                >
                   <img
                     src={personalInfo.profileImage}
                     alt={`Professional profile photo of ${personalInfo.firstName} ${personalInfo.lastName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
-                    className="w-full h-full object-cover"
-                    style={{ objectPosition: '50% 40%' }}
+                    className="h-full w-full object-cover"
+                    style={{ 
+                      objectPosition: '50% 40%', 
+                      WebkitBackfaceVisibility: 'hidden', 
+                      backfaceVisibility: 'hidden' 
+                    }}
+                    sizes="80px"
                     loading="lazy"
                     decoding="async"
-                    fetchPriority="low"
                   />
                 </div>
               </div>
             ) : (
-              <div className="flex-shrink-0 w-16 h-16 rounded-lg border-4 border-primary shadow-lg bg-muted flex items-center justify-center photo-placeholder">
-                <span className="text-muted-foreground" style={{ fontSize: sizes.xs }}>Photo</span>
+              <div 
+                className="flex-shrink-0 w-20 h-20 rounded-xl shadow-lg border-[3px] flex items-center justify-center photo-placeholder" 
+                style={{ 
+                  borderColor: accentColor,
+                  backgroundColor: `${accentColor}10`
+                }}
+              >
+                <span style={{ fontSize: sizes.xs, color: accentColor, opacity: 0.6 }}>Photo</span>
               </div>
             )}
           </div>
         </div>
 
-        {/* Sections with creative timeline */}
-        <div>
+        {/* Sections — compact spacing */}
+        <div className="space-y-3">
           {orderedSections.map(section => renderSection(section))}
         </div>
 
-        {/* Capped spacer - fills partial pages, won't create extra pages */}
+        {/* Spacer */}
         <div aria-hidden="true" className="resume-spacer" style={{ flex: '1 1 auto', minHeight: 0 }}></div>
 
-        {/* Page Number Footer */}
+        {/* Page Footer */}
         <style>{`
-        /* Hide page numbers in preview (screen) */
-        .page-number-footer {
-          display: none;
-        }
+        .page-number-footer { display: none; }
         @media print {
           @page {
             margin-bottom: 20mm;
@@ -537,13 +940,8 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
               opacity: 0.6;
             }
           }
-          @page :first {
-            margin-top: 0;
-          }
-          /* Ensure our footer is hidden in print */
-          .page-number-footer {
-            display: none !important;
-          }
+          @page :first { margin-top: 0; }
+          .page-number-footer { display: none !important; }
         }
       `}</style>
         <div className="page-number-footer"></div>

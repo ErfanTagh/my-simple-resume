@@ -1,5 +1,5 @@
 import { CVFormData } from "../types";
-import { Mail, Phone, MapPin, Linkedin, Github, Globe, Calendar, ExternalLink } from "lucide-react";
+import { Mail, Phone, MapPin, Linkedin, Github, Globe, Calendar } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatDateRange } from "@/lib/dateFormatter";
 import { formatProficiency } from "@/lib/languageProficiency";
@@ -18,7 +18,6 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
   // Extract styling options with defaults
   const fontFamily = styling?.fontFamily || "Inter";
   const fontSizeInput = styling?.fontSize || "medium";
-  // Ensure fontSize is valid to prevent crashes
   const fontSize: "small" | "medium" | "large" =
     (fontSizeInput === "small" || fontSizeInput === "medium" || fontSizeInput === "large")
       ? fontSizeInput
@@ -27,42 +26,44 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
   const titleBold = styling?.titleBold ?? true;
   const headingColor = styling?.headingColor || "#2563eb";
   const headingBold = styling?.headingBold ?? true;
-  const textColor = styling?.textColor || "#1f2937";
+  const textColor = styling?.textColor || "#4b5563";
   const linkColor = styling?.linkColor || "#2563eb";
 
   // Extract section-specific styling for personalInfo
   const personalInfoSectionStyling = styling?.sectionStyling?.personalInfo;
-  // Use headingColor as fallback (blue) instead of titleColor (black) to match template defaults
   const personalInfoTitleColor = personalInfoSectionStyling?.titleColor || headingColor;
   const personalInfoTitleSize = personalInfoSectionStyling?.titleSize || fontSize;
   const personalInfoBodyColor = personalInfoSectionStyling?.bodyColor || textColor;
   const personalInfoBodySize = personalInfoSectionStyling?.bodySize || fontSize;
 
-  // Font size mappings - Increased differences for more noticeable size changes
+  // Enhanced font size mappings with better hierarchy
   const fontSizeMap = {
     small: {
-      base: '0.6875rem',    // 11px
-      sm: '0.8125rem',      // 13px
-      baseText: '0.625rem', // 10px (reduced from 11px)
-      title: '1.25rem',     // 20px (reduced from 22px)
-      heading: '0.75rem',   // 12px (reduced from 13px)
-      xs: '0.5625rem',      // 9px
+      xs: '0.625rem',        // 10px - metadata
+      sm: '0.75rem',         // 12px - body text
+      base: '0.875rem',      // 14px - section items
+      baseText: '0.6875rem', // 11px - paragraph text
+      heading: '0.8125rem',  // 13px - section headings
+      title: '1.25rem',      // 20px - legacy / fallback
+      name: '1.75rem',       // 28px - header name
     },
     medium: {
-      base: '0.9375rem',    // 15px (+4px from small)
-      sm: '1.125rem',       // 18px (+5px from small)
-      baseText: '0.8125rem', // 13px (reduced from 15px)
-      title: '1.625rem',    // 26px (reduced from 30px)
-      heading: '1rem',      // 16px (reduced from 18px)
-      xs: '0.75rem',        // 12px (+3px from small)
+      xs: '0.75rem',         // 12px - metadata
+      sm: '0.875rem',        // 14px - body text
+      base: '1rem',          // 16px - section items
+      baseText: '0.8125rem', // 13px - paragraph text
+      heading: '0.9375rem',  // 15px - section headings
+      title: '1.625rem',     // 26px - legacy / fallback
+      name: '2rem',          // 32px - header name
     },
     large: {
-      base: '1.1875rem',    // 19px (+4px from medium)
-      sm: '1.4375rem',      // 23px (+5px from medium)
-      baseText: '1rem',    // 16px (reduced from 19px)
-      title: '2rem',        // 32px (reduced from 38px)
-      heading: '1.25rem',   // 20px (reduced from 23px)
-      xs: '0.9375rem',      // 15px (+3px from medium)
+      xs: '0.875rem',        // 14px - metadata
+      sm: '1rem',            // 16px - body text
+      base: '1.125rem',      // 18px - section items
+      baseText: '0.9375rem', // 15px - paragraph text
+      heading: '1.0625rem',  // 17px - section headings
+      title: '2rem',         // 32px - legacy / fallback
+      name: '2.375rem',      // 38px - header name
     },
   };
 
@@ -105,34 +106,34 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
   const languagesTitleSizes = fontSizeMap[languagesStyling.titleSize];
   const languagesBodySizes = fontSizeMap[languagesStyling.bodySize];
 
-  // Helper function for section headings (keep for backward compatibility, but sections should use section-specific styling)
-  const getHeadingStyle = () => ({
-    color: headingColor,
-    fontWeight: headingBold ? 'bold' : 'normal',
-    borderColor: headingColor,
-    fontSize: sizes.heading,
-  });
-
-  // Helper function for section headings className
-  const getHeadingClassName = () => "mb-3 border-b-2 pb-1";
+  const getHeadingClassName = () => "mb-2 pb-1 border-b-2";
 
   const renderSection = (sectionKey: string) => {
     switch (sectionKey) {
       case "summary":
         return personalInfo.summary && personalInfo.summary.trim() ? (
-          <div key="summary" className="mb-6" data-resume-section="true">
+          <div key="summary" data-resume-section="true">
             <h2
-              className={`text-lg mb-3 border-b-2 pb-1`}
+              className={getHeadingClassName()}
               style={{
                 color: personalInfoTitleColor,
                 fontWeight: headingBold ? 'bold' : 'normal',
                 borderColor: personalInfoTitleColor,
-                fontSize: personalInfoTitleSizes.heading
+                fontSize: personalInfoTitleSizes.heading,
+                letterSpacing: '0.05em'
               }}
             >
               {t('resume.sections.professionalSummary').toUpperCase()}
             </h2>
-            <p className="leading-relaxed whitespace-pre-wrap" style={{ color: personalInfoBodyColor, fontSize: personalInfoBodySizes.baseText }}>
+            <p 
+              className="leading-relaxed whitespace-pre-wrap" 
+              style={{ 
+                color: personalInfoBodyColor, 
+                fontSize: personalInfoBodySizes.baseText, 
+                lineHeight: '1.65',
+                marginTop: '0.5rem'
+              }}
+            >
               {personalInfo.summary.trim()}
             </p>
           </div>
@@ -140,57 +141,86 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
 
       case "workExperience":
         return workExperience.some(exp => exp.position || exp.company) ? (
-          <div key="workExperience" className="mb-6" data-resume-section="true">
-            <h2 className={getHeadingClassName()} style={{ color: workExperienceStyling.titleColor, fontWeight: headingBold ? 'bold' : 'normal', borderColor: workExperienceStyling.titleColor, fontSize: workExperienceTitleSizes.heading }}>{t('resume.sections.experience').toUpperCase()}</h2>
-            <div className="space-y-4">
+          <div key="workExperience" data-resume-section="true">
+            <h2 
+              className={getHeadingClassName()} 
+              style={{ 
+                color: workExperienceStyling.titleColor, 
+                fontWeight: headingBold ? 'bold' : 'normal', 
+                borderColor: workExperienceStyling.titleColor, 
+                fontSize: workExperienceTitleSizes.heading,
+                letterSpacing: '0.05em'
+              }}
+            >
+              {t('resume.sections.experience').toUpperCase()}
+            </h2>
+            <div className="space-y-3">
               {workExperience.map((exp, index) => (
                 (exp.position || exp.company) && (
-                  <div key={index}>
-                    <div className="flex justify-between items-start mb-1">
-                      <div>
-                        {/* Position: primary, bolder and slightly larger */}
+                  <div key={index} className="space-y-1">
+                    <div className="flex justify-between items-baseline gap-3">
+                      <div className="flex-1 min-w-0">
                         <h3
-                          className="font-bold"
-                          style={{ fontSize: workExperienceBodySizes.baseText, color: workExperienceStyling.bodyColor }}
+                          className="font-bold truncate"
+                          style={{ 
+                            fontSize: workExperienceBodySizes.base, 
+                            color: workExperienceStyling.bodyColor,
+                            letterSpacing: '0.01em'
+                          }}
                         >
                           {exp.position}
                         </h3>
-                        {/* Company: secondary, smaller and lighter */}
                         <p
-                          className="italic"
+                          className="italic text-sm"
                           style={{
-                            fontSize: workExperienceBodySizes.xs,
+                            fontSize: workExperienceBodySizes.sm,
                             color: workExperienceStyling.bodyColor,
                             opacity: 0.8,
                           }}
                         >
-                          {exp.company}
+                          {exp.company}{exp.location && ` • ${exp.location}`}
                         </p>
-                        {exp.location && (
-                          <p
-                            style={{
-                              fontSize: workExperienceBodySizes.xs,
-                              color: workExperienceStyling.bodyColor,
-                            }}
-                          >
-                            {exp.location}
-                          </p>
-                        )}
                       </div>
                       {(exp.startDate || exp.endDate) && (
-                        <div className="flex items-center gap-1" style={{ fontSize: workExperienceBodySizes.xs, color: workExperienceStyling.bodyColor }}>
-                          <Calendar className="h-3 w-3" />
+                        <div 
+                          className="flex items-center gap-1.5 whitespace-nowrap flex-shrink-0" 
+                          style={{ 
+                            fontSize: workExperienceBodySizes.xs, 
+                            color: workExperienceStyling.bodyColor,
+                            opacity: 0.7,
+                            fontStyle: 'italic'
+                          }}
+                        >
+                          <Calendar className="h-3 w-3" style={{ opacity: 0.7 }} />
                           <span>{formatDateRange(exp.startDate, exp.endDate, t('resume.fields.present'), language)}</span>
                         </div>
                       )}
                     </div>
-                    {exp.description && <p className="mb-2" style={{ color: workExperienceStyling.bodyColor, fontSize: workExperienceBodySizes.baseText }}>{exp.description}</p>}
+                    {exp.description && (
+                      <p 
+                        className="mt-1" 
+                        style={{ 
+                          color: workExperienceStyling.bodyColor, 
+                          fontSize: workExperienceBodySizes.sm, 
+                          lineHeight: '1.6' 
+                        }}
+                      >
+                        {exp.description}
+                      </p>
+                    )}
                     {exp.responsibilities && exp.responsibilities.length > 0 && (
-                      <ul className="space-y-1 mb-2" style={{ fontSize: workExperienceBodySizes.baseText, color: workExperienceStyling.bodyColor }}>
+                      <ul 
+                        className="space-y-1 mt-1" 
+                        style={{ 
+                          fontSize: workExperienceBodySizes.sm, 
+                          color: workExperienceStyling.bodyColor, 
+                          lineHeight: '1.6' 
+                        }}
+                      >
                         {exp.responsibilities.map((resp, i) => (
                           resp.responsibility && (
-                            <li key={i} className="flex gap-2">
-                              <span style={{ color: workExperienceStyling.bodyColor }}>•</span>
+                            <li key={i} className="flex gap-2.5">
+                              <span style={{ color: workExperienceStyling.bodyColor, opacity: 0.5 }}>•</span>
                               <span className="flex-1">{resp.responsibility}</span>
                             </li>
                           )
@@ -198,13 +228,29 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                       </ul>
                     )}
                     {exp.technologies && exp.technologies.length > 0 && (
-                      <p className="mt-2" style={{ fontSize: workExperienceBodySizes.xs, color: workExperienceStyling.bodyColor }}>
-                        {t('resume.sections.technologies')}: {exp.technologies.map(t => typeof t === 'string' ? t : t.technology).filter(Boolean).join(", ")}
+                      <p 
+                        className="mt-1.5" 
+                        style={{ 
+                          fontSize: workExperienceBodySizes.xs, 
+                          color: workExperienceStyling.bodyColor,
+                          opacity: 0.85 
+                        }}
+                      >
+                        <span style={{ fontWeight: 500 }}>{t('resume.sections.technologies')}:</span>{' '}
+                        {exp.technologies.map(t => typeof t === 'string' ? t : t.technology).filter(Boolean).join(" • ")}
                       </p>
                     )}
                     {exp.competencies && exp.competencies.length > 0 && (
-                      <p className="mt-1" style={{ fontSize: workExperienceBodySizes.xs, color: workExperienceStyling.bodyColor }}>
-                        {t('resume.labels.keyCompetencies')}: {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(", ")}
+                      <p 
+                        className="mt-1" 
+                        style={{ 
+                          fontSize: workExperienceBodySizes.xs, 
+                          color: workExperienceStyling.bodyColor,
+                          opacity: 0.85 
+                        }}
+                      >
+                        <span style={{ fontWeight: 500 }}>{t('resume.labels.keyCompetencies')}:</span>{' '}
+                        {exp.competencies.map(c => typeof c === 'string' ? c : c.competency).filter(Boolean).join(" • ")}
                       </p>
                     )}
                   </div>
@@ -216,26 +262,83 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
 
       case "education":
         return education.some(edu => edu.degree || edu.institution) ? (
-          <div key="education" className="mb-6" data-resume-section="true">
-            <h2 className={getHeadingClassName()} style={{ color: educationStyling.titleColor, fontWeight: headingBold ? 'bold' : 'normal', borderColor: educationStyling.titleColor, fontSize: educationTitleSizes.heading }}>{t('resume.sections.education').toUpperCase()}</h2>
-            <div className="space-y-3">
+          <div key="education" data-resume-section="true">
+            <h2 
+              className={getHeadingClassName()} 
+              style={{ 
+                color: educationStyling.titleColor, 
+                fontWeight: headingBold ? 'bold' : 'normal', 
+                borderColor: educationStyling.titleColor, 
+                fontSize: educationTitleSizes.heading,
+                letterSpacing: '0.05em'
+              }}
+            >
+              {t('resume.sections.education').toUpperCase()}
+            </h2>
+            <div className="space-y-2.5">
               {education.map((edu, index) => (
                 (edu.degree || edu.institution) && (
                   <div key={index}>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-bold" style={{ fontSize: educationBodySizes.baseText, color: educationStyling.bodyColor }}>{edu.degree}</h3>
-                        <p style={{ fontSize: educationBodySizes.baseText, color: educationStyling.bodyColor }}>{edu.institution}</p>
-                        {edu.location && <p style={{ fontSize: educationBodySizes.xs, color: educationStyling.bodyColor }}>{edu.location}</p>}
-                        {edu.field && <p className="italic" style={{ fontSize: educationBodySizes.baseText, color: educationStyling.bodyColor }}>{edu.field}</p>}
+                    <div className="flex justify-between items-start gap-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 
+                          className="font-bold" 
+                          style={{ 
+                            fontSize: educationBodySizes.base, 
+                            color: educationStyling.bodyColor,
+                            letterSpacing: '0.01em'
+                          }}
+                        >
+                          {edu.degree}
+                        </h3>
+                        <p 
+                          className="text-sm" 
+                          style={{ 
+                            fontSize: educationBodySizes.sm, 
+                            color: educationStyling.bodyColor,
+                            opacity: 0.85 
+                          }}
+                        >
+                          {edu.institution}{edu.location && ` • ${edu.location}`}
+                        </p>
+                        {edu.field && (
+                          <p 
+                            className="italic mt-0.5" 
+                            style={{ 
+                              fontSize: educationBodySizes.sm, 
+                              color: educationStyling.bodyColor,
+                              opacity: 0.8
+                            }}
+                          >
+                            {edu.field}
+                          </p>
+                        )}
                         {edu.keyCourses && edu.keyCourses.length > 0 && (
-                          <p className="mt-1" style={{ fontSize: educationBodySizes.xs, color: educationStyling.bodyColor }}>
-                            {t('resume.labels.keyCourses')}: {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(", ")}
+                          <p 
+                            className="mt-1" 
+                            style={{ 
+                              fontSize: educationBodySizes.xs, 
+                              color: educationStyling.bodyColor,
+                              opacity: 0.85
+                            }}
+                          >
+                            <span style={{ fontWeight: 500 }}>{t('resume.labels.keyCourses')}:</span>{' '}
+                            {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(" • ")}
                           </p>
                         )}
                       </div>
                       {(edu.startDate || edu.endDate) && (
-                        <span style={{ fontSize: educationBodySizes.xs, color: educationStyling.bodyColor }}>{formatDateRange(edu.startDate, edu.endDate, t('resume.fields.present'), language)}</span>
+                        <span 
+                          className="whitespace-nowrap flex-shrink-0" 
+                          style={{ 
+                            fontSize: educationBodySizes.xs, 
+                            color: educationStyling.bodyColor,
+                            opacity: 0.7,
+                            fontStyle: 'italic'
+                          }}
+                        >
+                          {formatDateRange(edu.startDate, edu.endDate, t('resume.fields.present'), language)}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -247,25 +350,72 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
 
       case "projects":
         return projects.some(proj => proj.name) ? (
-          <div key="projects" className="mb-6" data-resume-section="true">
-            <h2 className={getHeadingClassName()} style={{ color: projectsStyling.titleColor, fontWeight: headingBold ? 'bold' : 'normal', borderColor: projectsStyling.titleColor, fontSize: projectsTitleSizes.heading }}>{t('resume.sections.projects').toUpperCase()}</h2>
-            <div className="space-y-3">
+          <div key="projects" data-resume-section="true">
+            <h2 
+              className={getHeadingClassName()} 
+              style={{ 
+                color: projectsStyling.titleColor, 
+                fontWeight: headingBold ? 'bold' : 'normal', 
+                borderColor: projectsStyling.titleColor, 
+                fontSize: projectsTitleSizes.heading,
+                letterSpacing: '0.05em'
+              }}
+            >
+              {t('resume.sections.projects').toUpperCase()}
+            </h2>
+            <div className="space-y-2.5">
               {projects.map((proj, index) => (
                 proj.name && (
                   <div key={index}>
-                    <div className="flex justify-between items-start mb-1">
-                      <h3 className="font-bold" style={{ fontSize: projectsBodySizes.baseText, color: projectsStyling.bodyColor }}>{proj.name}</h3>
+                    <div className="flex justify-between items-start gap-3 mb-1">
+                      <h3 
+                        className="font-bold flex-1" 
+                        style={{ 
+                          fontSize: projectsBodySizes.base, 
+                          color: projectsStyling.bodyColor,
+                          letterSpacing: '0.01em'
+                        }}
+                      >
+                        {proj.name}
+                      </h3>
                       {(proj.startDate || proj.endDate) && (
-                        <span style={{ fontSize: projectsBodySizes.xs, color: projectsStyling.bodyColor }}>{formatDateRange(proj.startDate, proj.endDate, t('resume.fields.present'), language)}</span>
+                        <span 
+                          className="whitespace-nowrap flex-shrink-0" 
+                          style={{ 
+                            fontSize: projectsBodySizes.xs, 
+                            color: projectsStyling.bodyColor,
+                            opacity: 0.7,
+                            fontStyle: 'italic'
+                          }}
+                        >
+                          {formatDateRange(proj.startDate, proj.endDate, t('resume.fields.present'), language)}
+                        </span>
                       )}
                     </div>
-                    {proj.description && <p className="mb-2" style={{ fontSize: projectsBodySizes.baseText, color: projectsStyling.bodyColor }}>{proj.description}</p>}
+                    {proj.description && (
+                      <p 
+                        style={{ 
+                          fontSize: projectsBodySizes.sm, 
+                          color: projectsStyling.bodyColor,
+                          lineHeight: '1.6'
+                        }}
+                      >
+                        {proj.description}
+                      </p>
+                    )}
                     {proj.highlights && proj.highlights.length > 0 && (
-                      <ul className="space-y-1 mb-2" style={{ fontSize: projectsBodySizes.baseText, color: projectsStyling.bodyColor }}>
+                      <ul 
+                        className="space-y-1 mt-1" 
+                        style={{ 
+                          fontSize: projectsBodySizes.sm, 
+                          color: projectsStyling.bodyColor,
+                          lineHeight: '1.6'
+                        }}
+                      >
                         {proj.highlights.map((highlight, i) => (
                           highlight.highlight && (
-                            <li key={i} className="flex gap-2">
-                              <span style={{ color: projectsStyling.bodyColor }}>•</span>
+                            <li key={i} className="flex gap-2.5">
+                              <span style={{ color: projectsStyling.bodyColor, opacity: 0.5 }}>•</span>
                               <span className="flex-1">{highlight.highlight}</span>
                             </li>
                           )
@@ -273,12 +423,30 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                       </ul>
                     )}
                     {proj.technologies && proj.technologies.length > 0 && (
-                      <p className="mt-1" style={{ fontSize: projectsBodySizes.xs, color: projectsStyling.bodyColor }}>
-                        {t('resume.sections.technologies')}: {proj.technologies.map(t => typeof t === 'string' ? t : t.technology).filter(Boolean).join(", ")}
+                      <p 
+                        className="mt-1.5" 
+                        style={{ 
+                          fontSize: projectsBodySizes.xs, 
+                          color: projectsStyling.bodyColor,
+                          opacity: 0.85
+                        }}
+                      >
+                        <span style={{ fontWeight: 500 }}>{t('resume.sections.technologies')}:</span>{' '}
+                        {proj.technologies.map(t => typeof t === 'string' ? t : t.technology).filter(Boolean).join(" • ")}
                       </p>
                     )}
                     {proj.link && (
-                      <a href={proj.link} target="_blank" rel="noopener noreferrer" className="hover:underline mt-1 block" style={{ fontSize: projectsBodySizes.xs, color: linkColor }}>
+                      <a 
+                        href={proj.link} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="hover:underline mt-1 block transition-opacity" 
+                        style={{ 
+                          fontSize: projectsBodySizes.xs, 
+                          color: linkColor,
+                          opacity: 0.85
+                        }}
+                      >
                         {proj.link.replace(/^https?:\/\/(www\.)?/, '')}
                       </a>
                     )}
@@ -291,26 +459,80 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
 
       case "certificates":
         return certificates.some(cert => cert.name) ? (
-          <div key="certificates" className="mb-6" data-resume-section="true">
-            <h2 className={getHeadingClassName()} style={{ color: certificatesStyling.titleColor, fontWeight: headingBold ? 'bold' : 'normal', borderColor: certificatesStyling.titleColor, fontSize: certificatesTitleSizes.heading }}>{t('resume.sections.certifications').toUpperCase()}</h2>
+          <div key="certificates" data-resume-section="true">
+            <h2 
+              className={getHeadingClassName()} 
+              style={{ 
+                color: certificatesStyling.titleColor, 
+                fontWeight: headingBold ? 'bold' : 'normal', 
+                borderColor: certificatesStyling.titleColor, 
+                fontSize: certificatesTitleSizes.heading,
+                letterSpacing: '0.05em'
+              }}
+            >
+              {t('resume.sections.certifications').toUpperCase()}
+            </h2>
             <div className="space-y-2">
               {certificates.map((cert, index) => (
                 cert.name && (
                   <div key={index}>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-semibold" style={{ fontSize: certificatesBodySizes.baseText, color: certificatesStyling.bodyColor }}>{cert.name}</h3>
-                        <p style={{ fontSize: certificatesBodySizes.baseText, color: certificatesStyling.bodyColor }}>{cert.organization}</p>
+                    <div className="flex justify-between items-start gap-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 
+                          className="font-semibold" 
+                          style={{ 
+                            fontSize: certificatesBodySizes.base, 
+                            color: certificatesStyling.bodyColor,
+                            letterSpacing: '0.01em'
+                          }}
+                        >
+                          {cert.name}
+                        </h3>
+                        <p 
+                          style={{ 
+                            fontSize: certificatesBodySizes.sm, 
+                            color: certificatesStyling.bodyColor,
+                            opacity: 0.85
+                          }}
+                        >
+                          {cert.organization}
+                        </p>
                         {(cert.issueDate || cert.expirationDate) && (
-                          <p className="mt-1" style={{ fontSize: certificatesBodySizes.xs, color: certificatesStyling.bodyColor }}>
+                          <p 
+                            className="mt-0.5" 
+                            style={{ 
+                              fontSize: certificatesBodySizes.xs, 
+                              color: certificatesStyling.bodyColor,
+                              opacity: 0.7,
+                              fontStyle: 'italic'
+                            }}
+                          >
                             {cert.issueDate} {cert.expirationDate && `- ${cert.expirationDate}`}
                           </p>
                         )}
                         {cert.credentialId && (
-                          <p style={{ fontSize: certificatesBodySizes.xs, color: certificatesStyling.bodyColor }}>ID: {cert.credentialId}</p>
+                          <p 
+                            style={{ 
+                              fontSize: certificatesBodySizes.xs, 
+                              color: certificatesStyling.bodyColor,
+                              opacity: 0.7
+                            }}
+                          >
+                            ID: {cert.credentialId}
+                          </p>
                         )}
                         {cert.url && (
-                          <a href={cert.url} target="_blank" rel="noopener noreferrer" className="hover:underline mt-1 block" style={{ fontSize: certificatesBodySizes.xs, color: linkColor }}>
+                          <a 
+                            href={cert.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="hover:underline mt-1 block transition-opacity" 
+                            style={{ 
+                              fontSize: certificatesBodySizes.xs, 
+                              color: linkColor,
+                              opacity: 0.85
+                            }}
+                          >
                             {cert.url.replace(/^https?:\/\/(www\.)?/, '')}
                           </a>
                         )}
@@ -325,12 +547,32 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
 
       case "skills":
         return skills.some(s => s.skill) ? (
-          <div key="skills" className="mb-6" data-resume-section="true">
-            <h2 className={getHeadingClassName()} style={{ color: skillsStyling.titleColor, fontWeight: headingBold ? 'bold' : 'normal', borderColor: skillsStyling.titleColor, fontSize: skillsTitleSizes.heading }}>{t('resume.sections.skills').toUpperCase()}</h2>
-            <div className="flex flex-wrap gap-2">
+          <div key="skills" data-resume-section="true">
+            <h2 
+              className={getHeadingClassName()} 
+              style={{ 
+                color: skillsStyling.titleColor, 
+                fontWeight: headingBold ? 'bold' : 'normal', 
+                borderColor: skillsStyling.titleColor, 
+                fontSize: skillsTitleSizes.heading,
+                letterSpacing: '0.05em'
+              }}
+            >
+              {t('resume.sections.skills').toUpperCase()}
+            </h2>
+            <div className="flex flex-wrap gap-1.5 mt-2">
               {skills.map((s, index) => (
                 s.skill && (
-                  <span key={index} className="px-3 py-1 rounded-full font-medium" style={{ fontSize: skillsBodySizes.xs, color: skillsStyling.bodyColor, backgroundColor: `${skillsStyling.bodyColor}15` }}>
+                  <span 
+                    key={index} 
+                    className="px-2.5 py-1 rounded-full font-medium" 
+                    style={{ 
+                      fontSize: skillsBodySizes.xs, 
+                      color: skillsStyling.bodyColor, 
+                      backgroundColor: `${skillsStyling.bodyColor}15`,
+                      letterSpacing: '0.01em'
+                    }}
+                  >
                     {s.skill}
                   </span>
                 )
@@ -341,17 +583,40 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
 
       case "languages":
         return languages.some(lang => lang.language) ? (
-          <div key="languages" className="mb-6" data-resume-section="true">
-            <h2 className={getHeadingClassName()} style={{ color: languagesStyling.titleColor, fontWeight: headingBold ? 'bold' : 'normal', borderColor: languagesStyling.titleColor, fontSize: languagesTitleSizes.heading }}>{t('resume.sections.languages').toUpperCase()}</h2>
-            <div className="space-y-2">
+          <div key="languages" data-resume-section="true">
+            <h2 
+              className={getHeadingClassName()} 
+              style={{ 
+                color: languagesStyling.titleColor, 
+                fontWeight: headingBold ? 'bold' : 'normal', 
+                borderColor: languagesStyling.titleColor, 
+                fontSize: languagesTitleSizes.heading,
+                letterSpacing: '0.05em'
+              }}
+            >
+              {t('resume.sections.languages').toUpperCase()}
+            </h2>
+            <div className="space-y-1.5 mt-2">
               {languages.map((lang, index) => (
                 lang.language && (
-                  <div key={index} className="flex justify-between items-center gap-4 pr-2" style={{ fontSize: languagesBodySizes.xs, color: languagesStyling.bodyColor }}>
-                    <span className="font-semibold">{lang.language}</span>
+                  <div 
+                    key={index} 
+                    className="flex justify-between items-center gap-4" 
+                    style={{ 
+                      fontSize: languagesBodySizes.sm, 
+                      color: languagesStyling.bodyColor 
+                    }}
+                  >
+                    <span style={{ fontWeight: 500 }}>{lang.language}</span>
                     {lang.proficiency && (
                       <span
-                        className="whitespace-nowrap flex-shrink-0"
-                        style={{ color: languagesStyling.bodyColor, opacity: 0.7 }}
+                        className="whitespace-nowrap"
+                        style={{ 
+                          color: languagesStyling.bodyColor, 
+                          opacity: 0.7,
+                          fontStyle: 'italic',
+                          fontSize: languagesBodySizes.xs
+                        }}
                       >
                         {formatProficiency(t, lang.proficiency)}
                       </span>
@@ -365,9 +630,29 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
 
       case "interests":
         return personalInfo.interests && personalInfo.interests.length > 0 && personalInfo.interests.some(i => i.interest) ? (
-          <div key="interests" className="mb-6" data-resume-section="true">
-            <h2 className={getHeadingClassName()} style={{ color: personalInfoTitleColor, fontWeight: headingBold ? 'bold' : 'normal', borderColor: personalInfoTitleColor, fontSize: personalInfoTitleSizes.heading }}>{t('resume.sections.interests').toUpperCase()}</h2>
-            <p style={{ color: personalInfoBodyColor, fontSize: personalInfoBodySizes.baseText }}>{personalInfo.interests.map(i => i.interest).filter(Boolean).join(", ")}</p>
+          <div key="interests" data-resume-section="true">
+            <h2 
+              className={getHeadingClassName()} 
+              style={{ 
+                color: personalInfoTitleColor, 
+                fontWeight: headingBold ? 'bold' : 'normal', 
+                borderColor: personalInfoTitleColor, 
+                fontSize: personalInfoTitleSizes.heading,
+                letterSpacing: '0.05em'
+              }}
+            >
+              {t('resume.sections.interests').toUpperCase()}
+            </h2>
+            <p 
+              className="mt-2" 
+              style={{ 
+                color: personalInfoBodyColor, 
+                fontSize: personalInfoBodySizes.sm, 
+                lineHeight: '1.65' 
+              }}
+            >
+              {personalInfo.interests.map(i => i.interest).filter(Boolean).join(" • ")}
+            </p>
           </div>
         ) : null;
 
@@ -379,13 +664,11 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
   return (
     <>
       <style>{`
-        /* Apply padding for both screen (preview) and print */
         .resume-page-container {
-          padding-top: 32px !important;
-          padding-bottom: 32px !important;
+          padding-top: 24px !important;
+          padding-bottom: 24px !important;
         }
         @media print {
-          /* Hide photo placeholders in print/PDF */
           .photo-placeholder {
             display: none !important;
           }
@@ -413,14 +696,12 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
           .resume-page-container > div:not([aria-hidden="true"]) {
             flex: 0 0 auto;
           }
-          /* Spacer fills remaining page space; max-height set dynamically by JS */
           .resume-page-container > div[aria-hidden="true"],
           .resume-spacer {
             flex: 1 1 auto !important;
             min-height: 0 !important;
             background: var(--pdf-background, hsl(var(--background))) !important;
           }
-          /* Prevent sections from breaking awkwardly */
           div[class*="mb-"] {
             page-break-inside: avoid;
             break-inside: avoid;
@@ -431,104 +712,114 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
         className="resume-page-container bg-background text-foreground p-8 max-w-4xl mx-auto"
         style={{ fontFamily: `"${fontFamily}", ui-sans-serif, system-ui, sans-serif` }}
       >
-        {/* Header with colored background */}
-        <div className="-mx-8 -mt-8 px-8 py-6 mb-6 border-l-4" style={{ backgroundColor: `${linkColor}0D`, borderColor: linkColor }}>
+        {/* Compact header with colored accent */}
+        <div className="-mx-8 -mt-8 px-8 py-5 mb-5 border-l-4" style={{ backgroundColor: `${linkColor}0D`, borderColor: linkColor }}>
           <div className="flex items-start gap-6">
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <h1
-                className="mb-2"
+                className="mb-1.5"
                 style={{
                   color: linkColor,
-                  fontWeight: titleBold ? 'bold' : 'normal',
-                  fontSize: sizes.title,
+                  fontWeight: titleBold ? '700' : '400',
+                  fontSize: sizes.name,
                   lineHeight: '1.2',
+                  letterSpacing: '0.01em',
                 }}
               >
-                {personalInfo.firstName} {personalInfo.lastName}                                
+                {personalInfo.firstName} {personalInfo.lastName}
               </h1>
               {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (
-                <p className="font-semibold mb-2" style={{ fontSize: sizes.base, color: textColor }}>{personalInfo.professionalTitle.trim()}</p>
+                <p 
+                  className="font-semibold mb-3" 
+                  style={{ 
+                    fontSize: sizes.base, 
+                    color: textColor,
+                    opacity: 0.9
+                  }}
+                >
+                  {personalInfo.professionalTitle.trim()}
+                </p>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-3" style={{ fontSize: sizes.xs, color: textColor }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5" style={{ fontSize: sizes.xs, color: textColor }}>
                 {personalInfo.email && (
                   <div className="flex items-center gap-2 min-w-0">
-                    <Mail className="h-4 w-4 flex-shrink-0" style={{ color: linkColor }} />
+                    <Mail className="h-3.5 w-3.5 flex-shrink-0" style={{ color: linkColor }} />
                     <span className="truncate">{personalInfo.email}</span>
                   </div>
                 )}
                 {personalInfo.phone && (
                   <div className="flex items-center gap-2 min-w-0">
-                    <Phone className="h-4 w-4 flex-shrink-0" style={{ color: linkColor }} />
+                    <Phone className="h-3.5 w-3.5 flex-shrink-0" style={{ color: linkColor }} />
                     <span className="truncate">{personalInfo.phone}</span>
                   </div>
                 )}
                 {personalInfo.location && (
                   <div className="flex items-center gap-2 min-w-0">
-                    <MapPin className="h-4 w-4 flex-shrink-0" style={{ color: linkColor }} />
+                    <MapPin className="h-3.5 w-3.5 flex-shrink-0" style={{ color: linkColor }} />
                     <span className="truncate">{personalInfo.location}</span>
                   </div>
                 )}
                 {personalInfo.linkedin && (
                   <div className="flex items-center gap-2 min-w-0">
-                    <Linkedin className="h-4 w-4 flex-shrink-0" style={{ color: linkColor }} />
+                    <Linkedin className="h-3.5 w-3.5 flex-shrink-0" style={{ color: linkColor }} />
                     <span className="truncate">{personalInfo.linkedin}</span>
                   </div>
                 )}
                 {personalInfo.github && (
                   <div className="flex items-center gap-2 min-w-0">
-                    <Github className="h-4 w-4 flex-shrink-0" style={{ color: linkColor }} />
+                    <Github className="h-3.5 w-3.5 flex-shrink-0" style={{ color: linkColor }} />
                     <span className="truncate">{personalInfo.github}</span>
                   </div>
                 )}
                 {personalInfo.website && (
                   <div className="flex items-center gap-2 min-w-0">
-                    <Globe className="h-4 w-4 flex-shrink-0" style={{ color: linkColor }} />
+                    <Globe className="h-3.5 w-3.5 flex-shrink-0" style={{ color: linkColor }} />
                     <span className="truncate">{personalInfo.website}</span>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Profile image */}
+            {/* Compact profile image */}
             {personalInfo.profileImage ? (
               <div className="flex-shrink-0">
-                <div className="w-24 h-24 md:w-28 md:h-28 rounded-md border-2 overflow-hidden" style={{ borderColor: linkColor }}>
+                <div className="w-20 h-20 rounded-md border-2 overflow-hidden" style={{ borderColor: linkColor }}>
                   <img
                     src={personalInfo.profileImage}
                     alt={`Professional profile photo of ${personalInfo.firstName} ${personalInfo.lastName}${personalInfo.professionalTitle ? `, ${personalInfo.professionalTitle}` : ''}${personalInfo.location ? ` from ${personalInfo.location}` : ''}`}
-                    className="w-full h-full object-cover"
+                    className="h-full w-full object-cover"
                     style={{ objectPosition: '50% 40%' }}
                     loading="lazy"
                     decoding="async"
-                    fetchPriority="low"
                   />
                 </div>
               </div>
             ) : (
-              <div className="flex-shrink-0 w-24 h-24 md:w-28 md:h-28 rounded-md border-2 bg-muted flex items-center justify-center photo-placeholder" style={{ borderColor: linkColor }}>
+              <div 
+                className="flex-shrink-0 w-20 h-20 rounded-md border-2 bg-muted flex items-center justify-center photo-placeholder" 
+                style={{ borderColor: linkColor }}
+              >
                 <span className="text-xs text-muted-foreground">Photo</span>
               </div>
             )}
           </div>
         </div>
 
-        {/* Sections */}
-        <div className="space-y-2">
+        {/* Compact section spacing - reduced from space-y-4 to space-y-3 */}
+        <div className="space-y-3">
           {orderedSections.map(section => renderSection(section))}
         </div>
 
-        {/* Capped spacer - fills partial pages, won't create extra pages */}
+        {/* Spacer for page filling */}
         <div aria-hidden="true" className="resume-spacer" style={{ flex: '1 1 auto', minHeight: 0 }}></div>
 
         {/* Page Number Footer */}
         <style>{`
-        /* Hide page numbers in preview (screen) */
         .page-number-footer {
           display: none;
         }
         @media print {
-          /* Hide photo placeholders in print/PDF */
           .photo-placeholder {
             display: none !important;
           }
@@ -545,7 +836,6 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
           @page :first {
             margin-top: 0;
           }
-          /* Ensure our footer is hidden in print */
           .page-number-footer {
             display: none !important;
           }
