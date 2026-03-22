@@ -486,11 +486,28 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
             height: 100%;
           }
           .resume-page-container {
-            min-height: 297mm !important;
+            min-height: 0 !important;
             background: var(--pdf-background, hsl(var(--background))) !important;
             width: 210mm;
             margin: 0 auto;
-
+            display: flex;
+            flex-direction: column;
+          }
+          .resume-page-container > div:not([aria-hidden="true"]) {
+            flex: 0 0 auto;
+          }
+          /* Cap spacer to prevent creating extra pages; fills partial pages up to 200mm */
+          .resume-page-container > div[aria-hidden="true"],
+          .resume-spacer {
+            flex: 1 1 auto !important;
+            min-height: 0 !important;
+            max-height: 200mm !important;
+            background: var(--pdf-background, hsl(var(--background))) !important;
+          }
+          /* Prevent sections from breaking awkwardly */
+          div[class*="mb-"] {
+            page-break-inside: avoid;
+            break-inside: avoid;
           }
         }
       `}</style>
@@ -602,6 +619,9 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
             .filter(section => section !== 'summary' && section !== 'skills')
             .map(section => renderSection(section))}
         </div>
+
+        {/* Capped spacer - fills partial pages, won't create extra pages */}
+        <div aria-hidden="true" className="resume-spacer" style={{ flex: '1 1 auto', minHeight: 0 }}></div>
 
         {/* Page Number Footer */}
         <style>{`

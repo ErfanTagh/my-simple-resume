@@ -677,17 +677,22 @@ async function downloadPDFFromHTML(
         min-height: 100% !important;
         background: var(--pdf-background) !important;
       }
-      /* Force container to extend to exactly 297mm (A4 height) */
-      /* But allow it to grow if content is longer */
       .resume-page-container {
         background: var(--pdf-background) !important;
-        display: block !important;
-        /* Remove min-height and flex - let content flow naturally */
-        /* Pages will fill based on content, not forced breaks */
+        min-height: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
       }
-      /* Hide spacer div completely in PDF - it causes page breaks */
-      .resume-page-container > div[aria-hidden="true"] {
-        display: none !important;
+      .resume-page-container > div:not([aria-hidden="true"]) {
+        flex: 0 0 auto !important;
+      }
+      /* Cap spacer to prevent extra pages; fills partial pages up to 200mm */
+      .resume-page-container > div[aria-hidden="true"],
+      .resume-spacer {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        max-height: 200mm !important;
+        background: var(--pdf-background) !important;
       }
       /* Ensure gradient containers still have background */
       .resume-page-container.bg-gradient-to-br {
@@ -738,23 +743,6 @@ async function downloadPDFFromHTML(
 </body>
 </html>`;
 
-  // Debug: Log container dimensions before PDF generation
-  if (typeof window !== 'undefined') {
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = resumeHTML;
-    const container = tempDiv.querySelector('.resume-page-container');
-    if (container) {
-      const spacer = tempDiv.querySelector('[aria-hidden="true"]');
-      console.log('[PDF Debug] Found resume container');
-      console.log('[PDF Debug] Spacer found:', !!spacer);
-      if (spacer) {
-        const spacerStyle = window.getComputedStyle(spacer as Element);
-        console.log('[PDF Debug] Spacer flex:', spacerStyle.flex);
-        console.log('[PDF Debug] Spacer max-height:', spacerStyle.maxHeight);
-        console.log('[PDF Debug] Spacer min-height:', spacerStyle.minHeight);
-      }
-    }
-  }
 
   const pdfBlob = await resumeAPI.generatePDF(resumeId, fullHTML);
   const blob = new Blob([pdfBlob], { type: 'application/pdf' });

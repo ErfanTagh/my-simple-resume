@@ -382,10 +382,19 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
         .resume-page-container {
           padding-top: 20px !important;
           padding-bottom: 20px !important;
-          min-height: 297mm;
+          min-height: 0;
+          display: flex;
+          flex-direction: column;
+        }
+        /* Constrain spacer in preview mode */
+        .resume-page-container > div[aria-hidden="true"],
+        .resume-spacer {
+          flex: 1 1 0;
+          min-height: 0;
+          max-height: 200mm;
+          overflow: hidden;
         }
         @media print {
-          /* Hide photo placeholders in print/PDF */
           .photo-placeholder {
             display: none !important;
           }
@@ -403,13 +412,27 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
             height: 100%;
           }
           .resume-page-container {
+            min-height: 0 !important;
             background: var(--pdf-background, hsl(var(--background))) !important;
             width: 210mm;
             margin: 0 auto;
+            display: flex;
+            flex-direction: column;
           }
-          @page {
-            size: A4;
-            margin: 0;
+          .resume-page-container > div:not([aria-hidden="true"]) {
+            flex: 0 0 auto;
+          }
+          /* Cap spacer to prevent creating extra pages; fills partial pages up to 200mm */
+          .resume-page-container > div[aria-hidden="true"],
+          .resume-spacer {
+            flex: 1 1 auto !important;
+            min-height: 0 !important;
+            max-height: 200mm !important;
+            background: var(--pdf-background, hsl(var(--background))) !important;
+          }
+          div[class*="mb-"] {
+            page-break-inside: avoid;
+            break-inside: avoid;
           }
         }
       `}</style>
@@ -495,6 +518,9 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
         <div>
           {orderedSections.map(section => renderSection(section))}
         </div>
+
+        {/* Capped spacer - fills partial pages, won't create extra pages */}
+        <div aria-hidden="true" className="resume-spacer" style={{ flex: '1 1 auto', minHeight: 0 }}></div>
 
         {/* Page Number Footer */}
         <style>{`

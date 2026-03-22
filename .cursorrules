@@ -272,10 +272,10 @@ For UI-only or styling changes, a brief summary is sufficient.
 
 **Implementation Strategy:**
 
-- Use `min-height: 297mm` on resume containers to ensure full pages
-- Use a spacer div with `flex: 1 1 0` to fill remaining space on the last page
-- Apply `page-break-before: avoid`, `page-break-after: avoid`, `orphans: 0`, `widows: 0` to prevent empty pages
-- Do NOT use `max-height` constraints on spacers that would prevent full-page filling
+- Use `min-height: 0` on resume containers in print to let content flow naturally
+- Use a spacer div with `flex: 1 1 auto` and `max-height: 200mm` to fill partial pages without creating extra blank pages
+- The 200mm cap prevents the spacer from growing beyond a safe threshold that would trigger a new page
+- Apply `page-break-inside: avoid` on sections to prevent awkward breaks
 - Ensure both preview (screen) and PDF (print) use consistent CSS rules
 
 **This applies to:**
