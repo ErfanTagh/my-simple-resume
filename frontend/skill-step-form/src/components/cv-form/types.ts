@@ -57,6 +57,11 @@ export const cvFormSchema = z.object({
           course: z.string().optional(),
         })
       ).optional(),
+      descriptions: z.array(
+        z.object({
+          description: z.string().optional(),
+        })
+      ).optional(),
     })
   ).optional(),
   projects: z.array(

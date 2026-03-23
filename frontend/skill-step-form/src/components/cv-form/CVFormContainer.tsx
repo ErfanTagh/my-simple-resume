@@ -147,7 +147,8 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
         startDate: "",
         endDate: "",
         field: "",
-        keyCourses: []
+        keyCourses: [],
+        descriptions: []
       }],
       projects: [],
       certificates: [],
@@ -188,7 +189,10 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
         ? initialData.workExperience
         : defaults.workExperience,
       education: initialData.education && initialData.education.length > 0
-        ? initialData.education
+        ? initialData.education.map(edu => ({
+            ...edu,
+            descriptions: edu.descriptions ?? [],
+          }))
         : defaults.education,
       languages: Array.isArray(initialData.languages) ? initialData.languages : defaults.languages,
       skills: Array.isArray(initialData.skills) ? initialData.skills : defaults.skills,

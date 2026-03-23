@@ -266,6 +266,13 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                         {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(' · ')}
                       </p>
                     )}
+                    {edu.descriptions && edu.descriptions.length > 0 && (
+                      <BulletList
+                        items={edu.descriptions.filter(d => d?.description?.trim()).map(d => d!.description!.trim())}
+                        color={educationStyling.bodyColor}
+                        sizePx={educationBodySizes.sm}
+                      />
+                    )}
                   </div>
                 );
               })}

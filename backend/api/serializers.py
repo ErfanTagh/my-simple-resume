@@ -28,6 +28,10 @@ class CourseSerializer(serializers.Serializer):
     course = serializers.CharField(max_length=200, required=False, allow_blank=True)
 
 
+class EducationDescriptionSerializer(serializers.Serializer):
+    description = serializers.CharField(max_length=500, required=False, allow_blank=True)
+
+
 class PersonalInfoSerializer(serializers.Serializer):
     first_name = serializers.CharField(max_length=100)
     last_name = serializers.CharField(max_length=100)
@@ -106,6 +110,10 @@ class EducationSerializer(serializers.Serializer):
         allow_blank=True
     )
     key_courses = CourseSerializer(
+        many=True, 
+        required=False
+    )
+    descriptions = EducationDescriptionSerializer(
         many=True, 
         required=False
     )

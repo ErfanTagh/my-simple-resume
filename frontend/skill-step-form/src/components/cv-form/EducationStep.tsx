@@ -2,6 +2,7 @@ import { UseFormReturn, useFieldArray, Controller } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { MonthPicker } from "@/components/ui/month-picker";
@@ -36,6 +37,11 @@ const EducationItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index
   const { fields: courseFields, append: appendCourse, remove: removeCourse } = useFieldArray({
     control: form.control,
     name: `education.${index}.keyCourses`,
+  });
+
+  const { fields: descFields, append: appendDesc, remove: removeDesc } = useFieldArray({
+    control: form.control,
+    name: `education.${index}.descriptions`,
   });
 
   return (
@@ -195,6 +201,51 @@ const EducationItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index
           {t('resume.labels.addCourse')}
         </Button>
       </div>
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <Label>{t('resume.labels.keyDescriptions')}</Label>
+            <p className="text-xs text-muted-foreground mt-1">{t('resume.labels.keyDescriptionsHint')}</p>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => appendDesc({ description: "" })}
+            className="h-8"
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            {t('resume.labels.addDescription')}
+          </Button>
+        </div>
+        <div className="space-y-2">
+          {descFields.map((field, descIndex) => (
+            <div key={field.id} className="flex gap-2">
+              <Textarea
+                {...form.register(`education.${index}.descriptions.${descIndex}.description`)}
+                placeholder={t('resume.placeholders.responsibility')}
+                rows={1}
+                className="flex-1 resize-none h-9 min-h-0 leading-5 py-1.5"
+                onInput={(e) => {
+                  const el = e.currentTarget;
+                  el.style.height = "auto";
+                  el.style.height = `${el.scrollHeight}px`;
+                }}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => removeDesc(descIndex)}
+                className="shrink-0"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      </div>
     </>
   );
 };
@@ -221,7 +272,8 @@ export const EducationStep = ({ form }: EducationStepProps) => {
         startDate: "", 
         endDate: "", 
         field: "",
-        keyCourses: []
+        keyCourses: [],
+        descriptions: []
       });
     }
   }, [educationFields.length, appendEducation]);
@@ -275,7 +327,8 @@ export const EducationStep = ({ form }: EducationStepProps) => {
               startDate: "", 
               endDate: "", 
               field: "",
-              keyCourses: []
+              keyCourses: [],
+              descriptions: []
             })}
             className="w-full"
           >

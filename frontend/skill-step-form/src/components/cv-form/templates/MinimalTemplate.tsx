@@ -290,6 +290,16 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                         {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(" • ")}
                       </p>
                     )}
+                    {edu.descriptions && edu.descriptions.length > 0 && (
+                      <ul className="space-y-1 mt-1.5" style={{ fontSize: educationBodySizes.sm, color: educationStyling.bodyColor, lineHeight: '1.6' }}>
+                        {edu.descriptions.filter(d => d?.description?.trim()).map((d, i) => (
+                          <li key={i} className="flex gap-3">
+                            <span style={{ color: educationStyling.bodyColor, opacity: 0.5 }}>•</span>
+                            <span className="flex-1">{d.description!.trim()}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 )
               ))}

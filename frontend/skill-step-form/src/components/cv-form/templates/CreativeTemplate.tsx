@@ -368,6 +368,16 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                           {edu.keyCourses.map(c => typeof c === 'string' ? c : c.course).filter(Boolean).join(" • ")}
                         </p>
                       )}
+                      {edu.descriptions && edu.descriptions.length > 0 && (
+                        <ul className="space-y-1 mt-1.5" style={{ fontSize: educationBodySizes.sm, color: educationStyling.bodyColor, lineHeight: '1.6' }}>
+                          {edu.descriptions.filter(d => d?.description?.trim()).map((d, i) => (
+                            <li key={i} className="flex gap-2.5">
+                              <span style={{ color: educationStyling.bodyColor, opacity: 0.5 }}>•</span>
+                              <span className="flex-1">{d.description!.trim()}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </div>
                   )
                 ))}
@@ -776,8 +786,8 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
         {/* Elegant header with single accent color */}
         <div className="mb-4 relative">
           <div 
-            className="absolute top-0 left-0 w-1 h-full rounded-r-full" 
-            style={{ backgroundColor: accentColor, opacity: 0.3 }}
+            className="absolute top-0 left-0 h-full rounded-r-full" 
+            style={{ width: '3px', backgroundColor: accentColor }}
           />
           <div className="flex items-start gap-6 mb-3 pl-4">
             <div className="flex-1">

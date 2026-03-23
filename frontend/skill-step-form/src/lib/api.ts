@@ -300,6 +300,7 @@ export interface ResumeData {
     endDate?: string;
     field?: string;
     keyCourses?: Array<{ course: string }>;
+    descriptions?: Array<{ description: string }>;
   }>;
   projects?: Array<{
     name?: string;

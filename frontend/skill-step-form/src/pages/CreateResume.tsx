@@ -52,6 +52,7 @@ const createEmptyCVFormData = (): CVFormData => ({
       endDate: "",
       field: "",
       keyCourses: [],
+      descriptions: [],
     },
   ],
   projects: [],
