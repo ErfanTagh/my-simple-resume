@@ -113,7 +113,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
       case "summary":
         return personalInfo.summary && personalInfo.summary.trim() ? (
           <div key="summary">
-            <h2 className="font-bold mb-2 uppercase tracking-wide" style={{ fontSize: personalInfoTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: personalInfoTitleColor }}>{t('resume.sections.summary').toUpperCase()}</h2>
+            <h2 className="font-bold mb-1 uppercase tracking-wide" style={{ fontSize: personalInfoTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: personalInfoTitleColor }}>{t('resume.sections.summary').toUpperCase()}</h2>
             <p className="leading-relaxed whitespace-pre-wrap" style={{ fontSize: personalInfoBodySizes.baseText, color: personalInfoBodyColor, lineHeight: '1.7' }}>{personalInfo.summary.trim()}</p>
           </div>
         ) : null;
@@ -121,7 +121,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
       case "workExperience":
         return workExperience.some(exp => exp.position || exp.company) ? (
           <div key="workExperience">
-            <h2 className="font-bold mb-2 uppercase tracking-wide" style={{ fontSize: workExperienceTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: workExperienceStyling.titleColor }}>{t('resume.sections.workExperience').toUpperCase()}</h2>
+            <h2 className="font-bold mb-1 uppercase tracking-wide" style={{ fontSize: workExperienceTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: workExperienceStyling.titleColor }}>{t('resume.sections.workExperience').toUpperCase()}</h2>
             <div className="space-y-3">
               {workExperience.map((exp, index) => (
                 (exp.position || exp.company) && (
@@ -178,7 +178,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
       case "education":
         return education.some(edu => edu.degree || edu.institution) ? (
           <div key="education">
-            <h2 className="font-bold mb-2 uppercase tracking-wide" style={{ fontSize: educationTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: educationStyling.titleColor }}>{t('resume.sections.education').toUpperCase()}</h2>
+            <h2 className="font-bold mb-1 uppercase tracking-wide" style={{ fontSize: educationTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: educationStyling.titleColor }}>{t('resume.sections.education').toUpperCase()}</h2>
             <div className="space-y-3">
               {education.map((edu, index) => (
                 (edu.degree || edu.institution) && (
@@ -211,7 +211,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
       case "projects":
         return projects.some(proj => proj.name) ? (
           <div key="projects">
-            <h2 className="font-bold mb-2 uppercase tracking-wide" style={{ fontSize: projectsTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: projectsStyling.titleColor }}>{t('resume.sections.projects').toUpperCase()}</h2>
+            <h2 className="font-bold mb-1 uppercase tracking-wide" style={{ fontSize: projectsTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: projectsStyling.titleColor }}>{t('resume.sections.projects').toUpperCase()}</h2>
             <div className="space-y-3">
               {projects.map((proj, index) => (
                 proj.name && (
@@ -259,7 +259,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
       case "certificates":
         return certificates.some(cert => cert.name) ? (
           <div key="certificates">
-            <h2 className="font-bold mb-2 uppercase tracking-wide" style={{ fontSize: certificatesTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: certificatesStyling.titleColor }}>{t('resume.sections.certifications').toUpperCase()}</h2>
+            <h2 className="font-bold mb-1 uppercase tracking-wide" style={{ fontSize: certificatesTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: certificatesStyling.titleColor }}>{t('resume.sections.certifications').toUpperCase()}</h2>
             <div className="space-y-2">
               {certificates.map((cert, index) => (
                 cert.name && (
@@ -289,7 +289,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
       case "skills":
         return skills.some(s => s.skill) ? (
           <div key="skills">
-            <h2 className="font-bold mb-2 uppercase tracking-wide" style={{ fontSize: skillsTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: skillsStyling.titleColor }}>{t('resume.sections.skills').toUpperCase()}</h2>
+            <h2 className="font-bold mb-1 uppercase tracking-wide" style={{ fontSize: skillsTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: skillsStyling.titleColor }}>{t('resume.sections.skills').toUpperCase()}</h2>
             <p style={{ fontSize: skillsBodySizes.sm, color: skillsStyling.bodyColor, lineHeight: '1.7' }}>
               {skills.filter(s => s.skill).map(s => s.skill).join(" • ")}
             </p>
@@ -299,7 +299,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
       case "languages":
         return languages.some(lang => lang.language) ? (
           <div key="languages">
-            <h2 className="font-bold mb-2 uppercase tracking-wide" style={{ fontSize: languagesTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: languagesStyling.titleColor }}>{t('resume.sections.languages').toUpperCase()}</h2>
+            <h2 className="font-bold mb-1 uppercase tracking-wide" style={{ fontSize: languagesTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: languagesStyling.titleColor }}>{t('resume.sections.languages').toUpperCase()}</h2>
             <div className="space-y-1.5">
               {languages.map((lang, index) => (
                 lang.language && (
@@ -320,7 +320,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
       case "interests":
         return personalInfo.interests && personalInfo.interests.length > 0 && personalInfo.interests.some(i => i.interest) ? (
           <div key="interests">
-            <h2 className="font-bold mb-2 uppercase tracking-wide" style={{ fontSize: personalInfoTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: personalInfoTitleColor }}>{t('resume.sections.interests').toUpperCase()}</h2>
+            <h2 className="font-bold mb-1 uppercase tracking-wide" style={{ fontSize: personalInfoTitleSizes.heading, fontWeight: headingBold ? 'bold' : 'normal', color: personalInfoTitleColor }}>{t('resume.sections.interests').toUpperCase()}</h2>
             <p style={{ fontSize: personalInfoBodySizes.sm, color: personalInfoBodyColor, lineHeight: '1.7' }}>{personalInfo.interests.map(i => i.interest).filter(Boolean).join(" • ")}</p>
           </div>
         ) : null;
@@ -407,7 +407,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
             </div>
           )}
 
-          <h1 className="font-bold mb-2 uppercase tracking-wide" style={{ fontSize: sizes.name, fontWeight: titleBold ? '700' : '400', color: linkColor, letterSpacing: '0.02em' }}>
+          <h1 className="font-bold mb-1 uppercase tracking-wide" style={{ fontSize: sizes.name, fontWeight: titleBold ? '700' : '400', color: linkColor, letterSpacing: '0.02em' }}>
             {personalInfo.firstName} {personalInfo.lastName}
           </h1>
           {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (
@@ -455,7 +455,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
         </div>
 
         {/* Sections - traditional single column */}
-        <div>
+        <div className="space-y-3">
           {orderedSections.map(section => renderSection(section))}
         </div>
 
