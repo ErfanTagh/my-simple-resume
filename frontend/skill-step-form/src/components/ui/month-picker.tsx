@@ -1,6 +1,6 @@
 import * as React from "react";
 import { format, parse, isValid, startOfYear, setMonth } from "date-fns";
-import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { CalendarIcon, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +14,10 @@ interface MonthPickerProps {
   onChange: (value: string) => void;
   placeholder?: string;
   disabled?: boolean;
+  /** When true, show a clear control when a date is set (e.g. optional expiration). */
+  clearable?: boolean;
+  /** Accessible label for the external clear button (use i18n from parent). */
+  clearAriaLabel?: string;
 }
 
 const MONTHS = [
@@ -26,6 +30,8 @@ export function MonthPicker({
   onChange,
   placeholder = "Select month",
   disabled = false,
+  clearable = false,
+  clearAriaLabel = "Clear date",
 }: MonthPickerProps) {
   const [open, setOpen] = React.useState(false);
 
@@ -63,68 +69,87 @@ export function MonthPicker({
 
   const selectedMonth = dateValue ? dateValue.getMonth() : undefined;
 
-  return (
-    <Popover open={disabled ? false : open} onOpenChange={(newOpen) => {
-      if (!disabled) {
-        setOpen(newOpen);
-      }
-    }}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          disabled={disabled}
-          className={cn(
-            "w-full justify-start text-left font-normal",
-            !dateValue && "text-muted-foreground",
-            disabled && "opacity-50 cursor-not-allowed"
-          )}
-        >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {dateValue ? format(dateValue, "MMMM yyyy") : <span>{placeholder}</span>}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <div className="p-3">
-          {/* Year Navigation */}
-          <div className="flex items-center justify-between mb-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7"
-              onClick={() => handleYearChange(-1)}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <span className="text-sm font-medium px-4">{displayYear}</span>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7"
-              onClick={() => handleYearChange(1)}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
+  const showClear = clearable && Boolean(dateValue) && !disabled;
 
-          {/* Month Grid */}
-          <div className="grid grid-cols-3 gap-2">
-            {MONTHS.map((month, index) => (
-              <Button
-                key={month}
-                variant={selectedMonth === index && dateValue?.getFullYear() === displayYear ? "default" : "outline"}
-                className={cn(
-                  "h-9 text-sm",
-                  selectedMonth === index && dateValue?.getFullYear() === displayYear && "bg-primary text-primary-foreground"
-                )}
-                onClick={() => handleMonthSelect(index)}
-              >
-                {month.slice(0, 3)}
-              </Button>
-            ))}
-          </div>
-        </div>
-      </PopoverContent>
-    </Popover>
+  return (
+    <div className="flex w-full gap-1 items-stretch">
+      <div className="min-w-0 flex-1">
+        <Popover open={disabled ? false : open} onOpenChange={(newOpen) => {
+          if (!disabled) {
+            setOpen(newOpen);
+          }
+        }}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              disabled={disabled}
+              className={cn(
+                "w-full justify-start text-left font-normal",
+                !dateValue && "text-muted-foreground",
+                disabled && "opacity-50 cursor-not-allowed"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
+              {dateValue ? format(dateValue, "MMMM yyyy") : <span>{placeholder}</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <div className="p-3">
+              {/* Year Navigation */}
+              <div className="flex items-center justify-between mb-4">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => handleYearChange(-1)}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <span className="text-sm font-medium px-4">{displayYear}</span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => handleYearChange(1)}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Month Grid */}
+              <div className="grid grid-cols-3 gap-2">
+                {MONTHS.map((month, index) => (
+                  <Button
+                    key={month}
+                    variant={selectedMonth === index && dateValue?.getFullYear() === displayYear ? "default" : "outline"}
+                    className={cn(
+                      "h-9 text-sm",
+                      selectedMonth === index && dateValue?.getFullYear() === displayYear && "bg-primary text-primary-foreground"
+                    )}
+                    onClick={() => handleMonthSelect(index)}
+                  >
+                    {month.slice(0, 3)}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
+      {showClear && (
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="shrink-0"
+          aria-label={clearAriaLabel}
+          title={clearAriaLabel}
+          onClick={() => onChange("")}
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      )}
+    </div>
   );
 }
 

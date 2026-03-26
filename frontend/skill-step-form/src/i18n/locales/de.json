@@ -180,8 +180,12 @@
       "projectName": "Personal Portfolio Website",
       "projectDescription": "Built responsive portfolio website showcasing projects and skills",
       "skill": "JavaScript",
+      "certificateName": "z. B. AWS Certified Developer – Associate",
+      "certOrg": "z. B. Amazon Web Services",
       "selectIssueDate": "Ausstellungsdatum auswählen",
-      "noExpiration": "Kein Ablaufdatum"
+      "noExpiration": "Kein Ablaufdatum",
+      "credentialIdExample": "ABC123XYZ456",
+      "credentialUrlExample": "https://credentials.example.com/verify"
     },
     "labels": {
       "profileImage": "Profilbild",
@@ -272,6 +276,7 @@
       "addLanguage": "Sprache hinzufügen",
       "addInterest": "Interesse hinzufügen",
       "remove": "Entfernen",
+      "clearCertificateExpiration": "Ablaufdatum entfernen",
       "uploadResume": "Lebenslauf hochladen",
       "completeCV": "Lebenslauf abschließen"
     },

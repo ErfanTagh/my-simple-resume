@@ -176,7 +176,13 @@
       "searchArticles": "Search articles...",
       "summary": "Recent Computer Science graduate with strong foundation in JavaScript, React, and Python. Quick learner with excellent problem-solving skills.",
       "experienceDescription": "e.g., Led frontend development for enterprise SaaS platform serving 50,000+ users",
-      "interests": "e.g., Running, Cycling, Language Learning"
+      "interests": "e.g., Running, Cycling, Language Learning",
+      "certificateName": "e.g. AWS Certified Developer – Associate",
+      "certOrg": "e.g. Amazon Web Services",
+      "selectIssueDate": "Select issue date",
+      "noExpiration": "No expiration",
+      "credentialIdExample": "ABC123XYZ456",
+      "credentialUrlExample": "https://credentials.example.com/verify"
     },
     "labels": {
       "profileImage": "Profile Image",
@@ -267,6 +273,7 @@
       "addLanguage": "Add Language",
       "addInterest": "Add Interest",
       "remove": "Remove",
+      "clearCertificateExpiration": "Clear expiration date",
       "uploadResume": "Upload Resume",
       "completeCV": "Complete CV"
     },

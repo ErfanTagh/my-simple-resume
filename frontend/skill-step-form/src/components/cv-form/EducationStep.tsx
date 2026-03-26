@@ -415,6 +415,8 @@ export const EducationStep = ({ form }: EducationStepProps) => {
                       value={field.value}
                       onChange={field.onChange}
                       placeholder={t('resume.placeholders.noExpiration')}
+                      clearable
+                      clearAriaLabel={t('resume.actions.clearCertificateExpiration')}
                     />
                   )}
                 />
@@ -425,7 +427,7 @@ export const EducationStep = ({ form }: EducationStepProps) => {
               <Label htmlFor={`certificates.${index}.credentialId`}>{t('resume.labels.credentialId')}</Label>
               <Input
                 {...form.register(`certificates.${index}.credentialId`)}
-                placeholder="ABC123XYZ456"
+                placeholder={t('resume.placeholders.credentialIdExample')}
               />
             </div>
 
@@ -434,7 +436,7 @@ export const EducationStep = ({ form }: EducationStepProps) => {
               <Input
                 type="url"
                 {...form.register(`certificates.${index}.url`)}
-                placeholder="https://credentials.example.com/verify"
+                placeholder={t('resume.placeholders.credentialUrlExample')}
               />
               {form.formState.errors.certificates?.[index]?.url && (
                 <p className="text-sm text-destructive">
