@@ -1,0 +1,295 @@
+/**
+ * Hosted public profile (/p/:id) — Poppins typography & layout (hero, section-shot, project cards).
+ */
+
+.hosted-profile {
+  font-family: "Poppins", system-ui, sans-serif;
+}
+
+/* Headings */
+.hosted-profile .hero h1 {
+  font-size: 90px;
+  font-weight: 800;
+  line-height: 1.05;
+  margin: 0 0 10px 0;
+  color: inherit;
+}
+
+.hosted-profile h2 {
+  font-size: 50px;
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0 0 20px 0;
+  color: inherit;
+}
+
+.hosted-profile .project-card h3 {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+  color: #222;
+}
+
+/* Body */
+.hosted-profile p.hosted-body {
+  font-size: 30px;
+  font-weight: 300;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.hosted-profile .hosted-tagline {
+  font-size: 30px;
+  font-weight: 300;
+  line-height: 1.35;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.hosted-profile .project-card .subtext {
+  font-size: 17px;
+  line-height: 1.6;
+  font-weight: 400;
+  color: #444;
+  margin: 0;
+}
+
+/* Hero */
+.hosted-profile .hero {
+  background-color: #1c1d25;
+  color: #fff;
+}
+
+.hosted-profile .hosted-profile-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  padding-bottom: 0.25rem;
+}
+
+.hosted-profile .hosted-profile-nav--text {
+  justify-content: center;
+  gap: 1.25rem 1.75rem;
+}
+
+.hosted-profile .hosted-profile-nav-link {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.95);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.15s ease;
+}
+
+.hosted-profile .hosted-profile-nav-link:hover {
+  opacity: 0.82;
+}
+
+.hosted-profile .hero-text {
+  text-align: left;
+  min-width: 0;
+}
+
+.hosted-profile .hero-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.25rem;
+  margin-top: 2rem;
+}
+
+.hosted-profile .hero-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem 1.6rem;
+  border-radius: 9999px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.hosted-profile .hero-cta:hover {
+  opacity: 0.92;
+}
+
+.hosted-profile .hero-cta--coral {
+  background-color: var(--hp-accent, #ef744b);
+}
+
+.hosted-profile .hero-cta--magenta {
+  background-color: var(--hp-secondary, #d946a3);
+}
+
+.hosted-profile .hero-area {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2rem;
+}
+
+@media (min-width: 769px) {
+  .hosted-profile .hero-area:not(.hero-area--no-socials) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2.5rem;
+  }
+
+  .hosted-profile .hero-area:not(.hero-area--no-socials) .hero-text {
+    flex: 1;
+  }
+
+  .hosted-profile .hero-area:not(.hero-area--no-socials) .socials {
+    flex-shrink: 0;
+  }
+}
+
+.hosted-profile .hero-area--no-socials .hero-text {
+  max-width: 100%;
+}
+
+.hosted-profile .hero-avatar {
+  width: 140px;
+  height: 140px;
+  border-radius: 9999px;
+  object-fit: cover;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+  border: 4px solid rgba(255, 255, 255, 0.12);
+  margin-bottom: 1.25rem;
+}
+
+/* Social column: cyan icons, vertical on desktop */
+.hosted-profile .socials {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.hosted-profile .socials.socials--cyan a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: auto;
+  padding: 0.2rem;
+  border-radius: 0.25rem;
+  border: none;
+  color: var(--hp-social, #5eead4);
+  background: transparent;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.hosted-profile .socials.socials--cyan a:hover {
+  opacity: 0.88;
+  filter: brightness(1.08);
+}
+
+.hosted-profile .socials.socials--cyan a svg {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+@media (min-width: 769px) {
+  .hosted-profile .hero-area:not(.hero-area--no-socials) .socials.socials--cyan {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    padding-top: 0.25rem;
+  }
+}
+
+.hosted-profile .socials a:focus-visible {
+  outline: 2px solid var(--hp-social, #5eead4);
+  outline-offset: 3px;
+}
+
+/* About: text + headshot */
+.hosted-profile .section-shot {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+@media (min-width: 769px) {
+  .hosted-profile .section-shot.section-shot--with-photo {
+    flex-direction: row;
+    gap: 3rem;
+    align-items: flex-start;
+  }
+
+  .hosted-profile .section-shot .section-shot-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .hosted-profile .section-shot .section-shot-photo {
+    flex-shrink: 0;
+    width: 280px;
+  }
+}
+
+.hosted-profile .section-shot-photo img {
+  width: 100%;
+  max-width: 280px;
+  border-radius: 1rem;
+  object-fit: cover;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* Section titles on light backgrounds */
+.hosted-profile section:not(.hero) h2 {
+  color: #111827;
+}
+
+/* Responsive type */
+@media (max-width: 768px) {
+  .hosted-profile .hero h1 {
+    font-size: 50px;
+  }
+
+  .hosted-profile p.hosted-body {
+    font-size: 22px;
+  }
+
+  .hosted-profile .hosted-tagline {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hosted-profile .hero h1 {
+    font-size: 36px;
+  }
+
+  .hosted-profile h2 {
+    font-size: 32px;
+  }
+
+  .hosted-profile p.hosted-body {
+    font-size: 18px;
+  }
+
+  .hosted-profile .hosted-tagline {
+    font-size: 18px;
+  }
+
+  .hosted-profile .project-card h3 {
+    font-size: 20px;
+  }
+
+  .hosted-profile .project-card .subtext {
+    font-size: 15px;
+  }
+}

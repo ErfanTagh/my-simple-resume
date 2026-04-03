@@ -1,7 +1,12 @@
 """
 API Views for Resume/CV operations
 """
-from .resume_views import resume_list, resume_detail
+from .resume_views import (
+    resume_list,
+    resume_detail,
+    public_resume_detail,
+    resume_public_profile_toggle,
+)
 from .parse_views import parse_resume
 from .health_views import health_check
 from .pdf_views import generate_resume_pdf
@@ -13,6 +18,8 @@ from .feedback_views import send_feedback
 __all__ = [
     'resume_list',
     'resume_detail',
+    'public_resume_detail',
+    'resume_public_profile_toggle',
     'parse_resume',
     'health_check',
     'generate_resume_pdf',

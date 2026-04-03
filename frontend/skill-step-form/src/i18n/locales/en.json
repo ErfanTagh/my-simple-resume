@@ -535,6 +535,25 @@
       "myResumesDesc": "View and manage your saved resumes",
       "viewAll": "View All"
     },
+    "hostedProfile": {
+      "navAbout": "About",
+      "navProjects": "Projects",
+      "navCertificates": "Certificates",
+      "navContact": "Contact",
+      "sectionAbout": "About me",
+      "sectionProjects": "Projects",
+      "sectionCertificates": "Certificates",
+      "sectionContact": "Contact",
+      "contactHint": "Reach me by email.",
+      "viewCredential": "View credential",
+      "untitledProject": "Project",
+      "untitledCertificate": "Certificate",
+      "footerBrand": "Built with 123Resume",
+      "socialsLabel": "Social links",
+      "heroResumeCta": "Resume",
+      "invalidId": "Invalid profile link.",
+      "notFound": "This profile is not available or may have been turned off."
+    },
     "resumes": {
       "title": "My Resumes",
       "subtitle": "View and manage your created CVs",
@@ -573,6 +592,35 @@
       "duplicate": "Duplicate",
       "menu": "Resume options",
       "editName": "Click to edit resume name",
+      "publicProfile": {
+        "label": "Public profile page",
+        "hint": "Anyone with the link can view a portfolio-style page. You control visibility here—not when you save your resume.",
+        "copyLink": "Copy link",
+        "open": "Open",
+        "linkCopied": "Link copied",
+        "toastOn": "Public profile enabled",
+        "toastOnDesc": "Share your link from this page whenever you like.",
+        "toastOff": "Public profile disabled",
+        "toastOffDesc": "Your public URL no longer works for visitors.",
+        "toggleFailed": "Could not update public profile settings.",
+        "copyFailed": "Could not copy to clipboard.",
+        "sectionsTitle": "Show on public page",
+        "sections": {
+          "photo": "Profile photo",
+          "socials": "Social links",
+          "about": "About / summary",
+          "projects": "Projects",
+          "certificates": "Certificates",
+          "contact": "Contact"
+        },
+        "themeTitle": "Color scheme",
+        "themes": {
+          "orange": "Orange & coral",
+          "blue": "Blue & violet",
+          "green": "Green & teal",
+          "violet": "Violet & pink"
+        }
+      },
       "deleteDialog": {
         "title": "Delete Resume?",
         "description": "This action cannot be undone. This will permanently delete your resume.",

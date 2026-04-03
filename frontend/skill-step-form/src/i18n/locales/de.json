@@ -538,6 +538,25 @@
       "myResumesDesc": "Anzeigen und Verwalten Ihrer gespeicherten Lebensläufe",
       "viewAll": "Alle anzeigen"
     },
+    "hostedProfile": {
+      "navAbout": "Über mich",
+      "navProjects": "Projekte",
+      "navCertificates": "Zertifikate",
+      "navContact": "Kontakt",
+      "sectionAbout": "Über mich",
+      "sectionProjects": "Projekte",
+      "sectionCertificates": "Zertifikate",
+      "sectionContact": "Kontakt",
+      "contactHint": "Sie erreichen mich per E-Mail.",
+      "viewCredential": "Zertifikat ansehen",
+      "untitledProject": "Projekt",
+      "untitledCertificate": "Zertifikat",
+      "footerBrand": "Erstellt mit 123Resume",
+      "socialsLabel": "Social-Links",
+      "heroResumeCta": "Lebenslauf",
+      "invalidId": "Ungültiger Profil-Link.",
+      "notFound": "Dieses Profil ist nicht verfügbar oder wurde deaktiviert."
+    },
     "resumes": {
       "title": "Meine Lebensläufe",
       "subtitle": "Anzeigen und Verwalten Ihrer erstellten Lebensläufe",
@@ -576,6 +595,35 @@
       "duplicate": "Duplizieren",
       "menu": "Lebenslauf-Optionen",
       "editName": "Klicken Sie, um den Lebenslauf-Namen zu bearbeiten",
+      "publicProfile": {
+        "label": "Öffentliche Profilseite",
+        "hint": "Jede Person mit dem Link sieht eine Portfolio-Seite. Sie steuern das hier—nicht beim Speichern des Lebenslaufs.",
+        "copyLink": "Link kopieren",
+        "open": "Öffnen",
+        "linkCopied": "Link kopiert",
+        "toastOn": "Öffentliches Profil aktiviert",
+        "toastOnDesc": "Teilen Sie den Link von dieser Seite aus, wann immer Sie möchten.",
+        "toastOff": "Öffentliches Profil deaktiviert",
+        "toastOffDesc": "Ihre öffentliche URL funktioniert für Besucher nicht mehr.",
+        "toggleFailed": "Einstellungen für das öffentliche Profil konnten nicht aktualisiert werden.",
+        "copyFailed": "Konnte nicht in die Zwischenablage kopieren.",
+        "sectionsTitle": "Auf der öffentlichen Seite anzeigen",
+        "sections": {
+          "photo": "Profilfoto",
+          "socials": "Social-Links",
+          "about": "Über mich / Kurztext",
+          "projects": "Projekte",
+          "certificates": "Zertifikate",
+          "contact": "Kontakt"
+        },
+        "themeTitle": "Farbschema",
+        "themes": {
+          "orange": "Orange & Koralle",
+          "blue": "Blau & Violett",
+          "green": "Grün & Türkis",
+          "violet": "Violett & Pink"
+        }
+      },
       "deleteDialog": {
         "title": "Lebenslauf löschen?",
         "description": "Diese Aktion kann nicht rückgängig gemacht werden. Dies wird Ihren Lebenslauf dauerhaft löschen.",

@@ -3,7 +3,7 @@ Resume CRUD views (list, create, retrieve, update, delete)
 """
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from bson import ObjectId as BsonObjectId
 from datetime import datetime
@@ -104,6 +104,13 @@ def resume_list(request):
                     'formatting_score': resume_doc.get('formatting_score', 0.0),
                     'impact_score': resume_doc.get('impact_score', 0.0),
                     'overall_score': resume_doc.get('overall_score', 0.0),
+                    'public_profile_enabled': resume_doc.get('public_profile_enabled', False),
+                    'public_profile_sections': _normalize_public_profile_sections(
+                        resume_doc.get('public_profile_sections'),
+                    ),
+                    'public_profile_theme': _normalize_public_profile_theme(
+                        resume_doc.get('public_profile_theme'),
+                    ),
                     'created_at': get_date_or_now(created_at_raw),
                     'updated_at': get_date_or_now(updated_at_raw),
                 }
@@ -213,6 +220,7 @@ def resume_list(request):
                     'formatting_score': quality_scores.get('formatting_score', 0.0),
                     'impact_score': quality_scores.get('impact_score', 0.0),
                     'overall_score': quality_scores.get('overall_score', 0.0),
+                    'public_profile_enabled': False,
                     'created_at': datetime.utcnow(),
                     'updated_at': datetime.utcnow(),
                 }
@@ -255,6 +263,13 @@ def resume_list(request):
                     'formatting_score': created_doc.get('formatting_score', 0.0),
                     'impact_score': created_doc.get('impact_score', 0.0),
                     'overall_score': created_doc.get('overall_score', 0.0),
+                    'public_profile_enabled': created_doc.get('public_profile_enabled', False),
+                    'public_profile_sections': _normalize_public_profile_sections(
+                        created_doc.get('public_profile_sections'),
+                    ),
+                    'public_profile_theme': _normalize_public_profile_theme(
+                        created_doc.get('public_profile_theme'),
+                    ),
                     'created_at': get_date_or_now(created_doc.get('created_at')),
                     'updated_at': get_date_or_now(created_doc.get('updated_at')),
                 }
@@ -351,37 +366,7 @@ def resume_detail(request, pk):
             styling_from_db = resume_doc.get('styling')
             print(f"[STYLING LOG] resume_detail GET: resume_id={resume_doc.get('_id')}, has_styling={styling_from_db is not None}, styling_keys={list(styling_from_db.keys()) if isinstance(styling_from_db, dict) else None}, font_size={(styling_from_db or {}).get('font_size') if isinstance(styling_from_db, dict) else None}", file=sys.stderr)
             
-            resume_dict = {
-                'id': str(resume_doc['_id']),
-                'name': resume_doc.get('name'),
-                'personal_info': resume_doc.get('personal_info', {}),
-                'work_experience': resume_doc.get('work_experience', []),
-                'education': resume_doc.get('education', []),
-                'projects': resume_doc.get('projects', []),
-                'certificates': resume_doc.get('certificates', []),
-                'languages': resume_doc.get('languages', []),
-                'skills': resume_doc.get('skills', []),
-                'template': resume_doc.get('template', 'modern'),
-                'section_order': resume_doc.get('section_order', [
-                    'summary',
-                    'workExperience',
-                    'education',
-                    'projects',
-                    'certificates',
-                    'skills',
-                    'languages',
-                    'interests',
-                ]),
-                'styling': resume_doc.get('styling', {}),  # Include styling field
-                'completeness_score': resume_doc.get('completeness_score', 0.0),
-                'clarity_score': resume_doc.get('clarity_score', 0.0),
-                'formatting_score': resume_doc.get('formatting_score', 0.0),
-                'impact_score': resume_doc.get('impact_score', 0.0),
-                'overall_score': resume_doc.get('overall_score', 0.0),
-                'created_at': get_date_or_now(resume_doc.get('created_at')),
-                'updated_at': get_date_or_now(resume_doc.get('updated_at')),
-            }
-            return Response(resume_dict)
+            return Response(_resume_dict_from_doc(resume_doc))
         except Exception as e:
             logger.error(f"Error serializing resume: {str(e)}")
             import traceback
@@ -422,6 +407,14 @@ def resume_detail(request, pk):
                 # Prepare update data - preserve created_at, update everything else
                 update_data = serializer.validated_data.copy()
                 update_data.update(quality_scores)  # Add scores to update
+                # Do not let full-form saves clear public profile visibility (managed on My Resumes)
+                update_data['public_profile_enabled'] = existing_doc.get('public_profile_enabled', False)
+                update_data['public_profile_sections'] = _normalize_public_profile_sections(
+                    existing_doc.get('public_profile_sections'),
+                )
+                update_data['public_profile_theme'] = _normalize_public_profile_theme(
+                    existing_doc.get('public_profile_theme'),
+                )
                 update_data['updated_at'] = datetime.utcnow()  # Set updated_at timestamp
                 # Preserve created_at from existing document
                 if 'created_at' in existing_doc:
@@ -445,37 +438,7 @@ def resume_detail(request, pk):
                 updated_styling = updated_doc.get('styling')
                 print(f"[STYLING LOG] resume_detail PUT (after update): resume_id={updated_doc.get('_id')}, has_styling={updated_styling is not None}, styling_keys={list(updated_styling.keys()) if isinstance(updated_styling, dict) else None}, font_size={(updated_styling or {}).get('font_size') if isinstance(updated_styling, dict) else None}", file=sys.stderr)
                 
-                resume_dict = {
-                    'id': str(updated_doc['_id']),
-                    'name': updated_doc.get('name'),
-                    'personal_info': updated_doc.get('personal_info', {}),
-                    'work_experience': updated_doc.get('work_experience', []),
-                    'education': updated_doc.get('education', []),
-                    'projects': updated_doc.get('projects', []),
-                    'certificates': updated_doc.get('certificates', []),
-                    'languages': updated_doc.get('languages', []),
-                    'skills': updated_doc.get('skills', []),
-                    'template': updated_doc.get('template', 'modern'),
-                    'section_order': updated_doc.get('section_order', [
-                        'summary',
-                        'workExperience',
-                        'education',
-                        'projects',
-                        'certificates',
-                        'skills',
-                        'languages',
-                        'interests',
-                    ]),
-                    'styling': updated_doc.get('styling', {}),  # Include styling field
-                    'completeness_score': updated_doc.get('completeness_score', 0.0),
-                    'clarity_score': updated_doc.get('clarity_score', 0.0),
-                    'formatting_score': updated_doc.get('formatting_score', 0.0),
-                    'impact_score': updated_doc.get('impact_score', 0.0),
-                    'overall_score': updated_doc.get('overall_score', 0.0),
-                    'created_at': get_date_or_now(updated_doc.get('created_at')),
-                    'updated_at': get_date_or_now(updated_doc.get('updated_at')),
-                }
-                return Response(resume_dict)
+                return Response(_resume_dict_from_doc(updated_doc))
             except Exception as e:
                 return Response(
                     {'error': str(e)},
@@ -496,4 +459,240 @@ def resume_detail(request, pk):
             {'message': 'Resume deleted successfully'},
             status=status.HTTP_204_NO_CONTENT
         )
+
+
+def _mongo_db():
+    """Return pymongo Database handle (same connection logic as resume_detail)."""
+    from pymongo import MongoClient
+    import os
+
+    connection_string = os.getenv('MONGODB_CONNECTION_STRING')
+    if connection_string:
+        try:
+            client = MongoClient(connection_string)
+            client.admin.command('ping')
+        except Exception:
+            connection_string = None
+
+    if not connection_string:
+        mongo_host = os.getenv('MONGODB_HOST', 'localhost')
+        mongo_port = int(os.getenv('MONGODB_PORT', 27017))
+        mongo_username = os.getenv('MONGODB_USERNAME', '')
+        mongo_password = os.getenv('MONGODB_PASSWORD', '')
+        if mongo_username and mongo_password:
+            client = MongoClient(
+                mongo_host,
+                mongo_port,
+                username=mongo_username,
+                password=mongo_password,
+                authSource='admin',
+                authMechanism='SCRAM-SHA-1',
+            )
+        else:
+            client = MongoClient(mongo_host, mongo_port)
+
+    return client[os.getenv('MONGODB_NAME', 'resume_db')]
+
+
+# Hosted profile (/p/:id): which sections visitors see (all default True).
+_PUBLIC_PROFILE_SECTION_KEYS = (
+    'photo',
+    'socials',
+    'about',
+    'projects',
+    'certificates',
+    'contact',
+)
+
+
+def _normalize_public_profile_sections(raw):
+    """Return dict section_key -> bool; missing keys default to True."""
+    base = {k: True for k in _PUBLIC_PROFILE_SECTION_KEYS}
+    if not raw or not isinstance(raw, dict):
+        return base
+    for k in _PUBLIC_PROFILE_SECTION_KEYS:
+        if k in raw:
+            v = raw[k]
+            if isinstance(v, bool):
+                base[k] = v
+            else:
+                base[k] = str(v).lower() in ('1', 'true', 'yes')
+    return base
+
+
+_PUBLIC_PROFILE_THEME_KEYS = frozenset({'orange', 'blue', 'green', 'violet'})
+
+
+def _normalize_public_profile_theme(raw):
+    """Hosted profile accent scheme; default orange."""
+    if raw is None:
+        return 'orange'
+    s = str(raw).strip().lower()
+    if s in _PUBLIC_PROFILE_THEME_KEYS:
+        return s
+    return 'orange'
+
+
+def _doc_personal_info(resume_doc):
+    """Prefer snake_case; some legacy/imports store camelCase personalInfo."""
+    if 'personal_info' in resume_doc:
+        v = resume_doc['personal_info']
+        return v if v is not None else {}
+    if 'personalInfo' in resume_doc:
+        v = resume_doc['personalInfo']
+        return v if v is not None else {}
+    return {}
+
+
+def _doc_projects(resume_doc):
+    if 'projects' in resume_doc:
+        v = resume_doc['projects']
+        return v if v is not None else []
+    if 'Projects' in resume_doc:
+        v = resume_doc['Projects']
+        return v if v is not None else []
+    return []
+
+
+def _doc_certificates(resume_doc):
+    if 'certificates' in resume_doc:
+        v = resume_doc['certificates']
+        return v if v is not None else []
+    if 'Certificates' in resume_doc:
+        v = resume_doc['Certificates']
+        return v if v is not None else []
+    return []
+
+
+def _resume_dict_from_doc(resume_doc):
+    """Shape a Mongo resume document for API JSON (snake_case, matches resume_detail GET)."""
+    return {
+        'id': str(resume_doc['_id']),
+        'name': resume_doc.get('name'),
+        'personal_info': _doc_personal_info(resume_doc),
+        'work_experience': resume_doc.get('work_experience', []),
+        'education': resume_doc.get('education', []),
+        'projects': _doc_projects(resume_doc),
+        'certificates': _doc_certificates(resume_doc),
+        'languages': resume_doc.get('languages', []),
+        'skills': resume_doc.get('skills', []),
+        'template': resume_doc.get('template', 'modern'),
+        'section_order': resume_doc.get(
+            'section_order',
+            [
+                'summary',
+                'workExperience',
+                'education',
+                'projects',
+                'certificates',
+                'skills',
+                'languages',
+                'interests',
+            ],
+        ),
+        'styling': resume_doc.get('styling', {}),
+        'completeness_score': resume_doc.get('completeness_score', 0.0),
+        'clarity_score': resume_doc.get('clarity_score', 0.0),
+        'formatting_score': resume_doc.get('formatting_score', 0.0),
+        'impact_score': resume_doc.get('impact_score', 0.0),
+        'overall_score': resume_doc.get('overall_score', 0.0),
+        'public_profile_enabled': resume_doc.get('public_profile_enabled', False),
+        'public_profile_sections': _normalize_public_profile_sections(
+            resume_doc.get('public_profile_sections'),
+        ),
+        'public_profile_theme': _normalize_public_profile_theme(
+            resume_doc.get('public_profile_theme'),
+        ),
+        'created_at': get_date_or_now(resume_doc.get('created_at')),
+        'updated_at': get_date_or_now(resume_doc.get('updated_at')),
+    }
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def public_resume_detail(request, pk):
+    """
+    Public read-only resume payload when the owner enabled hosted profile.
+    No authentication required.
+    """
+    db = _mongo_db()
+    try:
+        resume_id = BsonObjectId(pk)
+    except Exception:
+        return Response(
+            {'error': 'Invalid resume ID format'},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    resume_doc = db.resumes.find_one({'_id': resume_id})
+    if not resume_doc or not resume_doc.get('public_profile_enabled', False):
+        return Response(
+            {'error': 'Not found'},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    return Response(_resume_dict_from_doc(resume_doc))
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def resume_public_profile_toggle(request, pk):
+    """
+    Enable or disable public hosted profile for a resume (owner only).
+    Body: {"enabled": true, "sections": {...} optional, "theme": "orange"|"blue"|"green"|"violet" optional}
+    """
+    db = _mongo_db()
+    try:
+        resume_id = BsonObjectId(pk)
+    except Exception:
+        return Response(
+            {'error': 'Invalid resume ID format'},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    enabled = request.data.get('enabled', False)
+    if not isinstance(enabled, bool):
+        enabled = str(enabled).lower() in ('1', 'true', 'yes')
+
+    set_fields = {
+        'public_profile_enabled': bool(enabled),
+        'updated_at': datetime.utcnow(),
+    }
+    sections_payload = request.data.get('sections')
+    if sections_payload is not None:
+        if not isinstance(sections_payload, dict):
+            return Response(
+                {'error': 'sections must be an object'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        set_fields['public_profile_sections'] = _normalize_public_profile_sections(sections_payload)
+
+    theme_payload = request.data.get('theme')
+    if theme_payload is not None:
+        set_fields['public_profile_theme'] = _normalize_public_profile_theme(theme_payload)
+
+    result = db.resumes.update_one(
+        {'_id': resume_id, 'user_id': request.user.id},
+        {'$set': set_fields},
+    )
+
+    if result.matched_count == 0:
+        return Response(
+            {'error': 'Resume not found'},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    updated = db.resumes.find_one({'_id': resume_id})
+    return Response(
+        {
+            'id': str(updated['_id']),
+            'public_profile_enabled': updated.get('public_profile_enabled', False),
+            'public_profile_sections': _normalize_public_profile_sections(
+                updated.get('public_profile_sections'),
+            ),
+            'public_profile_theme': _normalize_public_profile_theme(
+                updated.get('public_profile_theme'),
+            ),
+        }
+    )
 

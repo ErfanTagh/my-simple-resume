@@ -3,6 +3,9 @@
  * Handles all HTTP requests to the Django backend
  */
 
+import type { PublicProfileSections } from "@/lib/publicProfileSections";
+import type { PublicProfileThemeId } from "@/lib/publicProfileTheme";
+
 // Use environment variable if available, otherwise use relative path for Vite proxy
 // Remove trailing slash if present to avoid double slashes
 const getApiBaseUrl = () => {
@@ -364,6 +367,12 @@ export interface Resume extends ResumeData {
   formattingScore?: number;
   impactScore?: number;
   overallScore?: number;
+  /** When true, resume is available at /p/:id without login */
+  publicProfileEnabled?: boolean;
+  /** Which hosted-profile blocks are shown at /p/:id (defaults all true if omitted). */
+  publicProfileSections?: PublicProfileSections;
+  /** Accent palette for the hosted page (orange | blue | green | violet). */
+  publicProfileTheme?: PublicProfileThemeId;
 }
 
 export const resumeAPI = {
@@ -399,6 +408,50 @@ export const resumeAPI = {
     });
     const response = await makeRequest();
     return handleResponse(response, makeRequest);
+  },
+
+  /**
+   * Public hosted profile payload (no auth). 404 if not enabled or missing.
+   */
+  getPublicById: async (id: string): Promise<Resume> => {
+    const response = await fetch(`${API_BASE_URL}/public/resume/${id}/`, {
+      headers: createHeaders(false),
+      cache: 'no-store',
+    });
+    return handleResponse(response);
+  },
+
+  /**
+   * Enable or disable public hosted profile for a resume (owner only).
+   */
+  setPublicProfile: async (
+    id: string,
+    enabled: boolean,
+    sections?: PublicProfileSections,
+    theme?: PublicProfileThemeId,
+  ): Promise<{
+    id: string;
+    publicProfileEnabled: boolean;
+    publicProfileSections: PublicProfileSections;
+    publicProfileTheme: PublicProfileThemeId;
+  }> => {
+    const body: {
+      enabled: boolean;
+      sections?: PublicProfileSections;
+      theme?: PublicProfileThemeId;
+    } = { enabled };
+    if (sections !== undefined) {
+      body.sections = sections;
+    }
+    if (theme !== undefined) {
+      body.theme = theme;
+    }
+    const response = await fetch(`${API_BASE_URL}/resumes/${id}/public-profile/`, {
+      method: 'POST',
+      headers: createHeaders(true),
+      body: JSON.stringify(body),
+    });
+    return handleResponse(response);
   },
 
   /**

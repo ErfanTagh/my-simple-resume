@@ -43,6 +43,7 @@ import Terms from "./pages/Terms";
 import DataProtection from "./pages/DataProtection";
 import Cookies from "./pages/Cookies";
 import NotFound from "./pages/NotFound";
+import HostedProfilePage from "./pages/HostedProfilePage";
 
 const queryClient = new QueryClient();
 
@@ -59,7 +60,11 @@ const LandingOrRedirect = () => {
 const AppRoutes = () => {
   const location = useLocation();
   // Hide header/footer on login, signup, and OAuth callback pages for focused experience
-  const hideHeaderFooter = location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/oauth/callback';
+  const hideHeaderFooter =
+    location.pathname === '/login' ||
+    location.pathname === '/signup' ||
+    location.pathname === '/oauth/callback' ||
+    location.pathname.startsWith('/p/');
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -73,6 +78,7 @@ const AppRoutes = () => {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/oauth/callback" element={<OAuthCallback />} />
+          <Route path="/p/:id" element={<HostedProfilePage />} />
           <Route
             path="/dashboard"
             element={

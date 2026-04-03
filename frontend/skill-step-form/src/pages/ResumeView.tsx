@@ -19,7 +19,7 @@ import { MinimalTemplate } from '@/components/cv-form/templates/MinimalTemplate'
 import { CreativeTemplate } from '@/components/cv-form/templates/CreativeTemplate';
 import { LatexTemplate } from '@/components/cv-form/templates/LatexTemplate';
 import { StarRoverTemplate } from '@/components/cv-form/templates/StarRoverTemplate';
-import { CVFormData } from '@/components/cv-form/types';
+import { resumeToCvFormData } from '@/lib/resumeToCvFormData';
 import { SEO } from '@/components/SEO';
 
 export default function ResumeView() {
@@ -151,85 +151,9 @@ export default function ResumeView() {
     );
   }
 
-  // Helper: convert backend styling (snake_case) to frontend CVFormData styling (camelCase)
-  const convertStyling = (styling: any | undefined): CVFormData['styling'] => {
-    if (!styling) {
-      return {};
-    }
-
-    // Support both camelCase (already in CVFormData) and snake_case (from backend)
-    const fontFamily = styling.fontFamily ?? styling.font_family;
-    const fontSize = styling.fontSize ?? styling.font_size;
-    const titleColor = styling.titleColor ?? styling.title_color;
-    const titleBold = styling.titleBold ?? styling.title_bold;
-    const headingColor = styling.headingColor ?? styling.heading_color;
-    const headingBold = styling.headingBold ?? styling.heading_bold;
-    const textColor = styling.textColor ?? styling.text_color;
-    const linkColor = styling.linkColor ?? styling.link_color;
-
-    let sectionStyling: CVFormData['styling'] extends { sectionStyling?: infer T } ? T : any = undefined;
-
-    const rawSectionStyling = styling.sectionStyling ?? styling.section_styling;
-    if (rawSectionStyling && typeof rawSectionStyling === 'object') {
-      sectionStyling = {};
-      Object.keys(rawSectionStyling).forEach((key) => {
-        const section = rawSectionStyling[key] || {};
-        // IMPORTANT:
-        // For personalInfo (summary/about me), do NOT carry over per-section
-        // font sizes from old data. Those historical values were created
-        // before global font-size controls existed and effectively "lock"
-        // the summary at medium size. Let templates fall back to the
-        // global styling.fontSize instead, while still honoring colors.
-        if (key === 'personalInfo') {
-          sectionStyling![key] = {
-            titleColor: section.titleColor ?? section.title_color,
-            bodyColor: section.bodyColor ?? section.body_color,
-          };
-        } else {
-          sectionStyling![key] = {
-            titleColor: section.titleColor ?? section.title_color,
-            titleSize: section.titleSize ?? section.title_size,
-            bodyColor: section.bodyColor ?? section.body_color,
-            bodySize: section.bodySize ?? section.body_size,
-          };
-        }
-      });
-    }
-
-    const convertedStyling = {
-      fontFamily,
-      fontSize,
-      titleColor,
-      titleBold,
-      headingColor,
-      headingBold,
-      textColor,
-      linkColor,
-      sectionStyling,
-    };
-
-    return convertedStyling;
-  };
-
-  // Convert Resume to CVFormData format for template rendering
-  const convertResumeToFormData = (resume: Resume): CVFormData => {
-    return {
-      template: resume.template || 'modern',
-      personalInfo: resume.personalInfo,
-      workExperience: resume.workExperience || [],
-      education: resume.education || [],
-      projects: resume.projects || [],
-      certificates: resume.certificates || [],
-      skills: resume.skills || [],
-      languages: resume.languages || [],
-      sectionOrder: resume.sectionOrder || [],
-      styling: convertStyling((resume as any).styling),  // Normalize styling for templates
-    };
-  };
-
   // Render the appropriate template component
   const renderTemplate = () => {
-    const formData = convertResumeToFormData(resume);
+    const formData = resumeToCvFormData(resume);
     const template = resume.template || 'modern';
 
     switch (template) {

@@ -26,11 +26,15 @@ urlpatterns = [
     path('auth/social/<str:provider>/url/', social_views.social_login_url, name='social-login-url'),
     path('auth/social/<str:provider>/callback/', social_views.social_login_callback, name='social-login-callback'),
     
+    # Public hosted profile (no auth)
+    path('public/resume/<str:pk>/', views.public_resume_detail, name='public-resume-detail'),
+
     # Resume endpoints (protected)
     path('resumes/', views.resume_list, name='resume-list'),
     path('resumes/parse/', views.parse_resume, name='resume-parse'),  # Must come before <str:pk> pattern
     path('resumes/<str:resume_id>/pdf/', views.generate_resume_pdf, name='resume-pdf'),
     path('resumes/<str:resume_id>/match/', views.match_resume_to_job, name='resume-match'),
+    path('resumes/<str:pk>/public-profile/', views.resume_public_profile_toggle, name='resume-public-profile-toggle'),
     path('resumes/<str:pk>/', views.resume_detail, name='resume-detail'),
     
     # Blog post endpoints
