@@ -183,9 +183,9 @@ export function HostedProfileTemplate({ data, visibility: visibilityProp, resume
       </section>
 
       {showAbout && (
-        <section id="about" className="max-w-6xl mx-auto px-6 py-14 md:py-20">
+        <section id="about" className="px-6 py-14 md:py-20">
           <div
-            className={`section-shot ${showAboutHeadshot ? "section-shot--with-photo" : ""}`.trim()}
+            className={`section-shot max-w-6xl mx-auto ${showAboutHeadshot ? "section-shot--with-photo" : ""}`.trim()}
           >
             <div className="section-shot-text w-full">
               <h2 className="pb-2 border-b-2" style={{ borderColor: themeColors.accent }}>
@@ -240,37 +240,39 @@ export function HostedProfileTemplate({ data, visibility: visibilityProp, resume
       )}
 
       {showCertificates && (
-        <section id="certificates" className="max-w-6xl mx-auto px-6 py-14 md:py-20">
-          <h2 className="pb-2 border-b-2" style={{ borderColor: themeColors.accent }}>
-            {t("pages.hostedProfile.sectionCertificates")}
-          </h2>
-          <ul className="space-y-8 mt-10">
-            {certs.map((c, i) => {
-              const certTitle =
-                c.name?.trim() ||
-                c.organization?.trim() ||
-                t("pages.hostedProfile.untitledCertificate");
-              return (
-                <li key={i} className="border-b border-gray-100 pb-8 last:border-0 last:pb-0">
-                  <h3 className="text-lg font-bold text-gray-900 mb-1">{certTitle}</h3>
-                  {c.name?.trim() && c.organization?.trim() ? (
-                    <p className="text-sm text-gray-600 mb-3">{c.organization}</p>
-                  ) : null}
-                  {hasWebLink(c.url) ? (
-                    <a
-                      href={normalizeExternalUrl(c.url!)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm font-medium underline underline-offset-2"
-                      style={{ color: themeColors.accent }}
-                    >
-                      {t("pages.hostedProfile.viewCredential")}
-                    </a>
-                  ) : null}
-                </li>
-              );
-            })}
-          </ul>
+        <section id="certificates" className="px-6 py-14 md:py-20">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="pb-2 border-b-2" style={{ borderColor: themeColors.accent }}>
+              {t("pages.hostedProfile.sectionCertificates")}
+            </h2>
+            <ul className="space-y-8 mt-10">
+              {certs.map((c, i) => {
+                const certTitle =
+                  c.name?.trim() ||
+                  c.organization?.trim() ||
+                  t("pages.hostedProfile.untitledCertificate");
+                return (
+                  <li key={i} className="border-b border-gray-100 pb-8 last:border-0 last:pb-0">
+                    <h3 className="text-lg font-bold text-gray-900 mb-1">{certTitle}</h3>
+                    {c.name?.trim() && c.organization?.trim() ? (
+                      <p className="text-sm text-gray-600 mb-3">{c.organization}</p>
+                    ) : null}
+                    {hasWebLink(c.url) ? (
+                      <a
+                        href={normalizeExternalUrl(c.url!)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-medium underline underline-offset-2"
+                        style={{ color: themeColors.accent }}
+                      >
+                        {t("pages.hostedProfile.viewCredential")}
+                      </a>
+                    ) : null}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </section>
       )}
 
