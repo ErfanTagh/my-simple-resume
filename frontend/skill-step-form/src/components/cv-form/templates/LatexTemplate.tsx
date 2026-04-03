@@ -2,6 +2,8 @@ import { CVFormData } from "../types";
 import { Mail, Phone, MapPin, Linkedin, Github, Globe } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatProficiency } from "@/lib/languageProficiency";
+import { hasWebLink, normalizeExternalUrl } from "@/lib/contactLinkUtils";
+import { ProjectLinkedTitle } from "@/components/cv-form/ProjectLinkedTitle";
 
 interface LatexTemplateProps {
   data: CVFormData;
@@ -116,16 +118,27 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
   };
 
   // ── Refined icon+text renderer ──────────────────────────────────────────
-  const renderIconText = (Icon: any, text: string | undefined, url?: string) => {
+  const renderIconText = (Icon: any, text: string | undefined, url?: string, linkLabel?: string) => {
     if (!text) return null;
 
     let displayText = text;
-    if (url) {
+    if (linkLabel) {
+      displayText = linkLabel;
+    } else if (url && url !== '#') {
       if (text.includes('linkedin.com')) {
         const match = text.match(/linkedin\.com\/in\/(.+)/i);
         displayText = match ? `linkedin.com/in/${match[1]}` : text.replace(/^https?:\/\/(www\.)?/i, '').replace(/\/$/, '');
       } else if (text.startsWith('http')) {
         displayText = text.replace(/^https?:\/\/(www\.)?/i, '').replace(/\/$/, '');
+      }
+    }
+
+    let href: string | undefined;
+    if (url && url !== '#') {
+      if (url.startsWith('mailto:') || url.startsWith('tel:')) {
+        href = url;
+      } else {
+        href = normalizeExternalUrl(url);
       }
     }
 
@@ -146,9 +159,9 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
       </div>
     );
 
-    if (url && (url.startsWith('http') || url.startsWith('mailto'))) {
+    if (href) {
       return (
-        <a href={url} target="_blank" rel="noopener noreferrer" className="hover:opacity-70 block transition-opacity">
+        <a href={href} target="_blank" rel="noopener noreferrer" className="hover:opacity-70 block transition-opacity">
           {content}
         </a>
       );
@@ -261,23 +274,12 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '8px', marginBottom: '2px' }}>
                         <span style={{ fontSize: projectsBodySizes.body, fontWeight: 700, color: projectsStyling.bodyColor }}>
-                          {proj.name}
+                          <ProjectLinkedTitle
+                            name={proj.name}
+                            link={proj.link}
+                            anchorStyle={{ textUnderlineOffset: '2px' }}
+                          />
                         </span>
-                        {proj.link && (
-                          <a href={proj.link} target="_blank" rel="noopener noreferrer" style={{
-                            fontSize: projectsBodySizes.xs,
-                            color: linkColor,
-                            flexShrink: 0,
-                            maxWidth: '130px',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                            textDecoration: 'none',
-                            borderBottom: `0.5px solid ${linkColor}60`,
-                          }}>
-                            {proj.link.replace(/^https?:\/\//, '').substring(0, 28)}
-                          </a>
-                        )}
                       </div>
                       {proj.description && (
                         <p style={{ fontSize: projectsBodySizes.body, color: projectsStyling.bodyColor, lineHeight: 1.55, marginBottom: '2px', wordBreak: 'break-word' }}>
@@ -322,7 +324,12 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                         </span>
                         <div style={{ textAlign: 'right', flexShrink: 0 }}>
                           <span style={{ fontSize: educationBodySizes.body, fontWeight: 600, color: educationStyling.bodyColor }}>
-                            {edu.institution || ''}
+                            <ProjectLinkedTitle
+                              name={edu.institution || ''}
+                              link={edu.link}
+                              anchorStyle={{ fontSize: educationBodySizes.body, fontWeight: 600, color: educationStyling.bodyColor }}
+                              inheritColor
+                            />
                           </span>
                           {edu.location && (
                             <span style={{ display: 'block', fontSize: educationBodySizes.xs, color: educationStyling.bodyColor, opacity: 0.65 }}>
@@ -384,7 +391,12 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                         </span>
                         <div style={{ textAlign: 'right', flexShrink: 0 }}>
                           <span style={{ fontSize: workExperienceBodySizes.body, fontWeight: 600, color: workExperienceStyling.bodyColor }}>
-                            {exp.company || ''}
+                            <ProjectLinkedTitle
+                              name={exp.company || ''}
+                              link={exp.link}
+                              anchorStyle={{ fontSize: workExperienceBodySizes.body, fontWeight: 600, color: workExperienceStyling.bodyColor }}
+                              inheritColor
+                            />
                           </span>
                           {exp.location && (
                             <span style={{ display: 'block', fontSize: workExperienceBodySizes.xs, color: workExperienceStyling.bodyColor, opacity: 0.65 }}>
@@ -428,28 +440,26 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                     <DateCol text={dateRange || cert.issueDate || ''} color={certificatesStyling.bodyColor} sizePx={certificatesBodySizes.small} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '8px' }}>
-                        <span style={{ fontSize: certificatesBodySizes.body, fontWeight: 700, color: certificatesStyling.bodyColor }}>{cert.name}</span>
+                        <span style={{ fontSize: certificatesBodySizes.body, fontWeight: 700, color: certificatesStyling.bodyColor }}>
+                          {hasWebLink(cert.url) ? (
+                            <a
+                              href={normalizeExternalUrl(cert.url)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ color: 'inherit', textDecoration: 'underline', textUnderlineOffset: '2px' }}
+                            >
+                              {cert.name}
+                            </a>
+                          ) : (
+                            cert.name
+                          )}
+                        </span>
                         <span style={{ fontSize: certificatesBodySizes.small, fontWeight: 600, color: certificatesStyling.bodyColor, flexShrink: 0 }}>{cert.organization || ''}</span>
                       </div>
                       {cert.credentialId && (
                         <p style={{ fontSize: certificatesBodySizes.xs, color: certificatesStyling.bodyColor, opacity: 0.65, marginTop: '1px' }}>
                           {t('resume.fields.credentialId')}: {cert.credentialId}
                         </p>
-                      )}
-                      {cert.url && (
-                        <a href={cert.url} target="_blank" rel="noopener noreferrer" style={{
-                          fontSize: certificatesBodySizes.xs,
-                          color: linkColor,
-                          display: 'block',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                          maxWidth: '200px',
-                          textDecoration: 'none',
-                          borderBottom: `0.5px solid ${linkColor}50`,
-                        }}>
-                          {cert.url.replace(/^https?:\/\/(www\.)?/, '')}
-                        </a>
                       )}
                     </div>
                   </div>
@@ -623,7 +633,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
             }}>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 {personalInfo.website
-                  ? renderIconText(Globe, personalInfo.website, personalInfo.website)
+                  ? renderIconText(Globe, personalInfo.website, personalInfo.website, t('resume.contactLinkShort.website'))
                   : renderIconText(Globe, "yourwebsite.com", "#")}
                 {personalInfo.phone
                   ? renderIconText(Phone, personalInfo.phone)
@@ -637,10 +647,10 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                   ? renderIconText(Mail, personalInfo.email, `mailto:${personalInfo.email}`)
                   : renderIconText(Mail, "your.email@example.com", "#")}
                 {personalInfo.github
-                  ? renderIconText(Github, personalInfo.github, personalInfo.github)
+                  ? renderIconText(Github, personalInfo.github, personalInfo.github, t('resume.contactLinkShort.github'))
                   : renderIconText(Github, "github.com/username", "#")}
                 {personalInfo.linkedin
-                  ? renderIconText(Linkedin, personalInfo.linkedin, personalInfo.linkedin)
+                  ? renderIconText(Linkedin, personalInfo.linkedin, personalInfo.linkedin, t('resume.contactLinkShort.linkedin'))
                   : renderIconText(Linkedin, "linkedin.com/in/username", "#")}
               </div>
             </div>

@@ -3,6 +3,8 @@ import { Mail, Phone, MapPin, Linkedin, Github, Globe, Calendar } from "lucide-r
 import { formatDateRange } from "@/lib/dateFormatter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatProficiency } from "@/lib/languageProficiency";
+import { hasWebLink, normalizeExternalUrl } from "@/lib/contactLinkUtils";
+import { ProjectLinkedTitle } from "@/components/cv-form/ProjectLinkedTitle";
 
 interface ClassicTemplateProps {
   data: CVFormData;
@@ -129,7 +131,15 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
                     <h3 className="font-semibold" style={{ fontSize: workExperienceBodySizes.base, color: workExperienceStyling.bodyColor, letterSpacing: '0.01em' }}>{exp.position}</h3>
                     <div className="flex justify-between items-baseline" style={{ fontSize: workExperienceBodySizes.xs, color: workExperienceStyling.bodyColor }}>
                       <div>
-                        <span className="italic" style={{ opacity: 0.9 }}>{exp.company}</span>
+                        <span className="italic" style={{ opacity: 0.9 }}>
+                          <ProjectLinkedTitle
+                            name={exp.company || ""}
+                            link={exp.link}
+                            className="italic"
+                            anchorStyle={{ opacity: 0.9 }}
+                            inheritColor
+                          />
+                        </span>
                         {exp.location && <span className="ml-2">• {exp.location}</span>}
                       </div>
                       {(exp.startDate || exp.endDate) && (
@@ -186,7 +196,15 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
                     <h3 className="font-semibold" style={{ color: educationStyling.bodyColor }}>{edu.degree}</h3>
                     <div className="flex justify-between items-center text-sm" style={{ color: educationStyling.bodyColor }}>
                       <div>
-                        <span className="italic" style={{ color: educationStyling.bodyColor }}>{edu.institution}</span>
+                        <span className="italic" style={{ color: educationStyling.bodyColor }}>
+                          <ProjectLinkedTitle
+                            name={edu.institution || ""}
+                            link={edu.link}
+                            className="italic"
+                            anchorStyle={{ color: educationStyling.bodyColor }}
+                            inheritColor
+                          />
+                        </span>
                         {edu.location && <span className="ml-2" style={{ fontSize: educationBodySizes.xs, color: educationStyling.bodyColor }}>• {edu.location}</span>}
                       </div>
                       {(edu.startDate || edu.endDate) && (
@@ -227,7 +245,9 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
                 proj.name && (
                   <div key={index}>
                     <div className="flex justify-between items-center">
-                      <h3 className="font-semibold" style={{ color: projectsStyling.bodyColor }}>{proj.name}</h3>
+                      <h3 className="font-semibold" style={{ color: projectsStyling.bodyColor }}>
+                        <ProjectLinkedTitle name={proj.name} link={proj.link} className="underline" />
+                      </h3>
                         {(proj.startDate || proj.endDate) && (
                         <span style={{ fontSize: projectsBodySizes.xs, color: projectsStyling.bodyColor, opacity: 0.7, fontStyle: 'italic' }}>
                           {formatDateRange(proj.startDate, proj.endDate, t('resume.fields.present'), language)}
@@ -254,11 +274,6 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
                         {t('resume.sections.technologies')}: {proj.technologies.map(techItem => techItem.technology).filter(Boolean).join(", ")}
                       </p>
                     )}
-                    {proj.link && (
-                      <a href={proj.link} target="_blank" rel="noopener noreferrer" className="hover:underline mt-1 block" style={{ fontSize: sizes.xs, color: linkColor }}>
-                        {proj.link.replace(/^https?:\/\/(www\.)?/, '')}
-                      </a>
-                    )}
                   </div>
                 )
               ))}
@@ -274,7 +289,15 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
               {certificates.map((cert, index) => (
                 cert.name && (
                   <div key={index}>
-                    <h3 className="font-semibold" style={{ color: certificatesStyling.bodyColor }}>{cert.name}</h3>
+                    <h3 className="font-semibold" style={{ color: certificatesStyling.bodyColor }}>
+                      {hasWebLink(cert.url) ? (
+                        <a href={normalizeExternalUrl(cert.url)} target="_blank" rel="noopener noreferrer" className="underline" style={{ color: 'inherit' }}>
+                          {cert.name}
+                        </a>
+                      ) : (
+                        cert.name
+                      )}
+                    </h3>
                     <p className="text-muted-foreground" style={{ fontSize: certificatesBodySizes.baseText, color: certificatesStyling.bodyColor }}>{cert.organization}</p>
                     {(cert.issueDate || cert.expirationDate) && (
                       <p className="text-muted-foreground mt-1" style={{ fontSize: certificatesBodySizes.xs, color: certificatesStyling.bodyColor }}>
@@ -283,11 +306,6 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
                     )}
                     {cert.credentialId && (
                       <p className="text-muted-foreground" style={{ fontSize: certificatesBodySizes.xs, color: certificatesStyling.bodyColor }}>ID: {cert.credentialId}</p>
-                    )}
-                    {cert.url && (
-                      <a href={cert.url} target="_blank" rel="noopener noreferrer" className="hover:underline mt-1 block" style={{ fontSize: sizes.xs, color: linkColor }}>
-                        {cert.url.replace(/^https?:\/\/(www\.)?/, '')}
-                      </a>
                     )}
                   </div>
                 )
@@ -444,22 +462,40 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
               </div>
             )}
             {personalInfo.linkedin && (
-              <div className="flex items-center gap-1 min-w-0">
+              <a
+                href={normalizeExternalUrl(personalInfo.linkedin)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 min-w-0 no-underline"
+                style={{ color: 'inherit' }}
+              >
                 <Linkedin className="h-3 w-3 flex-shrink-0" />
-                <span className="truncate">{personalInfo.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span>
-              </div>
+                <span className="truncate">{t('resume.contactLinkShort.linkedin')}</span>
+              </a>
             )}
             {personalInfo.github && (
-              <div className="flex items-center gap-1 min-w-0">
+              <a
+                href={normalizeExternalUrl(personalInfo.github)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 min-w-0 no-underline"
+                style={{ color: 'inherit' }}
+              >
                 <Github className="h-3 w-3 flex-shrink-0" />
-                <span className="truncate">{personalInfo.github.replace(/^https?:\/\/(www\.)?/, '')}</span>
-              </div>
+                <span className="truncate">{t('resume.contactLinkShort.github')}</span>
+              </a>
             )}
             {personalInfo.website && (
-              <div className="flex items-center gap-1 min-w-0">
+              <a
+                href={normalizeExternalUrl(personalInfo.website)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 min-w-0 no-underline"
+                style={{ color: 'inherit' }}
+              >
                 <Globe className="h-3 w-3 flex-shrink-0" />
-                <span className="truncate">{personalInfo.website.replace(/^https?:\/\/(www\.)?/, '')}</span>
-              </div>
+                <span className="truncate">{t('resume.contactLinkShort.website')}</span>
+              </a>
             )}
           </div>
         </div>

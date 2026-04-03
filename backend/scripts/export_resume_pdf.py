@@ -42,6 +42,17 @@ def resume_to_html(doc):
     def esc(s):
         return (s or '').replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
 
+    def normalize_external_url(raw):
+        t = (raw or '').strip()
+        if not t:
+            return t
+        low = t.lower()
+        if low.startswith(('http://', 'https://')):
+            return t
+        if low.startswith(('mailto:', 'tel:')):
+            return t
+        return 'https://' + t
+
     lines = []
     lines.append('<!DOCTYPE html><html><head><meta charset="UTF-8"><style>')
     lines.append('''
@@ -77,10 +88,16 @@ def resume_to_html(doc):
             pos = j.get('position', '')
             company = j.get('company', '')
             loc = j.get('location', '')
+            link = (j.get('link') or '').strip()
             start = j.get('start_date', '')
             end = j.get('end_date', '') or 'Present'
             date_str = f"{start} – {end}" if start else end
-            lines.append(f'<div class="job"><span class="job-title">{esc(pos)}</span> <span class="date">{esc(date_str)}</span><br><span class="company">{esc(company)}' + (f', {esc(loc)}' if loc else '') + '</span>')
+            if company and link:
+                href = normalize_external_url(link)
+                company_html = f'<a href="{esc(href)}">{esc(company)}</a>'
+            else:
+                company_html = esc(company)
+            lines.append(f'<div class="job"><span class="job-title">{esc(pos)}</span> <span class="date">{esc(date_str)}</span><br><span class="company">{company_html}' + (f', {esc(loc)}' if loc else '') + '</span>')
             resp = j.get('responsibilities') or []
             if resp:
                 lines.append('<ul>')
@@ -94,18 +111,61 @@ def resume_to_html(doc):
         for e in edu:
             degree = e.get('degree', '')
             inst = e.get('institution', '')
+            elink = (e.get('link') or '').strip()
             start = e.get('start_date', '')
             end = e.get('end_date', '')
             date_str = f"{start} – {end}" if (start or end) else ''
-            lines.append(f'<div class="edu-item"><span class="edu-degree">{esc(degree)}</span>' + (f' <span class="date">{esc(date_str)}</span>' if date_str else '') + f'<br><span class="institution">{esc(inst)}</span></div>')
+            if inst and elink:
+                href = normalize_external_url(elink)
+                inst_html = f'<a href="{esc(href)}">{esc(inst)}</a>'
+            else:
+                inst_html = esc(inst)
+            lines.append(f'<div class="edu-item"><span class="edu-degree">{esc(degree)}</span>' + (f' <span class="date">{esc(date_str)}</span>' if date_str else '') + f'<br><span class="institution">{inst_html}</span>')
+            descs = e.get('descriptions') or []
+            bullets = [d.get('description', '').strip() for d in descs if d and (d.get('description') or '').strip()]
+            if bullets:
+                lines.append('<ul>')
+                for b in bullets:
+                    lines.append(f'<li>{esc(b)}</li>')
+                lines.append('</ul>')
+            lines.append('</div>')
+        lines.append('</div>')
+    certs = doc.get('certificates') or []
+    valid_certs = [c for c in certs if (c.get('name') or '').strip()]
+    if valid_certs:
+        lines.append('<div class="section"><div class="section-title">Certifications</div>')
+        for c in valid_certs:
+            nm = c.get('name', '')
+            org = c.get('organization', '')
+            issue = c.get('issue_date', '') or ''
+            exp = c.get('expiration_date', '') or ''
+            url = (c.get('url') or '').strip()
+            lines.append('<div class="job">')
+            if nm and url:
+                href = normalize_external_url(url)
+                lines.append(f'<span class="job-title"><a href="{esc(href)}">{esc(nm)}</a></span>')
+            else:
+                lines.append(f'<span class="job-title">{esc(nm)}</span>')
+            if org:
+                lines.append(f'<br><span class="company">{esc(org)}</span>')
+            if issue or exp:
+                date_line = f"{issue}" + (f" – {exp}" if exp else "")
+                lines.append(f'<p style="font-size:10pt;color:#666;margin:4px 0 0 0;">{esc(date_line)}</p>')
+            lines.append('</div>')
         lines.append('</div>')
     if projects:
         lines.append('<div class="section"><div class="section-title">Projects</div>')
         for p in projects:
             name_p = p.get('name', '')
             desc = p.get('description', '')
+            link = (p.get('link') or '').strip()
             if name_p or desc:
-                lines.append(f'<div class="project"><span class="job-title">{esc(name_p)}</span><br><p>{esc(desc)}</p></div>')
+                if name_p and link:
+                    href = normalize_external_url(link)
+                    title_html = f'<a href="{esc(href)}">{esc(name_p)}</a>'
+                else:
+                    title_html = esc(name_p)
+                lines.append(f'<div class="project"><span class="job-title">{title_html}</span><br><p>{esc(desc)}</p></div>')
         lines.append('</div>')
     if skills:
         line = '<div class="section"><div class="section-title">Skills</div><div class="skills-list">'

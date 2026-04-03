@@ -1,7 +1,10 @@
+import { Fragment, type ReactNode } from "react";
 import { CVFormData } from "../types";
 import { formatDateRange } from "@/lib/dateFormatter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatProficiency } from "@/lib/languageProficiency";
+import { hasWebLink, normalizeExternalUrl } from "@/lib/contactLinkUtils";
+import { ProjectLinkedTitle } from "@/components/cv-form/ProjectLinkedTitle";
 
 interface MinimalTemplateProps {
   data: CVFormData;
@@ -157,7 +160,17 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                     {/* Company/Location and Date */}
                     <div className="flex justify-between items-baseline gap-4">
                       <p style={{ fontSize: sizes.xs, color: workExperienceStyling.bodyColor, opacity: 0.8 }}>
-                        {exp.company}{exp.location && ` • ${exp.location}`}
+                        <ProjectLinkedTitle
+                          name={exp.company || ""}
+                          link={exp.link}
+                          anchorStyle={{
+                            fontSize: sizes.xs,
+                            color: workExperienceStyling.bodyColor,
+                            opacity: 0.8,
+                          }}
+                          inheritColor
+                        />
+                        {exp.location && ` • ${exp.location}`}
                       </p>
                       {(exp.startDate || exp.endDate) && (
                         <span 
@@ -256,7 +269,17 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                     </h3>
                     <div className="flex justify-between items-baseline gap-4">
                       <p style={{ fontSize: sizes.xs, color: educationStyling.bodyColor, opacity: 0.8 }}>
-                        {edu.institution}{edu.location && ` • ${edu.location}`}
+                        <ProjectLinkedTitle
+                          name={edu.institution || ""}
+                          link={edu.link}
+                          anchorStyle={{
+                            fontSize: sizes.xs,
+                            color: educationStyling.bodyColor,
+                            opacity: 0.8,
+                          }}
+                          inheritColor
+                        />
+                        {edu.location && ` • ${edu.location}`}
                       </p>
                       {(edu.startDate || edu.endDate) && (
                         <span 
@@ -324,7 +347,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                           letterSpacing: '0.01em'
                         }}
                       >
-                        {proj.name}
+                        <ProjectLinkedTitle name={proj.name} link={proj.link} className="underline" />
                       </h3>
                       {(proj.startDate || proj.endDate) && (
                         <span 
@@ -384,21 +407,6 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                         {proj.technologies.map(techItem => techItem.technology).filter(Boolean).join(" • ")}
                       </p>
                     )}
-                    {proj.link && (
-                      <a 
-                        href={proj.link} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="hover:underline mt-1 block transition-opacity" 
-                        style={{ 
-                          fontSize: sizes.xs, 
-                          color: linkColor,
-                          opacity: 0.8
-                        }}
-                      >
-                        {proj.link.replace(/^https?:\/\/(www\.)?/, '')}
-                      </a>
-                    )}
                   </div>
                 )
               ))}
@@ -422,7 +430,19 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                         letterSpacing: '0.01em'
                       }}
                     >
-                      {cert.name}
+                      {hasWebLink(cert.url) ? (
+                        <a
+                          href={normalizeExternalUrl(cert.url)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline"
+                          style={{ color: 'inherit' }}
+                        >
+                          {cert.name}
+                        </a>
+                      ) : (
+                        cert.name
+                      )}
                     </h3>
                     <div className="flex justify-between items-baseline gap-4 mt-1">
                       <p style={{ fontSize: sizes.xs, color: certificatesStyling.bodyColor, opacity: 0.8 }}>
@@ -453,21 +473,6 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                       >
                         ID: {cert.credentialId}
                       </p>
-                    )}
-                    {cert.url && (
-                      <a 
-                        href={cert.url} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="hover:underline mt-1 block transition-opacity" 
-                        style={{ 
-                          fontSize: sizes.xs, 
-                          color: linkColor,
-                          opacity: 0.8
-                        }}
-                      >
-                        {cert.url.replace(/^https?:\/\/(www\.)?/, '')}
-                      </a>
                     )}
                   </div>
                 )
@@ -550,14 +555,50 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
     }
   };
 
-  // Build contact info array
-  const contactItems: string[] = [];
-  if (personalInfo.email) contactItems.push(personalInfo.email);
-  if (personalInfo.phone) contactItems.push(personalInfo.phone);
-  if (personalInfo.location) contactItems.push(personalInfo.location);
-  if (personalInfo.linkedin) contactItems.push(personalInfo.linkedin.replace(/^https?:\/\/(www\.)?/, ''));
-  if (personalInfo.github) contactItems.push(personalInfo.github.replace(/^https?:\/\/(www\.)?/, ''));
-  if (personalInfo.website) contactItems.push(personalInfo.website.replace(/^https?:\/\/(www\.)?/, ''));
+  // Contact line: plain text for email/phone/location; short labels as links for social/web
+  const contactLineParts: ReactNode[] = [];
+  if (personalInfo.email) contactLineParts.push(<span key="email">{personalInfo.email}</span>);
+  if (personalInfo.phone) contactLineParts.push(<span key="phone">{personalInfo.phone}</span>);
+  if (personalInfo.location) contactLineParts.push(<span key="loc">{personalInfo.location}</span>);
+  if (personalInfo.linkedin) {
+    contactLineParts.push(
+      <a
+        key="linkedin"
+        href={normalizeExternalUrl(personalInfo.linkedin)}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ color: 'inherit', textDecoration: 'underline' }}
+      >
+        {t('resume.contactLinkShort.linkedin')}
+      </a>
+    );
+  }
+  if (personalInfo.github) {
+    contactLineParts.push(
+      <a
+        key="github"
+        href={normalizeExternalUrl(personalInfo.github)}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ color: 'inherit', textDecoration: 'underline' }}
+      >
+        {t('resume.contactLinkShort.github')}
+      </a>
+    );
+  }
+  if (personalInfo.website) {
+    contactLineParts.push(
+      <a
+        key="website"
+        href={normalizeExternalUrl(personalInfo.website)}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ color: 'inherit', textDecoration: 'underline' }}
+      >
+        {t('resume.contactLinkShort.website')}
+      </a>
+    );
+  }
 
   return (
     <>
@@ -642,7 +683,7 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
               )}
 
               {/* Contact info with subtle separators */}
-              {contactItems.length > 0 && (
+              {contactLineParts.length > 0 && (
                 <p 
                   style={{ 
                     fontSize: sizes.xs,
@@ -651,7 +692,12 @@ export const MinimalTemplate = ({ data }: MinimalTemplateProps) => {
                     letterSpacing: '0.01em'
                   }}
                 >
-                  {contactItems.join('  •  ')}
+                  {contactLineParts.map((node, i) => (
+                    <Fragment key={i}>
+                      {i > 0 ? '  •  ' : null}
+                      {node}
+                    </Fragment>
+                  ))}
                 </p>
               )}
             </div>

@@ -138,7 +138,8 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
         description: "",
         responsibilities: [],
         technologies: [],
-        competencies: []
+        competencies: [],
+        link: "",
       }],
       education: [{
         degree: "",
@@ -148,7 +149,8 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
         endDate: "",
         field: "",
         keyCourses: [],
-        descriptions: []
+        descriptions: [],
+        link: "",
       }],
       projects: [],
       certificates: [],

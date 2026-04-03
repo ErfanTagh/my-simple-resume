@@ -291,6 +291,7 @@ export interface ResumeData {
     responsibilities?: Array<{ responsibility: string }>;
     technologies?: Array<{ technology: string }>;
     competencies?: Array<{ competency: string }>;
+    link?: string;
   }>;
   education?: Array<{
     degree: string;
@@ -301,6 +302,7 @@ export interface ResumeData {
     field?: string;
     keyCourses?: Array<{ course: string }>;
     descriptions?: Array<{ description: string }>;
+    link?: string;
   }>;
   projects?: Array<{
     name?: string;

@@ -4,6 +4,8 @@ import { Mail, Phone, MapPin, Linkedin, Github, Globe, Briefcase, GraduationCap,
 import { formatDateRange } from "@/lib/dateFormatter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatProficiency } from "@/lib/languageProficiency";
+import { hasWebLink, normalizeExternalUrl } from "@/lib/contactLinkUtils";
+import { ProjectLinkedTitle } from "@/components/cv-form/ProjectLinkedTitle";
 
 interface CreativeTemplateProps {
   data: CVFormData;
@@ -203,7 +205,18 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                             opacity: 0.85
                           }}
                         >
-                          {exp.company}{exp.location && ` • ${exp.location}`}
+                          <ProjectLinkedTitle
+                            name={exp.company || ""}
+                            link={exp.link}
+                            className="font-medium"
+                            anchorStyle={{
+                              fontSize: workExperienceBodySizes.sm,
+                              color: workExperienceStyling.bodyColor,
+                              opacity: 0.85,
+                            }}
+                            inheritColor
+                          />
+                          {exp.location && ` • ${exp.location}`}
                         </p>
                         {(exp.startDate || exp.endDate) && (
                           <span 
@@ -328,7 +341,17 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                             opacity: 0.85
                           }}
                         >
-                          {edu.institution}{edu.location && ` • ${edu.location}`}
+                          <ProjectLinkedTitle
+                            name={edu.institution || ""}
+                            link={edu.link}
+                            anchorStyle={{
+                              fontSize: educationBodySizes.sm,
+                              color: educationStyling.bodyColor,
+                              opacity: 0.85,
+                            }}
+                            inheritColor
+                          />
+                          {edu.location && ` • ${edu.location}`}
                         </p>
                         {(edu.startDate || edu.endDate) && (
                           <span 
@@ -420,7 +443,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                             letterSpacing: '0.01em'
                           }}
                         >
-                          {proj.name}
+                          <ProjectLinkedTitle name={proj.name} link={proj.link} className="underline" />
                         </h3>
                         {(proj.startDate || proj.endDate) && (
                           <span 
@@ -486,21 +509,6 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                           ))}
                         </div>
                       )}
-                      {proj.link && (
-                        <a 
-                          href={proj.link} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          className="hover:underline mt-1 block transition-opacity" 
-                          style={{ 
-                            fontSize: sizes.xs, 
-                            color: linkColor,
-                            opacity: 0.8
-                          }}
-                        >
-                          {proj.link.replace(/^https?:\/\/(www\.)?/, '')}
-                        </a>
-                      )}
                     </div>
                   )
                 ))}
@@ -542,7 +550,19 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                           letterSpacing: '0.01em'
                         }}
                       >
-                        {cert.name}
+                        {hasWebLink(cert.url) ? (
+                          <a
+                            href={normalizeExternalUrl(cert.url)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline"
+                            style={{ color: 'inherit' }}
+                          >
+                            {cert.name}
+                          </a>
+                        ) : (
+                          cert.name
+                        )}
                       </h3>
                       <div className="flex justify-between items-center gap-4">
                         <p 
@@ -577,21 +597,6 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                         >
                           ID: {cert.credentialId}
                         </p>
-                      )}
-                      {cert.url && (
-                        <a 
-                          href={cert.url} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          className="hover:underline mt-0.5 block transition-opacity" 
-                          style={{ 
-                            fontSize: sizes.xs, 
-                            color: linkColor,
-                            opacity: 0.8
-                          }}
-                        >
-                          {cert.url.replace(/^https?:\/\/(www\.)?/, '')}
-                        </a>
                       )}
                     </div>
                   )
@@ -857,37 +862,61 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                   </div>
                 )}
                 {personalInfo.linkedin && (
-                  <div 
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full min-w-0" 
-                    style={{ backgroundColor: 'hsl(var(--muted))', opacity: 0.8 }}
+                  <a
+                    href={normalizeExternalUrl(personalInfo.linkedin)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="no-underline"
+                    style={{ color: 'inherit' }}
                   >
-                    <Linkedin className="h-3 w-3 flex-shrink-0" style={{ color: accentColor }} />
-                    <span className="truncate" style={{ color: textColor }}>
-                      {personalInfo.linkedin.replace(/^https?:\/\/(www\.)?/, '')}
-                    </span>
-                  </div>
+                    <div 
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-full min-w-0" 
+                      style={{ backgroundColor: 'hsl(var(--muted))', opacity: 0.8 }}
+                    >
+                      <Linkedin className="h-3 w-3 flex-shrink-0" style={{ color: accentColor }} />
+                      <span className="truncate" style={{ color: textColor }}>
+                        {t('resume.contactLinkShort.linkedin')}
+                      </span>
+                    </div>
+                  </a>
                 )}
                 {personalInfo.github && (
-                  <div 
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full min-w-0" 
-                    style={{ backgroundColor: 'hsl(var(--muted))', opacity: 0.8 }}
+                  <a
+                    href={normalizeExternalUrl(personalInfo.github)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="no-underline"
+                    style={{ color: 'inherit' }}
                   >
-                    <Github className="h-3 w-3 flex-shrink-0" style={{ color: accentColor }} />
-                    <span className="truncate" style={{ color: textColor }}>
-                      {personalInfo.github.replace(/^https?:\/\/(www\.)?/, '')}
-                    </span>
-                  </div>
+                    <div 
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-full min-w-0" 
+                      style={{ backgroundColor: 'hsl(var(--muted))', opacity: 0.8 }}
+                    >
+                      <Github className="h-3 w-3 flex-shrink-0" style={{ color: accentColor }} />
+                      <span className="truncate" style={{ color: textColor }}>
+                        {t('resume.contactLinkShort.github')}
+                      </span>
+                    </div>
+                  </a>
                 )}
                 {personalInfo.website && (
-                  <div 
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full min-w-0" 
-                    style={{ backgroundColor: 'hsl(var(--muted))', opacity: 0.8 }}
+                  <a
+                    href={normalizeExternalUrl(personalInfo.website)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="no-underline"
+                    style={{ color: 'inherit' }}
                   >
-                    <Globe className="h-3 w-3 flex-shrink-0" style={{ color: accentColor }} />
-                    <span className="truncate" style={{ color: textColor }}>
-                      {personalInfo.website.replace(/^https?:\/\/(www\.)?/, '')}
-                    </span>
-                  </div>
+                    <div 
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-full min-w-0" 
+                      style={{ backgroundColor: 'hsl(var(--muted))', opacity: 0.8 }}
+                    >
+                      <Globe className="h-3 w-3 flex-shrink-0" style={{ color: accentColor }} />
+                      <span className="truncate" style={{ color: textColor }}>
+                        {t('resume.contactLinkShort.website')}
+                      </span>
+                    </div>
+                  </a>
                 )}
               </div>
             </div>

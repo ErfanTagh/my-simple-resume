@@ -68,6 +68,17 @@ const WorkExperienceItem = ({ form, index }: { form: UseFormReturn<CVFormData>; 
       </div>
 
       <div className="space-y-2">
+        <Label htmlFor={`workExperience.${index}.link`}>{t('resume.labels.companyWebsiteLink')}</Label>
+        <Input
+          type="url"
+          inputMode="url"
+          autoComplete="url"
+          {...form.register(`workExperience.${index}.link`)}
+          placeholder={t('resume.placeholders.companyUrl')}
+        />
+      </div>
+
+      <div className="space-y-2">
         <Label htmlFor={`workExperience.${index}.location`}>{t('resume.fields.location')}</Label>
         <Controller
           control={form.control}
@@ -592,7 +603,8 @@ export const ExperienceStep = ({ form }: ExperienceStepProps) => {
             description: "",
             responsibilities: [],
             technologies: [],
-            competencies: []
+            competencies: [],
+            link: "",
           })}
           className="w-full"
         >

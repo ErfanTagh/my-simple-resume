@@ -71,6 +71,17 @@ const EducationItem = ({ form, index }: { form: UseFormReturn<CVFormData>; index
       </div>
 
       <div className="space-y-2">
+        <Label htmlFor={`education.${index}.link`}>{t('resume.labels.institutionWebsiteLink')}</Label>
+        <Input
+          type="url"
+          inputMode="url"
+          autoComplete="url"
+          {...form.register(`education.${index}.link`)}
+          placeholder={t('resume.placeholders.institutionUrl')}
+        />
+      </div>
+
+      <div className="space-y-2">
         <Label htmlFor={`education.${index}.location`}>{t('resume.fields.location')}</Label>
         <Controller
           control={form.control}
@@ -273,7 +284,8 @@ export const EducationStep = ({ form }: EducationStepProps) => {
         endDate: "", 
         field: "",
         keyCourses: [],
-        descriptions: []
+        descriptions: [],
+        link: "",
       });
     }
   }, [educationFields.length, appendEducation]);
@@ -328,7 +340,8 @@ export const EducationStep = ({ form }: EducationStepProps) => {
               endDate: "", 
               field: "",
               keyCourses: [],
-              descriptions: []
+              descriptions: [],
+              link: "",
             })}
             className="w-full"
           >

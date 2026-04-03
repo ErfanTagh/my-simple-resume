@@ -12,6 +12,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import i18n from '@/i18n/config';
 import { formatProficiency as formatProficiencyShared } from '@/lib/languageProficiency';
 import { formatDateRange, formatMonthYear } from '@/lib/dateFormatter';
+import { hasWebLink, normalizeExternalUrl } from '@/lib/contactLinkUtils';
 
 /**
  * Sanitize filename for filesystem compatibility
@@ -236,7 +237,11 @@ function generateResumeHTML(resume: Resume): string {
               <h4><strong>${escapeHtml(exp.position || '')}</strong></h4>
             </div>
             <div class="experience-place">
-              <span class="company"><strong>${escapeHtml(exp.company || '')}</strong></span>
+              <span class="company"><strong>${
+                hasWebLink(exp.link)
+                  ? `<a href="${escapeHtml(normalizeExternalUrl(exp.link))}" target="_blank" rel="noopener noreferrer">${escapeHtml(exp.company || '')}</a>`
+                  : escapeHtml(exp.company || '')
+              }</strong></span>
               ${exp.startDate || exp.endDate ? `
                 <span class="period">
                   ${escapeHtml(formatDateRange(exp.startDate, exp.endDate, presentText, locale))}
@@ -283,7 +288,11 @@ function generateResumeHTML(resume: Resume): string {
           <div class="education-item">
             <h4><strong>${escapeHtml(edu.degree || '')}</strong></h4>
             <div class="education-header">
-              <p class="institution"><strong>${escapeHtml(edu.institution || '')}</strong></p>
+              <p class="institution"><strong>${
+                hasWebLink(edu.link)
+                  ? `<a href="${escapeHtml(normalizeExternalUrl(edu.link))}" target="_blank" rel="noopener noreferrer">${escapeHtml(edu.institution || '')}</a>`
+                  : escapeHtml(edu.institution || '')
+              }</strong></p>
               ${edu.startDate || edu.endDate ? `
                 <p class="period">
                   ${escapeHtml(formatDateRange(edu.startDate, edu.endDate, presentText, locale))}
@@ -315,12 +324,11 @@ function generateResumeHTML(resume: Resume): string {
         ${validProjects.map((project: any) => `
           <div class="project-item">
             <div class="project-header">
-              <h4><strong>${escapeHtml(project.name)}</strong></h4>
-              ${project.link ? `
-                <a href="${escapeHtml(project.link)}" target="_blank" rel="noopener noreferrer" class="project-link">
-                  View Project
-                </a>
-              ` : ''}
+              <h4><strong>${
+                hasWebLink(project.link)
+                  ? `<a href="${escapeHtml(normalizeExternalUrl(project.link))}" target="_blank" rel="noopener noreferrer" class="project-link">${escapeHtml(project.name)}</a>`
+                  : escapeHtml(project.name)
+              }</strong></h4>
             </div>
             ${project.description ? `<p class="project-description">${escapeHtml(project.description)}</p>` : ''}
             ${project.technologies?.length && project.technologies.some((tech: any) => tech.technology?.trim()) ? `
@@ -347,15 +355,14 @@ function generateResumeHTML(resume: Resume): string {
         ${validCerts.map((cert: any) => `
           <div class="certification-item">
             <div class="certification-header">
-              <h4><strong>${escapeHtml(cert.name)}</strong></h4>
+              <h4><strong>${
+                hasWebLink(cert.url)
+                  ? `<a href="${escapeHtml(normalizeExternalUrl(cert.url))}" target="_blank" rel="noopener noreferrer" class="certification-link">${escapeHtml(cert.name)}</a>`
+                  : escapeHtml(cert.name)
+              }</strong></h4>
               ${cert.organization ? `<span class="certification-issuer">${escapeHtml(cert.organization)}</span>` : ''}
             </div>
             ${cert.issueDate ? `<p class="certification-date">${escapeHtml(formatMonthYear(cert.issueDate, locale) || cert.issueDate)}</p>` : ''}
-            ${cert.url ? `
-              <a href="${escapeHtml(cert.url)}" target="_blank" rel="noopener noreferrer" class="certification-link">
-                View Certificate
-              </a>
-            ` : ''}
           </div>
         `).join('')}
       </section>
@@ -440,9 +447,9 @@ function generateResumeHTML(resume: Resume): string {
             ${personalInfo.phone ? `<div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%; font-size: ${pdfSizes.contact};"><span>Phone: ${escapeHtml(personalInfo.phone)}</span></div>` : ''}
             <div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%; font-size: ${pdfSizes.contact};"><span>Email: ${escapeHtml(personalInfo.email || '')}</span></div>
             ${personalInfo.location ? `<div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%; font-size: ${pdfSizes.contact};"><span>Location: ${escapeHtml(personalInfo.location)}</span></div>` : ''}
-            ${personalInfo.github ? `<div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%; font-size: ${pdfSizes.contact};"><span>GitHub: <a href="${escapeHtml(personalInfo.github)}" target="_blank" rel="noopener noreferrer" class="contact-link">${escapeHtml(personalInfo.github)}</a></span></div>` : ''}
-            ${personalInfo.linkedin ? `<div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%; font-size: ${pdfSizes.contact};"><span>LinkedIn: <a href="${escapeHtml(personalInfo.linkedin)}" target="_blank" rel="noopener noreferrer" class="contact-link">${escapeHtml(personalInfo.linkedin)}</a></span></div>` : ''}
-            ${personalInfo.website ? `<div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%; font-size: ${pdfSizes.contact};"><span>Website: <a href="${escapeHtml(personalInfo.website)}" target="_blank" rel="noopener noreferrer" class="contact-link">${escapeHtml(personalInfo.website)}</a></span></div>` : ''}
+            ${personalInfo.linkedin ? `<div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%; font-size: ${pdfSizes.contact};"><a href="${escapeHtml(normalizeExternalUrl(personalInfo.linkedin))}" target="_blank" rel="noopener noreferrer" class="contact-link">${escapeHtml(i18n.t('resume.contactLinkShort.linkedin'))}</a></div>` : ''}
+            ${personalInfo.website ? `<div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%; font-size: ${pdfSizes.contact};"><a href="${escapeHtml(normalizeExternalUrl(personalInfo.website))}" target="_blank" rel="noopener noreferrer" class="contact-link">${escapeHtml(i18n.t('resume.contactLinkShort.website'))}</a></div>` : ''}
+            ${personalInfo.github ? `<div class="contact-item" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; text-align: left; width: 100%; font-size: ${pdfSizes.contact};"><a href="${escapeHtml(normalizeExternalUrl(personalInfo.github))}" target="_blank" rel="noopener noreferrer" class="contact-link">${escapeHtml(i18n.t('resume.contactLinkShort.github'))}</a></div>` : ''}
           </div>
         </section>
         ${renderEducation()}

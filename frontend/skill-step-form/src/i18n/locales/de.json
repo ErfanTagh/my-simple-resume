@@ -112,6 +112,11 @@
       "interests": "Interessen",
       "technologies": "Technologien"
     },
+    "contactLinkShort": {
+      "linkedin": "LinkedIn",
+      "github": "GitHub",
+      "website": "Webseite"
+    },
     "fields": {
       "firstName": "Vorname",
       "lastName": "Nachname",
@@ -185,7 +190,9 @@
       "selectIssueDate": "Ausstellungsdatum auswählen",
       "noExpiration": "Kein Ablaufdatum",
       "credentialIdExample": "ABC123XYZ456",
-      "credentialUrlExample": "https://credentials.example.com/verify"
+      "credentialUrlExample": "https://credentials.example.com/verify",
+      "companyUrl": "https://unternehmen.de",
+      "institutionUrl": "https://universitaet.de"
     },
     "labels": {
       "profileImage": "Profilbild",
@@ -205,6 +212,8 @@
       "keyDescriptionsHint": "Fügen Sie Aufzählungspunkte zu Erfolgen, Thesis oder Highlights hinzu",
       "addDescription": "Aufzählungspunkt hinzufügen",
       "projectLink": "Projekt-Link",
+      "companyWebsiteLink": "Unternehmenswebsite (optional)",
+      "institutionWebsiteLink": "Website der Bildungseinrichtung (optional)",
       "viewProject": "Projekt ansehen",
       "viewCertificate": "Zertifikat ansehen",
       "skillsDesc": "Fügen Sie Ihre beruflichen Fähigkeiten und Kompetenzen hinzu",

@@ -84,6 +84,7 @@ class WorkExperienceSerializer(serializers.Serializer):
     responsibilities = ResponsibilitySerializer(many=True, required=False)
     technologies = TechnologySerializer(many=True, required=False)
     competencies = CompetencySerializer(many=True, required=False)
+    link = serializers.CharField(required=False, allow_blank=True, max_length=500)
 
 
 class EducationSerializer(serializers.Serializer):
@@ -117,6 +118,7 @@ class EducationSerializer(serializers.Serializer):
         many=True, 
         required=False
     )
+    link = serializers.CharField(required=False, allow_blank=True, max_length=500)
 
 
 class ProjectSerializer(serializers.Serializer):

@@ -8,6 +8,8 @@ import { SectionOrderManager } from "./SectionOrderManager";
 import { CVRating } from "./CVRating";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatProficiency } from "@/lib/languageProficiency";
+import { hasWebLink, normalizeExternalUrl } from "@/lib/contactLinkUtils";
+import { ProjectLinkedTitle } from "@/components/cv-form/ProjectLinkedTitle";
 
 interface ReviewStepProps {
   form: UseFormReturn<CVFormData>;
@@ -85,20 +87,41 @@ export const ReviewStep = ({ form, onEditStep }: ReviewStepProps) => {
               )}
               {data.personalInfo.linkedin && (
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <Linkedin className="h-4 w-4" />
-                  <span className="truncate">{data.personalInfo.linkedin}</span>
+                  <Linkedin className="h-4 w-4 flex-shrink-0" />
+                  <a
+                    href={normalizeExternalUrl(data.personalInfo.linkedin)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="truncate text-primary underline"
+                  >
+                    {t('resume.contactLinkShort.linkedin')}
+                  </a>
                 </div>
               )}
               {data.personalInfo.github && (
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <Github className="h-4 w-4" />
-                  <span className="truncate">{data.personalInfo.github}</span>
+                  <Github className="h-4 w-4 flex-shrink-0" />
+                  <a
+                    href={normalizeExternalUrl(data.personalInfo.github)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="truncate text-primary underline"
+                  >
+                    {t('resume.contactLinkShort.github')}
+                  </a>
                 </div>
               )}
               {data.personalInfo.website && (
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <Globe className="h-4 w-4" />
-                  <span className="truncate">{data.personalInfo.website}</span>
+                  <Globe className="h-4 w-4 flex-shrink-0" />
+                  <a
+                    href={normalizeExternalUrl(data.personalInfo.website)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="truncate text-primary underline"
+                  >
+                    {t('resume.contactLinkShort.website')}
+                  </a>
                 </div>
               )}
             </div>
@@ -135,7 +158,14 @@ export const ReviewStep = ({ form, onEditStep }: ReviewStepProps) => {
                       <div className="flex justify-between items-start">
                         <div>
                           <p className="font-semibold text-foreground">{exp.position || "Position"}</p>
-                          <p className="text-sm text-muted-foreground">{exp.company || "Company"}</p>
+                          <p className="text-sm text-muted-foreground">
+                            <ProjectLinkedTitle
+                              name={exp.company || "Company"}
+                              link={exp.link}
+                              className="text-primary underline"
+                              inheritColor={false}
+                            />
+                          </p>
                           {exp.location && <p className="text-xs text-muted-foreground">{exp.location}</p>}
                         </div>
                         {(exp.startDate || exp.endDate) && (
@@ -169,7 +199,14 @@ export const ReviewStep = ({ form, onEditStep }: ReviewStepProps) => {
                       <div className="flex justify-between items-start">
                         <div>
                           <p className="font-semibold text-foreground">{edu.degree || "Degree"}</p>
-                          <p className="text-sm text-muted-foreground">{edu.institution || "Institution"}</p>
+                          <p className="text-sm text-muted-foreground">
+                            <ProjectLinkedTitle
+                              name={edu.institution || "Institution"}
+                              link={edu.link}
+                              className="text-primary underline"
+                              inheritColor={false}
+                            />
+                          </p>
                           {edu.field && <p className="text-sm text-muted-foreground italic">{edu.field}</p>}
                           {edu.location && <p className="text-xs text-muted-foreground">{edu.location}</p>}
                         </div>
@@ -199,7 +236,14 @@ export const ReviewStep = ({ form, onEditStep }: ReviewStepProps) => {
                   proj.name && (
                     <div key={index} className="space-y-1">
                       <div className="flex justify-between items-start">
-                        <p className="font-semibold text-foreground">{proj.name}</p>
+                        <p className="font-semibold text-foreground">
+                          <ProjectLinkedTitle
+                            name={proj.name}
+                            link={proj.link}
+                            className="text-primary underline"
+                            inheritColor={false}
+                          />
+                        </p>
                         {(proj.startDate || proj.endDate) && (
                           <div className="flex items-center gap-1 text-xs text-muted-foreground">
                             <Calendar className="h-3 w-3" />
@@ -214,12 +258,6 @@ export const ReviewStep = ({ form, onEditStep }: ReviewStepProps) => {
                         <p className="text-xs text-muted-foreground">
                           <span className="font-medium">Technologies:</span> {proj.technologies.map(t => t.technology).filter(Boolean).join(", ")}
                         </p>
-                      )}
-                      {proj.link && (
-                        <a href={proj.link} className="text-xs text-primary hover:underline flex items-center gap-1">
-                          <Globe className="h-3 w-3" />
-                          View Project
-                        </a>
                       )}
                     </div>
                   )
@@ -239,7 +277,20 @@ export const ReviewStep = ({ form, onEditStep }: ReviewStepProps) => {
                 {data.certificates.map((cert, index) => (
                   cert.name && (
                     <div key={index} className="space-y-1">
-                      <p className="font-semibold text-foreground">{cert.name}</p>
+                      <p className="font-semibold text-foreground">
+                        {hasWebLink(cert.url) ? (
+                          <a
+                            href={normalizeExternalUrl(cert.url)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary underline"
+                          >
+                            {cert.name}
+                          </a>
+                        ) : (
+                          cert.name
+                        )}
+                      </p>
                       {cert.organization && (
                         <p className="text-sm text-muted-foreground">{cert.organization}</p>
                       )}

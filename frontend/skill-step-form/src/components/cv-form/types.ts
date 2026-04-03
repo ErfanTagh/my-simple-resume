@@ -42,6 +42,7 @@ export const cvFormSchema = z.object({
           competency: z.string().optional(),
         })
       ).optional(),
+      link: z.string().optional().or(z.literal("")),
     })
   ).optional(),
   education: z.array(
@@ -62,6 +63,7 @@ export const cvFormSchema = z.object({
           description: z.string().optional(),
         })
       ).optional(),
+      link: z.string().optional().or(z.literal("")),
     })
   ).optional(),
   projects: z.array(

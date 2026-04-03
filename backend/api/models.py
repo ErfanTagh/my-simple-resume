@@ -95,6 +95,7 @@ class WorkExperience(models.Model):
     responsibilities = models.ArrayField(model_container=Responsibility, blank=True, null=True)
     technologies = models.ArrayField(model_container=Technology, blank=True, null=True)
     competencies = models.ArrayField(model_container=Competency, blank=True, null=True)
+    link = models.URLField(blank=True, null=True)
 
     class Meta:
         abstract = True
@@ -108,6 +109,7 @@ class Education(models.Model):
     end_date = models.CharField(max_length=20, blank=True, null=True)
     field = models.CharField(max_length=200, blank=True, null=True)
     key_courses = models.ArrayField(model_container=Course, blank=True, null=True)
+    link = models.URLField(blank=True, null=True)
 
     class Meta:
         abstract = True

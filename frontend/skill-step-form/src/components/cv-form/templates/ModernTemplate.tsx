@@ -3,6 +3,8 @@ import { Mail, Phone, MapPin, Linkedin, Github, Globe, Calendar } from "lucide-r
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatDateRange } from "@/lib/dateFormatter";
 import { formatProficiency } from "@/lib/languageProficiency";
+import { hasWebLink, normalizeExternalUrl } from "@/lib/contactLinkUtils";
+import { ProjectLinkedTitle } from "@/components/cv-form/ProjectLinkedTitle";
 
 interface ModernTemplateProps {
   data: CVFormData;
@@ -178,7 +180,18 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                             opacity: 0.8,
                           }}
                         >
-                          {exp.company}{exp.location && ` • ${exp.location}`}
+                          <ProjectLinkedTitle
+                            name={exp.company || ""}
+                            link={exp.link}
+                            className="italic text-sm"
+                            anchorStyle={{
+                              fontSize: workExperienceBodySizes.sm,
+                              color: workExperienceStyling.bodyColor,
+                              opacity: 0.8,
+                            }}
+                            inheritColor
+                          />
+                          {exp.location && ` • ${exp.location}`}
                         </p>
                       </div>
                       {(exp.startDate || exp.endDate) && (
@@ -299,7 +312,18 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                             opacity: 0.85 
                           }}
                         >
-                          {edu.institution}{edu.location && ` • ${edu.location}`}
+                          <ProjectLinkedTitle
+                            name={edu.institution || ""}
+                            link={edu.link}
+                            className="text-sm"
+                            anchorStyle={{
+                              fontSize: educationBodySizes.sm,
+                              color: educationStyling.bodyColor,
+                              opacity: 0.85,
+                            }}
+                            inheritColor
+                          />
+                          {edu.location && ` • ${edu.location}`}
                         </p>
                         {edu.field && (
                           <p 
@@ -386,7 +410,7 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                           letterSpacing: '0.01em'
                         }}
                       >
-                        {proj.name}
+                        <ProjectLinkedTitle name={proj.name} link={proj.link} className="underline" />
                       </h3>
                       {(proj.startDate || proj.endDate) && (
                         <span 
@@ -445,21 +469,6 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                         {proj.technologies.map(t => typeof t === 'string' ? t : t.technology).filter(Boolean).join(" • ")}
                       </p>
                     )}
-                    {proj.link && (
-                      <a 
-                        href={proj.link} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="hover:underline mt-1 block transition-opacity" 
-                        style={{ 
-                          fontSize: projectsBodySizes.xs, 
-                          color: linkColor,
-                          opacity: 0.85
-                        }}
-                      >
-                        {proj.link.replace(/^https?:\/\/(www\.)?/, '')}
-                      </a>
-                    )}
                   </div>
                 )
               ))}
@@ -496,7 +505,19 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                             letterSpacing: '0.01em'
                           }}
                         >
-                          {cert.name}
+                          {hasWebLink(cert.url) ? (
+                            <a
+                              href={normalizeExternalUrl(cert.url)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="underline"
+                              style={{ color: 'inherit' }}
+                            >
+                              {cert.name}
+                            </a>
+                          ) : (
+                            cert.name
+                          )}
                         </h3>
                         <p 
                           style={{ 
@@ -530,21 +551,6 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                           >
                             ID: {cert.credentialId}
                           </p>
-                        )}
-                        {cert.url && (
-                          <a 
-                            href={cert.url} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            className="hover:underline mt-1 block transition-opacity" 
-                            style={{ 
-                              fontSize: certificatesBodySizes.xs, 
-                              color: linkColor,
-                              opacity: 0.85
-                            }}
-                          >
-                            {cert.url.replace(/^https?:\/\/(www\.)?/, '')}
-                          </a>
                         )}
                       </div>
                     </div>
@@ -771,22 +777,40 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                   </div>
                 )}
                 {personalInfo.linkedin && (
-                  <div className="flex items-center gap-2 min-w-0">
+                  <a
+                    href={normalizeExternalUrl(personalInfo.linkedin)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 min-w-0 no-underline"
+                    style={{ color: 'inherit' }}
+                  >
                     <Linkedin className="h-3.5 w-3.5 flex-shrink-0" style={{ color: linkColor }} />
-                    <span className="truncate">{personalInfo.linkedin}</span>
-                  </div>
+                    <span className="truncate">{t('resume.contactLinkShort.linkedin')}</span>
+                  </a>
                 )}
                 {personalInfo.github && (
-                  <div className="flex items-center gap-2 min-w-0">
+                  <a
+                    href={normalizeExternalUrl(personalInfo.github)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 min-w-0 no-underline"
+                    style={{ color: 'inherit' }}
+                  >
                     <Github className="h-3.5 w-3.5 flex-shrink-0" style={{ color: linkColor }} />
-                    <span className="truncate">{personalInfo.github}</span>
-                  </div>
+                    <span className="truncate">{t('resume.contactLinkShort.github')}</span>
+                  </a>
                 )}
                 {personalInfo.website && (
-                  <div className="flex items-center gap-2 min-w-0">
+                  <a
+                    href={normalizeExternalUrl(personalInfo.website)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 min-w-0 no-underline"
+                    style={{ color: 'inherit' }}
+                  >
                     <Globe className="h-3.5 w-3.5 flex-shrink-0" style={{ color: linkColor }} />
-                    <span className="truncate">{personalInfo.website}</span>
-                  </div>
+                    <span className="truncate">{t('resume.contactLinkShort.website')}</span>
+                  </a>
                 )}
               </div>
             </div>

@@ -3,6 +3,8 @@ import { Mail, Phone, MapPin, Linkedin, Github, Globe } from "lucide-react";
 import { formatMonthYear } from "@/lib/dateFormatter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatProficiency } from "@/lib/languageProficiency";
+import { hasWebLink, normalizeExternalUrl } from "@/lib/contactLinkUtils";
+import { ProjectLinkedTitle } from "@/components/cv-form/ProjectLinkedTitle";
 
 interface StarRoverTemplateProps {
   data: CVFormData;
@@ -110,12 +112,28 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
   };
 
   // ── Contact chip ───────────────────────────────────────────────────────
-  const renderContactIcon = (Icon: any, text: string | undefined, url?: string) => {
+  const renderContactIcon = (
+    Icon: any,
+    text: string | undefined,
+    url?: string,
+    linkLabel?: string,
+  ) => {
     if (!text) return null;
 
-    const displayText = text.startsWith('http')
-      ? text.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '').split('/')[0]
-      : text;
+    let href: string | undefined;
+    if (url && url !== '#') {
+      if (url.startsWith('mailto:') || url.startsWith('tel:')) {
+        href = url;
+      } else {
+        href = normalizeExternalUrl(url);
+      }
+    }
+
+    const displayText =
+      linkLabel ??
+      (text.startsWith('http')
+        ? text.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '').split('/')[0]
+        : text);
 
     const inner = (
       <span style={{
@@ -132,9 +150,9 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
       </span>
     );
 
-    if (url && (url.startsWith('http') || url.startsWith('mailto') || url.startsWith('tel'))) {
+    if (href) {
       return (
-        <a href={url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+        <a href={href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
           {inner}
         </a>
       );
@@ -241,11 +259,28 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                   <div key={index}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '8px', marginBottom: '2px' }}>
                       <span style={{ fontSize: educationBodySizes.baseText, fontWeight: 700, color: educationStyling.bodyColor, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                        {edu.institution || edu.degree}
-                        {edu.degree && edu.institution && (
-                          <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0, fontStyle: 'italic' }}>
-                            {' | '}{edu.degree}
-                          </span>
+                        {edu.institution ? (
+                          <>
+                            <ProjectLinkedTitle
+                              name={edu.institution}
+                              link={edu.link}
+                              anchorStyle={{
+                                fontSize: educationBodySizes.baseText,
+                                fontWeight: 700,
+                                color: educationStyling.bodyColor,
+                                letterSpacing: '0.04em',
+                                textTransform: 'uppercase',
+                              }}
+                              inheritColor
+                            />
+                            {edu.degree && (
+                              <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0, fontStyle: 'italic' }}>
+                                {' | '}{edu.degree}
+                              </span>
+                            )}
+                          </>
+                        ) : (
+                          edu.degree
                         )}
                       </span>
                       {dateRange && <DateBadge text={dateRange} color={educationStyling.bodyColor} />}
@@ -298,7 +333,22 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                     {/* Company line */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '8px', marginBottom: '1px' }}>
                       <span style={{ fontSize: workExperienceBodySizes.baseText, fontWeight: 700, color: workExperienceStyling.bodyColor, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                        {exp.company || exp.position}
+                        {exp.company ? (
+                          <ProjectLinkedTitle
+                            name={exp.company}
+                            link={exp.link}
+                            anchorStyle={{
+                              fontSize: workExperienceBodySizes.baseText,
+                              fontWeight: 700,
+                              color: workExperienceStyling.bodyColor,
+                              letterSpacing: '0.04em',
+                              textTransform: 'uppercase',
+                            }}
+                            inheritColor
+                          />
+                        ) : (
+                          exp.position
+                        )}
                       </span>
                       {exp.location && (
                         <span style={{ fontSize: workExperienceBodySizes.xs, color: workExperienceStyling.bodyColor, opacity: 0.6, flexShrink: 0 }}>
@@ -344,27 +394,11 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                   <div key={index}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '8px', marginBottom: '2px' }}>
                       <span style={{ fontSize: projectsBodySizes.baseText, fontWeight: 700, color: projectsStyling.bodyColor, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                        {proj.name}
-                        {proj.link && (
-                          <a
-                            href={proj.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{
-                              fontSize: projectsBodySizes.xs,
-                              color: linkColor,
-                              fontWeight: 400,
-                              textTransform: 'none',
-                              letterSpacing: 0,
-                              marginLeft: '8px',
-                              opacity: 0.7,
-                              textDecoration: 'none',
-                              borderBottom: `0.5px solid ${linkColor}60`,
-                            }}
-                          >
-                            {proj.link.replace(/^https?:\/\//, '').split('/')[0]}
-                          </a>
-                        )}
+                        <ProjectLinkedTitle
+                          name={proj.name}
+                          link={proj.link}
+                          anchorStyle={{ textUnderlineOffset: '2px' }}
+                        />
                       </span>
                       {dateRange && <DateBadge text={dateRange} color={projectsStyling.bodyColor} />}
                     </div>
@@ -403,7 +437,20 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                 return (
                   <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '8px' }}>
                     <div>
-                      <span style={{ fontSize: certificatesBodySizes.baseText, color: certificatesStyling.bodyColor, fontWeight: 600 }}>{cert.name}</span>
+                      <span style={{ fontSize: certificatesBodySizes.baseText, color: certificatesStyling.bodyColor, fontWeight: 600 }}>
+                        {hasWebLink(cert.url) ? (
+                          <a
+                            href={normalizeExternalUrl(cert.url)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ color: 'inherit', textDecoration: 'underline', textUnderlineOffset: '2px' }}
+                          >
+                            {cert.name}
+                          </a>
+                        ) : (
+                          cert.name
+                        )}
+                      </span>
                       {cert.organization && (
                         <span style={{ fontSize: certificatesBodySizes.xs, color: certificatesStyling.bodyColor, opacity: 0.7 }}>{', '}{cert.organization}</span>
                       )}
@@ -411,20 +458,6 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
                         <span style={{ fontSize: certificatesBodySizes.xs, color: certificatesStyling.bodyColor, opacity: 0.55, marginLeft: '6px' }}>
                           #{cert.credentialId}
                         </span>
-                      )}
-                      {cert.url && (
-                        <a href={cert.url} target="_blank" rel="noopener noreferrer" style={{
-                          display: 'block',
-                          fontSize: certificatesBodySizes.xs,
-                          color: linkColor,
-                          opacity: 0.7,
-                          textDecoration: 'none',
-                          borderBottom: `0.5px solid ${linkColor}50`,
-                          width: 'fit-content',
-                          marginTop: '1px',
-                        }}>
-                          {cert.url.replace(/^https?:\/\/(www\.)?/, '')}
-                        </a>
                       )}
                     </div>
                     {(dateRange || cert.issueDate) && (
@@ -621,9 +654,9 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
               {personalInfo.location ? renderContactIcon(MapPin, personalInfo.location) : renderContactIcon(MapPin, "City, Country")}
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 20px' }}>
-              {personalInfo.linkedin ? renderContactIcon(Linkedin, personalInfo.linkedin, personalInfo.linkedin) : renderContactIcon(Linkedin, "linkedin.com/in/username", "#")}
-              {personalInfo.github ? renderContactIcon(Github, personalInfo.github, personalInfo.github) : renderContactIcon(Github, "github.com/username", "#")}
-              {personalInfo.website ? renderContactIcon(Globe, personalInfo.website, personalInfo.website) : renderContactIcon(Globe, "yourwebsite.com", "#")}
+              {personalInfo.linkedin ? renderContactIcon(Linkedin, personalInfo.linkedin, personalInfo.linkedin, t('resume.contactLinkShort.linkedin')) : renderContactIcon(Linkedin, "linkedin.com/in/username", "#")}
+              {personalInfo.github ? renderContactIcon(Github, personalInfo.github, personalInfo.github, t('resume.contactLinkShort.github')) : renderContactIcon(Github, "github.com/username", "#")}
+              {personalInfo.website ? renderContactIcon(Globe, personalInfo.website, personalInfo.website, t('resume.contactLinkShort.website')) : renderContactIcon(Globe, "yourwebsite.com", "#")}
             </div>
           </div>
         </div>

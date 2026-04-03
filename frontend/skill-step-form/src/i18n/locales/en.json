@@ -112,6 +112,11 @@
       "interests": "Interests",
       "technologies": "Technologies"
     },
+    "contactLinkShort": {
+      "linkedin": "LinkedIn",
+      "github": "GitHub",
+      "website": "Website"
+    },
     "fields": {
       "firstName": "First Name",
       "lastName": "Last Name",
@@ -182,7 +187,9 @@
       "selectIssueDate": "Select issue date",
       "noExpiration": "No expiration",
       "credentialIdExample": "ABC123XYZ456",
-      "credentialUrlExample": "https://credentials.example.com/verify"
+      "credentialUrlExample": "https://credentials.example.com/verify",
+      "companyUrl": "https://company.com",
+      "institutionUrl": "https://university.edu"
     },
     "labels": {
       "profileImage": "Profile Image",
@@ -202,6 +209,8 @@
       "keyDescriptionsHint": "Add bullet points describing achievements, thesis, or highlights",
       "addDescription": "Add Bullet Point",
       "projectLink": "Project Link",
+      "companyWebsiteLink": "Company website (optional)",
+      "institutionWebsiteLink": "Institution website (optional)",
       "viewProject": "View Project",
       "viewCertificate": "View Certificate",
       "skillsDesc": "Add your professional skills and competencies",
