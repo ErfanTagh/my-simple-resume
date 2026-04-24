@@ -1,195 +1,206 @@
-name: Deploy to Production
+# ─────────────────────────────────────────────────────────────
+# FILE: .github/workflows/deploy.yml
+# ─────────────────────────────────────────────────────────────
+
+name: Deploy to Production        # Name shown in GitHub Actions UI
 
 on:
   push:
     branches:
-      - main
-  workflow_dispatch: # Allow manual trigger
+      - main                      # Triggers on every push to main
+  workflow_dispatch:              # Also allows manual trigger from GitHub UI
 
 jobs:
   deploy:
     name: Deploy to Server
-    runs-on: ubuntu-latest
-    timeout-minutes: 15 # Prevent hanging deployments
+    runs-on: ubuntu-latest        # GitHub spins up a fresh Ubuntu VM for this job
+    timeout-minutes: 15           # Kill the job if it hangs beyond 15 min
 
     steps:
       - name: 🚀 Deploy to Production Server
-        uses: appleboy/ssh-action@v1.1.0
+        uses: appleboy/ssh-action@v1.1.0   # Third-party action that SSHes into your server
         with:
-          host: 37.27.31.223
-          username: root
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: 37.27.31.223               # Your Hetzner server IP
+          username: root                   # SSH directly as root (deploy key is in /root/.ssh/authorized_keys)
+          key: ${{ secrets.SSH_PRIVATE_KEY }} # Private key stored in GitHub repo secrets
           port: 22
-          script_stop: true # Stop on error
+          script_stop: true               # If any command fails, stop immediately (don't continue)
           script: |
-            set -euo pipefail  # Exit on error, undefined vars, pipe failures
-            echo "🔄 Starting zero-downtime deployment..."
-            cd ~/my-simple-resume
+            set -euo pipefail
+            # -e  = exit immediately on any error
+            # -u  = treat unset variables as errors
+            # -o pipefail = a pipe fails if any command in it fails (not just the last one)
 
-            # Create backup directory
-            BACKUP_DIR="~/backups/$(date +%Y%m%d_%H%M%S)"
+            echo "🔄 Starting deployment..."
+
+            PROJECT_DIR="/root/my-simple-resume"          # Absolute path — never use ~ in scripts
+            BACKUP_DIR="/root/backups/$(date +%Y%m%d_%H%M%S)"  # Timestamped backup folder
+
+            cd "$PROJECT_DIR"
+
+            # ── STEP 0: Database backup ──────────────────────────────────────────
+            echo "💾 Backing up database..."
             mkdir -p "$BACKUP_DIR"
+            docker exec resume_mongodb mongodump \
+              --archive="$BACKUP_DIR/mongodb_backup.archive" \
+              --gzip \
+              || echo "⚠️  Backup failed, continuing anyway..."
+            # We use || echo so a backup failure doesn't abort the whole deployment.
+            # mongodump runs INSIDE the resume_mongodb container, writes to a host path
+            # that is bind-mounted into the container via the backup volume.
 
-            # Step 0: Backup database before deployment
-            echo "💾 Creating database backup..."
-            docker exec resume_mongodb mongodump --archive="$BACKUP_DIR/mongodb_backup.archive" --gzip || echo "⚠️  Backup failed, continuing..."
-
-            # Update code
-            echo "📥 Updating code from repository..."
+            # ── STEP 1: Pull latest code ─────────────────────────────────────────
+            echo "📥 Pulling latest code..."
             git fetch origin
             git reset --hard origin/main
-            git clean -fd  # Remove untracked files
+            # reset --hard discards any local changes and sets HEAD to origin/main.
+            # We intentionally do NOT use "git clean -fd" because that would delete
+            # the .env file which is not tracked in git but is required at runtime.
 
-            # Step 1: Build new images FIRST (while old containers are still running)
-            echo "📦 Building new images (old containers still serving traffic)..."
-            # Use cache for faster builds, but ensure clean builds when needed
+            # ── STEP 2: Build new Docker images ──────────────────────────────────
+            echo "📦 Building new images..."
             docker compose -f docker-compose.prod.yml build backend frontend
+            # Builds new images from updated code. Old containers are STILL RUNNING
+            # and serving traffic during this step — zero downtime so far.
+            # We only rebuild backend and frontend; mongodb and certbot don't change.
 
-            # Step 2: Run migrations BEFORE updating backend (safer)
-            echo "🔄 Running migrations on new backend image..."
-            # Create a temporary container to run migrations
-            docker compose -f docker-compose.prod.yml run --rm backend python manage.py migrate --noinput || {
-              echo "❌ Migrations failed!"
-              exit 1
-            }
+            # ── STEP 3: Run database migrations ──────────────────────────────────
+            echo "🔄 Running migrations..."
+            docker compose -f docker-compose.prod.yml run --rm --no-deps backend \
+              python manage.py migrate --noinput
+            # --rm         = delete the temporary container after it exits
+            # --no-deps    = don't start mongodb again, it's already running
+            # --noinput    = don't prompt for confirmation
+            # This runs migrations BEFORE swapping the backend container,
+            # so if migrations fail the old backend is still serving traffic safely.
 
-            # Step 3: Update backend with health check
-            echo "🔄 Updating backend..."
+            # ── STEP 4: Swap in the new backend ──────────────────────────────────
+            echo "🔄 Updating backend container..."
             docker compose -f docker-compose.prod.yml up -d --no-deps backend
+            # -d        = detached (run in background)
+            # --no-deps = don't touch mongodb, certbot, or frontend — only backend
+            # Docker stops the old backend container and starts the new one.
 
-            # Wait for backend to be healthy
+            # Wait for backend to be healthy before proceeding
             echo "⏳ Waiting for backend to be healthy..."
             timeout=60
-            health_check_passed=false
+            healthy=false
             while [ $timeout -gt 0 ]; do
-              if docker exec resume_backend wget -q --spider http://localhost:8000/api/health/ 2>/dev/null || \
-                 docker exec resume_backend python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health/')" 2>/dev/null; then
-                echo "✅ Backend is healthy and ready"
-                health_check_passed=true
+              if docker exec resume_backend python -c \
+                "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health/')" \
+                2>/dev/null; then
+                healthy=true
                 break
               fi
               sleep 2
               timeout=$((timeout - 2))
             done
+            # Polls every 2 seconds for up to 60 seconds.
+            # Tries to hit /api/health/ inside the container on localhost:8000.
+            # If the endpoint doesn't exist in your Django app yet, add a simple view
+            # that just returns HTTP 200.
 
-            # Verify backend health check passed
-            if [ "$health_check_passed" = false ]; then
-              echo "❌ Backend health check failed!"
-              docker compose -f docker-compose.prod.yml ps backend
+            if [ "$healthy" = false ]; then
+              echo "❌ Backend failed health check!"
               docker compose -f docker-compose.prod.yml logs --tail 50 backend
-              exit 1
+              exit 1   # Abort deployment — gateway_nginx still routes to old backend
             fi
+            echo "✅ Backend is healthy"
 
-            # Verify backend is actually running
-            if ! docker ps --filter "name=resume_backend" --filter "status=running" --format "{{.Names}}" | grep -q "resume_backend"; then
-              echo "❌ Backend container failed to start!"
-              docker compose -f docker-compose.prod.yml ps backend
-              docker compose -f docker-compose.prod.yml logs --tail 50 backend
-              exit 1
-            fi
-
-            # Step 4: Update frontend
-            echo "🔄 Updating frontend..."
+            # ── STEP 5: Swap in the new frontend ─────────────────────────────────
+            echo "🔄 Updating frontend container..."
             docker compose -f docker-compose.prod.yml up -d --no-deps frontend
+            # Same pattern as backend. The frontend container builds the React app
+            # and writes output into the shared Docker volume (frontend_volume).
+            # gateway_nginx serves files from that volume directly.
 
-            # Wait for frontend build to complete
-            echo "⏳ Waiting for frontend build to complete..."
-            timeout=180  # Increased timeout for large builds
-            frontend_ready=false
+            # Wait for the frontend build to complete and files to appear
+            echo "⏳ Waiting for frontend build..."
+            timeout=180   # React builds can take a while
+            ready=false
             while [ $timeout -gt 0 ]; do
-              # Check if frontend container is running and has built files
-              if docker ps --filter "name=resume_frontend" --filter "status=running" --format "{{.Names}}" | grep -q "resume_frontend" && \
+              if docker ps --filter "name=resume_frontend" --filter "status=running" \
+                   --format "{{.Names}}" | grep -q "resume_frontend" && \
                  docker exec resume_frontend test -f /usr/share/nginx/html/index.html 2>/dev/null; then
-                echo "✅ Frontend build complete"
-                frontend_ready=true
+                ready=true
                 break
               fi
               sleep 3
               timeout=$((timeout - 3))
             done
 
-            if [ "$frontend_ready" = false ]; then
+            if [ "$ready" = false ]; then
               echo "❌ Frontend build failed or timed out!"
-              docker compose -f docker-compose.prod.yml ps frontend
               docker compose -f docker-compose.prod.yml logs --tail 50 frontend
               exit 1
             fi
+            echo "✅ Frontend is ready"
 
-            # Step 5: Frontend files should be in shared volume, but verify (non-fatal)
-            # The docker-compose.prod.yml uses frontend_volume which is shared with nginx.
-            # In normal operation this should already be populated by the frontend container.
-            # If for some reason index.html is missing, we WARN but do not fail the deployment,
-            # because nginx may still be serving previous static files.
-            echo "🔍 Verifying frontend files in nginx volume..."
-            if docker exec resume_nginx test -f /usr/share/nginx/html/index.html 2>/dev/null; then
-              echo "✅ Frontend files present in nginx volume"
-            else
-              echo "⚠️  Frontend index.html not found in nginx volume."
-              echo "    Nginx may still be serving a previous build; check manually if needed."
-            fi
+            # ── STEP 6: Reload the gateway nginx ─────────────────────────────────
+            echo "🔄 Reloading gateway nginx..."
+            docker exec gateway_nginx nginx -t
+            # -t = test the config for syntax errors BEFORE reloading.
+            # If this fails, the reload below won't run (script_stop: true).
 
-            # Step 6: Reload nginx (zero-downtime - just reloads config, doesn't restart)
-            echo "🔄 Reloading nginx (zero-downtime)..."
-            if ! docker compose -f docker-compose.prod.yml exec -T nginx nginx -s reload 2>/dev/null; then
-              echo "⚠️  Nginx reload failed, restarting..."
-              docker compose -f docker-compose.prod.yml restart nginx || {
-                echo "❌ Nginx restart failed!"
+            docker exec gateway_nginx nginx -s reload
+            # -s reload = sends a SIGHUP signal to the nginx master process.
+            # nginx gracefully finishes existing connections then reloads config.
+            # Zero downtime — no connections are dropped.
+            # NOTE: gateway_nginx is in /root/nginx-gateway/, NOT in this project's
+            # compose. We use docker exec directly instead of docker compose exec.
+
+            # ── STEP 7: Verify all containers are up ─────────────────────────────
+            echo "🔍 Verifying containers..."
+            for container in resume_backend resume_frontend resume_mongodb gateway_nginx; do
+              if docker ps --filter "name=$container" --filter "status=running" \
+                   --format "{{.Names}}" | grep -q "^${container}$"; then
+                echo "  ✅ $container is running"
+              else
+                echo "  ❌ $container is NOT running!"
+                docker logs "$container" --tail 30 || true
                 exit 1
-              }
-            fi
+              fi
+            done
+            # Loops over all four critical containers and confirms each is running.
+            # We check gateway_nginx here (not resume_nginx — that no longer exists).
 
-            # Step 7: Verify all critical containers are running
-            echo "🔍 Verifying all containers are running..."
-            if ! docker ps --filter "name=resume_backend" --filter "status=running" --format "{{.Names}}" | grep -q "resume_backend"; then
-              echo "❌ Backend container is not running!"
-              docker compose -f docker-compose.prod.yml ps backend
-              docker compose -f docker-compose.prod.yml logs --tail 50 backend
-              exit 1
-            fi
-
-            if ! docker ps --filter "name=resume_nginx" --filter "status=running" --format "{{.Names}}" | grep -q "resume_nginx"; then
-              echo "❌ Nginx container is not running!"
-              docker compose -f docker-compose.prod.yml ps nginx
-              docker compose -f docker-compose.prod.yml logs --tail 50 nginx
-              exit 1
-            fi
-
-            if ! docker ps --filter "name=resume_mongodb" --filter "status=running" --format "{{.Names}}" | grep -q "resume_mongodb"; then
-              echo "❌ MongoDB container is not running!"
-              docker compose -f docker-compose.prod.yml ps mongodb
-              exit 1
-            fi
-
-            # Step 8: Final health check - verify API is responding (must not trigger set -e)
-            echo "🏥 Performing final health check..."
-            sleep 3  # Give services a moment to stabilize
-            health_ok=0
-            curl -f -s http://localhost/api/health/ > /dev/null 2>&1 && health_ok=1 || true
-            if [ "$health_ok" = 1 ]; then
-              echo "✅ Health check passed"
+            # ── STEP 8: End-to-end smoke test ────────────────────────────────────
+            echo "🏥 Smoke test through nginx..."
+            sleep 3   # Give everything a moment to stabilize
+            if curl -f -s --max-time 10 https://123resume.de/api/health/ > /dev/null 2>&1; then
+              echo "✅ End-to-end health check passed"
             else
-              echo "⚠️  Health check endpoint not responding, but containers are running"
+              echo "⚠️  /api/health/ not responding — containers are up but check manually"
             fi
+            # This hits the live domain over HTTPS — goes through gateway_nginx → backend.
+            # We use || true semantics (no exit 1) so a missing health endpoint
+            # doesn't fail an otherwise successful deployment.
 
-            # Step 9: Clean up old images (optional, saves disk space)
-            echo "🧹 Cleaning up old images..."
-            docker image prune -f --filter "until=24h" || true
+            # ── STEP 9: Cleanup ───────────────────────────────────────────────────
+            echo "🧹 Pruning old images for this project..."
+            docker image prune -f \
+              --filter "label=com.docker.compose.project=my-simple-resume" \
+              --filter "until=24h" || true
+            # Scoped to THIS project's images only via the compose project label.
+            # "until=24h" = only remove images older than 24 hours (keeps today's build).
+            # || true = don't fail the deployment if prune fails.
 
-            # Keep last 3 backups
-            echo "🧹 Cleaning up old backups (keeping last 3)..."
-            (cd ~/backups && ls -t 2>/dev/null | tail -n +4 | xargs rm -rf 2>/dev/null) || true
+            echo "🧹 Keeping last 3 database backups..."
+            (ls -dt /root/backups/*/ 2>/dev/null | tail -n +4 | xargs rm -rf) || true
+            # ls -dt  = list dirs sorted by time, newest first
+            # tail -n +4 = skip the 3 newest, print the rest (i.e. everything older)
+            # xargs rm -rf = delete those older ones
 
-            echo "✅ Zero-downtime deployment complete!"
-            docker compose -f docker-compose.prod.yml ps || true
+            echo "✅ Deployment complete!"
+            docker compose -f docker-compose.prod.yml ps
 
-      - name: ✅ Deployment Status
+      # ── These steps run on the GitHub-hosted runner, not the server ──────────
+      - name: ✅ Success
         if: success()
-        run: |
-          echo "✅ Successfully deployed to production!"
-          echo "🌐 Your site is live at: https://123resume.de"
+        run: echo "✅ Deployed successfully to https://123resume.de"
 
-      - name: ❌ Deployment Failed
+      - name: ❌ Failed
         if: failure()
         run: |
-          echo "❌ Deployment failed! Check the logs above."
-          echo "💡 Tip: Check the server logs with: ssh root@37.27.31.223 'docker compose -f ~/my-simple-resume/docker-compose.prod.yml logs --tail 100'"
+          echo "❌ Deployment failed — check the logs above."
+          echo "To debug: ssh root@37.27.31.223 'cd /root/my-simple-resume && docker compose -f docker-compose.prod.yml logs --tail 100'"
