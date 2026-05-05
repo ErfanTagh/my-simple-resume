@@ -30,7 +30,7 @@ const Index = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="p-8 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/create')}>
+          <Card className="p-8 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/create/start')}>
             <div className="flex flex-col items-center text-center space-y-4">
               <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
                 <Plus className="h-8 w-8 text-primary" />

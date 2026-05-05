@@ -488,7 +488,7 @@ export default function Resumes() {
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-primary mb-2">{t('pages.resumes.title') || 'My Resumes'}</h1>
             <p className="text-sm sm:text-base text-muted-foreground/80">{t('pages.resumes.subtitle') || 'View and manage your created CVs'}</p>
           </div>
-          <Button onClick={() => navigate('/create')} size="lg" className="w-full sm:w-auto">
+          <Button onClick={() => navigate('/create/start')} size="lg" className="w-full sm:w-auto">
             <Plus className="mr-2 h-4 w-4" />
             {t('pages.resumes.createNew') || 'Create New CV'}
           </Button>
@@ -516,7 +516,7 @@ export default function Resumes() {
               <p className="text-sm sm:text-base text-muted-foreground/80 mb-4 px-4">
                 {t('pages.resumes.empty.description') || 'Create your first CV to get started'}
               </p>
-              <Button onClick={() => navigate('/create')} className="text-sm sm:text-base">
+              <Button onClick={() => navigate('/create/start')} className="text-sm sm:text-base">
                 <Plus className="mr-2 h-4 w-4" />
                 {t('pages.resumes.empty.createButton') || 'Create Your First CV'}
               </Button>

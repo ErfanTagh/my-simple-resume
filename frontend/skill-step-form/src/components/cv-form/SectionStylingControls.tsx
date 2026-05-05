@@ -8,6 +8,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
+import { RESUME_ACCENT_BLUE, RESUME_BODY_GRAY } from "@/lib/resumeTemplatePalette";
 
 interface SectionStylingControlsProps {
   form: UseFormReturn<CVFormData>;
@@ -33,28 +34,17 @@ export const SectionStylingControls = ({ form, sectionName, sectionLabel }: Sect
   const template = useWatch({ control: form.control, name: "template" }) || form.getValues("template") || "modern";
 
   // Get template-specific default for personalInfo section heading color
-  const getTemplateDefaultPersonalInfoTitleColor = (templateName: string): string => {
-    const templateDefaults: Record<string, string> = {
-      modern: "#2563eb",    // Blue - ModernTemplate uses blue headings
-      creative: "#2563eb",  // Blue - CreativeTemplate uses blue headings
-      minimal: "#2563eb",   // Blue - MinimalTemplate uses blue headings
-      classic: "#2563eb",   // Blue - ClassicTemplate uses blue headings
-      latex: "#1f2937",     // Black - LatexTemplate uses black headings
-      starRover: "#141E61", // Dark blue - StarRoverTemplate uses dark blue headings
-    };
-    return templateDefaults[templateName] || "#2563eb"; // Default to blue if unknown
-  };
+  const getTemplateDefaultPersonalInfoTitleColor = (_templateName: string): string => RESUME_ACCENT_BLUE;
 
   const sectionStyling = styling.sectionStyling?.[sectionName] || {};
 
   // For personalInfo section, use template-specific default. For other sections, use headingColor.
   // Note: The "Title/Heading Color" in settings controls section headings, not the header name
   const defaultTitleColor = sectionName === "personalInfo"
-    ? getTemplateDefaultPersonalInfoTitleColor(template)  // Use template-specific default
-    : (styling.headingColor || "#1f2937"); // Other sections use headingColor
+    ? getTemplateDefaultPersonalInfoTitleColor(template)
+    : (styling.headingColor || RESUME_ACCENT_BLUE);
 
-  // Body color always uses textColor as default
-  const defaultBodyColor = styling.textColor || "#1f2937";
+  const defaultBodyColor = styling.textColor || RESUME_BODY_GRAY;
 
   // Use template fontSize as default, fallback to "medium"
   const defaultFontSize = (styling.fontSize || "medium") as "small" | "medium" | "large";
@@ -71,19 +61,6 @@ export const SectionStylingControls = ({ form, sectionName, sectionLabel }: Sect
   const hasCustomTitleSize = Boolean(sectionStyling.titleSize && sectionStyling.titleSize !== defaultFontSize);
   const hasCustomBodySize = Boolean(sectionStyling.bodySize && sectionStyling.bodySize !== defaultFontSize);
   const hasCustomStyling = hasCustomTitleColor || hasCustomBodyColor || hasCustomTitleSize || hasCustomBodySize;
-
-  if (sectionName === "personalInfo") {
-    console.log(`[${sectionName}] Colors:`, {
-      titleColor: titleColorInputValue,
-      bodyColor: bodyColorInputValue,
-      hasCustom: hasCustomStyling,
-      sectionTitleColor: sectionStyling.titleColor,
-      defaultTitleColor: defaultTitleColor,
-      templateHeadingColor: styling.headingColor,
-      templateTextColor: styling.textColor,
-      template: template,
-    });
-  }
 
   const updateSectionStyling = (updates: { titleColor?: string; titleSize?: "small" | "medium" | "large"; bodyColor?: string; bodySize?: "small" | "medium" | "large" }) => {
     const currentStyling = form.getValues("styling") || {};

@@ -12,6 +12,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { CityAutocomplete } from "@/components/ui/city-autocomplete";
 import { ProfessionalTitleAutocomplete } from "@/components/ProfessionalTitleAutocomplete";
 import { SectionStylingControls } from "./SectionStylingControls";
+import { RESUME_ACCENT_BLUE, RESUME_BODY_GRAY, RESUME_TITLE_GRAY } from "@/lib/resumeTemplatePalette";
 
 interface PersonalInfoStepProps {
   form: UseFormReturn<CVFormData>;
@@ -37,10 +38,10 @@ export const PersonalInfoStep = ({ form }: PersonalInfoStepProps) => {
   useLayoutEffect(() => {
     // Default styling values that match template defaults
     const defaultStyling = {
-      titleColor: "#1f2937",
-      textColor: "#1f2937",
-      headingColor: "#2563eb",
-      linkColor: "#2563eb",
+      titleColor: RESUME_TITLE_GRAY,
+      textColor: RESUME_BODY_GRAY,
+      headingColor: RESUME_ACCENT_BLUE,
+      linkColor: RESUME_ACCENT_BLUE,
       fontSize: "medium" as const,
       fontFamily: "Inter",
       titleBold: true,

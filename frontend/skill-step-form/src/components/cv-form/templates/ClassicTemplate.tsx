@@ -5,6 +5,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { formatProficiency } from "@/lib/languageProficiency";
 import { hasWebLink, normalizeExternalUrl } from "@/lib/contactLinkUtils";
 import { ProjectLinkedTitle } from "@/components/cv-form/ProjectLinkedTitle";
+import { RESUME_ACCENT_BLUE, RESUME_BODY_GRAY, RESUME_TITLE_GRAY } from "@/lib/resumeTemplatePalette";
 
 interface ClassicTemplateProps {
   data: CVFormData;
@@ -25,12 +26,12 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
     (fontSizeInput === "small" || fontSizeInput === "medium" || fontSizeInput === "large")
       ? fontSizeInput
       : "medium";
-  const titleColor = styling?.titleColor || "#1f2937";
+  const titleColor = styling?.titleColor || RESUME_TITLE_GRAY;
   const titleBold = styling?.titleBold ?? true;
-  const headingColor = styling?.headingColor || "#1f2937";
+  const headingColor = styling?.headingColor || RESUME_ACCENT_BLUE;
   const headingBold = styling?.headingBold ?? true;
-  const textColor = styling?.textColor || "#4b5563";
-  const linkColor = styling?.linkColor || "#2563eb";
+  const textColor = styling?.textColor || RESUME_BODY_GRAY;
+  const linkColor = styling?.linkColor || RESUME_ACCENT_BLUE;
 
   // Enhanced font size mappings with better hierarchy
   const fontSizeMap = {
@@ -439,7 +440,7 @@ export const ClassicTemplate = ({ data }: ClassicTemplateProps) => {
             {personalInfo.firstName} {personalInfo.lastName}
           </h1>
           {personalInfo.professionalTitle && personalInfo.professionalTitle.trim().length > 0 && (
-            <p className="font-normal mb-3 italic" style={{ fontSize: sizes.base, color: textColor }}>{personalInfo.professionalTitle.trim()}</p>
+            <p className="font-normal mb-3 italic" style={{ fontSize: sizes.base, color: titleColor, opacity: 0.95 }}>{personalInfo.professionalTitle.trim()}</p>
           )}
 
           <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-muted-foreground" style={{ fontSize: sizes.xs }}>

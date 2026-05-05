@@ -89,6 +89,20 @@ GITHUB_CLIENT_SECRET = os.getenv('GITHUB_CLIENT_SECRET', '').strip()
 XING_CLIENT_ID = os.getenv('XING_CLIENT_ID', '').strip()
 XING_CLIENT_SECRET = os.getenv('XING_CLIENT_SECRET', '').strip()
 
+# DeepSeek — OpenAI-compatible HTTP API (cheaper than GPT for many workloads).
+# Keys: https://platform.deepseek.com/ — set DEEPSEEK_API_KEY in .env (never commit it).
+DEEPSEEK_API_KEY = os.getenv('DEEPSEEK_API_KEY', '').strip()
+DEEPSEEK_BASE_URL = os.getenv('DEEPSEEK_BASE_URL', 'https://api.deepseek.com').strip().rstrip('/')
+# e.g. deepseek-chat, deepseek-reasoner, or newer IDs from DeepSeek model list
+DEEPSEEK_MODEL = os.getenv('DEEPSEEK_MODEL', 'deepseek-chat').strip()
+DEEPSEEK_MAX_OUTPUT_TOKENS = int(os.getenv('DEEPSEEK_MAX_OUTPUT_TOKENS', '1024'))
+# Larger budget for structured resume scoring JSON
+DEEPSEEK_RESUME_SCORE_MAX_TOKENS = int(os.getenv('DEEPSEEK_RESUME_SCORE_MAX_TOKENS', '2048'))
+# Resume upload → structured JSON (large completion)
+DEEPSEEK_RESUME_PARSE_MAX_TOKENS = int(os.getenv('DEEPSEEK_RESUME_PARSE_MAX_TOKENS', '4096'))
+# Resume ↔ job match (JSON score + short rationale)
+DEEPSEEK_JOB_MATCH_MAX_TOKENS = int(os.getenv('DEEPSEEK_JOB_MATCH_MAX_TOKENS', '1024'))
+
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [

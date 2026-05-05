@@ -1,0 +1,119 @@
+"""
+AI-assisted features (authenticated). Backed by DeepSeek's OpenAI-compatible API.
+"""
+import json
+import logging
+
+from django.conf import settings
+from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+from .. import deepseek_chat
+from .. import resume_ai_scoring
+
+logger = logging.getLogger(__name__)
+
+MAX_MESSAGE_CHARS = 8000
+MAX_RESUME_JSON_CHARS = 320_000
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def resume_assistant_chat(request):
+    """
+    One-shot resume helper chat for logged-in users.
+
+    Body JSON:
+      - message (required): user question or text to improve
+
+    Response:
+      - reply: assistant message text
+    """
+    data = request.data or {}
+    message = (data.get("message") or "").strip()
+
+    if not message:
+        return Response(
+            {"error": "message is required"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    if len(message) > MAX_MESSAGE_CHARS:
+        return Response(
+            {"error": f"message must be at most {MAX_MESSAGE_CHARS} characters"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if not settings.DEEPSEEK_API_KEY:
+        return Response(
+            {
+                "error": "AI assistant is not configured. Set DEEPSEEK_API_KEY on the server.",
+            },
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
+
+    try:
+        reply = deepseek_chat.resume_assistant_reply(message)
+        return Response({"reply": reply}, status=status.HTTP_200_OK)
+    except RuntimeError as e:
+        logger.error("Resume assistant configuration error: %s", e)
+        return Response(
+            {"error": "AI assistant is not configured."},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
+    except Exception:
+        logger.exception("DeepSeek resume assistant failed")
+        return Response(
+            {"error": "Could not get a response from the AI service. Try again later."},
+            status=status.HTTP_502_BAD_GATEWAY,
+        )
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def resume_score(request):
+    """
+    AI resume score for logged-in users (DeepSeek). Body: { "resume": { ... CV JSON ... } }.
+    """
+    data = request.data or {}
+    resume = data.get("resume")
+
+    if not isinstance(resume, dict):
+        return Response(
+            {"error": "resume must be a JSON object"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        raw_len = len(json.dumps(resume, default=str))
+    except Exception:
+        raw_len = MAX_RESUME_JSON_CHARS + 1
+
+    if raw_len > MAX_RESUME_JSON_CHARS:
+        return Response(
+            {"error": "resume payload is too large"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if not settings.DEEPSEEK_API_KEY:
+        return Response(
+            {"error": "AI assistant is not configured. Set DEEPSEEK_API_KEY on the server."},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
+
+    try:
+        result = resume_ai_scoring.score_resume_with_deepseek(resume)
+        return Response(result, status=status.HTTP_200_OK)
+    except RuntimeError as e:
+        logger.error("Resume score configuration error: %s", e)
+        return Response(
+            {"error": "AI assistant is not configured."},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
+    except Exception:
+        logger.exception("DeepSeek resume scoring failed")
+        return Response(
+            {"error": "Could not score this resume with AI. Try again later."},
+            status=status.HTTP_502_BAD_GATEWAY,
+        )

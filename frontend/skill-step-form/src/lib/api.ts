@@ -265,6 +265,66 @@ export const feedbackAPI = {
 };
 
 // ============================================
+// AI (DeepSeek resume assistant — backend; requires login)
+// ============================================
+
+export const aiAPI = {
+  /**
+   * Ask the server-side resume assistant (DeepSeek). Returns { reply: string }.
+   * 401 if not logged in; 503 if DEEPSEEK_API_KEY is not set on the server.
+   */
+  resumeAssistant: async (message: string): Promise<{ reply: string }> => {
+    const payload = camelToSnakeObject({ message });
+    const doFetch = () =>
+      fetch(`${API_BASE_URL}/ai/resume-assistant/`, {
+        method: "POST",
+        headers: createHeaders(true, true),
+        body: JSON.stringify(payload),
+      });
+    const response = await doFetch();
+    return handleResponse(response, doFetch) as Promise<{ reply: string }>;
+  },
+
+  /**
+   * AI resume score (DeepSeek). Body sends { resume }. Returns camelCase:
+   * overallScore, estimatedPages?, categories[{name,score,maxScore,feedback}], suggestions
+   */
+  scoreResume: async (
+    resume: Record<string, unknown>,
+  ): Promise<{
+    overallScore: number;
+    estimatedPages?: number;
+    categories: Array<{
+      name: string;
+      score: number;
+      maxScore: number;
+      feedback: string;
+    }>;
+    suggestions: string[];
+  }> => {
+    const payload = { resume };
+    const doFetch = () =>
+      fetch(`${API_BASE_URL}/ai/resume-score/`, {
+        method: "POST",
+        headers: createHeaders(true, true),
+        body: JSON.stringify(payload),
+      });
+    const response = await doFetch();
+    return handleResponse(response, doFetch) as Promise<{
+      overallScore: number;
+      estimatedPages?: number;
+      categories: Array<{
+        name: string;
+        score: number;
+        maxScore: number;
+        feedback: string;
+      }>;
+      suggestions: string[];
+    }>;
+  },
+};
+
+// ============================================
 // Resume APIs
 // ============================================
 
@@ -575,7 +635,19 @@ export const resumeAPI = {
       body: JSON.stringify({ title: jobTitle, description: jobDescription }),
     });
     const response = await makeRequest();
-    return handleResponse(response, makeRequest);
+    const raw = (await handleResponse(response, makeRequest)) as Record<
+      string,
+      unknown
+    >;
+    // handleResponse camelCases keys; normalize for callers that expect snake_case
+    return {
+      resume_id: String(raw.resumeId ?? raw.resume_id ?? ""),
+      job_title: String(raw.jobTitle ?? raw.job_title ?? ""),
+      job_description: String(raw.jobDescription ?? raw.job_description ?? ""),
+      similarity: Number(raw.similarity ?? 0),
+      match_percentage: Number(raw.matchPercentage ?? raw.match_percentage ?? 0),
+      resume_summary: String(raw.resumeSummary ?? raw.resume_summary ?? ""),
+    };
   },
 
   /**

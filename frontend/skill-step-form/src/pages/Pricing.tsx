@@ -60,7 +60,7 @@ const Pricing = () => {
                 <span className="text-muted-foreground">{t('pages.pricing.atsOptimized')}</span>
               </li>
             </ul>
-            <Link to="/create" className="block">
+            <Link to="/create/start" className="block">
               <Button size="lg" variant="outline" className="w-full">
                 {t('pages.pricing.getStartedFree')}
               </Button>

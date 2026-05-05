@@ -8,6 +8,7 @@ import { Palette, Type, Bold, Text, RotateCcw } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { CVFormData } from "./types";
 import { Separator } from "@/components/ui/separator";
+import { RESUME_ACCENT_BLUE, RESUME_BODY_GRAY, RESUME_TITLE_GRAY } from "@/lib/resumeTemplatePalette";
 
 interface StylingSettingsProps {
   data: CVFormData;
@@ -153,15 +154,15 @@ export const StylingSettings = ({ data, currentStep, onStylingChange }: StylingS
           <Input
             id="titleColor"
             type="color"
-            value={styling.titleColor || "#2563eb"}
+            value={styling.titleColor || RESUME_TITLE_GRAY}
             onChange={(e) => updateStyling({ titleColor: e.target.value })}
             className="w-16 h-10 cursor-pointer"
           />
           <Input
             type="text"
-            value={styling.titleColor || "#2563eb"}
+            value={styling.titleColor || RESUME_TITLE_GRAY}
             onChange={(e) => updateStyling({ titleColor: e.target.value })}
-            placeholder="#2563eb"
+            placeholder={RESUME_TITLE_GRAY}
             className="flex-1"
           />
         </div>
@@ -190,15 +191,15 @@ export const StylingSettings = ({ data, currentStep, onStylingChange }: StylingS
           <Input
             id="headingColor"
             type="color"
-            value={styling.headingColor || "#2563eb"}
+            value={styling.headingColor || RESUME_ACCENT_BLUE}
             onChange={(e) => updateStyling({ headingColor: e.target.value })}
             className="w-16 h-10 cursor-pointer"
           />
           <Input
             type="text"
-            value={styling.headingColor || "#2563eb"}
+            value={styling.headingColor || RESUME_ACCENT_BLUE}
             onChange={(e) => updateStyling({ headingColor: e.target.value })}
-            placeholder="#2563eb"
+            placeholder={RESUME_ACCENT_BLUE}
             className="flex-1"
           />
         </div>
@@ -227,15 +228,15 @@ export const StylingSettings = ({ data, currentStep, onStylingChange }: StylingS
           <Input
             id="textColor"
             type="color"
-            value={styling.textColor || "#1f2937"}
+            value={styling.textColor || RESUME_BODY_GRAY}
             onChange={(e) => updateStyling({ textColor: e.target.value })}
             className="w-16 h-10 cursor-pointer"
           />
           <Input
             type="text"
-            value={styling.textColor || "#1f2937"}
+            value={styling.textColor || RESUME_BODY_GRAY}
             onChange={(e) => updateStyling({ textColor: e.target.value })}
-            placeholder="#1f2937"
+            placeholder={RESUME_BODY_GRAY}
             className="flex-1"
           />
         </div>
@@ -251,15 +252,15 @@ export const StylingSettings = ({ data, currentStep, onStylingChange }: StylingS
           <Input
             id="linkColor"
             type="color"
-            value={styling.linkColor || "#2563eb"}
+            value={styling.linkColor || RESUME_ACCENT_BLUE}
             onChange={(e) => updateStyling({ linkColor: e.target.value })}
             className="w-16 h-10 cursor-pointer"
           />
           <Input
             type="text"
-            value={styling.linkColor || "#2563eb"}
+            value={styling.linkColor || RESUME_ACCENT_BLUE}
             onChange={(e) => updateStyling({ linkColor: e.target.value })}
-            placeholder="#2563eb"
+            placeholder={RESUME_ACCENT_BLUE}
             className="flex-1"
           />
         </div>

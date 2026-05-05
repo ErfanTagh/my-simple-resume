@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, AlertCircle, Sparkles, TrendingUp } from "lucide-react";
 import { CVFormData } from "./types";
 import { calculateResumeScore } from "@/lib/resumeScorer";
+import { getResumeScoreWithOptionalAI } from "@/lib/resumeScoreClient";
+import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
-  import { useLanguage } from "@/contexts/LanguageContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface RatingCategory {
   name: string;
@@ -28,15 +30,30 @@ interface CVRatingProps {
 
 export const CVRating = ({ data, onAnalyze, isAnalyzing, rating: externalRating }: CVRatingProps) => {
   const { t } = useLanguage();
+  const { isAuthenticated } = useAuth();
   const [rating, setRating] = useState(externalRating);
+  const [scoreLoading, setScoreLoading] = useState(false);
 
-  // Calculate score whenever data changes
+  // Logged-in users: AI score via DeepSeek (debounced). Guests: local heuristic.
   useEffect(() => {
-    if (data) {
-      const score = calculateResumeScore(data);
-      setRating(score);
-    }
-  }, [data]);
+    if (!data) return;
+    let cancelled = false;
+    const timer = window.setTimeout(async () => {
+      setScoreLoading(true);
+      try {
+        const score = await getResumeScoreWithOptionalAI(data, isAuthenticated);
+        if (!cancelled) setRating(score);
+      } catch {
+        if (!cancelled) setRating(calculateResumeScore(data));
+      } finally {
+        if (!cancelled) setScoreLoading(false);
+      }
+    }, 650);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [data, isAuthenticated]);
 
   const getScoreColor = (score: number, maxScore: number) => {
     const percentage = (score / maxScore) * 100;
@@ -121,7 +138,9 @@ if (!rating) {
           {t('resume.score.label') || 'Resume Score'}
         </CardTitle>
         <CardDescription>
-          {t('resume.score.subtitle') || 'Real-time completeness analysis'}
+          {scoreLoading
+            ? t("resume.score.scoringInProgress") || "Updating score…"
+            : t("resume.score.subtitle") || "Real-time completeness analysis"}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">

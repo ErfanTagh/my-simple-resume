@@ -5,6 +5,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { formatProficiency } from "@/lib/languageProficiency";
 import { hasWebLink, normalizeExternalUrl } from "@/lib/contactLinkUtils";
 import { ProjectLinkedTitle } from "@/components/cv-form/ProjectLinkedTitle";
+import { RESUME_ACCENT_BLUE, RESUME_BODY_GRAY, RESUME_TITLE_GRAY } from "@/lib/resumeTemplatePalette";
 
 interface StarRoverTemplateProps {
   data: CVFormData;
@@ -24,12 +25,12 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
     (fontSizeInput === "small" || fontSizeInput === "medium" || fontSizeInput === "large")
       ? fontSizeInput
       : "medium";
-  const titleColor = styling?.titleColor || "#141E61";
+  const titleColor = styling?.titleColor || RESUME_TITLE_GRAY;
   const titleBold = styling?.titleBold ?? true;
-  const headingColor = styling?.headingColor || "#141E61";
+  const headingColor = styling?.headingColor || RESUME_ACCENT_BLUE;
   const headingBold = styling?.headingBold ?? true;
-  const textColor = styling?.textColor || "#374151";
-  const linkColor = styling?.linkColor || "#141E61";
+  const textColor = styling?.textColor || RESUME_BODY_GRAY;
+  const linkColor = styling?.linkColor || RESUME_ACCENT_BLUE;
   const sectionHeadingColor = headingColor;
 
   const fontSizeMap = {
@@ -582,7 +583,7 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
               <h1 style={{
                 fontSize: sizes.name,
                 fontWeight: titleBold ? 900 : 700,
-                color: titleColor,
+                color: linkColor,
                 letterSpacing: '0.06em',
                 lineHeight: 1.05,
                 margin: '0 0 6px 0',
@@ -594,12 +595,12 @@ export const StarRoverTemplate = ({ data }: StarRoverTemplateProps) => {
               {professionalTitle && (
                 <p style={{
                   fontSize: sizes.title,
-                  color: sectionHeadingColor,
+                  color: titleColor,
                   fontWeight: 500,
                   letterSpacing: '0.14em',
                   textTransform: 'uppercase',
                   margin: 0,
-                  opacity: 0.75,
+                  opacity: 0.85,
                   fontStyle: 'italic',
                 }}>
                   {professionalTitle}

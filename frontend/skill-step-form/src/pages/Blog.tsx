@@ -595,7 +595,7 @@ const Blog = () => {
           <p className="text-base sm:text-lg text-muted-foreground mb-8">
             {t('blog.ctaSubtitle')}
           </p>
-          <Link to="/create">
+          <Link to="/create/start">
             <Button size="lg" className="bg-primary hover:bg-primary/90 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 rounded-xl">
               {t('navigation.startBuildingFree')}
               <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />

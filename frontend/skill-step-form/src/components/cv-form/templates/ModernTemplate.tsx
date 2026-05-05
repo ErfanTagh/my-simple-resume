@@ -5,6 +5,7 @@ import { formatDateRange } from "@/lib/dateFormatter";
 import { formatProficiency } from "@/lib/languageProficiency";
 import { hasWebLink, normalizeExternalUrl } from "@/lib/contactLinkUtils";
 import { ProjectLinkedTitle } from "@/components/cv-form/ProjectLinkedTitle";
+import { RESUME_ACCENT_BLUE, RESUME_BODY_GRAY, RESUME_TITLE_GRAY } from "@/lib/resumeTemplatePalette";
 
 interface ModernTemplateProps {
   data: CVFormData;
@@ -24,12 +25,12 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
     (fontSizeInput === "small" || fontSizeInput === "medium" || fontSizeInput === "large")
       ? fontSizeInput
       : "medium";
-  const titleColor = styling?.titleColor || "#1f2937";
+  const titleColor = styling?.titleColor || RESUME_TITLE_GRAY;
   const titleBold = styling?.titleBold ?? true;
-  const headingColor = styling?.headingColor || "#2563eb";
+  const headingColor = styling?.headingColor || RESUME_ACCENT_BLUE;
   const headingBold = styling?.headingBold ?? true;
-  const textColor = styling?.textColor || "#4b5563";
-  const linkColor = styling?.linkColor || "#2563eb";
+  const textColor = styling?.textColor || RESUME_BODY_GRAY;
+  const linkColor = styling?.linkColor || RESUME_ACCENT_BLUE;
 
   // Extract section-specific styling for personalInfo
   const personalInfoSectionStyling = styling?.sectionStyling?.personalInfo;
@@ -749,8 +750,8 @@ export const ModernTemplate = ({ data }: ModernTemplateProps) => {
                   className="font-semibold mb-3" 
                   style={{ 
                     fontSize: sizes.base, 
-                    color: textColor,
-                    opacity: 0.9
+                    color: titleColor,
+                    opacity: 0.95
                   }}
                 >
                   {personalInfo.professionalTitle.trim()}

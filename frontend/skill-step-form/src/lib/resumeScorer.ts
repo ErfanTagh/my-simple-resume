@@ -1,13 +1,13 @@
 import { CVFormData } from "@/components/cv-form/types";
 
-interface ScoreCategory {
+export interface ScoreCategory {
   name: string;
   score: number;
   maxScore: number;
   feedback: string;
 }
 
-interface ResumeScore {
+export interface ResumeScore {
   overallScore: number; // 0-10 scale
   categories: ScoreCategory[];
   suggestions: string[];
@@ -150,7 +150,7 @@ export const calculateResumeScore = (data: CVFormData): ResumeScore => {
   totalScore += contentScore;
 
   // Estimate length once for global red-flag checks (not tied to formatting criteria)
-  const estimatedLength = estimateResumeLength(data);
+  const estimatedLength = estimateResumePages(data);
 
   // ============================================
   // 2. PROFESSIONAL SUMMARY (1 point)
@@ -500,9 +500,9 @@ function getAllTextContent(data: CVFormData): string {
 }
 
 /**
- * Estimate resume length in pages (rough approximation)
+ * Estimate resume length in pages (rough approximation, ~250 words per page).
  */
-function estimateResumeLength(data: CVFormData): number {
+export function estimateResumePages(data: CVFormData): number {
   let wordCount = 0;
   
   // Personal info

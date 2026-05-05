@@ -20,6 +20,7 @@ import ResetPassword from "./pages/ResetPassword";
 import OAuthCallback from "./pages/OAuthCallback";
 import Resumes from "./pages/Resumes";
 import CreateResume from "./pages/CreateResume";
+import CreateResumeGuide from "./pages/CreateResumeGuide";
 import ResumeView from "./pages/ResumeView";
 import JobMatching from "./pages/JobMatching";
 import Profile from "./pages/Profile";
@@ -87,6 +88,7 @@ const AppRoutes = () => {
               </ProtectedRoute>
             }
           />
+          <Route path="/create/start" element={<CreateResumeGuide />} />
           <Route path="/create" element={<CreateResume />} />
           <Route
             path="/resumes"

@@ -89,7 +89,7 @@ const About = () => {
           </section>
 
           <div className="text-center pt-8">
-            <Link to="/create">
+            <Link to="/create/start">
               <Button size="lg" className="bg-primary hover:bg-primary/90">
                 {t('pages.about.startBuilding')}
                 <ArrowRight className="ml-2 w-4 h-4" />

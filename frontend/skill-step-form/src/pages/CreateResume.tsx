@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { CVFormContainer } from "@/components/cv-form/CVFormContainer";
+import { CreatePageContactFAB } from "@/components/CreatePageContactFAB";
 import type { CVFormData } from "@/components/cv-form/types";
 import { resumeAPI, type Resume } from "@/lib/api";
 import { SEO } from "@/components/SEO";
+import { RESUME_ACCENT_BLUE, RESUME_BODY_GRAY, RESUME_TITLE_GRAY } from "@/lib/resumeTemplatePalette";
 
 const DEFAULT_SECTION_ORDER = [
   "summary",
@@ -62,10 +64,10 @@ const createEmptyCVFormData = (): CVFormData => ({
   sectionOrder: DEFAULT_SECTION_ORDER,
   template: "modern",
   styling: {
-    titleColor: "#1f2937",
-    textColor: "#1f2937",
-    headingColor: "#2563eb",
-    linkColor: "#2563eb",
+    titleColor: RESUME_TITLE_GRAY,
+    textColor: RESUME_BODY_GRAY,
+    headingColor: RESUME_ACCENT_BLUE,
+    linkColor: RESUME_ACCENT_BLUE,
     fontSize: "medium",
     fontFamily: "Inter",
     titleBold: true,
@@ -172,29 +174,35 @@ const CreateResume = () => {
 
   if (editId && isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground text-sm">
-          Loading your resume...
-        </p>
-      </div>
+      <>
+        <div className="min-h-screen flex items-center justify-center">
+          <p className="text-muted-foreground text-sm">
+            Loading your resume...
+          </p>
+        </div>
+        <CreatePageContactFAB />
+      </>
     );
   }
 
   if (editId && error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="max-w-md rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
-          <h2 className="mb-2 text-lg font-semibold">Unable to load resume</h2>
-          <p className="text-sm text-muted-foreground mb-4">{error}</p>
-          <p className="text-xs text-muted-foreground">
-            You can try again from the{" "}
-            <a href="/resumes" className="underline">
-              My Resumes
-            </a>{" "}
-            page.
-          </p>
+      <>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="max-w-md rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
+            <h2 className="mb-2 text-lg font-semibold">Unable to load resume</h2>
+            <p className="text-sm text-muted-foreground mb-4">{error}</p>
+            <p className="text-xs text-muted-foreground">
+              You can try again from the{" "}
+              <a href="/resumes" className="underline">
+                My Resumes
+              </a>{" "}
+              page.
+            </p>
+          </div>
         </div>
-      </div>
+        <CreatePageContactFAB />
+      </>
     );
   }
 
@@ -206,6 +214,7 @@ const CreateResume = () => {
         noindex={true}
       />
       <CVFormContainer initialData={initialData} editId={editId} />
+      <CreatePageContactFAB />
     </>
   );
 };

@@ -291,7 +291,57 @@
       "subtitle": "Select a template that best fits your style. You can see a live preview as you fill out your information.",
       "label": "Choose CV Template",
       "description": "Select a template that best fits your style and industry",
-      "continue": "Continue with Template"
+      "continue": "Continue with Template",
+      "recommendationCta": "Not sure? Get a personalized template suggestion."
+    },
+    "templateGuide": {
+      "pageTitle": "Pick a resume template — 123Resume",
+      "pageDescription": "Choose your language, answer a few questions, and we will suggest a template based on your experience and goals.",
+      "badge": "Quick guide",
+      "title": "Which template fits you?",
+      "subtitle": "First pick the language for your résumé and this guide. The next questions and your builder will use that language for titles and labels.",
+      "stepIndicator": "Step {{current}} of {{total}}",
+      "languageLabel": "Résumé language",
+      "languageSubtitle": "We switch the whole site to match so section titles, buttons, and tips are in the same language as your CV.",
+      "language": {
+        "en": { "title": "English", "hint": "Interface and résumé labels in English." },
+        "de": { "title": "Deutsch", "hint": "Oberfläche und Lebenslauf-Bezeichnungen auf Deutsch." }
+      },
+      "yearsLabel": "Roughly how many years of relevant experience do you have?",
+      "years": {
+        "y0": { "title": "0–2 years", "hint": "Internships, first roles, or switching careers." },
+        "y3": { "title": "3–5 years", "hint": "Solid track record; growing ownership." },
+        "y6": { "title": "6–10 years", "hint": "Deep expertise; often mentoring or leading pieces of work." },
+        "y10": { "title": "10+ years", "hint": "Long arc of impact; leadership or principal-level scope." }
+      },
+      "seniorityLabel": "Which level is closest to your next role?",
+      "seniority": {
+        "entry": { "title": "Entry / junior", "hint": "Learning the craft; execution with guidance." },
+        "mid": { "title": "Mid-level", "hint": "Owns features or projects end to end." },
+        "senior": { "title": "Senior", "hint": "Drives direction; shapes quality across the team." },
+        "lead": { "title": "Lead / staff / executive", "hint": "Sets strategy; broad influence or people leadership." }
+      },
+      "focusLabel": "What matters most for this resume right now?",
+      "focus": {
+        "ats": { "title": "Pass ATS & recruiters first", "hint": "Conservative layout; maximum clarity for screening software." },
+        "balanced": { "title": "Balance polish and readability", "hint": "Professional look that still feels current." },
+        "standout": { "title": "Stand out visually", "hint": "More personality—best when humans will read it closely." }
+      },
+      "resultTitle": "Suggested starting template",
+      "useRecommended": "Continue with {{name}}",
+      "alternatesTitle": "Other strong options",
+      "restart": "Start over",
+      "browseAll": "Browse all templates instead",
+      "skipToTemplates": "Skip questions — I will choose a template myself",
+      "reasons": {
+        "reasonAtsDense": "For senior profiles and ATS-heavy applications, a structured, text-forward layout helps dense experience read cleanly.",
+        "reasonAtsGeneral": "A traditional layout reads well in conservative industries and keeps keywords easy for both humans and parsers to find.",
+        "reasonStandoutCreative": "You prioritized standing out; a bolder layout helps personality-led roles without sacrificing basic structure.",
+        "reasonEarlyModern": "Early-career resumes often have shorter sections—a clear two-column flow uses space well and stays easy to scan.",
+        "reasonMidBalanced": "A contemporary layout keeps plenty of room for achievements while staying familiar to most hiring managers.",
+        "reasonSeniorClassic": "With more history to tell, a timeless single-column flow keeps chronology obvious and professional.",
+        "reasonLeadershipDistinction": "For senior or leadership positioning, a refined distinctive look signals confidence while staying readable."
+      }
     },
     "form": {
       "title": "Build Your CV",
@@ -324,6 +374,7 @@
       "label": "Resume Score",
       "title": "CV Rating & Analysis",
       "subtitle": "Real-time completeness analysis",
+      "scoringInProgress": "Updating score with AI…",
       "description": {
         "withData": "Click analyze to generate your latest resume score",
         "withoutData": "Get AI-powered feedback on your CV and suggestions for improvement"
@@ -424,6 +475,9 @@
       }
     },
     "feedback": {
+      "contactFab": "Contact",
+      "contactFabAria": "Contact us or send feedback",
+      "contactEmailIntro": "You can also email us directly at",
       "button": "Give Feedback",
       "title": "Send Feedback",
       "description": "Share your ideas, issues, or feature requests with the 123Resume team. Your feedback helps us improve the builder.",

@@ -38,7 +38,7 @@ export const Footer = () => {
             <h3 className="font-semibold text-foreground mb-4">{t('footer.product')}</h3>
             <ul className="space-y-3">
               <li><Link to="/" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('footer.home')}</Link></li>
-              <li><Link to="/create" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('footer.resumeBuilder')}</Link></li>
+              <li><Link to="/create/start" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('footer.resumeBuilder')}</Link></li>
               <li><Link to="/resumes" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('footer.myResumes')}</Link></li>
               <li><Link to="/templates" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('footer.templates')}</Link></li>
               <li><Link to="/pricing" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t('footer.pricing')}</Link></li>

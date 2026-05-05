@@ -1,4 +1,6 @@
-FROM node:18-alpine
+# Debian-based image: Rollup/Vite optional native bindings are reliable on glibc
+# (Alpine/musl often misses @rollup/rollup-linux-*-musl in bind-mounted node_modules).
+FROM node:20-bookworm-slim
 
 WORKDIR /app
 

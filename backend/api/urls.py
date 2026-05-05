@@ -46,5 +46,9 @@ urlpatterns = [
 
     # Feedback / contact endpoint
     path('feedback/', views.send_feedback, name='send-feedback'),
+
+    # AI resume assistant (DeepSeek, authenticated only)
+    path('ai/resume-assistant/', views.resume_assistant_chat, name='resume-assistant-chat'),
+    path('ai/resume-score/', views.resume_score, name='resume-score'),
 ]
 

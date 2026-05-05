@@ -4,6 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { formatProficiency } from "@/lib/languageProficiency";
 import { hasWebLink, normalizeExternalUrl } from "@/lib/contactLinkUtils";
 import { ProjectLinkedTitle } from "@/components/cv-form/ProjectLinkedTitle";
+import { RESUME_ACCENT_BLUE, RESUME_BODY_GRAY, RESUME_TITLE_GRAY } from "@/lib/resumeTemplatePalette";
 
 interface LatexTemplateProps {
   data: CVFormData;
@@ -23,12 +24,12 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
     (fontSizeInput === "small" || fontSizeInput === "medium" || fontSizeInput === "large")
       ? fontSizeInput
       : "medium";
-  const titleColor = styling?.titleColor || "#111827";
+  const titleColor = styling?.titleColor || RESUME_TITLE_GRAY;
   const titleBold = styling?.titleBold ?? true;
-  const headingColor = styling?.headingColor || "#111827";
+  const headingColor = styling?.headingColor || RESUME_TITLE_GRAY;
   const headingBold = styling?.headingBold ?? true;
-  const textColor = styling?.textColor || "#374151";
-  const linkColor = styling?.linkColor || "#2563eb";
+  const textColor = styling?.textColor || RESUME_BODY_GRAY;
+  const linkColor = styling?.linkColor || RESUME_ACCENT_BLUE;
   const sectionHeadingColor = linkColor;
 
   const personalInfoSectionStyling = styling?.sectionStyling?.personalInfo;
@@ -602,7 +603,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
                 fontFamily: "'Playfair Display', Georgia, serif",
                 fontSize: personalInfoTitleSizes.name,
                 fontWeight: titleBold ? 700 : 600,
-                color: titleColor,
+                color: linkColor,
                 letterSpacing: '0.02em',
                 lineHeight: 1.1,
                 margin: '0 0 5px 0',
@@ -612,7 +613,7 @@ export const LatexTemplate = ({ data }: LatexTemplateProps) => {
               </h1>
               <p style={{
                 fontSize: personalInfoBodySizes.title,
-                color: sectionHeadingColor,
+                color: titleColor,
                 fontWeight: 500,
                 letterSpacing: '0.06em',
                 textTransform: 'uppercase',

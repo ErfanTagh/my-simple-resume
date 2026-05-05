@@ -1,11 +1,16 @@
 """
 Resume parsing views
 """
+import logging
+
+from django.conf import settings
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
+
+logger = logging.getLogger(__name__)
 
 
 @api_view(['POST'])
@@ -13,14 +18,21 @@ from rest_framework.response import Response
 @parser_classes([MultiPartParser, FormParser, JSONParser])
 def parse_resume(request):
     """
-    Parse uploaded resume (PDF or text) and return structured data
-    
+    Parse uploaded resume (PDF or text) and return structured data.
+
     POST /api/resumes/parse/
-    Accepts:
-    - file: PDF or text file (optional - backend will extract text using pdfplumber)
-    - text: Plain text string (optional - if frontend already extracted)
-    
-    Returns structured resume data matching CVFormData format
+
+    Query:
+    - parser=auto (default): DeepSeek JSON extraction when DEEPSEEK_API_KEY is set,
+      otherwise the classic rules-based parser; on AI failure, falls back to rules.
+    - parser=ai: DeepSeek only (502 if AI fails).
+    - parser=rules: classic parser only.
+
+    Body:
+    - file: PDF or text (backend extracts PDF text with pdfplumber), or
+    - text: plain resume text (e.g. from client-side PDF extraction).
+
+    Returns structured resume data (camelCase) matching CVFormData.
     """
     try:
         from ..resume_parser import get_resume_parser
@@ -63,12 +75,47 @@ def parse_resume(request):
                 {"error": "No text content found. Please provide a valid resume file or text."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
-        # Parse the resume
-        print("🤖 Initializing resume parser...")
-        parser = get_resume_parser()
-        parsed_data = parser.parse_text(text)
-        print(f"✅ Parsed data keys: {list(parsed_data.keys())}")
+
+        parser_mode = (request.query_params.get("parser") or "auto").lower()
+        if parser_mode == "ai" and not settings.DEEPSEEK_API_KEY:
+            return Response(
+                {"error": "AI resume parsing requires DEEPSEEK_API_KEY on the server."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
+        parsed_data = None
+        use_ai = parser_mode == "ai" or (
+            parser_mode == "auto" and bool(settings.DEEPSEEK_API_KEY)
+        )
+
+        if use_ai and parser_mode != "rules":
+            try:
+                from ..resume_ai_parsing import parse_resume_text_with_deepseek
+
+                parsed_data = parse_resume_text_with_deepseek(text)
+                logger.info(
+                    "Resume parse via DeepSeek: work=%s edu=%s skills=%s",
+                    len(parsed_data.get("workExperience") or []),
+                    len(parsed_data.get("education") or []),
+                    len(parsed_data.get("skills") or []),
+                )
+            except Exception as e:
+                logger.warning("DeepSeek resume parse failed, using rules parser: %s", e)
+                if parser_mode == "ai":
+                    return Response(
+                        {
+                            "error": "AI parsing failed. Try again or use parser=rules for the classic parser.",
+                        },
+                        status=status.HTTP_502_BAD_GATEWAY,
+                    )
+                parsed_data = None
+
+        if parsed_data is None:
+            print("🤖 Initializing resume parser (rules-based)...")
+            parser = get_resume_parser()
+            parsed_data = parser.parse_text(text)
+            print(f"✅ Parsed data keys: {list(parsed_data.keys())}")
+
         print(f"✅ Personal info: {parsed_data.get('personalInfo', {})}")
         print(f"✅ Work experience count: {len(parsed_data.get('workExperience', []))}")
         print(f"✅ Education count: {len(parsed_data.get('education', []))}")
@@ -76,7 +123,7 @@ def parse_resume(request):
         print(f"✅ Projects count: {len(parsed_data.get('projects', []))}")
         print(f"✅ Certificates count: {len(parsed_data.get('certificates', []))}")
         print(f"✅ Languages count: {len(parsed_data.get('languages', []))}")
-        
+
         return Response(parsed_data, status=status.HTTP_200_OK)
         
     except ImportError as e:

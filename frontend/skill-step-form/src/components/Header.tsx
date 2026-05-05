@@ -87,7 +87,7 @@ export const Header = () => {
                   <Link to="/login">{t('navigation.login')}</Link>
                 </Button>
                 <Button size="sm" className="bg-primary hover:bg-primary/90 text-xs sm:text-sm px-2 sm:px-3 md:px-4 h-8 sm:h-9 whitespace-nowrap" asChild>
-                  <Link to="/create">
+                  <Link to="/create/start">
                     <span className="hidden md:inline">{t('navigation.startBuildingFree')}</span>
                     <span className="md:hidden">{t('navigation.startFree')}</span>
                   </Link>

@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useLayoutEffect, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { CVFormData, CVTemplate } from "./types";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { calculateResumeScore } from "@/lib/resumeScorer";
+import { getResumeScoreWithOptionalAI } from "@/lib/resumeScoreClient";
 import { feedbackAPI } from "@/lib/api";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -124,24 +125,44 @@ export const CVPreview = ({ data, actualDataForScoring, onTemplateChange, onSect
     ? `${actualDataForScoring.skills.length}-${actualDataForScoring.skills.map(s => s.skill || '').join(',')}`
     : '0-';
   
-  const resumeScore = useMemo(() => {
+  const dataForScoring = actualDataForScoring || data;
+  const [resumeScore, setResumeScore] = useState(() => {
     try {
-      // Use actualDataForScoring if provided (form data without hints), otherwise use data
-      const dataForScoring = actualDataForScoring || data;
       return calculateResumeScore(dataForScoring);
     } catch {
-      return { overallScore: 0 };
+      return { overallScore: 0, categories: [], suggestions: [] };
     }
+  });
+
+  useEffect(() => {
+    const d = actualDataForScoring || data;
+    let cancelled = false;
+    const t = window.setTimeout(async () => {
+      try {
+        const score = await getResumeScoreWithOptionalAI(d, !!user);
+        if (!cancelled) setResumeScore(score);
+      } catch {
+        if (!cancelled) {
+          try {
+            setResumeScore(calculateResumeScore(d));
+          } catch {
+            setResumeScore({ overallScore: 0, categories: [], suggestions: [] });
+          }
+        }
+      }
+    }, 650);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(t);
+    };
   }, [
-    // Include skills as a dependency string to detect changes
     skillsForDependency,
-    // Include other key fields that affect scoring
     actualDataForScoring?.workExperience?.length || 0,
     actualDataForScoring?.education?.length || 0,
     actualDataForScoring?.personalInfo?.summary,
-    // Include full objects as fallback (though they may not change reference)
     actualDataForScoring,
-    data
+    data,
+    user,
   ]);
 
   // Calculate page count based on content height

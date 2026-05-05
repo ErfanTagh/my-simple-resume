@@ -134,7 +134,7 @@ export default function JobMatching() {
             Resume-Job Matching
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground">
-            Compare your resume with a job description and get your match score using AI
+            Compare your resume with a job description and get a match score (AI when configured, otherwise embedding similarity)
           </p>
         </div>
 
@@ -169,7 +169,7 @@ export default function JobMatching() {
                 <Alert>
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
-                    No resumes found. <Button variant="link" className="p-0 h-auto" onClick={() => navigate('/create')}>Create one first</Button>
+                    No resumes found. <Button variant="link" className="p-0 h-auto" onClick={() => navigate('/create/start')}>Create one first</Button>
                   </AlertDescription>
                 </Alert>
               ) : (

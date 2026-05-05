@@ -69,7 +69,7 @@ const Templates = () => {
         </div>
 
         <div className="text-center">
-          <Link to="/create">
+          <Link to="/create/start">
             <Button size="lg" className="bg-primary hover:bg-primary/90">
               {t('pages.about.startBuilding')}
               <ArrowRight className="ml-2 w-4 h-4" />

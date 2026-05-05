@@ -294,7 +294,57 @@
       "subtitle": "Wählen Sie eine Vorlage, die am besten zu Ihrem Stil passt. Sie können eine Live-Vorschau sehen, während Sie Ihre Informationen eingeben.",
       "label": "CV-Vorlage wählen",
       "description": "Wählen Sie eine Vorlage, die am besten zu Ihrem Stil und Ihrer Branche passt",
-      "continue": "Mit Vorlage fortfahren"
+      "continue": "Mit Vorlage fortfahren",
+      "recommendationCta": "Unsicher? Kurz beantworten — wir schlagen eine passende Vorlage vor."
+    },
+    "templateGuide": {
+      "pageTitle": "Vorlage wählen — 123Resume",
+      "pageDescription": "Sprache wählen, kurz antworten — wir schlagen eine Vorlage passend zu Erfahrung und Zielen vor.",
+      "badge": "Kurz-Guide",
+      "title": "Welche Vorlage passt zu Ihnen?",
+      "subtitle": "Zuerst die Sprache für Lebenslauf und diesen Guide. Die folgenden Fragen und der Editor nutzen dieselbe Sprache für Überschriften und Beschriftungen.",
+      "stepIndicator": "Schritt {{current}} von {{total}}",
+      "languageLabel": "Sprache des Lebenslaufs",
+      "languageSubtitle": "Wir stellen die Website darauf um, damit Menüs, Schritte und Bezeichnungen zur gewählten Sprache passen.",
+      "language": {
+        "en": { "title": "English", "hint": "Oberfläche und Bezeichnungen auf Englisch." },
+        "de": { "title": "Deutsch", "hint": "Oberfläche und Bezeichnungen auf Deutsch." }
+      },
+      "yearsLabel": "Wie viele Jahre relevante Erfahrung haben Sie ungefähr?",
+      "years": {
+        "y0": { "title": "0–2 Jahre", "hint": "Praktika, erste Jobs oder Quereinstieg." },
+        "y3": { "title": "3–5 Jahre", "hint": "Solide Ergebnisse; wachsende Verantwortung." },
+        "y6": { "title": "6–10 Jahre", "hint": "Tiefe Expertise; oft Mentoring oder Lead-Themen." },
+        "y10": { "title": "10+ Jahre", "hint": "Lange Wirkung; Führung oder Principal-Level." }
+      },
+      "seniorityLabel": "Welches Level trifft auf Ihre nächste Rolle am ehesten zu?",
+      "seniority": {
+        "entry": { "title": "Einsteiger / Junior", "hint": "Aufbau von Kompetenz; Umsetzung mit Anleitung." },
+        "mid": { "title": "Professional / Mid-Level", "hint": "End-to-end Verantwortung für Projekte oder Themen." },
+        "senior": { "title": "Senior", "hint": "Prägt Richtung und Qualität über das Team hinweg." },
+        "lead": { "title": "Lead / Staff / Führung", "hint": "Strategie, große Wirkung oder Personalverantwortung." }
+      },
+      "focusLabel": "Was ist für diesen Lebenslauf gerade am wichtigsten?",
+      "focus": {
+        "ats": { "title": "ATS & Recruiting zuerst", "hint": "Zurückhaltendes Layout; maximale Klarheit für Software und erste Sichtung." },
+        "balanced": { "title": "Balance aus Klarheit und Stil", "hint": "Professionell und zeitgemäß." },
+        "standout": { "title": "Visuell hervorstechen", "hint": "Mehr Persönlichkeit — ideal, wenn Menschen genau lesen." }
+      },
+      "resultTitle": "Empfohlene Start-Vorlage",
+      "useRecommended": "Weiter mit {{name}}",
+      "alternatesTitle": "Weitere gute Optionen",
+      "restart": "Von vorn beginnen",
+      "browseAll": "Stattdessen alle Vorlagen ansehen",
+      "skipToTemplates": "Überspringen — ich wähle selbst",
+      "reasons": {
+        "reasonAtsDense": "Für sehr erfahrene Profile und ATS-fokussierte Bewerbungen hilft ein strukturiertes, textbetontes Layout, viel Inhalt klar zu halten.",
+        "reasonAtsGeneral": "Ein klassisches Layout wirkt in konservativen Branchen vertraut und hält Stichwörter gut findbar — für Menschen und Parser.",
+        "reasonStandoutCreative": "Sie legen Wert auf Auffallen; ein mutigeres Layout unterstützt persönlichkeitsgetriebene Rollen bei klarer Grundstruktur.",
+        "reasonEarlyModern": "In der Frühphase gibt es oft weniger Abschnitte — ein klarer zweispaltiger Aufbau nutzt den Platz und bleibt gut scannbar.",
+        "reasonMidBalanced": "Ein zeitgemäßes Layout bietet Raum für Erfolge und bleibt dennoch den meisten Hiring Managern vertraut.",
+        "reasonSeniorClassic": "Mit mehr Historie sorgt ein zeitloser einteiliger Fluss für klare Chronologie und seriösen Eindruck.",
+        "reasonLeadershipDistinction": "Für Führung oder sehr senior wirkt ein markantes, dennoch lesbares Design oft souverän."
+      }
     },
     "form": {
       "title": "Erstellen Sie Ihren Lebenslauf",
@@ -327,6 +377,7 @@
       "label": "Lebenslauf-Bewertung",
       "title": "CV-Bewertung & Analyse",
       "subtitle": "Echtzeit-Vollständigkeitsanalyse",
+      "scoringInProgress": "Bewertung wird per KI aktualisiert…",
       "description": {
         "withData": "Klicken Sie auf Analysieren, um Ihre neueste Lebenslauf-Bewertung zu generieren",
         "withoutData": "Erhalten Sie KI-gestütztes Feedback zu Ihrem Lebenslauf und Verbesserungsvorschläge"
@@ -427,6 +478,9 @@
       }
     },
     "feedback": {
+      "contactFab": "Kontakt",
+      "contactFabAria": "Kontakt aufnehmen oder Feedback senden",
+      "contactEmailIntro": "Sie erreichen uns auch direkt per E-Mail unter",
       "button": "Feedback geben",
       "title": "Feedback senden",
       "description": "Teilen Sie Ihre Ideen, Probleme oder Feature-Wünsche mit dem 123Resume‑Team. Ihr Feedback hilft uns, den Builder zu verbessern.",

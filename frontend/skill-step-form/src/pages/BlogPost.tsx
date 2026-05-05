@@ -223,7 +223,7 @@ const BlogPost = () => {
                 <span className="hidden sm:inline">All Articles</span>
               </Button>
             </Link>
-            <Link to="/create">
+            <Link to="/create/start">
               <Button size="sm" className="bg-primary hover:bg-primary/90 text-xs sm:text-sm">
                 <span className="hidden sm:inline">Start Building Free</span>
                 <span className="sm:hidden">Start Free</span>
@@ -340,7 +340,7 @@ const BlogPost = () => {
             <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
               {t('blog.ctaSubtitle')}
             </p>
-            <Link to="/create">
+            <Link to="/create/start">
               <Button size="lg" className="bg-primary hover:bg-primary/90 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 rounded-xl">
                 {t('navigation.startBuildingFree')}
                 <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />

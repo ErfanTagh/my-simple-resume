@@ -11,7 +11,6 @@ import {
   Clock,
   BookOpen
 } from "lucide-react";
-import { LandingTemplatePreview } from "./LandingTemplatePreview";
 import { getBlogPosts } from "@/lib/blogPosts";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useMemo } from "react";
@@ -20,15 +19,7 @@ import { SEO } from "@/components/SEO";
 const Landing = () => {
   const { language, t } = useLanguage();
   const blogPosts = useMemo(() => getBlogPosts(language), [language]);
-  
-  const allTemplates = [
-    { nameKey: 'templateModern', descKey: 'templateModernDesc', key: 'modern' as const },
-    { nameKey: 'templateClassic', descKey: 'templateClassicDesc', key: 'classic' as const },
-    { nameKey: 'templateCreative', descKey: 'templateCreativeDesc', key: 'creative' as const },
-    { nameKey: 'templateMinimal', descKey: 'templateMinimalDesc', key: 'minimal' as const },
-    { nameKey: 'templateLatex', descKey: 'templateLatexDesc', key: 'latex' as const },
-    { nameKey: 'templateStarRover', descKey: 'templateStarRoverDesc', key: 'starRover' as const }
-  ];
+
   return (
     <>
       <SEO
@@ -77,7 +68,7 @@ const Landing = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-5 pt-2 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-              <Link to="/create" className="w-full sm:w-auto">
+              <Link to="/create/start" className="w-full sm:w-auto">
                 <Button size="lg" className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-base sm:text-lg px-8 sm:px-10 py-6 sm:py-7 rounded-2xl shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 font-semibold">
                   {t('landing.ctaStartBuilding')}
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -88,37 +79,6 @@ const Landing = () => {
                   {t('landing.ctaLogin')}
                 </Button>
               </Link>
-            </div>
-          </div>
-
-          {/* Preview Cards */}
-          <div className="mt-12 sm:mt-20">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto">
-              {allTemplates.map((template, i) => (
-                <div
-                  key={template.key}
-                  className="bg-card rounded-2xl border border-border p-3 sm:p-4 shadow-lg hover:shadow-[0_8px_25px_-5px_hsl(var(--primary)/0.35)] transition-all duration-300 hover:-translate-y-1.5"
-                  style={{ animationDelay: `${i * 0.1}s` }}
-                >
-                  <div className="aspect-[3/4] bg-white rounded-lg mb-2 sm:mb-3 overflow-hidden border border-border shadow-inner relative max-h-[350px] sm:max-h-[420px]">
-                    <div className="absolute inset-0 w-full h-full">
-                      <LandingTemplatePreview templateName={template.key} />
-                    </div>
-                  </div>
-                  <div className="space-y-0.5 pt-0.5 mb-3">
-                    <h3 className="font-bold text-sm sm:text-base" style={{ color: 'hsl(215 25% 15%)' }}>{t(`landing.${template.nameKey}`)} {t('landing.templateLabel')}</h3>
-                    <p className="text-xs font-medium line-clamp-2 mb-3" style={{ color: 'hsl(214 95% 45%)' }}>{t(`landing.${template.descKey}`)}</p>
-                  </div>
-                  <Link to={`/create?template=${template.key}`} className="block w-full">
-                    <Button 
-                      size="sm" 
-                      className="w-full bg-primary hover:bg-primary/90 text-white text-xs sm:text-sm px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-semibold"
-                    >
-{t('landing.chooseThisTemplate')}
-                    </Button>
-                  </Link>
-                </div>
-              ))}
             </div>
           </div>
         </div>
@@ -215,7 +175,7 @@ const Landing = () => {
           </div>
 
           <div className="text-center mt-12 sm:mt-16">
-            <Link to="/create">
+            <Link to="/create/start">
               <Button size="lg" className="bg-primary hover:bg-primary/90 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 rounded-xl">
                 {t('landing.ctaStartBuildingNow')}
                 <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />

@@ -6,6 +6,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { formatProficiency } from "@/lib/languageProficiency";
 import { hasWebLink, normalizeExternalUrl } from "@/lib/contactLinkUtils";
 import { ProjectLinkedTitle } from "@/components/cv-form/ProjectLinkedTitle";
+import { RESUME_ACCENT_BLUE, RESUME_BODY_GRAY, RESUME_TITLE_GRAY } from "@/lib/resumeTemplatePalette";
 
 interface CreativeTemplateProps {
   data: CVFormData;
@@ -25,12 +26,12 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
     (fontSizeInput === "small" || fontSizeInput === "medium" || fontSizeInput === "large")
       ? fontSizeInput
       : "medium";
-  const titleColor = styling?.titleColor || "#1e293b";
+  const titleColor = styling?.titleColor || RESUME_TITLE_GRAY;
   const titleBold = styling?.titleBold ?? true;
-  const headingColor = styling?.headingColor || "#2563eb"; // Blue - matches form default
+  const headingColor = styling?.headingColor || RESUME_ACCENT_BLUE;
   const headingBold = styling?.headingBold ?? true;
-  const textColor = styling?.textColor || "#475569";
-  const linkColor = styling?.linkColor || "#2563eb";
+  const textColor = styling?.textColor || RESUME_BODY_GRAY;
+  const linkColor = styling?.linkColor || RESUME_ACCENT_BLUE;
 
   // Subtle accent color - one primary color for elegance
   const accentColor = headingColor;
@@ -802,7 +803,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                   style={{ 
                     fontSize: sizes.name, 
                     fontWeight: titleBold ? '900' : 'bold', 
-                    color: titleColor,
+                    color: linkColor,
                     lineHeight: '1.1'
                   }}
                 >
@@ -813,7 +814,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                   style={{ 
                     fontSize: sizes.name, 
                     fontWeight: titleBold ? '900' : 'bold', 
-                    color: headingColor,
+                    color: linkColor,
                     lineHeight: '1.1'
                   }}
                 >
@@ -825,7 +826,7 @@ export const CreativeTemplate = ({ data }: CreativeTemplateProps) => {
                   className="font-bold italic mb-2" 
                   style={{ 
                     fontSize: sizes.base, 
-                    color: headingColor,
+                    color: titleColor,
                     letterSpacing: '0.02em'
                   }}
                 >

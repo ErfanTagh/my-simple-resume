@@ -1,7 +1,7 @@
 import { useState, useEffect, useLayoutEffect, useRef, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProgressIndicator } from "./ProgressIndicator";
@@ -19,11 +19,12 @@ import { toast } from "@/hooks/use-toast";
 import { getTestProfile, getTestProfileNames } from "@/lib/testData";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { calculateResumeScore } from "@/lib/resumeScorer";
+import { getResumeScoreWithOptionalAI } from "@/lib/resumeScoreClient";
 import { feedbackAPI } from "@/lib/api";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { RESUME_ACCENT_BLUE, RESUME_BODY_GRAY, RESUME_TITLE_GRAY } from "@/lib/resumeTemplatePalette";
 
 interface CVFormContainerProps {
   initialData?: CVFormData;
@@ -74,19 +75,8 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
     return () => window.removeEventListener('popstate', handlePopState);
   }, [currentStep, templateSelected, editId, initialData]);
 
-  // Get template-specific default for headingColor (used by all sections)
-  // This matches each template's original headingColor default
-  const getTemplateDefaultHeadingColor = (template: string): string => {
-    const templateDefaults: Record<string, string> = {
-      modern: "#2563eb",    // Blue - ModernTemplate uses blue headings
-      creative: "#2563eb",  // Blue - CreativeTemplate uses blue headings
-      minimal: "#2563eb",   // Blue - MinimalTemplate uses blue headings
-      classic: "#2563eb",  // Blue - ClassicTemplate uses blue headings
-      latex: "#1f2937",     // Black - LatexTemplate uses black headings
-      starRover: "#141E61", // Dark blue - StarRoverTemplate uses dark blue headings
-    };
-    return templateDefaults[template] || "#2563eb"; // Default to blue if unknown
-  };
+  /** Section heading / accent — same blue as LaTeX Vorlage (`linkColor`) for every template */
+  const getTemplateDefaultHeadingColor = (_template: string): string => RESUME_ACCENT_BLUE;
 
   // Get template-specific default for personalInfo section heading color
   // This matches each template's original headingColor default
@@ -104,10 +94,10 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
     // Default styling values that match template defaults
     // Use template-specific headingColor instead of always blue
     const defaultStyling = {
-      titleColor: "#1f2937",
-      textColor: "#1f2937",
-      headingColor: templateDefaultHeadingColor, // Use template-specific default
-      linkColor: "#2563eb",
+      titleColor: RESUME_TITLE_GRAY,
+      textColor: RESUME_BODY_GRAY,
+      headingColor: templateDefaultHeadingColor,
+      linkColor: RESUME_ACCENT_BLUE,
       fontSize: "medium" as const,
       fontFamily: "Inter",
       titleBold: true,
@@ -378,7 +368,6 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
 
     // Only reset styling if template actually changed
     if (currentTemplate && currentTemplate !== prevTemplate) {
-      console.log('[CVFormContainer] Template changed:', { from: prevTemplate, to: currentTemplate });
       prevTemplateRef.current = currentTemplate;
 
       // Get template-specific defaults
@@ -388,10 +377,10 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
       // Default styling values that match template defaults
       // Use template-specific headingColor instead of always blue
       const defaultStyling = {
-        titleColor: "#1f2937",
-        textColor: "#1f2937",
-        headingColor: templateDefaultHeadingColor, // Use template-specific default
-        linkColor: "#2563eb",
+        titleColor: RESUME_TITLE_GRAY,
+        textColor: RESUME_BODY_GRAY,
+        headingColor: templateDefaultHeadingColor,
+        linkColor: RESUME_ACCENT_BLUE,
         fontSize: "medium" as const,
         fontFamily: "Inter",
         titleBold: true,
@@ -578,8 +567,8 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
     setShowSignupOverlay(false);
 
     try {
-      // Calculate resume score using frontend scorer
-      const scoreResult = calculateResumeScore(data);
+      // Resume score: DeepSeek AI for logged-in users (server rubric), else local heuristic
+      const scoreResult = await getResumeScoreWithOptionalAI(data, !!user);
 
       // Map frontend score format to backend format
       // Frontend: categories with names, overallScore 0-100
@@ -751,6 +740,14 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
                 <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                   {t('resume.templateSelection.subtitle')}
                 </p>
+                <p className="mt-4 text-center text-sm">
+                  <Link
+                    to="/create/start"
+                    className="font-medium text-primary underline-offset-4 hover:underline"
+                  >
+                    {t('resume.templateSelection.recommendationCta')}
+                  </Link>
+                </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -783,16 +780,16 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
                           <LandingTemplatePreview templateName={template.key} />
                         </div>
                       </div>
-                      <div className="p-3 sm:p-4 flex flex-col" style={{ height: '100px' }}>
-                        <h3 className="font-bold text-base sm:text-lg mb-1 flex-shrink-0" style={{ color: 'hsl(215 25% 15%)' }}>
+                      <div className="px-3 pt-4 pb-4 sm:px-4 sm:pt-5 sm:pb-5 flex flex-col gap-2 min-h-[6.5rem] sm:min-h-[7rem] flex-shrink-0">
+                        <h3 className="font-bold text-base sm:text-lg flex-shrink-0 leading-snug" style={{ color: 'hsl(215 25% 15%)' }}>
                           {t(`landing.${template.nameKey}`)} {t('landing.templateLabel')}
                         </h3>
-                        <p className="text-xs sm:text-sm font-medium flex-shrink-0 line-clamp-2" style={{ color: 'hsl(214 95% 45%)' }}>
+                        <p className="text-xs sm:text-sm font-medium flex-shrink-0 line-clamp-2 leading-snug" style={{ color: 'hsl(214 95% 45%)' }}>
                           {t(`landing.${template.descKey}`)}
                         </p>
                         {isSelected && (
-                          <div className="flex items-center gap-2 text-primary text-sm font-semibold mt-auto flex-shrink-0">
-                            <CheckCircle2 className="h-4 w-4" />
+                          <div className="flex items-center gap-2 text-primary text-sm font-semibold flex-shrink-0 mt-1 pt-3 border-t border-border/70">
+                            <CheckCircle2 className="h-4 w-4 shrink-0" />
                             <span>{t('common.selected') || 'Selected'}</span>
                           </div>
                         )}
