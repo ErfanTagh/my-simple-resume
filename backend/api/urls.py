@@ -59,5 +59,9 @@ urlpatterns = [
     path('ai/work-description-improve/', views.improve_work_description, name='work-description-improve'),
     path('ai/resume-improve/', views.improve_resume, name='resume-improve'),
     path('ai/resume-translate/', views.translate_resume, name='resume-translate'),
+
+    # LinkedIn profile import (Member Data Portability / DMA, authenticated)
+    path('linkedin/import-url/', views.linkedin_import_url, name='linkedin-import-url'),
+    path('linkedin/import/', views.linkedin_import_profile, name='linkedin-import'),
 ]
 

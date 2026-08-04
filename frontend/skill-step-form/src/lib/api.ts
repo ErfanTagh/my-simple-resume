@@ -287,6 +287,43 @@ export const feedbackAPI = {
 };
 
 // ============================================
+// LinkedIn profile import (Member Data Portability / DMA; requires login)
+// ============================================
+
+export const linkedinAPI = {
+  /**
+   * Get the LinkedIn consent URL for importing profile data. This uses the DMA
+   * data-portability scope, which is separate from the login scopes.
+   */
+  getImportUrl: async (): Promise<{ auth_url: string; state: string }> => {
+    const doFetch = () =>
+      fetch(`${API_BASE_URL}/linkedin/import-url/`, {
+        method: 'GET',
+        headers: createHeaders(true, true),
+      });
+    const response = await doFetch();
+    return handleResponse(response, doFetch);
+  },
+
+  /**
+   * Exchange the consent code and return the member's LinkedIn profile mapped
+   * onto the resume form shape: { resume, imported }.
+   */
+  importProfile: async (
+    code: string,
+  ): Promise<{ resume: Partial<ResumeData>; imported: Record<string, number> }> => {
+    const doFetch = () =>
+      fetch(`${API_BASE_URL}/linkedin/import/`, {
+        method: 'POST',
+        headers: createHeaders(true, true),
+        body: JSON.stringify({ code }),
+      });
+    const response = await doFetch();
+    return handleResponse(response, doFetch);
+  },
+};
+
+// ============================================
 // AI (DeepSeek resume assistant — backend; requires login)
 // ============================================
 
