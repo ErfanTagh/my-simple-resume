@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { CVFormContainer } from "@/components/cv-form/CVFormContainer";
 import { CreatePageContactFAB } from "@/components/CreatePageContactFAB";
@@ -132,35 +132,34 @@ const CreateResume = () => {
   const [isLoading, setIsLoading] = useState<boolean>(!!editId);
   const [error, setError] = useState<string | null>(null);
 
+  // For NEW resumes coming from the guide (/create?template=…&theme=…) the
+  // initial data must be ready on the FIRST render: CVFormContainer captures its
+  // react-hook-form defaultValues on mount and never resyncs for the create
+  // path. Building this in an effect (as before) mounted the form with default
+  // styling, so the chosen template/accent color were silently dropped.
+  const guidedInitialData = useMemo<CVFormData | undefined>(() => {
+    if (editId || !templateParam) return undefined;
+    const validTemplates = ['modern', 'classic', 'creative', 'minimal', 'latex', 'starRover', 'slateCopper', 'prism'];
+    const template = validTemplates.includes(templateParam) ? templateParam : 'modern';
+    const dataWithTemplate = createEmptyCVFormData();
+    dataWithTemplate.template = template as CVFormData['template'];
+
+    // Carry the color picked on the template card into the editor.
+    const accent = getResumeThemeAccent(themeParam);
+    if (accent) {
+      dataWithTemplate.styling = {
+        ...dataWithTemplate.styling,
+        headingColor: accent,
+        linkColor: accent,
+      };
+    }
+    return dataWithTemplate;
+  }, [editId, templateParam, themeParam]);
+
   useEffect(() => {
     if (!editId) {
       // Creating a new resume - clear any stale pending resume data to ensure fresh template selection
-      // Only restore pendingResume if explicitly needed (e.g., after signup flow)
-      // For now, always start fresh to show the new template selection UI
       localStorage.removeItem('pendingResume');
-      
-      // If template param is provided, set initialData with that template
-      // (optionally pre-applying a chosen accent color via ?theme=).
-      if (templateParam) {
-        const validTemplates = ['modern', 'classic', 'creative', 'minimal', 'latex', 'starRover', 'slateCopper', 'prism'];
-        const template = validTemplates.includes(templateParam) ? templateParam : 'modern';
-        const dataWithTemplate = createEmptyCVFormData();
-        dataWithTemplate.template = template as CVFormData['template'];
-
-        // Carry the color picked on the template card into the editor.
-        const accent = getResumeThemeAccent(themeParam);
-        if (accent) {
-          dataWithTemplate.styling = {
-            ...dataWithTemplate.styling,
-            headingColor: accent,
-            linkColor: accent,
-          };
-        }
-
-        setInitialData(dataWithTemplate);
-      } else {
-        setInitialData(undefined);
-      }
       setIsLoading(false);
       return;
     }
@@ -186,7 +185,7 @@ const CreateResume = () => {
     return () => {
       isMounted = false;
     };
-  }, [editId, templateParam, themeParam]);
+  }, [editId]);
 
   if (editId && isLoading) {
     return (
@@ -229,7 +228,7 @@ const CreateResume = () => {
         description="Build your professional resume with our easy-to-use form. Multiple templates available."
         noindex={true}
       />
-      <CVFormContainer initialData={initialData} editId={editId} />
+      <CVFormContainer initialData={editId ? initialData : guidedInitialData} editId={editId} />
       <CreatePageContactFAB />
     </>
   );
