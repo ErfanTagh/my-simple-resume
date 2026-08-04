@@ -43,7 +43,7 @@ def linkedin_import_url(request):
 
     Response: { auth_url, state }
     """
-    client_id = getattr(settings, "LINKEDIN_CLIENT_ID", "")
+    client_id = getattr(settings, "LINKEDIN_IMPORT_CLIENT_ID", "")
     if not client_id:
         return Response(
             {"error": "LinkedIn is not configured on this server."},
@@ -82,8 +82,8 @@ def linkedin_import_profile(request):
     if not code:
         return Response({"error": "code is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-    client_id = getattr(settings, "LINKEDIN_CLIENT_ID", "")
-    client_secret = getattr(settings, "LINKEDIN_CLIENT_SECRET", "")
+    client_id = getattr(settings, "LINKEDIN_IMPORT_CLIENT_ID", "")
+    client_secret = getattr(settings, "LINKEDIN_IMPORT_CLIENT_SECRET", "")
     if not client_id or not client_secret:
         return Response(
             {"error": "LinkedIn is not configured on this server."},

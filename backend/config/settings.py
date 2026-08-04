@@ -84,6 +84,12 @@ GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID', '').strip()
 GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET', '').strip()
 LINKEDIN_CLIENT_ID = os.getenv('LINKEDIN_CLIENT_ID', '').strip()
 LINKEDIN_CLIENT_SECRET = os.getenv('LINKEDIN_CLIENT_SECRET', '').strip()
+# Profile import (Member Data Portability) must live on its OWN LinkedIn app:
+# LinkedIn requires that product to be the only one provisioned on an app, so it
+# cannot share the app used for "Sign In with LinkedIn" above. Falls back to the
+# login credentials when unset so nothing breaks before the second app exists.
+LINKEDIN_IMPORT_CLIENT_ID = os.getenv('LINKEDIN_IMPORT_CLIENT_ID', '').strip() or LINKEDIN_CLIENT_ID
+LINKEDIN_IMPORT_CLIENT_SECRET = os.getenv('LINKEDIN_IMPORT_CLIENT_SECRET', '').strip() or LINKEDIN_CLIENT_SECRET
 GITHUB_CLIENT_ID = os.getenv('GITHUB_CLIENT_ID', '').strip()
 GITHUB_CLIENT_SECRET = os.getenv('GITHUB_CLIENT_SECRET', '').strip()
 XING_CLIENT_ID = os.getenv('XING_CLIENT_ID', '').strip()
