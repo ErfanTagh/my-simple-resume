@@ -16,7 +16,6 @@ from .match_views import match_resume_to_job, generate_resume_cover_letter, tail
 from .job_application_views import job_application_list, job_application_detail
 from .feedback_views import send_feedback
 from .ai_views import resume_assistant_chat, resume_score, suggest_work_bullet, improve_work_description, improve_resume, translate_resume
-from .linkedin_import_views import linkedin_import_url, linkedin_import_profile
 
 __all__ = [
     'resume_list',
@@ -41,7 +40,5 @@ __all__ = [
     'improve_work_description',
     'improve_resume',
     'translate_resume',
-    'linkedin_import_url',
-    'linkedin_import_profile',
 ]
 

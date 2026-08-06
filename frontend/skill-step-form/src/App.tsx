@@ -18,7 +18,6 @@ import EmailVerification from "./pages/EmailVerification";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import OAuthCallback from "./pages/OAuthCallback";
-import LinkedInImportCallback from "./pages/LinkedInImportCallback";
 import Resumes from "./pages/Resumes";
 import CreateResume from "./pages/CreateResume";
 import CreateResumeGuide from "./pages/CreateResumeGuide";
@@ -80,7 +79,6 @@ const AppRoutes = () => {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/oauth/callback" element={<OAuthCallback />} />
-          <Route path="/linkedin-import/callback" element={<LinkedInImportCallback />} />
           <Route path="/p/:id" element={<HostedProfilePage />} />
           <Route
             path="/dashboard"

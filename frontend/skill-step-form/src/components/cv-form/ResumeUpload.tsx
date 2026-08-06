@@ -1,12 +1,11 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Upload, Loader2, FileText, X, CheckCircle2, AlertCircle, Linkedin } from 'lucide-react';
-import { resumeAPI, linkedinAPI } from '@/lib/api';
+import { Upload, Loader2, FileText, X, CheckCircle2, AlertCircle } from 'lucide-react';
+import { resumeAPI } from '@/lib/api';
 import { CVFormData } from './types';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { LINKEDIN_IMPORT_STORAGE_KEY } from '@/pages/LinkedInImportCallback';
 
 interface ResumeUploadProps {
   onDataParsed: (data: Partial<CVFormData>) => void;
@@ -20,44 +19,8 @@ export const ResumeUpload = ({ onDataParsed, onClose, onParsingChange }: ResumeU
   const [error, setError] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [isLinkedInLoading, setIsLinkedInLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
-
-  // Coming back from the LinkedIn consent flow: the callback page parks the
-  // imported profile in sessionStorage, so apply it here through the same path
-  // the PDF parser uses.
-  const appliedImportRef = useRef(false);
-  useEffect(() => {
-    if (appliedImportRef.current) return;
-    const stored = sessionStorage.getItem(LINKEDIN_IMPORT_STORAGE_KEY);
-    if (!stored) return;
-
-    appliedImportRef.current = true;
-    sessionStorage.removeItem(LINKEDIN_IMPORT_STORAGE_KEY);
-    try {
-      onDataParsed(JSON.parse(stored) as Partial<CVFormData>);
-      toast({
-        title: 'LinkedIn profile imported!',
-        description: 'Your details have been filled in. Please review and edit as needed.',
-      });
-    } catch {
-      // Corrupted payload — nothing worth surfacing beyond leaving the form as-is.
-    }
-  }, [onDataParsed]);
-
-  const handleLinkedInImport = async () => {
-    setIsLinkedInLoading(true);
-    setError('');
-    try {
-      const { auth_url, state } = await linkedinAPI.getImportUrl();
-      if (state) sessionStorage.setItem('linkedin_import_state', state);
-      window.location.href = auth_url;
-    } catch (err: any) {
-      setError(err?.message || 'Could not start the LinkedIn import. Please try again.');
-      setIsLinkedInLoading(false);
-    }
-  };
 
   const validateFile = (file: File): string | null => {
     // Validate file type
@@ -224,30 +187,6 @@ export const ResumeUpload = ({ onDataParsed, onClose, onParsingChange }: ResumeU
                 <Upload className="mr-2 h-4 w-4" />
                 Choose File
               </Button>
-
-              <div className="flex w-full items-center gap-3 pt-2">
-                <span className="h-px flex-1 bg-border" />
-                <span className="text-xs text-muted-foreground">or</span>
-                <span className="h-px flex-1 bg-border" />
-              </div>
-
-              <Button
-                type="button"
-                variant="outline"
-                disabled={isUploading || isLinkedInLoading}
-                onClick={handleLinkedInImport}
-                className="bg-[#0A66C2] text-white border-[#0A66C2] hover:bg-[#0d7bd4] hover:border-[#0d7bd4] hover:text-white transition-colors"
-              >
-                {isLinkedInLoading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Linkedin className="mr-2 h-4 w-4" />
-                )}
-                {isLinkedInLoading ? 'Connecting…' : 'Import from LinkedIn'}
-              </Button>
-              <p className="text-xs text-muted-foreground">
-                Fills in your experience, education and skills automatically.
-              </p>
             </div>
           </>
         ) : (
