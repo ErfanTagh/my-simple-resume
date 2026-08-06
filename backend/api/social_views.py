@@ -13,6 +13,8 @@ import secrets
 import logging
 from urllib.parse import urlencode, parse_qs, urlparse
 
+from .admin_notifications import notify_new_user
+
 logger = logging.getLogger(__name__)
 
 # OAuth state is stored in Django sessions (works across multiple workers)
@@ -63,6 +65,9 @@ def get_or_create_user_from_social(email, first_name='', last_name='', provider=
             last_name=last_name or '',
             is_active=True,  # Social logins are trusted, no email verification needed
         )
+
+        # Social users are active immediately, so the account exists for real here
+        notify_new_user(user, provider=(provider or 'Social').capitalize())
         return user
 
 

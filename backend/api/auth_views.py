@@ -20,6 +20,7 @@ from .email_verification import (
     send_password_reset_email,
     send_password_changed_email
 )
+from .admin_notifications import notify_new_user
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -384,7 +385,11 @@ def verify_email(request):
         
         # Send welcome email
         send_welcome_email(user.email, user.username)
-        
+
+        # Alert contact@ - this is the point the signup actually completes for
+        # email/password users (they're created inactive at /register).
+        notify_new_user(user, provider='Email')
+
         # Generate tokens for auto-login
         refresh = RefreshToken.for_user(user)
         
