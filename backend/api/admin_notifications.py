@@ -23,10 +23,11 @@ def _esc(value):
     return html.escape(str(value or ""))
 
 
-def _build_new_user_email(user, provider):
+def _build_new_user_email(user, provider, pending=False):
     """Return (subject, plain_text, html) for the new-signup alert."""
     full_name = f"{user.first_name} {user.last_name}".strip() or "-"
     joined = user.date_joined.strftime('%d %b %Y, %H:%M UTC') if user.date_joined else "-"
+    status = "Waiting for email verification" if pending else "Active"
 
     try:
         total_users = User.objects.filter(is_active=True).count()
@@ -45,6 +46,7 @@ Username:   {user.username}
 Name:       {full_name}
 Email:      {user.email}
 Signed up:  {provider}
+Status:     {status}
 Joined:     {joined}
 {milestone}
 
@@ -109,6 +111,10 @@ https://123resume.de
                                     <td style="padding: 10px 0; color: #333333; border-top: 1px solid #f1f1f1;">{_esc(provider)}</td>
                                 </tr>
                                 <tr>
+                                    <td style="padding: 10px 0; color: #666666; border-top: 1px solid #f1f1f1;">Status</td>
+                                    <td style="padding: 10px 0; color: {'#b45309' if pending else '#059669'}; font-weight: 600; border-top: 1px solid #f1f1f1;">{_esc(status)}</td>
+                                </tr>
+                                <tr>
                                     <td style="padding: 10px 0; color: #666666; border-top: 1px solid #f1f1f1;">Joined</td>
                                     <td style="padding: 10px 0; color: #333333; border-top: 1px solid #f1f1f1;">{_esc(joined)}</td>
                                 </tr>
@@ -134,7 +140,7 @@ https://123resume.de
     return subject, plain_message, html_message
 
 
-def send_new_user_notification(user, provider='Email'):
+def send_new_user_notification(user, provider='Email', pending=False):
     """
     Blocking send of the new-signup alert. Returns True on success.
     Use notify_new_user() from request paths instead.
@@ -145,7 +151,7 @@ def send_new_user_notification(user, provider='Email'):
         return False
 
     try:
-        subject, plain_message, html_message = _build_new_user_email(user, provider)
+        subject, plain_message, html_message = _build_new_user_email(user, provider, pending)
         # Sent from the default noreply@<mailgun domain> rather than contact@:
         # a From that equals the To address tends to get flagged as spam.
         return _send_with_mailgun(
@@ -159,16 +165,68 @@ def send_new_user_notification(user, provider='Email'):
         return False
 
 
-def notify_new_user(user, provider='Email'):
+def notify_new_user(user, provider='Email', pending=False):
     """
     Announce a new signup by email. Safe to call from a view: never raises,
     never blocks the response.
+
+    pending=True means the account exists but the email isn't verified yet,
+    which is the state every /register user starts in.
     """
     try:
         threading.Thread(
             target=send_new_user_notification,
-            args=(user, provider),
+            args=(user, provider, pending),
             daemon=True,
         ).start()
     except Exception as e:
         logger.error("Could not start new-user notification thread: %s", e)
+
+
+def _build_verified_email(user):
+    """Short follow-up once a pending signup confirms their address."""
+    subject = f"✅ {user.username} verified their email"
+    plain_message = (
+        f"{user.username} ({user.email}) just verified their email address "
+        f"and can now use 123Resume.\n\n---\n123Resume\nhttps://123resume.de\n"
+    )
+    html_message = f"""<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"></head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background:#f4f4f4; margin:0; padding:0;">
+  <table role="presentation" style="width:100%; background:#f4f4f4;"><tr><td style="padding:20px 0;">
+    <table role="presentation" style="width:600px; margin:0 auto; background:#ffffff; border-radius:8px;">
+      <tr><td style="padding:28px 40px; border-left:5px solid #10b981;">
+        <p style="margin:0 0 8px; font-size:18px; color:#059669; font-weight:600;">✅ Email verified</p>
+        <p style="margin:0; font-size:15px; color:#333333;">
+          <strong>{_esc(user.username)}</strong> ({_esc(user.email)}) confirmed their address and can now use 123Resume.
+        </p>
+      </td></tr>
+    </table>
+  </td></tr></table>
+</body></html>
+"""
+    return subject, plain_message, html_message
+
+
+def notify_user_verified(user):
+    """Follow-up alert when a pending registration completes verification."""
+    recipient = getattr(settings, 'ADMIN_NOTIFICATION_EMAIL', '')
+    if not recipient:
+        return
+
+    def _send():
+        try:
+            subject, plain_message, html_message = _build_verified_email(user)
+            _send_with_mailgun(
+                subject=subject,
+                plain_message=plain_message,
+                html_message=html_message,
+                to_email=recipient,
+            )
+        except Exception as e:
+            logger.error("Verified-user notification failed: %s", e)
+
+    try:
+        threading.Thread(target=_send, daemon=True).start()
+    except Exception as e:
+        logger.error("Could not start verified-user notification thread: %s", e)

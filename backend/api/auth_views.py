@@ -20,7 +20,7 @@ from .email_verification import (
     send_password_reset_email,
     send_password_changed_email
 )
-from .admin_notifications import notify_new_user
+from .admin_notifications import notify_new_user, notify_user_verified
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -162,7 +162,12 @@ def register(request):
         domain = settings.DOMAIN
         verification_link = create_verification_link(token, domain)
         email_sent = send_verification_email(email, username, verification_link)
-        
+
+        # Alert contact@ as soon as the account exists. Roughly a third of
+        # /register users never verify, and those signups matter too - waiting
+        # for verification meant they were never reported at all.
+        notify_new_user(user, provider='Email', pending=True)
+
         if not email_sent:
             # If email fails, still return success but warn the user
             return Response({
@@ -386,9 +391,8 @@ def verify_email(request):
         # Send welcome email
         send_welcome_email(user.email, user.username)
 
-        # Alert contact@ - this is the point the signup actually completes for
-        # email/password users (they're created inactive at /register).
-        notify_new_user(user, provider='Email')
+        # Short follow-up; the signup itself was already announced at /register
+        notify_user_verified(user)
 
         # Generate tokens for auto-login
         refresh = RefreshToken.for_user(user)
