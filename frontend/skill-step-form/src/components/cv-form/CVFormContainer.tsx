@@ -994,6 +994,40 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
                             accent={isSelected ? formData.styling?.headingColor : undefined}
                           />
                         </div>
+
+                        {/* Selected → the CTA rises into the middle of the preview.
+                            Always mounted so the scrim and button can transition both
+                            ways; pointer-events are dropped while hidden. */}
+                        <div
+                          className={`absolute inset-0 z-20 flex items-center justify-center transition-opacity duration-300 ease-out ${
+                            isSelected ? "opacity-100" : "opacity-0 pointer-events-none"
+                          }`}
+                          aria-hidden={!isSelected}
+                        >
+                          <div
+                            className={`absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-black/10 transition-opacity duration-300 ease-out ${
+                              isSelected ? "opacity-100" : "opacity-0"
+                            }`}
+                          />
+                          <Button
+                            size="lg"
+                            tabIndex={isSelected ? 0 : -1}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              form.setValue("template", template.key);
+                              setTemplateSelected(true);
+                            }}
+                            style={{ transitionDelay: isSelected ? "90ms" : "0ms" }}
+                            className={`relative z-10 bg-primary hover:bg-primary/90 text-sm sm:text-base px-6 sm:px-7 py-5 sm:py-6 rounded-xl font-semibold shadow-2xl shadow-black/30 transition-all duration-300 ease-out hover:scale-105 motion-reduce:transition-none motion-reduce:transform-none ${
+                              isSelected
+                                ? "opacity-100 scale-100 translate-y-0"
+                                : "opacity-0 scale-90 translate-y-3"
+                            }`}
+                          >
+                            {t('resume.templateSelection.continue') || 'Continue with Template'}
+                            <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
+                          </Button>
+                        </div>
                       </div>
                       <div className="px-3 pt-4 pb-4 sm:px-4 sm:pt-5 sm:pb-5 flex flex-col gap-2 min-h-[6.5rem] sm:min-h-[7rem] flex-shrink-0">
                         {template.badges.length > 0 && (
@@ -1066,20 +1100,7 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
                   );
                 })}
               </div>
-
-              {/* Continue Button */}
-              {form.watch("template") && (
-                <div className="mt-10 flex justify-center">
-                  <Button
-                    size="lg"
-                    onClick={() => setTemplateSelected(true)}
-                    className="bg-primary hover:bg-primary/90 text-base sm:text-lg px-8 sm:px-10 py-6 sm:py-7 rounded-2xl shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 font-semibold"
-                  >
-                    {t('resume.templateSelection.continue') || 'Continue with Template'}
-                    <ArrowRight className="ml-2 w-5 h-5" />
-                  </Button>
-                </div>
-              )}
+              {/* Continue lives on the selected card's preview, not below the grid */}
             </div>
           ) : (
             // Main Form Flow
