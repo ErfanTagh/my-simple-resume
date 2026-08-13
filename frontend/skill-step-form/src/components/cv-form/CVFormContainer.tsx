@@ -976,7 +976,7 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
                     <div
                       key={template.key}
                       className={`bg-card rounded-2xl border-2 transition-all duration-300 ease-out cursor-pointer hover:shadow-[0_8px_25px_-5px_hsl(var(--primary)/0.35)] flex flex-col h-full motion-reduce:transform-none ${isSelected
-                        ? "border-primary shadow-2xl shadow-primary/25 ring-2 ring-primary/25 scale-[1.05] relative z-10"
+                        ? "border-primary shadow-2xl shadow-primary/25 ring-2 ring-primary/25 scale-[1.03] relative z-10"
                         : "border-border hover:border-primary/30 hover:-translate-y-1.5"
                         }`}
                       onClick={() => {
@@ -1004,11 +1004,6 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
                           }`}
                           aria-hidden={!isSelected}
                         >
-                          <div
-                            className={`absolute inset-0 bg-gradient-to-t from-white/90 via-white/70 to-white/50 backdrop-blur-[1px] transition-opacity duration-300 ease-out ${
-                              isSelected ? "opacity-100" : "opacity-0"
-                            }`}
-                          />
                           <Button
                             size="lg"
                             tabIndex={isSelected ? 0 : -1}
@@ -1018,7 +1013,7 @@ export const CVFormContainer = ({ initialData, editId }: CVFormContainerProps) =
                               setTemplateSelected(true);
                             }}
                             style={{ transitionDelay: isSelected ? "90ms" : "0ms" }}
-                            className={`relative z-10 bg-primary hover:bg-primary/90 text-sm sm:text-base px-6 sm:px-7 py-5 sm:py-6 rounded-xl font-semibold shadow-xl shadow-primary/35 ring-1 ring-white/60 transition-all duration-300 ease-out hover:scale-105 motion-reduce:transition-none motion-reduce:transform-none ${
+                            className={`relative z-10 bg-primary hover:bg-primary/90 text-sm sm:text-base px-6 sm:px-7 py-5 sm:py-6 rounded-xl font-semibold shadow-2xl shadow-black/25 transition-all duration-300 ease-out hover:scale-105 motion-reduce:transition-none motion-reduce:transform-none ${
                               isSelected
                                 ? "opacity-100 scale-100 translate-y-0"
                                 : "opacity-0 scale-90 translate-y-3"
