@@ -14,7 +14,7 @@ import { BusinessCardPanel } from '@/components/resumes/BusinessCardPanel';
 import { ResumesTabBar } from '@/components/resumes/ResumesTabBar';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
@@ -24,7 +24,6 @@ import {
   Eye,
   AlertCircle,
   Clock,
-  Star,
   Edit,
   X,
   Download,
@@ -480,7 +479,7 @@ export default function Resumes() {
               {t('pages.resumes.createNew') || 'Create New CV'}
             </Button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="flex flex-col gap-3 sm:gap-3.5">
             {resumes.map((resume) => {
               // Get quality scores from API (already converted to camelCase by API)
               // Backend returns scores in 0-10 format
@@ -497,206 +496,202 @@ export default function Resumes() {
                 : Math.round(((completenessScore + clarityScore + formattingScore + impactScore) / 4) * 10) / 10;
 
               const template = resume.template || 'modern';
+              // The row's own bottom edge is the scale — a real, measured score fills
+              // it directly, no separate widget or legend needed.
+              const scorePct = Math.max(0, Math.min(100, (displayScore / 10) * 100));
+              const barColorClass =
+                displayScore >= 9 ? 'bg-green-500' : displayScore >= 7 ? 'bg-yellow-500' : 'bg-red-500';
+              const scoreBreakdownTitle = `${t('pages.resumes.scores.completeness') || 'Completeness'} ${completenessScore}/10 · ${t('pages.resumes.scores.clarity') || 'Clarity'} ${clarityScore}/10 · ${t('pages.resumes.scores.formatting') || 'Formatting'} ${formattingScore}/10 · ${t('pages.resumes.scores.impact') || 'Impact'} ${impactScore}/10`;
+              const isEditingThis = editingResumeId === resume.id;
 
               return (
-                <Card key={resume.id} className="hover:shadow-lg transition-shadow relative group flex flex-col">
-                  {/* Burger menu - top right corner */}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                        }}
-                        className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-muted text-muted-foreground opacity-100 sm:opacity-0 sm:group-hover:opacity-100 hover:bg-muted/80 transition-all touch-manipulation"
-                        title={t('pages.resumes.menu') || 'Resume options'}
-                        aria-label={t('pages.resumes.menu') || 'Resume options'}
-                      >
-                        <MoreVertical className="h-4 w-4" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-                      <DropdownMenuItem
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setDeleteId(resume.id);
-                        }}
-                        className="cursor-pointer text-destructive focus:text-destructive"
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        <span>{t('pages.resumes.delete') || 'Delete'}</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                <div
+                  key={resume.id}
+                  className="group relative flex items-center gap-3 overflow-hidden rounded-xl border border-border bg-card p-3 pb-4 shadow-sm transition-shadow hover:shadow-md sm:gap-4 sm:p-4"
+                >
+                  {/* Cover — identifies the item, doesn't dominate it */}
+                  <div className="hidden h-11 w-11 flex-none items-center justify-center rounded-lg bg-primary/10 text-primary sm:flex sm:h-12 sm:w-12">
+                    <FileText className="h-5 w-5 sm:h-6 sm:w-6" />
+                  </div>
 
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-primary mb-2 flex-shrink-0" />
-                      <Badge variant="secondary" className="capitalize text-xs sm:text-sm">
-                        {template}
-                      </Badge>
-                    </div>
-                    <CardTitle className={`text-lg sm:text-xl break-words ${editingResumeId === resume.id ? 'pr-0' : 'pr-6'}`}>
-                      {editingResumeId === resume.id ? (
-                        <div className="flex items-center gap-1 -mx-4 px-4">
-                          <Input
-                            value={editingName}
-                            onChange={(e) => setEditingName(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                handleNameUpdate(resume.id, editingName);
-                              } else if (e.key === 'Escape') {
-                                cancelEditing();
-                              }
-                            }}
-                            className="flex-1 text-lg sm:text-xl font-semibold h-auto py-1"
-                            autoFocus
-                            onClick={(e) => e.stopPropagation()}
-                          />
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 flex-shrink-0"
-                            onClick={(e) => {
-                              e.stopPropagation();
+                  {/* Identity — gets a width floor so it's the last thing to give up space */}
+                  <div className="min-w-[130px] flex-1 sm:min-w-[200px]">
+                    {isEditingThis ? (
+                      <div className="flex items-center gap-1">
+                        <Input
+                          value={editingName}
+                          onChange={(e) => setEditingName(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
                               handleNameUpdate(resume.id, editingName);
-                            }}
-                          >
-                            <Check className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 flex-shrink-0"
-                            onClick={(e) => {
-                              e.stopPropagation();
+                            } else if (e.key === 'Escape') {
                               cancelEditing();
-                            }}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ) : (
-                        <div
-                          className="flex items-center gap-2 group cursor-pointer hover:text-primary transition-colors"
+                            }
+                          }}
+                          className="h-8 flex-1 py-1 text-sm font-semibold sm:text-base"
+                          autoFocus
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 flex-shrink-0"
                           onClick={(e) => {
                             e.stopPropagation();
-                            startEditing(resume);
+                            handleNameUpdate(resume.id, editingName);
                           }}
-                          title={t('pages.resumes.editName') || 'Click to edit resume name'}
                         >
-                          <span>{resume.name || generateDefaultResumeName(resume)}</span>
-                          <Pencil className="h-4 w-4 opacity-60 group-hover:opacity-100 transition-opacity flex-shrink-0" />
-                        </div>
-                      )}
-                    </CardTitle>
-                    <CardDescription className="flex items-center gap-2 text-xs sm:text-sm">
-                      <Clock className="h-3 w-3 flex-shrink-0" />
-                      {formatDate((resume as any).updatedAt || (resume as any).updated_at)}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex-1 flex flex-col gap-4">
-                    <div className="flex items-center justify-between flex-wrap gap-2">
-                      <div className="flex items-center gap-2">
-                        <Star className={`h-4 w-4 sm:h-5 sm:w-5 fill-current ${getRatingColor(displayScore)} flex-shrink-0`} />
-                        <span className={`text-xl sm:text-2xl font-bold ${getRatingColor(displayScore)}`}>
-                          {displayScore}
+                          <Check className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 flex-shrink-0"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            cancelEditing();
+                          }}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div
+                        className="group/name flex cursor-pointer items-center gap-1.5"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          startEditing(resume);
+                        }}
+                        title={t('pages.resumes.editName') || 'Click to edit resume name'}
+                      >
+                        <span className="truncate text-sm font-semibold transition-colors group-hover/name:text-primary sm:text-base">
+                          {resume.name || generateDefaultResumeName(resume)}
                         </span>
-                        <span className="text-sm sm:text-base text-muted-foreground">/10</span>
+                        <Pencil className="h-3.5 w-3.5 flex-shrink-0 opacity-0 transition-opacity group-hover/name:opacity-60" />
                       </div>
-                      <Badge variant="outline" className="text-xs sm:text-sm">{getRatingBadge(displayScore)}</Badge>
+                    )}
+                    <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-muted-foreground">
+                      <span className="capitalize">{template}</span>
+                      <span aria-hidden="true">·</span>
+                      <span className="inline-flex items-center gap-1">
+                        <Clock className="h-3 w-3 flex-shrink-0" />
+                        {formatDate((resume as any).updatedAt || (resume as any).updated_at)}
+                      </span>
                     </div>
+                  </div>
 
-                    <div className="space-y-2 text-xs sm:text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">{t('pages.resumes.scores.completeness') || 'Completeness'}</span>
-                        <span className="font-medium">{completenessScore}/10</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">{t('pages.resumes.scores.clarity') || 'Clarity'}</span>
-                        <span className="font-medium">{clarityScore}/10</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">{t('pages.resumes.scores.formatting') || 'Formatting'}</span>
-                        <span className="font-medium">{formattingScore}/10</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">{t('pages.resumes.scores.impact') || 'Impact'}</span>
-                        <span className="font-medium">{impactScore}/10</span>
-                      </div>
-                    </div>
+                  {/* Score — the one comparable field, aligned in its own column across every row */}
+                  <div
+                    className="hidden w-16 flex-none flex-col items-end sm:flex sm:w-20"
+                    title={scoreBreakdownTitle}
+                  >
+                    <span className={`text-lg font-bold tabular-nums sm:text-xl ${getRatingColor(displayScore)}`}>
+                      {displayScore}
+                      <span className="text-xs font-normal text-muted-foreground">/10</span>
+                    </span>
+                    <Badge variant="outline" className="mt-0.5 px-1.5 py-0 text-[10px] leading-4">
+                      {getRatingBadge(displayScore)}
+                    </Badge>
+                  </div>
 
-                    <div className="mt-auto space-y-3 border-t border-border/60 pt-3">
-                      <div className="flex flex-row gap-2">
-                        <Button
-                          variant="outline"
-                          className="flex-1"
-                          size="sm"
-                          onClick={() => navigate(`/create?edit=${resume.id}`)}
-                          title={t('pages.resumes.actions.edit') || 'Edit resume'}
-                        >
-                          <Edit className="h-3 w-3 mr-1 sm:mr-1.5" />
-                          <span className="text-xs sm:text-sm">{t('pages.resumes.actions.edit') || 'Edit'}</span>
-                        </Button>
-                        <Button
-                          variant="outline"
-                          className="flex-1"
-                          size="sm"
-                          onClick={() => handleDownloadPDF(resume)}
-                          title={t('pages.resumes.actions.downloadPDF') || 'Download PDF'}
-                        >
-                          <Download className="h-3 w-3 mr-1 sm:mr-1.5" />
-                          <span className="text-xs sm:text-sm">{t('pages.resumes.actions.pdf') || 'PDF'}</span>
-                        </Button>
-                        <Button
-                          variant="outline"
-                          className="flex-1"
-                          size="sm"
-                          onClick={() => navigate(`/resume/${resume.id}`)}
-                        >
-                          <Eye className="h-3 w-3 mr-1 sm:mr-1.5" />
-                          <span className="text-xs sm:text-sm">{t('pages.resumes.actions.view') || 'View'}</span>
-                        </Button>
-                      </div>
+                  {/* Actions — one filled (primary), a couple outlined, the rest behind the menu */}
+                  <div className="flex flex-none items-center gap-1.5 sm:gap-2">
+                    <Button
+                      size="sm"
+                      className="h-8 rounded-full px-2.5 sm:h-9 sm:px-4"
+                      onClick={() => navigate(`/create?edit=${resume.id}`)}
+                      title={t('pages.resumes.actions.edit') || 'Edit resume'}
+                    >
+                      <Edit className="h-3.5 w-3.5 sm:mr-1.5" />
+                      <span className="hidden sm:inline">{t('pages.resumes.actions.edit') || 'Edit'}</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="hidden h-8 rounded-full px-2.5 md:inline-flex sm:h-9"
+                      onClick={() => navigate(`/resume/${resume.id}`)}
+                      title={t('pages.resumes.actions.view') || 'View'}
+                    >
+                      <Eye className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="hidden h-8 rounded-full px-2.5 lg:inline-flex sm:h-9"
+                      onClick={() => handleDownloadPDF(resume)}
+                      title={t('pages.resumes.actions.downloadPDF') || 'Download PDF'}
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                    </Button>
 
-                      <div className="flex w-full items-center justify-center gap-2">
-                        <Button
-                          type="button"
-                          size="sm"
-                          className="h-9 rounded-full border-0 bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-md transition-colors hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex h-8 w-8 flex-none items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted sm:h-9 sm:w-9"
+                          title={t('pages.resumes.menu') || 'Resume options'}
+                          aria-label={t('pages.resumes.menu') || 'Resume options'}
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                        <DropdownMenuItem className="cursor-pointer md:hidden" onClick={() => navigate(`/resume/${resume.id}`)}>
+                          <Eye className="mr-2 h-4 w-4" />
+                          <span>{t('pages.resumes.actions.view') || 'View'}</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer lg:hidden" onClick={() => handleDownloadPDF(resume)}>
+                          <Download className="mr-2 h-4 w-4" />
+                          <span>{t('pages.resumes.actions.downloadPDF') || 'Download PDF'}</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="cursor-pointer"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDuplicate(resume);
                           }}
-                          title={t('pages.resumes.duplicate') || 'Duplicate'}
                         >
-                          <Copy className="mr-2 h-4 w-4 shrink-0 opacity-95" />
-                          {t('pages.resumes.duplicate') || 'Duplicate'}
-                        </Button>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          className="h-9 rounded-full px-6 text-sm font-semibold"
+                          <Copy className="mr-2 h-4 w-4" />
+                          <span>{t('pages.resumes.duplicate') || 'Duplicate'}</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="cursor-pointer"
                           disabled={translatingResumeId === resume.id}
                           onClick={(e) => {
                             e.stopPropagation();
                             setTranslateDialogResume(resume);
                           }}
-                          title={t('pages.resumes.actions.translate') || 'Translate'}
                         >
                           {translatingResumeId === resume.id ? (
-                            <Loader2 className="mr-2 h-4 w-4 shrink-0 animate-spin" />
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           ) : (
-                            <Languages className="mr-2 h-4 w-4 shrink-0 opacity-95" />
+                            <Languages className="mr-2 h-4 w-4" />
                           )}
-                          {translatingResumeId === resume.id
-                            ? t('pages.resumes.actions.translating') || 'Translating…'
-                            : t('pages.resumes.actions.translate') || 'Translate'}
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                          <span>
+                            {translatingResumeId === resume.id
+                              ? t('pages.resumes.actions.translating') || 'Translating…'
+                              : t('pages.resumes.actions.translate') || 'Translate'}
+                          </span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteId(resume.id);
+                          }}
+                          className="cursor-pointer text-destructive focus:text-destructive"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          <span>{t('pages.resumes.delete') || 'Delete'}</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+
+                  {/* Edge meter — real, measured overall score; the row is the scale */}
+                  <span className="absolute inset-x-0 bottom-0 h-1 bg-muted" aria-hidden="true">
+                    <span className={`block h-full ${barColorClass}`} style={{ width: `${scorePct}%` }} />
+                  </span>
+                </div>
               );
             })}
           </div>
